@@ -65,7 +65,7 @@ public class ClassFileReader {
 	private void readConstantPool(RandomAccessFile raf, int constantPoolCount) throws IOException {
 		ConstantPool cp = new ConstantPool(constantPoolCount);
 		for(int i = 0; i < constantPoolCount; i++) {
-			
+			int tag = raf.readByte();
 		}
 	}
 
@@ -112,7 +112,7 @@ public class ClassFileReader {
 		cf.fields = new Fields(fieldCount);
 		for(int i = 0; i < fieldCount; i++) {
 			FieldInfo info = new FieldInfo();
-			cf.fields.addElement(info);
+			cf.fields.add(info);
 		}
 	}
 
@@ -126,7 +126,7 @@ public class ClassFileReader {
 		cf.methods = new Methods(methodCount);
 		for(int i = 0; i < methodCount; i++) {
 			MethodInfo info = new MethodInfo();
-			cf.methods.addElement(info);
+			cf.methods.add(info);
 		}
 	}
 

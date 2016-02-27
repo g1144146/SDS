@@ -14,7 +14,7 @@ abstract class Members <T> {
 		return elements.length;
 	}
 
-	public void addElement(T element) {
+	public void add(T element) {
 		if(currentIndex == elements.length) {
 			throw new ArrayIndexOutOfBoundsException();
 		}
