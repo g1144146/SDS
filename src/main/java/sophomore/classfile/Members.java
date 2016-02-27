@@ -3,7 +3,7 @@ package sophomore.classfile;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-abstract class Members <T> implements Iterable<T> {
+abstract class Members <T> {
 	
 	T[] elements;
 	int currentIndex = 0;
@@ -21,23 +21,7 @@ abstract class Members <T> implements Iterable<T> {
 		elements[currentIndex++] = element;
 	}
 
-	@Override
-	public Iterator<T> iterator() {
-		return new Iterator<T>() {
-			private int index = 0;
-			@Override
-			public boolean hasNext() {
-				return index < elements.length;
-			}
-
-			@Override
-			public T next() {
-				if(hasNext()) {
-					return elements[index++];
-				}
-				throw new NoSuchElementException("" + index);
-			}
-		};
-	}
-	
+	public T[] getElements() {
+		return elements;
+	}	
 }
