@@ -1,27 +1,43 @@
 package sophomore.classfile;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+/**
+ * 
+ * @author inagakikenichi
+ */
+abstract class Members implements ArrayInfo<MemberInfo> {
+	/**
+	 * 
+	 */
+	MemberInfo[] elements;
 
-abstract class Members <T> {
-	
-	T[] elements;
-	int currentIndex = 0;
+	/**
+	 * 
+	 */
+	Members() {}
 
-	public Members() {}
-
+	@Override
 	public int getSize() {
 		return elements.length;
 	}
 
-	public void add(T element) {
-		if(currentIndex == elements.length) {
+	@Override
+	public void add(int index, MemberInfo element) {
+		if(index >= elements.length) {
 			throw new ArrayIndexOutOfBoundsException();
 		}
-		elements[currentIndex++] = element;
+		elements[index] = element;
 	}
 
-	public T[] getElements() {
+	@Override
+	public MemberInfo get(int index) {
+		if(index >= elements.length) {
+			throw new ArrayIndexOutOfBoundsException();
+		}
+		return elements[index];
+	}
+
+	@Override
+	public MemberInfo[] getAll() {
 		return elements;
 	}	
 }
