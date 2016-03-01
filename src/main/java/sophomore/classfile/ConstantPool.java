@@ -11,10 +11,6 @@ public class ConstantPool {
 	 * 
 	 */
 	private ConstantInfo[] pool;
-	/**
-	 * 
-	 */
-	private int currentIndex;
 
 	/**
 	 * 
@@ -26,13 +22,14 @@ public class ConstantPool {
 
 	/**
 	 * 
+	 * @param index
 	 * @param element 
 	 */
-	public void add(ConstantInfo element) {
-		if(currentIndex == pool.length) {
+	public void add(int index, ConstantInfo element) {
+		if(index >= pool.length) {
 			throw new ArrayIndexOutOfBoundsException();
 		}
-		pool[currentIndex++] = element;
+		pool[index] = element;
 	}
 
 	/**
@@ -41,5 +38,16 @@ public class ConstantPool {
 	 */
 	public ConstantInfo[] getPool() {
 		return pool;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		String sep = System.getProperty("line.separator");
+		sb.append("*** Constant Pool ***").append(sep);
+		for(int i = 0; i < pool.length; i++) {
+			sb.append("[").append(i+1).append("]: ").append(pool[i]).append(sep);
+		}
+		return sb.toString();
 	}
 }
