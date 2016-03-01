@@ -10,6 +10,6 @@ public class IntegerInfo extends IntOrFloatInfo {
 	 * 
 	 */
 	public IntegerInfo() {
-		super(ConstantType.C_Integer);
+		super(ConstantType.C_INTEGER);
 	}
 }

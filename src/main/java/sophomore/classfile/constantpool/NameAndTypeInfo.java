@@ -21,7 +21,7 @@ public class NameAndTypeInfo extends ConstantInfo {
 	 * 
 	 */
 	public NameAndTypeInfo() {
-		super(ConstantType.C_NameAndType);
+		super(ConstantType.C_NAME_AND_TYPE);
 	}
 
 	/**
@@ -42,6 +42,17 @@ public class NameAndTypeInfo extends ConstantInfo {
 
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		this.nameIndex = raf.readShort();
+		this.descriptorIndex = raf.readShort();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		String sep = System.getProperty("line.separator");
+		sb.append(super.toString()).append(sep).append("\t")
+			.append("name index      : ").append(nameIndex).append(sep).append("\t")
+			.append("descriptor index: ").append(descriptorIndex);
+		return sb.toString();
 	}
 }

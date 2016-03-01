@@ -9,6 +9,6 @@ public class FloatInfo extends IntOrFloatInfo {
 	 * 
 	 */
 	public FloatInfo() {
-		super(ConstantType.C_Float);
+		super(ConstantType.C_FLOAT);
 	}
 }

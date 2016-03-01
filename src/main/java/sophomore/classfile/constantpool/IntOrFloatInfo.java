@@ -34,4 +34,13 @@ abstract class IntOrFloatInfo extends ConstantInfo {
 	public void read(RandomAccessFile raf) throws IOException {
 		this.bytes = raf.readInt();
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		String sep = System.getProperty("line.separator");
+		sb.append(super.toString()).append(sep).append("\t")
+			.append("bytes: ").append(bytes);
+		return sb.toString();
+	}
 }

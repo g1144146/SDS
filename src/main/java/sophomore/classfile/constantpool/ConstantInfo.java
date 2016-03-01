@@ -1,12 +1,12 @@
 package sophomore.classfile.constantpool;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import sophomore.classfile.Info;
+
 /**
  * 
  * @author inagaki
  */
-public abstract class ConstantInfo {
+public abstract class ConstantInfo implements Info {
 	/**
 	 * 
 	 */
@@ -28,10 +28,8 @@ public abstract class ConstantInfo {
 		return tag;
 	}
 
-	/**
-	 * 
-	 * @param raf
-	 * @throws IOException 
-	 */
-	public abstract void read(RandomAccessFile raf) throws IOException;
+	@Override
+	public String toString() {
+		return "Constant Type: " + ConstantType.get(tag);
+	}
 }

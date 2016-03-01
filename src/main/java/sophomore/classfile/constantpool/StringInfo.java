@@ -17,7 +17,7 @@ public class StringInfo extends ConstantInfo {
 	 * 
 	 */
 	public StringInfo() {
-		super(ConstantType.C_String);
+		super(ConstantType.C_STRING);
 	}
 
 	/**
@@ -31,5 +31,14 @@ public class StringInfo extends ConstantInfo {
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
 		this.stringIndex = raf.readShort();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		String sep = System.getProperty("line.separator");
+		sb.append(super.toString()).append(sep).append("\t")
+			.append("string index: ").append(stringIndex);
+		return sb.toString();
 	}
 }

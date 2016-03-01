@@ -46,4 +46,14 @@ abstract class LongOrDoubleInfo extends ConstantInfo {
 		this.highBytes = raf.readInt();
 		this.lowBytes  = raf.readInt();
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		String sep = System.getProperty("line.separator");
+		sb.append(super.toString()).append(sep).append("\t")
+			.append("high bytes: ").append(highBytes).append(sep).append("\t")
+			.append("low  bytes: ").append(lowBytes);
+		return sb.toString();
+	}
 }

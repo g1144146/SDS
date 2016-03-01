@@ -10,6 +10,6 @@ public class FieldrefInfo extends MemberRefInfo {
 	 * 
 	 */
 	public FieldrefInfo() {
-		super(ConstantType.C_Fieldref);
+		super(ConstantType.C_FIELDREF);
 	}
 }

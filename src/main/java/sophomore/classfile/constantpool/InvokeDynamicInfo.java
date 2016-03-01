@@ -21,7 +21,7 @@ public class InvokeDynamicInfo extends ConstantInfo {
 	 * 
 	 */
 	public InvokeDynamicInfo() {
-		super(ConstantType.C_InvokeDynamic);
+		super(ConstantType.C_INVOKE_DYNAMIC);
 	}
 
 	/**
@@ -44,5 +44,16 @@ public class InvokeDynamicInfo extends ConstantInfo {
 	public void read(RandomAccessFile raf) throws IOException {
 		this.bootstrapMethodAttrIndex = raf.readShort();
 		this.nameAndTypeIndex = raf.readShort();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		String sep = System.getProperty("line.separator");
+		sb.append(super.toString()).append(sep).append("\t")
+			.append("bootstrap method attribute index: ").append(bootstrapMethodAttrIndex)
+			.append(sep).append("\t")
+			.append("name and type index             : ").append(nameAndTypeIndex);
+		return sb.toString();
 	}
 }

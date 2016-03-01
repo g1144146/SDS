@@ -9,6 +9,6 @@ public class DoubleInfo extends LongOrDoubleInfo {
 	 * 
 	 */
 	public DoubleInfo() {
-		super(ConstantType.C_Double);
+		super(ConstantType.C_DOUBLE);
 	}
 }
