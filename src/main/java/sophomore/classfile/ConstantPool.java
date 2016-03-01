@@ -6,7 +6,7 @@ import sophomore.classfile.constantpool.ConstantInfo;
  * 
  * @author inagaki
  */
-public class ConstantPool {
+public class ConstantPool implements ArrayInfo<ConstantInfo> {
 	/**
 	 * 
 	 */
@@ -20,11 +20,12 @@ public class ConstantPool {
 		this.pool = new ConstantInfo[size];
 	}
 
-	/**
-	 * 
-	 * @param index
-	 * @param element 
-	 */
+	@Override
+	public int getSize() {
+		return pool.length;
+	}
+
+	@Override
 	public void add(int index, ConstantInfo element) {
 		if(index >= pool.length) {
 			throw new ArrayIndexOutOfBoundsException();
@@ -32,12 +33,17 @@ public class ConstantPool {
 		pool[index] = element;
 	}
 
-	/**
-	 * 
-	 * @return 
-	 */
-	public ConstantInfo[] getPool() {
+	@Override
+	public ConstantInfo[] getAll() {
 		return pool;
+	}
+
+	@Override
+	public ConstantInfo get(int index) {
+		if(index >= pool.length) {
+			throw new ArrayIndexOutOfBoundsException();
+		}
+		return pool[index];
 	}
 
 	@Override
