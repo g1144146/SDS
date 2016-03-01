@@ -1,43 +1,48 @@
 package sophomore;
 
+import sophomore.classfile.AccessFlags;
 import sophomore.classfile.Attributes;
+import sophomore.classfile.ConstantPool;
 import sophomore.classfile.Fields;
 import sophomore.classfile.Methods;
-import sophomore.classfile.ConstantPool;
 
+/**
+ * 
+ * @author inagaki
+ */
 public class ClassFile {
 	/**
 	 * 
 	 */
-	int magicNumber;
+	int magicNumber = -100;
 	/**
 	 * 
 	 */
-	int majorVersion;
+	int majorVersion = -100;
 	/**
 	 * 
 	 */
-	int minorVersion;
+	int minorVersion = -100;
 	/**
 	 * 
 	 */
-	ConstantPool cp;
+	ConstantPool pool;
 	/**
 	 * 
 	 */
-	int accessFlag;
+	int accessFlag = -100;
 	/**
 	 * 
 	 */
-	int thisClass;
+	int thisClass = -100;
 	/**
 	 * 
 	 */
-	int superClass;
+	int superClass = -100;
 	/**
 	 * 
 	 */
-	int interfaceCount;
+	int interfaceCount = -100;
 	/**
 	 * 
 	 */
@@ -54,4 +59,17 @@ public class ClassFile {
 	 * 
 	 */
 	Attributes attr;
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		if(magicNumber  != -100) sb.append(  "Magic Number : ").append(magicNumber);
+		if(majorVersion != -100) sb.append("\nMajor Version: ").append(majorVersion);
+		if(minorVersion != -100) sb.append("\nMinor Version: ").append(minorVersion);
+		if(pool      != null) sb.append("\n").append(pool.toString());
+		if(accessFlag   != -100) sb.append("\nAccess Flag  : ").append(AccessFlags.get("class", accessFlag));
+		if(thisClass    != -100) sb.append("\nThis Class   : ").append("");
+
+		return sb.toString();
+	}
 }
