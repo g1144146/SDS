@@ -1,5 +1,11 @@
 package sophomore.classfile;
 
-public class MethodInfo {
-	
+/**
+ * 
+ * @author inagaki
+ */
+public class MethodInfo extends MemberInfo {
+	public MethodInfo() {
+		super("method");
+	}
 }

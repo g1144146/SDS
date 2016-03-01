@@ -1,5 +1,11 @@
 package sophomore.classfile;
 
-public class FieldInfo {
-	
+/**
+ * 
+ * @author inagaki
+ */
+public class FieldInfo extends MemberInfo {
+	public FieldInfo() {
+		super("field");
+	}
 }
