@@ -4,14 +4,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import sophomore.classfile.AccessFlags;
+import sophomore.classfile.Attributes;
 import sophomore.classfile.ConstantPool;
 import sophomore.classfile.Fields;
 import sophomore.classfile.FieldInfo;
 import sophomore.classfile.Methods;
 import sophomore.classfile.MethodInfo;
+import sophomore.classfile.attributes.AttributeInfo;
+import sophomore.classfile.attributes.AttributeInfoBuilder;
 import sophomore.classfile.constantpool.ConstantInfo;
 import sophomore.classfile.constantpool.ConstantInfoBuilder;
 import sophomore.classfile.constantpool.ConstantType;
+import sophomore.classfile.constantpool.Utf8Info;
 import sophomore.classfile.constantpool.UnknownConstantTypeException;
 
 
@@ -47,17 +52,15 @@ public class ClassFileReader {
 			readConstantPool(raf, raf.readShort()-1);
 			System.out.println(cf.pool.toString());
 			readAccessFlag(raf);
+			System.out.println(AccessFlags.get("class", cf.accessFlag));
 			readClass(raf);
 			readInterfaces(raf, raf.readShort());
 			readFields(raf, raf.readShort());
 			readMethods(raf, raf.readShort());
-			readAttributes(raf, raf.readShort());
+//			cf.attr = readAttributes(raf, raf.readShort());
 		} catch(IOException | UnknownConstantTypeException e) {
 			e.printStackTrace();
 		}
-//		for(ConstantInfo info : getClassFile().cp.getPool()) {
-//			System.out.println(info.toString());
-//		}
 	}
 
 	/**
@@ -81,9 +84,10 @@ public class ClassFileReader {
 	private void readConstantPool(RandomAccessFile raf, int constantPoolCount)
 	throws IOException, UnknownConstantTypeException {
 		ConstantPool pool = new ConstantPool(constantPoolCount);
+		ConstantInfoBuilder builder = ConstantInfoBuilder.getInstance();
 		for(int i = 0; i < constantPoolCount; i++) {
 			int tag = raf.readByte(); // 1 byte
-			ConstantInfo info = ConstantInfoBuilder.getInstance().build(tag);
+			ConstantInfo info = builder.build(tag);
 			info.read(raf);
 			pool.add(i, info);
 			if(tag == ConstantType.C_DOUBLE || tag == ConstantType.C_LONG) {
@@ -121,11 +125,11 @@ public class ClassFileReader {
 	 */
 	private void readInterfaces(RandomAccessFile raf, int interfaceCount) throws IOException {
 		cf.interfaceCount = interfaceCount;
-		cf.interfaces = new int[interfaceCount];
+		int[] interfaces = new int[interfaceCount];
 		for(int i = 0; i < interfaceCount; i++) {
-			cf.interfaces[i] = raf.readShort();
+			interfaces[i] = raf.readShort();
 		}
-		
+		cf.interfaces = interfaces;
 	}
 
 	/**
@@ -135,10 +139,13 @@ public class ClassFileReader {
 	 * @throws IOException 
 	 */
 	private void readFields(RandomAccessFile raf, int fieldCount) throws IOException {
+		System.out.println(fieldCount);
 		cf.fields = new Fields(fieldCount);
 		for(int i = 0; i < fieldCount; i++) {
 			FieldInfo info = new FieldInfo();
-			
+			info.read(raf);
+			Attributes attr = readAttributes(raf, raf.readShort());
+			info.setAttr(attr);
 			cf.fields.add(i, info);
 		}
 	}
@@ -153,6 +160,7 @@ public class ClassFileReader {
 		cf.methods = new Methods(methodCount);
 		for(int i = 0; i < methodCount; i++) {
 			MethodInfo info = new MethodInfo();
+			info.read(raf);
 			cf.methods.add(i, info);
 		}
 	}
@@ -161,10 +169,22 @@ public class ClassFileReader {
 	 * 
 	 * @param raf
 	 * @param attrCount
+	 * @return
 	 * @throws IOException 
 	 */
-	private void readAttributes(RandomAccessFile raf, int attrCount) throws IOException {
-		
+	private Attributes readAttributes(RandomAccessFile raf, int attrCount) throws IOException {
+		Attributes attrs = new Attributes(attrCount);
+		AttributeInfoBuilder builder = AttributeInfoBuilder.getInstance();
+		for(int i = 0; i < attrCount; i++) {
+			int nameIndex = raf.readShort();
+			int length = raf.readInt();
+//			byte[] b = new byte[length];
+//			raf.readFully(b);
+			String attrName = ((Utf8Info)cf.pool.get(nameIndex-1)).getValue();
+			AttributeInfo info = builder.build(attrName, nameIndex, length);
+			attrs.add(i, info);
+		}
+		return attrs;
 	}
 
 	/**

@@ -34,11 +34,6 @@ public class ConstantPool implements ArrayInfo<ConstantInfo> {
 	}
 
 	@Override
-	public ConstantInfo[] getAll() {
-		return pool;
-	}
-
-	@Override
 	public ConstantInfo get(int index) {
 		if(index >= pool.length) {
 			throw new ArrayIndexOutOfBoundsException();
@@ -47,12 +42,17 @@ public class ConstantPool implements ArrayInfo<ConstantInfo> {
 	}
 
 	@Override
+	public ConstantInfo[] getAll() {
+		return pool;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		String sep = System.getProperty("line.separator");
 		sb.append("*** Constant Pool ***").append(sep);
 		for(int i = 0; i < pool.length; i++) {
-			sb.append("[").append(i+1).append("]: ").append(pool[i]).append(sep);
+			sb.append("[").append(i).append("]: ").append(pool[i]).append(sep);
 		}
 		return sb.toString();
 	}

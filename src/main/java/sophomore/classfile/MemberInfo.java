@@ -3,9 +3,6 @@ package sophomore.classfile;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import sophomore.classfile.attributes.AttributeInfo;
-import sophomore.classfile.attributes.AttributeInfoBuilder;
-
 /**
  *
  * @author inagaki
@@ -74,6 +71,14 @@ abstract class MemberInfo implements Info {
 
 	/**
 	 * 
+	 * @param attr 
+	 */
+	public void setAttr(Attributes attr) {
+		this.attr = attr;
+	}
+
+	/**
+	 * 
 	 * @return 
 	 */
 	public String getType() {
@@ -85,12 +90,5 @@ abstract class MemberInfo implements Info {
 		this.accessFlags = raf.readShort();
 		this.nameIndex = raf.readShort();
 		this.descriptorIndex = raf.readShort();
-		int attrCount = raf.readShort();
-		this.attr = new Attributes(attrCount);
-		for(int i = 0; i < attrCount; i++) {
-			AttributeInfoBuilder builder = AttributeInfoBuilder.getInstance();
-			AttributeInfo info;
-		}
-//		attr.(raf);
 	}
 }

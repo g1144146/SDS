@@ -23,9 +23,10 @@ public class AttributeInfoBuilder {
 
 	/**
 	 * 
+	 * @param attrName
 	 * @return 
 	 */
-//	public AttributeInfo build() {
-//		
-//	}
+	public AttributeInfo build(String attrName, int nameIndex, int length) {
+		return null;
+	}
 }
