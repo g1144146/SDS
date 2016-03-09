@@ -18,7 +18,7 @@ public class Attributes implements ArrayInfo<AttributeInfo> {
 
 	/**
 	 * 
-	 * @param size 
+	 * @param size
 	 */
 	public Attributes(int size) {
 		this.info = new AttributeInfo[size];
@@ -48,5 +48,11 @@ public class Attributes implements ArrayInfo<AttributeInfo> {
 	@Override
 	public AttributeInfo[] getAll() {
 		return info;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		return sb.toString();
 	}
 }

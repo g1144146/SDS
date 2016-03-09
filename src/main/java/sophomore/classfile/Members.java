@@ -1,5 +1,7 @@
 package sophomore.classfile;
 
+import sophomore.classfile.constantpool.Utf8Info;
+
 /**
  * 
  * @author inagakikenichi
@@ -10,9 +12,6 @@ abstract class Members implements ArrayInfo<MemberInfo> {
 	 */
 	MemberInfo[] elements;
 
-	/**
-	 * 
-	 */
 	Members() {}
 
 	@Override
@@ -39,5 +38,5 @@ abstract class Members implements ArrayInfo<MemberInfo> {
 	@Override
 	public MemberInfo[] getAll() {
 		return elements;
-	}	
+	}
 }
