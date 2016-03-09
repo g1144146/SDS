@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
  *
  * @author inagakikenichi
  */
-class ArrayValue {
+public class ArrayValue {
 	/**
 	 *
 	 */

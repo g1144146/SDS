@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
  *
  * @author inagaki
  */
-class TargetInfo {
+public class TargetInfo {
 	// item of type_parameter_target
 	/**
 	 * 

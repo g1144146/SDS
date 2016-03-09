@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
  *
  * @author inagaki
  */
-class TypeAnnotation extends Annotation {
+public class TypeAnnotation extends Annotation {
 	/**
 	 * 
 	 */

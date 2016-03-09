@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
  *
  * @author inagaki
  */
-class TypePath {
+public class TypePath {
 	/**
 	 * 
 	 */

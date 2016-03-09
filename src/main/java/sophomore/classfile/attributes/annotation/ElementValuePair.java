@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
  *
  * @author inagakikenichi
  */
-class ElementValuePair {
+public class ElementValuePair {
 	/**
 	 *
 	 */
