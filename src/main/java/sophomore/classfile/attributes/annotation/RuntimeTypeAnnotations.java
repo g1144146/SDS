@@ -36,7 +36,7 @@ abstract class RuntimeTypeAnnotations extends AttributeInfo {
 		}
 	}
 
-	public TypeAnnotation[] getAnnotatinos() {
+	public TypeAnnotation[] getAnnotations() {
 		return annotations;
 	}
 }
