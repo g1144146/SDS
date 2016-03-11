@@ -6,7 +6,7 @@ import sophomore.classfile.attributes.AttributeType;
  *
  * @author inagaki
  */
-public class RuntimeInvisibleTypeAnnotations extends RuntimeParameterAnnotations {
+public class RuntimeInvisibleTypeAnnotations extends RuntimeTypeAnnotations {
 	/**
 	 * 
 	 * @param nameIndex
