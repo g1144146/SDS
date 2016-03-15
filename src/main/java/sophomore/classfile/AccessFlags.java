@@ -86,51 +86,108 @@ public class AccessFlags {
 	 * value: 16384
 	 */
 	public static final int ACC_ENUM = 0x4000;
+	/**
+	 * 
+	 */
+	public static final int CLASS_FLAG = ACC_PUBLIC | ACC_FINAL | ACC_SUPER
+		| ACC_INTERFACE | ACC_ABSTRACT | ACC_SYNTHETIC | ACC_ANNOTATION | ACC_ENUM;
+	/**
+	 * 
+	 */
+	public static final int FIELD_FLAG = ACC_PUBLIC | ACC_PRIVATE | ACC_PROTECTED
+		| ACC_STATIC | ACC_FINAL | ACC_VOLATILE | ACC_TRANSIENT | ACC_SYNTHETIC | ACC_ENUM;
+	/**
+	 * 
+	 */
+	public static final int METHOD_FLAG = ACC_PUBLIC | ACC_PRIVATE | ACC_PROTECTED
+		| ACC_STATIC | ACC_FINAL | ACC_SYNCHRONIZED | ACC_BRIDGE | ACC_VARARGS
+		| ACC_NATIVE | ACC_ABSTRACT | ACC_STRICT | ACC_SYNTHETIC;
 
 	/**
 	 * 
-	 * @param key
 	 * @param accessFlag
 	 * @return 
 	 */
-	public static String get(String key, int accessFlag) {
-		switch(accessFlag) {
-			case ACC_PUBLIC:
-				return "public";
-			case ACC_PRIVATE:
-				return "private";
-			case ACC_PROTECTED:
-				return "protected";
-			case ACC_STATIC:
-				return "static";
-			case ACC_FINAL:
-				return "final";
-			case ACC_SUPER:
-				if(key.equals("class")) return "super";
-				else /* method */       return "synchronized";
-			case ACC_VOLATILE:
-				if(key.equals("field")) return "volatile";
-				else /* method */       return "bridge";
-			case ACC_TRANSIENT:
-				if(key.equals("field")) return "transient";
-				else /* method */       return "varargs";
-			case ACC_NATIVE:
-				return "native";
-			case ACC_INTERFACE:
-				return "interface";
-			case ACC_ABSTRACT:
-				return "abstract";
-			case ACC_STRICT:
-				return "strict";
-			case ACC_SYNTHETIC:
-				return "synthetic";
-			case ACC_ANNOTATION:
-				return "annotation";
-			case ACC_ENUM:
-				return "enum";
-			default:
-				System.out.println("invalid access flag: " + accessFlag);
-				return " >>> unknown access flag <<<";
+	public static String get(int accessFlag) {
+		if((accessFlag | CLASS_FLAG) == CLASS_FLAG) {
+			return getClassAccessFlag(accessFlag);
+		} else if((accessFlag | FIELD_FLAG) == FIELD_FLAG) {
+			return getFieldAccessFlag(accessFlag);
+		} else if((accessFlag | METHOD_FLAG) == METHOD_FLAG) {
+			return getMethodAccessFlag(accessFlag);
 		}
+		System.out.println("unknown access flag: " + accessFlag);
+		return " >>> unknown access flag <<<";
+	}
+
+	/**
+	 * 
+	 * @param accessFlag
+	 * @return 
+	 */
+	private static String getClassAccessFlag(int accessFlag) {
+		StringBuilder sb = new StringBuilder();
+		if(checkFlag(accessFlag, ACC_PUBLIC))     sb.append("public ");
+		if(checkFlag(accessFlag, ACC_FINAL))      sb.append("final ");
+		if(checkFlag(accessFlag, ACC_SYNTHETIC))  sb.append("synthetic ");
+		if(checkFlag(accessFlag, ACC_ANNOTATION)) sb.append("@annotation ");
+		if(checkFlag(accessFlag, ACC_ENUM))       sb.append("enum ");
+		if(checkFlag(accessFlag, ACC_INTERFACE) && (checkFlag(accessFlag, ACC_ABSTRACT))) {
+			sb.append("interface ");
+		}
+		if((accessFlag & (ACC_INTERFACE | ACC_ENUM | ACC_ANNOTATION)) == 0) {
+			sb.append("class ");
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 
+	 * @param accessFlag
+	 * @return 
+	 */
+	private static String getFieldAccessFlag(int accessFlag) {
+		StringBuilder sb = new StringBuilder();
+		if(checkFlag(accessFlag, ACC_PUBLIC))     sb.append("public ");
+		if(checkFlag(accessFlag, ACC_PRIVATE))    sb.append("private ");
+		if(checkFlag(accessFlag, ACC_PROTECTED))  sb.append("protected ");
+		if(checkFlag(accessFlag, ACC_STATIC))     sb.append("static ");
+		if(checkFlag(accessFlag, ACC_FINAL))      sb.append("final ");
+		if(checkFlag(accessFlag, ACC_VOLATILE))   sb.append("volatile ");
+		if(checkFlag(accessFlag, ACC_TRANSIENT))  sb.append("transient ");
+		if(checkFlag(accessFlag, ACC_SYNTHETIC))  sb.append("synthetic ");
+		if(checkFlag(accessFlag, ACC_ENUM))       sb.append("enum ");
+		return sb.toString();
+	}
+
+	/**
+	 * 
+	 * @param accessFlag
+	 * @return 
+	 */
+	private static String getMethodAccessFlag(int accessFlag) {
+		StringBuilder sb = new StringBuilder();
+		if(checkFlag(accessFlag, ACC_PUBLIC))         sb.append("public ");
+		if(checkFlag(accessFlag, ACC_PRIVATE))        sb.append("private ");
+		if(checkFlag(accessFlag, ACC_PROTECTED))      sb.append("protected ");
+		if(checkFlag(accessFlag, ACC_STATIC))         sb.append("static ");
+		if(checkFlag(accessFlag, ACC_FINAL))          sb.append("final ");
+		if(checkFlag(accessFlag, ACC_SYNCHRONIZED))   sb.append("synchronized ");
+		if(checkFlag(accessFlag, ACC_BRIDGE))         sb.append("bridge ");
+		if(checkFlag(accessFlag, ACC_NATIVE))         sb.append("native ");
+		if(checkFlag(accessFlag, ACC_ABSTRACT))       sb.append("abstract ");
+		if(checkFlag(accessFlag, ACC_STRICT))         sb.append("strict ");
+		if(checkFlag(accessFlag, ACC_SYNTHETIC))      sb.append("synthetic ");
+		return sb.toString();
+	}
+
+	/**
+	 * 
+	 * @param accessFlag
+	 * @param target
+	 * @return 
+	 */
+	private static boolean checkFlag(int accessFlag, int target) {
+		return (accessFlag & target) == target;
 	}
 }
