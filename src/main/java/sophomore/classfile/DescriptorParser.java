@@ -1,7 +1,9 @@
 package sophomore.classfile;
 
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -9,104 +11,84 @@ import java.util.Iterator;
  */
 public class DescriptorParser {
 
-	/**
-	 * 
-	 * @param type
-	 * @param desc
-	 * @return 
-	 */
-	public static String parse(String type, String desc) {
-		if(type.equals("field")) {
-			return parseField(desc);
-		}
-		return parseMethod(desc);
-	}
+	private static final String objPattern  = "L[a-z\\.]*[A-Z][a-zA-Z\\.]+";
 
 	/**
 	 * 
 	 * @param desc
 	 * @return 
 	 */
-	private static String parseField(String desc) {
+	public static String parse(String desc) {
+		String primPattern = "(B|\\[B|C|\\[C|D|\\[D|F|\\[F|V|I|\\[I"
+								+ "|J|\\[J|S|\\[S|Z|\\[Z|\\(|\\))";
 		desc = desc.replace("/", ".");
-		String[] descArray = desc.split("");
-		if(descArray.length == 1) { // primitive
-			return parseType(descArray[0]);
-		} else if(descArray.length == 2) { // array primitive
-			return parseType(descArray[1]) + parseType(descArray[0]);
-		}
-		boolean isArray = descArray[0].equals("[");
-		String str = desc.substring(desc.indexOf("L")+1, desc.indexOf(";"));
-		if(isArray) { // array object
-			str += "[]";
-		}
-		return str;
-	}
-
-	/**
-	 * 
-	 * @param desc
-	 * @return 
-	 */
-	private static String parseMethod(String desc) {
-		desc = desc.replace("/", ".");
+		String obj = "(" + objPattern + "|\\[" + objPattern + ")";
+		Matcher m = Pattern.compile(obj + "|" + primPattern).matcher(desc);
 		StringBuilder sb = new StringBuilder();
-		boolean isArray = false;
-		Iterator<String> itr = Arrays.asList(desc.split("")).iterator();
-		while(itr.hasNext()) {
-			String str = itr.next();
-			if(str.matches("\\(|\\)")) {
-				sb.append(str);
-			} else if(str.equals("[")) {
-				isArray = true;
+		System.out.println(m.groupCount());
+		while(m.find()) {
+			String s = m.group();
+			if(s.startsWith("[")) { // primitive array
+				if(s.length() == 2) {
+					sb.append(parseType(s.substring(1))).append("[]");
+				} else { // object array
+					sb.append(s.subSequence(2, s.length())).append("[]");
+				}
+			} else if(s.startsWith("L")) { // object
+				sb.append(s.subSequence(1, s.length()));
+			} else if(s.equals("V")) { // void
+				sb.append(parseType(s));
+			} else if(!parseType(s).equals("")) { // primitive
+				sb.append(parseType(s));
+			} else if(s.matches("\\(|\\)")) {
+				sb.append(s);
+				continue;
 			} else {
-				String type = parseType(str);
-				if(type.equals("object")) {
-					String s;
-					while((s = itr.next()).equals(";")) {
-						sb.append(s);
-					}
-				} else {
-					sb.append(type);
-				}
-				if(isArray) {
-					sb.append("[]");
-					isArray = false;
-				}
-				sb.append(" ");
+				continue;
+			}
+			sb.append(",");
+		}
+		return sb.toString().substring(0, sb.toString().length()-1);
+	}
+
+	/**
+	 * 
+	 * @param desc
+	 * @return 
+	 */
+	public static String[] parseImportClass(String desc) {
+		List<String> classes = new ArrayList<>();
+		desc = desc.replace("/", ".");
+		Matcher m = Pattern.compile("(" + objPattern + ")").matcher(desc);
+		while(m.find()) {
+			String s = m.group();
+			if(s.startsWith("L") && !s.matches("Ljava\\.lang\\.[A-Z][a-zA-Z\\.]+")) {
+				classes.add(s.substring(1, s.length()));
 			}
 		}
-		return sb.toString();
+		if(classes.isEmpty()) {
+			return new String[0];
+		}
+		return classes.toArray(new String[0]);
 	}
 
-	/**
+		/**
 	 * 
 	 * @param head
 	 * @return 
 	 */
 	private static String parseType(String head) {
 		switch(head) {
-			case "B":
-				return "byte";
-			case "C":
-				return "char";
-			case "D":
-				return "double";
-			case "F":
-				return "float";
-			case "I":
-				return "int";
-			case "J":
-				return "long";
-			case "S":
-				return "short";
-			case "Z":
-				return "boolean";
-			case "L": // object
-				return "object";
-			default:
-				System.out.println("Invalid head of string: " + head);
-				return null;
+			case "B": return "byte";
+			case "C": return "char";
+			case "D": return "double";
+			case "F": return "float";
+			case "I": return "int";
+			case "J": return "long";
+			case "S": return "short";
+			case "Z": return "boolean";
+			case "V": return "void";
+			default : return "";
 		}
 	}
 }
