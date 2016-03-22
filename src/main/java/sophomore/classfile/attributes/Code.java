@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import sophomore.classfile.Attributes;
+import sophomore.classfile.ConstantPool;
+import sophomore.classfile.constantpool.Utf8Info;
 
 /**
  *
@@ -11,35 +13,35 @@ import sophomore.classfile.Attributes;
  */
 public class Code extends AttributeInfo {
 	/**
-	 * 
+	 *
 	 */
 	int maxStack;
 	/**
-	 * 
+	 *
 	 */
 	int maxLocals;
 	/**
-	 * 
+	 *
 	 */
 	byte[] code;
 	/**
-	 * 
+	 *
 	 */
 	ExceptionTable[] exceptionTable;
 	/**
-	 * 
+	 *
 	 */
 	Attributes attr;
 
 	/**
-	 * 
+	 *
 	 * @param nameIndex
-	 * @param length 
+	 * @param length
 	 */
 	public Code(int nameIndex, int length) {
 		super(AttributeType.Type.Code, nameIndex, length);
 	}
-	
+
 	/**
 	 *
 	 * @return
@@ -47,7 +49,7 @@ public class Code extends AttributeInfo {
 	public int getMaxStack() {
 		return maxStack;
 	}
-	
+
 	/**
 	 *
 	 * @return
@@ -55,7 +57,7 @@ public class Code extends AttributeInfo {
 	public int maxLocals() {
 		return maxLocals;
 	}
-	
+
 	/**
 	 *
 	 * @return
@@ -63,7 +65,7 @@ public class Code extends AttributeInfo {
 	public byte[] getCode() {
 		return code;
 	}
-	
+
 	/**
 	 *
 	 * @return
@@ -71,7 +73,7 @@ public class Code extends AttributeInfo {
 	public ExceptionTable[] getExceptionTable() {
 		return exceptionTable;
 	}
-	
+
 	/**
 	 *
 	 * @return
@@ -80,8 +82,8 @@ public class Code extends AttributeInfo {
 		return attr;
 	}
 
-	@Override
-	public void read(RandomAccessFile raf) throws IOException {
+	public void read(RandomAccessFile raf, ConstantPool pool)
+	throws IOException, UnknownAttributeTypeException {
 		this.maxStack = raf.readShort(); // this.dataStream.readShort();
 		this.maxLocals = raf.readShort();
 		int codeLen = raf.readInt();
@@ -95,17 +97,23 @@ public class Code extends AttributeInfo {
 		int count = raf.readShort();
 		this.attr = new Attributes(count);
 		AttributeInfoBuilder builder = AttributeInfoBuilder.getInstance();
-//		for(int i = 0; i < count; i++) {
-//			AttributeInfo info = builder.build(null);
-//			info.read(raf);
-//			attr.add(i, info);
-//		}
+		for(int i = 0; i < count; i++) {
+			int index = raf.readShort();
+			int length = raf.readInt();
+			String attrName = ((Utf8Info)pool.get(index-1)).getValue();
+			AttributeInfo info = builder.build(attrName, index, length);
+			info.read(raf);
+			attr.add(i, info);
+		}
 	}
 
+	@Override
+	public void read(RandomAccessFile raf) throws IOException {}
+
 	/**
-	 * 
+	 *
 	 */
-	class ExceptionTable {
+	public class ExceptionTable {
 		/**
 		 *
 		 */
@@ -122,11 +130,11 @@ public class Code extends AttributeInfo {
 		 *
 		 */
 		int catchType;
-		
+
 		/**
-		 * 
+		 *
 		 * @param raf
-		 * @throws IOException 
+		 * @throws IOException
 		 */
 		ExceptionTable(RandomAccessFile raf) throws IOException {
 			this.startPc = raf.readShort();
@@ -136,9 +144,9 @@ public class Code extends AttributeInfo {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param key
-		 * @return 
+		 * @return
 		 */
 		public int getNumber(String key) {
 			switch(key) {
