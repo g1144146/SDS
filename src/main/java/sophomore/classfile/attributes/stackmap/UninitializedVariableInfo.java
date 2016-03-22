@@ -7,9 +7,16 @@ import java.io.RandomAccessFile;
  *
  * @author inagaki
  */
-class UninitializedVariableInfo {
+public class UninitializedVariableInfo {
+	/**
+	 * 
+	 */
 	int tag;
+	/**
+	 * 
+	 */
 	int offset;
+
 	UninitializedVariableInfo(RandomAccessFile raf) throws IOException {
 		this.tag = raf.readByte();
 		this.offset = raf.readShort();
