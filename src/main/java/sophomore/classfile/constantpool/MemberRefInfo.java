@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
  * 
  * @author inagaki
  */
-abstract class MemberRefInfo extends ConstantInfo {
+public abstract class MemberRefInfo extends ConstantInfo {
 	/**
 	 * 
 	 */
