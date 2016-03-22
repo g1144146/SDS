@@ -10,13 +10,15 @@ import java.util.regex.Pattern;
  * @author inagaki
  */
 public class DescriptorParser {
-
-	private static final String objPattern  = "L[a-z\\.]*[A-Z][a-zA-Z\\.]+";
+	/**
+	 *
+	 */
+	private static final String objPattern  = "[a-z\\\\.]*[0-9a-zA-Z_\\$\\.]+";
 
 	/**
-	 * 
+	 *
 	 * @param desc
-	 * @return 
+	 * @return
 	 */
 	public static String parse(String desc) {
 		String primPattern = "(B|\\[B|C|\\[C|D|\\[D|F|\\[F|V|I|\\[I"
@@ -52,9 +54,9 @@ public class DescriptorParser {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param desc
-	 * @return 
+	 * @return
 	 */
 	public static String[] parseImportClass(String desc) {
 		List<String> classes = new ArrayList<>();
@@ -72,10 +74,10 @@ public class DescriptorParser {
 		return classes.toArray(new String[0]);
 	}
 
-		/**
-	 * 
+	/**
+	 *
 	 * @param head
-	 * @return 
+	 * @return
 	 */
 	private static String parseType(String head) {
 		switch(head) {
