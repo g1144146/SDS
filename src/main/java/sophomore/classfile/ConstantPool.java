@@ -3,18 +3,18 @@ package sophomore.classfile;
 import sophomore.classfile.constantpool.ConstantInfo;
 
 /**
- * 
+ *
  * @author inagaki
  */
 public class ConstantPool implements ArrayInfo<ConstantInfo> {
 	/**
-	 * 
+	 *
 	 */
 	private ConstantInfo[] pool;
 
 	/**
-	 * 
-	 * @param size 
+	 *
+	 * @param size
 	 */
 	public ConstantPool(int size) {
 		this.pool = new ConstantInfo[size];
@@ -28,7 +28,7 @@ public class ConstantPool implements ArrayInfo<ConstantInfo> {
 	@Override
 	public void add(int index, ConstantInfo element) {
 		if(index >= pool.length) {
-			throw new ArrayIndexOutOfBoundsException();
+			throw new ArrayIndexOutOfBoundsException(index);
 		}
 		pool[index] = element;
 	}
@@ -36,7 +36,8 @@ public class ConstantPool implements ArrayInfo<ConstantInfo> {
 	@Override
 	public ConstantInfo get(int index) {
 		if(index >= pool.length) {
-			throw new ArrayIndexOutOfBoundsException();
+			System.out.println("constant-pool size: " + pool.length);
+			throw new ArrayIndexOutOfBoundsException(index);
 		}
 		return pool[index];
 	}
@@ -52,7 +53,7 @@ public class ConstantPool implements ArrayInfo<ConstantInfo> {
 		String sep = System.getProperty("line.separator");
 		sb.append("*** Constant Pool ***").append(sep);
 		for(int i = 0; i < pool.length; i++) {
-			sb.append("[").append(i).append("]: ").append(pool[i]).append(sep);
+			sb.append("[").append(i+1).append("]: ").append(pool[i]).append(sep);
 		}
 		return sb.toString();
 	}

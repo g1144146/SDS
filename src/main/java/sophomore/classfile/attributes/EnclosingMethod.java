@@ -9,11 +9,11 @@ import java.io.RandomAccessFile;
  */
 public class EnclosingMethod extends AttributeInfo {
 	/**
-	 * 
+	 * The constant_pool entry at that index must be a CONSTANT_Class_info structure.
 	 */
 	int classIndex;
 	/**
-	 * 
+	 * The constant_pool entry at that index must be a CONSTANT_NameAndType_info structure.
 	 */
 	int methodIndex;
 	

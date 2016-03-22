@@ -39,17 +39,17 @@ public class InnerClasses extends AttributeInfo {
 		}
 	}
 	
-	class Classes {
+	public class Classes {
 		/**
-		 *
+		 * The constant_pool entry at that index must be a CONSTANT_Class_info structure.
 		 */
 		int innerClassInfoIndex;
 		/**
-		 *
+		 * the entry at that index must be a CONSTANT_Class_info structure.
 		 */
 		int outerClassInfoIndex;
 		/**
-		 *
+		 * the entry at that index must be a CONSTANT_Utf8_info structure.
 		 */
 		int innerNameIndex;
 		/**
@@ -58,11 +58,9 @@ public class InnerClasses extends AttributeInfo {
 		int innerClassAccessFlags;
 		
 		/**
-		 *
-		 * @param icii
-		 * @param ocii
-		 * @param ini
-		 * @param icaf
+		 * 
+		 * @param raf
+		 * @throws IOException 
 		 */
 		public Classes(RandomAccessFile raf) throws IOException {
 			this.innerClassInfoIndex = raf.readShort();

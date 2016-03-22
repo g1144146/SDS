@@ -9,7 +9,7 @@ import java.io.RandomAccessFile;
  */
 public class Exceptions extends AttributeInfo {
 	/**
-	 * 
+	 * The constant_pool entry at that index must be a CONSTANT_Class_info structure.
 	 */
 	int[] exceptionIndexTable;
 

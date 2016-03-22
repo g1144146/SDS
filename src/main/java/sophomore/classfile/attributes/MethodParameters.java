@@ -38,7 +38,7 @@ public class MethodParameters extends AttributeInfo {
 	/**
 	 * 
 	 */
-	class Parameters {
+	public class Parameters {
 		/**
 		 * 
 		 */
@@ -46,7 +46,7 @@ public class MethodParameters extends AttributeInfo {
 		/**
 		 * 
 		 */
-		int accessFlags;
+		int accessFlag;
 
 		/**
 		 * 
@@ -55,7 +55,15 @@ public class MethodParameters extends AttributeInfo {
 		 */
 		Parameters(RandomAccessFile raf) throws IOException {
 			this.nameIndex = raf.readShort();
-			this.accessFlags = raf.readShort();
+			this.accessFlag = raf.readShort();
+		}
+
+		public int getNameIndex() {
+			return nameIndex;
+		}
+
+		public int getAccessFlag() {
+			return accessFlag;
 		}
 	}
 }

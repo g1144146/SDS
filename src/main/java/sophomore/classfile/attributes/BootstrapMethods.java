@@ -31,16 +31,22 @@ public class BootstrapMethods extends AttributeInfo {
 		}
 	}
 
+	public BSM[] getBSM() {
+		return bsm;
+	}
+
 	/**
 	 * 
 	 */
-	class BSM {
+	public class BSM {
 		/**
-		 * 
+		 * The constant_pool entry at that index must be a CONSTANT_MethodHandle_info structure.
 		 */
 		int bsmRef;
 		/**
-		 * 
+		 * The constant_pool entry at that index must be a CONSTANT_String_info
+		 * , CONSTANT_Class_info, CONSTANT_Integer_info, CONSTANT_Long_info, CONSTANT_Float_info
+		 * , CONSTANT_Double_info, CONSTANT_MethodHandle_info, or CONSTANT_MethodType_info structure.
 		 */
 		int[] bootstrapArgs;
 
@@ -56,6 +62,14 @@ public class BootstrapMethods extends AttributeInfo {
 			for(int i = 0; i < len; i++) {
 				bootstrapArgs[i] = raf.readShort();
 			}
+		}
+
+		public int getBSMRef() {
+			return bsmRef;
+		}
+
+		public int[] getBSMArgs() {
+			return bootstrapArgs;
 		}
 	}
 }
