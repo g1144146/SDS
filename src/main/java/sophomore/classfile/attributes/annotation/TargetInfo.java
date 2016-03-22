@@ -131,7 +131,7 @@ public class TargetInfo {
 	/**
 	 * 
 	 */
-	class LocalVarTarget {
+	public class LocalVarTarget {
 		/**
 		 * 
 		 */
