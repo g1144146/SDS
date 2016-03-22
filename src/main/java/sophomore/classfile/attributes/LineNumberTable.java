@@ -9,9 +9,9 @@ import java.io.RandomAccessFile;
  */
 public class LineNumberTable extends AttributeInfo {
 	/**
-	 * 
+	 * array of line number table.
 	 */
-	Table[] lineNumberTable;
+	LNTable[] lineNumberTable;
 
 	/**
 	 * 
@@ -26,29 +26,29 @@ public class LineNumberTable extends AttributeInfo {
 	 * 
 	 * @return 
 	 */
-	public Table[] getLineNumberTable() {
+	public LNTable[] getLineNumberTable() {
 		return lineNumberTable;
 	}
 
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
 		int len = raf.readShort();
-		this.lineNumberTable = new Table[len];
+		this.lineNumberTable = new LNTable[len];
 		for(int i = 0; i < len; i++) {
-			lineNumberTable[i] = new Table(raf);
+			lineNumberTable[i] = new LNTable(raf);
 		}
 	}
 
 	/**
 	 * 
 	 */
-	class Table {
+	public class LNTable {
 		/**
-		 * 
+		 * start number of opcode.
 		 */
 		int startPc;
 		/**
-		 * 
+		 * line number in source file.
 		 */
 		int lineNumber;
 
@@ -57,7 +57,7 @@ public class LineNumberTable extends AttributeInfo {
 		 * @param startPc
 		 * @param lineNumber 
 		 */
-		Table(RandomAccessFile raf) throws IOException {
+		LNTable(RandomAccessFile raf) throws IOException {
 			this.startPc = raf.readShort();
 			this.lineNumber = raf.readShort();
 		}

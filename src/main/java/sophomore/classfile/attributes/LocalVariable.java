@@ -7,12 +7,12 @@ import java.io.RandomAccessFile;
  *
  * @author inagakikenichi
  */
-abstract class LocalVariable extends AttributeInfo {
+public abstract class LocalVariable extends AttributeInfo {
 
 	/**
 	 * 
 	 */
-	Table[] localVariableTable;
+	LVTable[] localVariableTable;
 
 	/**
 	 * 
@@ -28,23 +28,23 @@ abstract class LocalVariable extends AttributeInfo {
 	 * 
 	 * @return 
 	 */
-	public Table[] getTable() {
+	public LVTable[] getTable() {
 		return localVariableTable;
 	}
 
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
 		int len = raf.readShort();
-		this.localVariableTable = new Table[len];
+		this.localVariableTable = new LVTable[len];
 		for(int i = 0; i < len; i++) {
-			localVariableTable[i] = new Table(raf);
+			localVariableTable[i] = new LVTable(raf);
 		}
 	}
 
 	/**
 	 * 
 	 */
-	class Table {
+	public class LVTable {
 		/**
 		 * 
 		 */
@@ -74,7 +74,7 @@ abstract class LocalVariable extends AttributeInfo {
 		 * @param descriptorIndex
 		 * @param index 
 		 */
-		Table(RandomAccessFile raf) throws IOException {
+		LVTable(RandomAccessFile raf) throws IOException {
 			this.startPc = raf.readShort();
 			this.length = raf.readShort();
 			this.nameIndex = raf.readShort();
