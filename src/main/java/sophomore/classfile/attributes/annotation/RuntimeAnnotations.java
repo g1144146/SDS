@@ -22,7 +22,7 @@ abstract class RuntimeAnnotations extends AttributeInfo {
 	 * @param nameIndex
 	 * @param length 
 	 */
-	RuntimeAnnotations(AttributeType.Type type, int nameIndex, int length) {
+	RuntimeAnnotations(AttributeType type, int nameIndex, int length) {
 		super(type, nameIndex, length);
 	}
 

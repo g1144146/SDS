@@ -14,7 +14,7 @@ public class Deprecated extends AttributeInfo {
 	 * @param length 
 	 */
 	public Deprecated(int nameIndex, int length) {
-		super(AttributeType.Type.Deprecated, nameIndex, length);
+		super(AttributeType.Deprecated, nameIndex, length);
 	}
 
 	@Override

@@ -19,7 +19,7 @@ public class Signature extends AttributeInfo {
 	 * @param length 
 	 */
 	public Signature(int nameIndex, int length) {
-		super(AttributeType.Type.Signature, nameIndex, length);
+		super(AttributeType.Signature, nameIndex, length);
 	}
 
 	/**

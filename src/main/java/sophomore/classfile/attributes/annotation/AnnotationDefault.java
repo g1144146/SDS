@@ -22,7 +22,7 @@ public class AnnotationDefault extends AttributeInfo {
 	 * @param length 
 	 */
 	public AnnotationDefault(int nameIndex, int length) {
-		super(AttributeType.Type.AnnotationDefault, nameIndex, length);
+		super(AttributeType.AnnotationDefault, nameIndex, length);
 	}
 
 	@Override

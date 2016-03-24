@@ -19,7 +19,7 @@ public class InnerClasses extends AttributeInfo {
 	 * @param length 
 	 */
 	public InnerClasses(int nameIndex, int length) {
-		super(AttributeType.Type.InnerClasses, nameIndex, length);
+		super(AttributeType.InnerClasses, nameIndex, length);
 	}
 
 	/**

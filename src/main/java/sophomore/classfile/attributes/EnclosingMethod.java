@@ -23,7 +23,7 @@ public class EnclosingMethod extends AttributeInfo {
 	 * @param length 
 	 */
 	public EnclosingMethod(int nameIndex, int length) {
-		super(AttributeType.Type.EnclosingMethod, nameIndex, length);
+		super(AttributeType.EnclosingMethod, nameIndex, length);
 	}
 
 	/**

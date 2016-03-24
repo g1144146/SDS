@@ -39,7 +39,7 @@ public class Code extends AttributeInfo {
 	 * @param length
 	 */
 	public Code(int nameIndex, int length) {
-		super(AttributeType.Type.Code, nameIndex, length);
+		super(AttributeType.Code, nameIndex, length);
 	}
 
 	/**
@@ -102,6 +102,7 @@ public class Code extends AttributeInfo {
 			int length = raf.readInt();
 			String attrName = ((Utf8Info)pool.get(index-1)).getValue();
 			AttributeInfo info = builder.build(attrName, index, length);
+			System.out.println(index + ", " + length + ", "+info.getType());
 			info.read(raf);
 			attr.add(i, info);
 		}
@@ -150,14 +151,10 @@ public class Code extends AttributeInfo {
 		 */
 		public int getNumber(String key) {
 			switch(key) {
-				case "start_pc":
-					return startPc;
-				case "end_pc":
-					return endPc;
-				case "handler_pc":
-					return handlerPc;
-				case "catch_type":
-					return catchType;
+				case "start_pc":   return startPc;
+				case "end_pc":     return endPc;
+				case "handler_pc": return handlerPc;
+				case "catch_type": return catchType;
 				default:
 					System.out.println("invalid key: " + key);
 					return -10000;

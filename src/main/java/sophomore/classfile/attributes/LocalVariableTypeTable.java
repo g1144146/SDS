@@ -15,6 +15,6 @@ public class LocalVariableTypeTable extends LocalVariable {
 	 * @param length 
 	 */
 	public LocalVariableTypeTable(int nameIndex, int length) {
-		super(AttributeType.Type.LocalVariableTypeTable, nameIndex, length);
+		super(AttributeType.LocalVariableTypeTable, nameIndex, length);
 	}
 }

@@ -19,7 +19,7 @@ public class Exceptions extends AttributeInfo {
 	 * @param length 
 	 */
 	public Exceptions(int nameIndex, int length) {
-		super(AttributeType.Type.Exceptions, nameIndex, length);
+		super(AttributeType.Exceptions, nameIndex, length);
 	}
 
 	/**

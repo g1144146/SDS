@@ -14,6 +14,6 @@ public class RuntimeInvisibleAnnotations extends RuntimeAnnotations {
 	 * @param length 
 	 */
 	public RuntimeInvisibleAnnotations(int nameIndex, int length) {
-		super(AttributeType.Type.RuntimeInvisibleAnnotations, nameIndex, length);
+		super(AttributeType.RuntimeInvisibleAnnotations, nameIndex, length);
 	}
 }

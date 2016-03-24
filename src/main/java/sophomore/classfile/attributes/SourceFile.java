@@ -19,7 +19,7 @@ public class SourceFile extends AttributeInfo {
 	 * @param length 
 	 */
 	public SourceFile(int nameIndex, int length) {
-		super(AttributeType.Type.SourceFile, nameIndex, length);
+		super(AttributeType.SourceFile, nameIndex, length);
 	}
 
 	/**

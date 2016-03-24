@@ -21,7 +21,7 @@ public class ConstantValue extends AttributeInfo {
 	 * @param length 
 	 */
 	public ConstantValue(int nameIndex, int length) {
-		super(AttributeType.Type.ConstantValue, nameIndex, length);
+		super(AttributeType.ConstantValue, nameIndex, length);
 	}
 
 	/**

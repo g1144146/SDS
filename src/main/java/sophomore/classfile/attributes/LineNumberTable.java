@@ -19,7 +19,7 @@ public class LineNumberTable extends AttributeInfo {
 	 * @param length 
 	 */
 	public LineNumberTable(int nameIndex, int length) {
-		super(AttributeType.Type.LineNumberTable, nameIndex, length);
+		super(AttributeType.LineNumberTable, nameIndex, length);
 	}
 
 	/**

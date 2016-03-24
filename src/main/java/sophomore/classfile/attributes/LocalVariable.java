@@ -20,7 +20,7 @@ public abstract class LocalVariable extends AttributeInfo {
 	 * @param nameIndex
 	 * @param length 
 	 */
-	LocalVariable(AttributeType.Type type, int nameIndex, int length) {
+	LocalVariable(AttributeType type, int nameIndex, int length) {
 		super(type, nameIndex, length);
 	}
 

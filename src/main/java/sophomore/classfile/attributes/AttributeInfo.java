@@ -26,7 +26,7 @@ public abstract class AttributeInfo implements Info {
 	/**
 	 * 
 	 */
-	private AttributeType.Type type;
+	private AttributeType type;
 
 //	DataInputStream dataStream;
 
@@ -36,7 +36,7 @@ public abstract class AttributeInfo implements Info {
 	 * @param nameIndex
 	 * @param length 
 	 */
-	public AttributeInfo(AttributeType.Type type, int nameIndex, int length) {
+	public AttributeInfo(AttributeType type, int nameIndex, int length) {
 		this.type = type;
 		this.nameIndex = nameIndex;
 		this.attrLen = length;
@@ -70,7 +70,7 @@ public abstract class AttributeInfo implements Info {
 	 * 
 	 * @return 
 	 */
-	public AttributeType.Type getType() {
+	public AttributeType getType() {
 		return type;
 	}
 }

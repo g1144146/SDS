@@ -24,7 +24,7 @@ public class SourceDebugExtension extends AttributeInfo {
 	 * @param length 
 	 */
 	public SourceDebugExtension(int nameIndex, int length) {
-		super(AttributeType.Type.SourceDebugExtension, nameIndex, length);
+		super(AttributeType.SourceDebugExtension, nameIndex, length);
 	}
 
 	/**

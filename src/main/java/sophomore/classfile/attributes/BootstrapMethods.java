@@ -19,7 +19,7 @@ public class BootstrapMethods extends AttributeInfo {
 	 * @param length 
 	 */
 	public BootstrapMethods(int nameIndex, int length) {
-		super(AttributeType.Type.BootstrapMethods, nameIndex, length);
+		super(AttributeType.BootstrapMethods, nameIndex, length);
 	}
 
 	@Override

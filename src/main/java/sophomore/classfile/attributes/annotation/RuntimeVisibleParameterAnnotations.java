@@ -14,6 +14,6 @@ public class RuntimeVisibleParameterAnnotations extends RuntimeParameterAnnotati
 	 * @param length 
 	 */
 	public RuntimeVisibleParameterAnnotations(int nameIndex, int length) {
-		super(AttributeType.Type.RuntimeVisibleParameterAnnotations, nameIndex, length);
+		super(AttributeType.RuntimeVisibleParameterAnnotations, nameIndex, length);
 	}
 }

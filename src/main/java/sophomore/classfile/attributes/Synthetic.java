@@ -15,7 +15,7 @@ public class Synthetic extends AttributeInfo {
 	 * @param length 
 	 */
 	public Synthetic(int nameIndex, int length) {
-		super(AttributeType.Type.Synthetic, nameIndex, length);
+		super(AttributeType.Synthetic, nameIndex, length);
 	}
 
 	@Override

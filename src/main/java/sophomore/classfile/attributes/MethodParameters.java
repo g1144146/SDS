@@ -19,7 +19,7 @@ public class MethodParameters extends AttributeInfo {
 	 * @param length 
 	 */
 	public MethodParameters(int nameIndex, int length) {
-		super(AttributeType.Type.MethodParameters, nameIndex, length);
+		super(AttributeType.MethodParameters, nameIndex, length);
 	}
 
 	public Parameters[] getParams() {

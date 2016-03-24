@@ -13,6 +13,6 @@ public class RuntimeVisibleAnnotations extends RuntimeAnnotations {
 	 * @param length 
 	 */
 	public RuntimeVisibleAnnotations(int nameIndex, int length) {
-		super(AttributeType.Type.RuntimeVisibleAnnotations, nameIndex, length);
+		super(AttributeType.RuntimeVisibleAnnotations, nameIndex, length);
 	}
 }
