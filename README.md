@@ -17,14 +17,14 @@ This tool is for decompiling and investigating contents of java class files.
 
 # Requirements
 
-## Runtime / Development Environment
+* Runtime / Development Environment
 
-* [Java SE 8](http://www.oracle.com/technetwork/java/javase/overview/index.html)
+    * [Java SE 8](http://www.oracle.com/technetwork/java/javase/overview/index.html)
 
-## Project Management
+* Project Management
 
-* [Gradle 2.x](http://gradle.org/)
+    * [Gradle 2.x](http://gradle.org/)
 
-## Test Environment
+* Test Environment
 
-* [JUnit 4.12](http://junit.org/junit4/)
+    * [JUnit 4.12](http://junit.org/junit4/)
