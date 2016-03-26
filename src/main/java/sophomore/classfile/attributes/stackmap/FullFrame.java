@@ -17,17 +17,23 @@ public class FullFrame extends ChopFrame {
 	 */
 	VerificationTypeInfo[] stack;
 
-	public FullFrame(RandomAccessFile raf) throws IOException {
-		super(raf);
-		int numberOfLocals = raf.readShort();
-		this.locals = new VerificationTypeInfo[numberOfLocals];
-		for(int i = 0; i < numberOfLocals; i++) {
-			locals[i] = new VerificationTypeInfo(raf);
-		}
-		int numberOfStackItems = raf.readShort();
-		this.stack = new VerificationTypeInfo[numberOfStackItems];
-		for(int i = 0; i < numberOfStackItems; i++) {
-			stack[i] = new VerificationTypeInfo(raf);
+	public FullFrame(int tag, RandomAccessFile raf)
+	throws IOException {
+		super(StackMapFrameType.FullFrame, tag, raf);
+		try {
+			VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();
+			int localsLen = raf.readShort();
+			this.locals = new VerificationTypeInfo[localsLen];
+			for(int i = 0; i < localsLen; i++) {
+				locals[i] = builder.build(raf);
+			}
+			int stackLen = raf.readShort();
+			this.stack = new VerificationTypeInfo[stackLen];
+			for(int i = 0; i < stackLen; i++) {
+				stack[i] = builder.build(raf);
+			}
+		} catch(VerificationTypeException e) {
+			e.printStackTrace();
 		}
 	}
 

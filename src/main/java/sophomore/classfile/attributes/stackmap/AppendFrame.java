@@ -9,15 +9,21 @@ import java.io.RandomAccessFile;
  */
 public class AppendFrame extends ChopFrame {
 	/**
-	 * 
+	 *
 	 */
 	VerificationTypeInfo[] locals;
 
-	public AppendFrame(RandomAccessFile raf) throws IOException {
-		super(raf);
-		this.locals = new VerificationTypeInfo[frameType - 251];
-		for(int i = 0; i < locals.length; i++) {
-			locals[i] = new VerificationTypeInfo(raf);
+	public AppendFrame(int tag, RandomAccessFile raf)
+	throws IOException {
+		super(StackMapFrameType.AppendFrame, tag, raf);
+		this.locals = new VerificationTypeInfo[tag - 251];
+		try {
+			VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();
+			for(int i = 0; i < locals.length; i++) {
+				locals[i] = builder.build(raf);
+			}
+		} catch(VerificationTypeException e) {
+			e.printStackTrace();
 		}
 	}
 

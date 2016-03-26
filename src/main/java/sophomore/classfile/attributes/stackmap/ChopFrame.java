@@ -9,12 +9,13 @@ import java.io.RandomAccessFile;
  */
 public class ChopFrame extends SameFrame {
 	/**
-	 * 
+	 *
 	 */
 	int offsetDelta;
 
-	ChopFrame(RandomAccessFile raf) throws IOException {
-		super(raf.readByte());
+	ChopFrame(StackMapFrameType type, int tag, RandomAccessFile raf)
+	throws IOException {
+		super(type, tag);
 		this.offsetDelta = raf.readShort();
 	}
 

@@ -12,21 +12,21 @@ import sophomore.classfile.attributes.AttributeType;
  */
 public class StackMapTable extends AttributeInfo {
 	/**
-	 * 
+	 *
 	 */
 	 StackMapFrame[] entries;
 	/**
-	 * 
+	 *
 	 * @param nameIndex
-	 * @param length 
+	 * @param length
 	 */
 	public StackMapTable(int nameIndex, int length) {
-		super(AttributeType.Type.StackMapTable, nameIndex, length);
+		super(AttributeType.StackMapTable, nameIndex, length);
 	}
 
 	/**
-	 * 
-	 * @return 
+	 *
+	 * @return
 	 */
 	public StackMapFrame[] getEntries() {
 		return entries;
@@ -36,8 +36,13 @@ public class StackMapTable extends AttributeInfo {
 	public void read(RandomAccessFile raf) throws IOException {
 		int len = raf.readShort();
 		this.entries = new StackMapFrame[len];
-		for(int i = 0; i < len; i++) {
-			entries[i] = new StackMapFrame(raf);
+		try {
+			StackMapFrameBuilder builder = StackMapFrameBuilder.getInstance();
+			for(int i = 0; i < len; i++) {
+				entries[i] = builder.build(raf);
+			}
+		} catch(StackMapFrameException e) {
+			e.printStackTrace();
 		}
 	}
 }

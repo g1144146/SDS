@@ -7,23 +7,20 @@ import java.io.RandomAccessFile;
  *
  * @author inagaki
  */
-public class SameLocalsStackItemFrame {
+public class SameLocals1StackItemFrame extends SameFrame {
 	/**
-	 * 
-	 */
-	int frameType;
-	/**
-	 * 
+	 *
 	 */
 	VerificationTypeInfo stack;
 
-	SameLocalsStackItemFrame(RandomAccessFile raf) throws IOException {
-		this.frameType = raf.readByte();
-		this.stack = new VerificationTypeInfo(raf);
-	}
-
-	public int getFrameType() {
-		return frameType;
+	SameLocals1StackItemFrame(int tag, RandomAccessFile raf) throws IOException {
+		super(StackMapFrameType.SameLocals1StackItemFrame, tag);
+		try {
+			VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();			
+			this.stack = builder.build(raf);
+		} catch(VerificationTypeException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public VerificationTypeInfo getStack() {

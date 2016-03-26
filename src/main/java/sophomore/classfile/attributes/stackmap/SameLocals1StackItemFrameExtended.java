@@ -12,28 +12,25 @@ import java.io.RandomAccessFile;
  *
  * @author inagakikenichi
  */
-public class SameLocalsStackItemFrameExtended {
+public class SameLocals1StackItemFrameExtended extends SameFrame {
 	/**
-	 * 
-	 */
-	int frameType;
-	/**
-	 * 
+	 *
 	 */
 	int offsetDelta;
 	/**
-	 * 
+	 *
 	 */
 	VerificationTypeInfo stack;
 
-	SameLocalsStackItemFrameExtended(RandomAccessFile raf) throws IOException {
-		this.frameType = raf.readByte();
+	SameLocals1StackItemFrameExtended(int tag, RandomAccessFile raf) throws IOException {
+		super(StackMapFrameType.SameLocals1StackItemFrameExtended, tag);
 		this.offsetDelta = raf.readShort();
-		this.stack = new VerificationTypeInfo(raf);
-	}
-
-	public int getFrameType() {
-		return frameType;
+		try {
+			VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();			
+			this.stack = builder.build(raf);
+		} catch(VerificationTypeException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public int getOffset() {
