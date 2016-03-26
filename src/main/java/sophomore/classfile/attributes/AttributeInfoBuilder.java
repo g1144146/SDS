@@ -36,13 +36,12 @@ public class AttributeInfoBuilder {
 	 * @param nameIndex
 	 * @param length
 	 * @return
-	 * @throws UnknownAttributeTypeException 
+	 * @throws AttributeTypeException 
 	 */
 	public AttributeInfo build(String attrName, int nameIndex, int length)
-	throws UnknownAttributeTypeException {
+	throws AttributeTypeException {
 		switch(attrName) {
-			case "AnnotationDefault":
-				return new AnnotationDefault(nameIndex, length);
+			case "AnnotationDefault":return new AnnotationDefault(nameIndex, length);
 			case "BootstrapMethods":
 				return new BootstrapMethods(nameIndex, length);
 			case "Code":
@@ -88,8 +87,7 @@ public class AttributeInfoBuilder {
 			case "StackMapTable":
 				return new StackMapTable(nameIndex, length);
 			default:
-				System.out.println("unknow attribute type: " + attrName);
-				throw new UnknownAttributeTypeException(attrName);
+				throw new AttributeTypeException(attrName);
 		}
 	}
 }

@@ -4,13 +4,13 @@ package sophomore.classfile.attributes;
  *
  * @author inagaki
  */
-public class UnknownAttributeTypeException extends Exception {
+public class AttributeTypeException extends Exception {
 
 	/**
 	 * 
 	 * @param type 
 	 */
-	public UnknownAttributeTypeException(String type) {
+	public AttributeTypeException(String type) {
 		super(type);
 	}
 }
