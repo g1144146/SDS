@@ -11,10 +11,6 @@ public class TypeAnnotation extends Annotation {
 	/**
 	 * 
 	 */
-	int targetType;
-	/**
-	 * 
-	 */
 	TargetInfo targetInfo;
 	/**
 	 * 
@@ -26,10 +22,10 @@ public class TypeAnnotation extends Annotation {
 	 * @param raf
 	 * @throws IOException 
 	 */
-	TypeAnnotation(RandomAccessFile raf) throws IOException {
-		this.targetType = raf.readByte();
-		// 途中
-		this.targetInfo = new TargetInfo(raf);
+	TypeAnnotation(RandomAccessFile raf)
+	throws IOException, TargetTypeException, ElementValueException {
+		TargetInfoBuilder builder = TargetInfoBuilder.getInstance();
+		this.targetInfo = builder.build(raf);
 		this.targetPath = new TypePath(raf);
 		this.typeIndex = raf.readShort();
 		int len = raf.readShort();
@@ -37,10 +33,6 @@ public class TypeAnnotation extends Annotation {
 		for(int i = 0; i < len; i++) {
 			elementValuePairs[i] = new ElementValuePair(raf);
 		}
-	}
-
-	public int getTargetType() {
-		return targetType;
 	}
 
 	public TargetInfo getTargetInfo() {
