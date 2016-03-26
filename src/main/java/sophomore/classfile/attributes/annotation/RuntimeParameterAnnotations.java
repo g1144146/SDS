@@ -28,8 +28,12 @@ abstract class RuntimeParameterAnnotations extends AttributeInfo {
 	public void read(RandomAccessFile raf) throws IOException {
 		int len = raf.readByte();
 		this.parameterAnnotations = new ParameterAnnotations[len];
-		for(int i = 0; i < len; i++) {
-			parameterAnnotations[i] = new ParameterAnnotations(raf);
+		try {
+			for(int i = 0; i < len; i++) {
+				parameterAnnotations[i] = new ParameterAnnotations(raf);
+			}
+		} catch(ElementValueException e) {
+			e.printStackTrace();
 		}
 	}
 

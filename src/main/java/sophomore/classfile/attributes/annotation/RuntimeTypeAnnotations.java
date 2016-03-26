@@ -31,8 +31,12 @@ abstract class RuntimeTypeAnnotations extends AttributeInfo {
 	public void read(RandomAccessFile raf) throws IOException {
 		int len = raf.readShort();
 		this.annotations = new TypeAnnotation[len];
-		for(int i = 0; i < len; i++) {
-			annotations[i] = new TypeAnnotation(raf);
+		try {
+			for(int i = 0; i < len; i++) {
+				annotations[i] = new TypeAnnotation(raf);
+			}
+		} catch(ElementValueException | TargetTypeException e) {
+			e.printStackTrace();
 		}
 	}
 

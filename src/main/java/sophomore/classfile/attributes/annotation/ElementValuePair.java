@@ -22,7 +22,7 @@ public class ElementValuePair {
 	 * @param raf
 	 * @throws IOException
 	 */
-	ElementValuePair(RandomAccessFile raf) throws IOException {
+	ElementValuePair(RandomAccessFile raf) throws IOException, ElementValueException {
 		this.elementNameIndex = raf.readShort();
 		this.value = new ElementValue(raf);
 	}

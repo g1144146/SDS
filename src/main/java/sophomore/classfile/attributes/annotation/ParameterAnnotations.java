@@ -18,7 +18,7 @@ public class ParameterAnnotations {
 	 * @param raf
 	 * @throws IOException
 	 */
-	ParameterAnnotations(RandomAccessFile raf) throws IOException {
+	ParameterAnnotations(RandomAccessFile raf) throws IOException, ElementValueException {
 		int len= raf.readByte();
 		this.annotations = new Annotation[len];
 		for(int i = 0; i < len; i++) {

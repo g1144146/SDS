@@ -18,7 +18,7 @@ public class ArrayValue {
 	 * @param raf
 	 * @throws IOException
 	 */
-	ArrayValue(RandomAccessFile raf) throws IOException {
+	ArrayValue(RandomAccessFile raf) throws IOException, ElementValueException {
 		int num = raf.readShort();
 		this.values = new ElementValue[num];
 		for(int i = 0; i < values.length; i++) {

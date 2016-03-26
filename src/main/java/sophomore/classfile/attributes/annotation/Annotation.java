@@ -23,7 +23,7 @@ public class Annotation {
 	 * @param raf
 	 * @throws IOException
 	 */
-	Annotation(RandomAccessFile raf) throws IOException {
+	Annotation(RandomAccessFile raf) throws IOException, ElementValueException {
 		this.typeIndex = raf.readShort();
 		int len = raf.readShort();
 		this.elementValuePairs = new ElementValuePair[len];

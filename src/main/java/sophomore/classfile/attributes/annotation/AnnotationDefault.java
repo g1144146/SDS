@@ -27,7 +27,11 @@ public class AnnotationDefault extends AttributeInfo {
 
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
-		this.defaultValue = new ElementValue(raf);
+		try {
+			this.defaultValue = new ElementValue(raf);
+		} catch(ElementValueException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public ElementValue getDefaultValue() {
