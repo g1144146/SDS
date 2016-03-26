@@ -82,10 +82,10 @@ public class InnerClasses extends AttributeInfo {
 					return outerClassInfoIndex;
 				case "inner_name":
 					return innerNameIndex;
-				case "accsess_flag":
+				case "access_flag":
 					return innerClassAccessFlags;
 				default:
-					System.out.println("Invalid key: " + key);
+					System.out.println("Invalid key in InnerClasses: " + key);
 					return -10000;
 			}
 		}

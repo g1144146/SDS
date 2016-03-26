@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
  *
  * @author inagaki
  */
-abstract class MemberInfo implements Info {
+public class MemberInfo implements Info {
 	/**
 	 * 
 	 */

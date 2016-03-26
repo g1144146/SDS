@@ -13,7 +13,7 @@ public class DescriptorParser {
 	/**
 	 *
 	 */
-	private static final String objPattern  = "[a-z\\\\.]*[0-9a-zA-Z_\\$\\.]+";
+	private static final String objPattern  = "L[a-z\\\\.]*[0-9a-zA-Z_\\$\\.]+";
 
 	/**
 	 *
@@ -27,7 +27,6 @@ public class DescriptorParser {
 		String obj = "(" + objPattern + "|\\[" + objPattern + ")";
 		Matcher m = Pattern.compile(obj + "|" + primPattern).matcher(desc);
 		StringBuilder sb = new StringBuilder();
-		System.out.println(m.groupCount());
 		while(m.find()) {
 			String s = m.group();
 			if(s.startsWith("[")) { // primitive array

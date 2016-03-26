@@ -1,12 +1,10 @@
 package sophomore.classfile;
 
-import sophomore.classfile.constantpool.Utf8Info;
-
 /**
  * 
  * @author inagakikenichi
  */
-abstract class Members implements ArrayInfo<MemberInfo> {
+public class Members implements ArrayInfo<MemberInfo> {
 	/**
 	 * 
 	 */

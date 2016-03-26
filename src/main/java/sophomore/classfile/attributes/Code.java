@@ -5,6 +5,8 @@ import java.io.RandomAccessFile;
 
 import sophomore.classfile.Attributes;
 import sophomore.classfile.ConstantPool;
+import sophomore.classfile.bytecode.OpcodeInfo;
+import sophomore.classfile.bytecode.MnemonicTable;
 import sophomore.classfile.constantpool.Utf8Info;
 
 /**
@@ -83,12 +85,17 @@ public class Code extends AttributeInfo {
 	}
 
 	public void read(RandomAccessFile raf, ConstantPool pool)
-	throws IOException, UnknownAttributeTypeException {
+	throws IOException, AttributeTypeException {
 		this.maxStack = raf.readShort(); // this.dataStream.readShort();
 		this.maxLocals = raf.readShort();
 		int codeLen = raf.readInt();
+		long p = raf.getFilePointer();
 		this.code = new byte[codeLen];
-		raf.readFully(code);
+		for(int i = 0; i < code.length; i++) {
+			System.out.println("pc: "+(raf.getFilePointer() - p));
+			code[i] = raf.readByte();
+		}
+//		raf.readFully(code);
 		int tableLen = raf.readShort();
 		this.exceptionTable = new ExceptionTable[tableLen];
 		for(int i = 0; i < tableLen; i++) {
