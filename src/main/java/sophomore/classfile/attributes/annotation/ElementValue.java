@@ -38,13 +38,24 @@ public class ElementValue {
 	 * @param raf
 	 * @throws IOException
 	 */
-	ElementValue(RandomAccessFile raf) throws IOException {
+	ElementValue(RandomAccessFile raf) throws IOException, ElementValueException {
 		this.tag = raf.readByte();
-		this.constValueIndex = raf.readShort();
-		this.enumConstValue = new EnumConstValue(raf);
-		this.classInfoIndex = raf.readShort();
-		this.annotationValue = new Annotation(raf);
-		this.arrayValue = new ArrayValue(raf);
+		switch((char)tag) {
+			case 'B':
+			case 'C':
+			case 'D':
+			case 'F':
+			case 'I':
+			case 'J':
+			case 'S':
+			case 'Z':
+			case 's': this.constValueIndex = raf.readShort();         break;
+			case 'e': this.enumConstValue  = new EnumConstValue(raf); break;
+			case 'c': this.classInfoIndex  = raf.readShort();         break;
+			case '@': this.annotationValue = new Annotation(raf);     break;
+			case '[': this.arrayValue      = new ArrayValue(raf);     break;
+			default:  throw new ElementValueException(tag);
+		}
 	}
 	public int getTag() {
 		return tag;
