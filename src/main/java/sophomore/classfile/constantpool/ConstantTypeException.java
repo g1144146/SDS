@@ -1,11 +1,11 @@
 package sophomore.classfile.constantpool;
 
-public class UnknownConstantTypeException extends Exception {
-	public UnknownConstantTypeException() {
+public class ConstantTypeException extends Exception {
+	public ConstantTypeException() {
 		super();
 	}
 
-	public UnknownConstantTypeException(int tag) {
+	public ConstantTypeException(int tag) {
 		super("Tag " + tag + " is unknown.");
 	}
 }
