@@ -20,7 +20,7 @@ public class Members implements ArrayInfo<MemberInfo> {
 	@Override
 	public void add(int index, MemberInfo element) {
 		if(index >= elements.length) {
-			throw new ArrayIndexOutOfBoundsException();
+			throw new ArrayIndexOutOfBoundsException(index);
 		}
 		elements[index] = element;
 	}
@@ -28,7 +28,7 @@ public class Members implements ArrayInfo<MemberInfo> {
 	@Override
 	public MemberInfo get(int index) {
 		if(index >= elements.length) {
-			throw new ArrayIndexOutOfBoundsException();
+			throw new ArrayIndexOutOfBoundsException(index);
 		}
 		return elements[index];
 	}

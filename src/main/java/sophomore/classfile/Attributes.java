@@ -32,7 +32,7 @@ public class Attributes implements ArrayInfo<AttributeInfo> {
 	@Override
 	public void add(int index, AttributeInfo element) {
 		if(index >= info.length) {
-			throw new ArrayIndexOutOfBoundsException();
+			throw new ArrayIndexOutOfBoundsException(index);
 		}
 		info[index] = element;
 	}
@@ -40,7 +40,7 @@ public class Attributes implements ArrayInfo<AttributeInfo> {
 	@Override
 	public AttributeInfo get(int index) {
 		if(index >= info.length) {
-			throw new ArrayIndexOutOfBoundsException();
+			throw new ArrayIndexOutOfBoundsException(index);
 		}
 		return info[index];
 	}
