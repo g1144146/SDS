@@ -5,8 +5,10 @@ import java.io.RandomAccessFile;
 
 import sophomore.classfile.Attributes;
 import sophomore.classfile.ConstantPool;
-import sophomore.classfile.bytecode.OpcodeInfo;
 import sophomore.classfile.bytecode.MnemonicTable;
+import sophomore.classfile.bytecode.OpcodeInfo;
+import sophomore.classfile.bytecode.Opcodes;
+import sophomore.classfile.bytecode.UndefinedOpcodeException;
 import sophomore.classfile.constantpool.Utf8Info;
 
 /**
@@ -25,7 +27,7 @@ public class Code extends AttributeInfo {
 	/**
 	 *
 	 */
-	byte[] code;
+	Opcodes opcodes;
 	/**
 	 *
 	 */
@@ -64,8 +66,8 @@ public class Code extends AttributeInfo {
 	 *
 	 * @return
 	 */
-	public byte[] getCode() {
-		return code;
+	public Opcodes getCode() {
+		return opcodes;
 	}
 
 	/**
@@ -86,14 +88,23 @@ public class Code extends AttributeInfo {
 
 	public void read(RandomAccessFile raf, ConstantPool pool)
 	throws IOException, AttributeTypeException {
-		this.maxStack = raf.readShort(); // this.dataStream.readShort();
+		this.maxStack = raf.readShort();
 		this.maxLocals = raf.readShort();
 		int codeLen = raf.readInt();
-		long p = raf.getFilePointer();
-		this.code = new byte[codeLen];
-		for(int i = 0; i < code.length; i++) {
-			System.out.println("pc: "+(raf.getFilePointer() - p));
-			code[i] = raf.readByte();
+		int p = (int)raf.getFilePointer();
+		this.opcodes = new Opcodes();
+//		System.out.println(codeLen + ", " + p);
+		try {
+			int i;
+			while((i = (int)raf.getFilePointer()) < codeLen + p) {
+				int pc = (i - p);
+				int op = Byte.toUnsignedInt(raf.readByte());
+				OpcodeInfo info = MnemonicTable.get(op, pc);
+				info.read(raf);
+				opcodes.add(info);
+			}
+		} catch(UndefinedOpcodeException e) {
+			e.printStackTrace();
 		}
 //		raf.readFully(code);
 		int tableLen = raf.readShort();
