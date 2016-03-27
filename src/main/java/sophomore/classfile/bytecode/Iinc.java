@@ -21,4 +21,12 @@ public class Iinc extends OpcodeInfo {
 		this.index  = raf.readUnsignedByte();
 		this._const = raf.readByte();
 	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public int getConst() {
+		return _const;
+	}
 }
