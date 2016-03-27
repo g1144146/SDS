@@ -5,51 +5,29 @@ package sophomore.classfile.attributes;
  * @author inagaki
  */
 public enum AttributeType {
-	ConstantValue("ConstantValue"),
-	Code("Code"),
-	StackMapTable("StackMapTable"),
-	Exceptions("Exceptions"),
-	BootstrapMethods("BootstrapMethods"),
+	ConstantValue,
+	Code,
+	StackMapTable,
+	Exceptions,
+	BootstrapMethods,
 	
-	InnerClasses("InnerClasses"),
-	EnclosingMethod("EnclosingMethod"),
-	Synthetic("Synthetic"),
-	Signature("Signature"),
-	RuntimeVisibleAnnotations("RuntimeVisibleAnnotations"),
-	RuntimeInvisibleAnnotations("RuntimeInvisibleAnnotations"),
-	RuntimeVisibleParameterAnnotations("RuntimeVisibleParameterAnnotations"),
-	RuntimeInvisibleParameterAnnotations("RuntimeInvisibleParameterAnnotations"),
-	RuntimeVisibleTypeAnnotations("RuntimeVisibleTypeAnnotations"),
-	RuntimeInvisibleTypeAnnotations("RuntimeInvisibleTypeAnnotations"),
-	AnnotationDefault("AnnotationDefault"),
-	MethodParameters("MethodParameters"),
+	InnerClasses,
+	EnclosingMethod,
+	Synthetic,
+	Signature,
+	RuntimeVisibleAnnotations,
+	RuntimeInvisibleAnnotations,
+	RuntimeVisibleParameterAnnotations,
+	RuntimeInvisibleParameterAnnotations,
+	RuntimeVisibleTypeAnnotations,
+	RuntimeInvisibleTypeAnnotations,
+	AnnotationDefault,
+	MethodParameters,
 	
-	SourceFile("SourceFile"),
-	SourceDebugExtension("SourceDebugExtension"),
-	LineNumberTable("LineNumberTable"),
-	LocalVariableTable("LocalVariableTable"),
-	LocalVariableTypeTable("LocalVariableTypeTable"),
-	Deprecated("Deprecated");
-
-	/**
-	 * 
-	 */
-	private String type;
-
-	AttributeType(String type) {
-		this.type = type;
-	}
-	
-	/**
-	 *
-	 * @return
-	 */
-	public String getType() {
-		return type;
-	}
-
-	@Override
-	public String toString() {
-		return type;
-	}
+	SourceFile,
+	SourceDebugExtension,
+	LineNumberTable,
+	LocalVariableTable,
+	LocalVariableTypeTable,
+	Deprecated;
 }
