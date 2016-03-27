@@ -42,10 +42,6 @@ public class ClassFile {
 	/**
 	 * 
 	 */
-	int interfaceCount = -100;
-	/**
-	 * 
-	 */
 	int[] interfaces;
 	/**
 	 * 
@@ -60,16 +56,16 @@ public class ClassFile {
 	 */
 	Attributes attr;
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		if(magicNumber  != -100) sb.append(  "Magic Number : ").append(magicNumber);
-		if(majorVersion != -100) sb.append("\nMajor Version: ").append(majorVersion);
-		if(minorVersion != -100) sb.append("\nMinor Version: ").append(minorVersion);
-		if(pool      != null) sb.append("\n").append(pool.toString());
-		if(accessFlag   != -100) sb.append("\nAccess Flag  : ").append(AccessFlags.get("class", accessFlag));
-		if(thisClass    != -100) sb.append("\nThis Class   : ").append("");
-
-		return sb.toString();
-	}
+//	@Override
+//	public String toString() {
+//		StringBuilder sb = new StringBuilder();
+//		if(magicNumber  != -100) sb.append(  "Magic Number : ").append(magicNumber);
+//		if(majorVersion != -100) sb.append("\nMajor Version: ").append(majorVersion);
+//		if(minorVersion != -100) sb.append("\nMinor Version: ").append(minorVersion);
+//		if(pool         != null) sb.append("\n").append(pool.toString());
+//		if(accessFlag   != -100) sb.append("\nAccess Flag  : ").append(AccessFlags.get("class", accessFlag));
+//		if(thisClass    != -100) sb.append("\nThis Class   : ").append("");
+//
+//		return sb.toString();
+//	}
 }
