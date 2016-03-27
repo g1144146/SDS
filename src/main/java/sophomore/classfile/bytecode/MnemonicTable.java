@@ -234,7 +234,11 @@ public enum MnemonicTable {
 	public int getOperand() {
 		return operand;
 	}
-	
+
+	public int getOpcode() {
+		return opcode;
+	}
+
 	/**
 	 *
 	 * @param opcode
@@ -242,7 +246,7 @@ public enum MnemonicTable {
 	 * @return
 	 * @throws UndefinedOpcodeException
 	 */
-	public OpcodeInfo get(int opcode, int pc) throws UndefinedOpcodeException {
+	public static OpcodeInfo get(int opcode, int pc) throws UndefinedOpcodeException {
 		// has no operand
 		if( (0x00 <= opcode && opcode <= 0x0f) || (0x1a <= opcode && opcode <= 0x35) ||
 			(0x3b <= opcode && opcode <= 0x83) || (0x85 <= opcode && opcode <= 0x98) ||
@@ -267,7 +271,7 @@ public enum MnemonicTable {
 			case 0xc0: /** checkcast **/
 			case 0xbd: /** anewarray **/
 			case 0xc1: /** instanceof **/
-					   return new CpRefOpcode(values()[opcode], pc);
+				return new CpRefOpcode(values()[opcode], pc);
 			case 0x15: /** iload **/
 			case 0x16: /** lload **/
 			case 0x17: /** fload **/
@@ -279,7 +283,7 @@ public enum MnemonicTable {
 			case 0x39: /** dstore **/
 			case 0x3a: /** astore **/
 			case 0xa9: /** ret **/
-					   return new IndexOpcode(values()[opcode], pc);
+				return new IndexOpcode(values()[opcode], pc);
 			case 0x84: return new Iinc(pc);
 			case 0x99: /** ifeq **/
 			case 0x9a: /** ifne **/
@@ -299,16 +303,17 @@ public enum MnemonicTable {
 			case 0xa8: /** jsr **/	
 			case 0xc6: /** ifnull **/
 			case 0xc7: /** ifnonnull **/
-					   return new BranchOpcode(values()[opcode], pc);
+				return new BranchOpcode(values()[opcode], pc);
 			case 0xaa: return new TableSwitch(pc);
 			case 0xab: return new LookupSwitch(pc);
 			case 0xb9: return new InvokeInterface(pc);
 			case 0xba: return new InvokeDynamic(pc);
 			case 0xbc: return new NewArray(pc);
-case 0xc4: /** wide **/
+			case 0xc4: return new Wide(pc);
 			case 0xc5: return new MultiANewArray(pc);
-case 0xc8: /** goto_w **/
-case 0xc9: /** jsr_w **/
+			case 0xc8: /** goto_w **/
+			case 0xc9: /** jsr_w **/
+				return new BranchWideOpcode(values()[opcode], pc);
 			case 0xfe: return new OpcodeInfo(values()[0xcb], pc); 
 			case 0xff: return new OpcodeInfo(values()[0xcc], pc);
 			default:   throw  new UndefinedOpcodeException(opcode);
