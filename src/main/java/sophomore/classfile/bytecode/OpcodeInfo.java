@@ -34,4 +34,9 @@ public class OpcodeInfo implements Info {
 	public int getPc() {
 		return pc;
 	}
+
+	@Override
+	public String toString() {
+		return opcodeType.toString();
+	}
 }
