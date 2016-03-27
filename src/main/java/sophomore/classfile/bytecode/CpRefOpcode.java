@@ -16,7 +16,11 @@ public class CpRefOpcode extends OpcodeInfo {
 
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
-		this.index = raf.readShort();
+		if(opcodeType == MnemonicTable.ldc) {
+			this.index = raf.readUnsignedByte();
+		} else {
+			this.index = raf.readShort();
+		}
 	}
 
 	public int getIndexByte() {
