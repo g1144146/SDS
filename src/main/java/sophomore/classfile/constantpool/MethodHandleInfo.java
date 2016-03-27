@@ -16,43 +16,6 @@ public class MethodHandleInfo extends ConstantInfo {
 	 * 
 	 */
 	int referenceIndex;
-
-	/**
-	 * 
-	 */
-	public static final int REF_GET_FIELD  = 1;
-	/**
-	 * 
-	 */
-	public static final int REF_GET_STATIC = 2;
-	/**
-	 * 
-	 */
-	public static final int REF_PUT_FIELD  = 3;
-	/**
-	 * 
-	 */
-	public static final int REF_PUT_STATIC = 4;
-	/**
-	 * 
-	 */
-	public static final int REF_INVOKE_VIRTUAL     = 5;
-	/**
-	 * 
-	 */
-	public static final int REF_INVOKE_STATIC      = 6;
-	/**
-	 * 
-	 */
-	public static final int REF_INVOKE_SPECIAL     = 7;
-	/**
-	 * 
-	 */
-	public static final int REF_NEW_INVOKE_SPECIAL = 8;
-	/**
-	 * 
-	 */
-	public static final int REF_INVOKE_INTERFACE   = 9;
 	
 	 /**
 	  * 
@@ -75,6 +38,25 @@ public class MethodHandleInfo extends ConstantInfo {
 	 */
 	public int getReferenceIndex() {
 		return referenceIndex;
+	}
+
+	/**
+	 * 
+	 * @return 
+	 */
+	public String getRefKindValue() {
+		switch(referenceKind) {
+			case 1:  return "REF_getField";
+			case 2:  return "REF_getStatic";
+			case 3:  return "REF_putField";
+			case 4:  return "REF_putStatic";
+			case 5:  return "REF_invokeVirtual";
+			case 6:  return "REF_invokeStatic";
+			case 7:  return "REF_invokeSpecial";
+			case 8:  return "REF_newInvokeSpecial";
+			case 9:  return "REF_invokeInterface";
+			default: return ">>> unknown reference kind <<<";
+		}
 	}
 
 	@Override
