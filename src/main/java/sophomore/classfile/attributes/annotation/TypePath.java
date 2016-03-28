@@ -11,11 +11,11 @@ public class TypePath {
 	/**
 	 * 
 	 */
-	int typePathKind;
+	int[] typePathKind;
 	/**
 	 * 
 	 */
-	int typeArgIndex;
+	int[] typeArgIndex;
 
 	/**
 	 * 
@@ -23,15 +23,20 @@ public class TypePath {
 	 * @throws IOException 
 	 */
 	TypePath(RandomAccessFile raf) throws IOException {
-		this.typePathKind = raf.readByte();
-		this.typeArgIndex = raf.readByte();
+		int len = raf.readUnsignedByte();
+		this.typeArgIndex = new int[len];
+		this.typePathKind = new int[len];
+		for(int i = 0; i < len; i++) {
+			this.typePathKind[i] = raf.readByte();
+			this.typeArgIndex[i] = raf.readByte();
+		}
 	}
 
 	/**
 	 * 
 	 * @return 
 	 */
-	public int getPathKind() {
+	public int[] getPathKind() {
 		return typePathKind;
 	}
 
@@ -39,7 +44,7 @@ public class TypePath {
 	 * 
 	 * @return 
 	 */
-	public int getArgIndex() {
+	public int[] getArgIndex() {
 		return typeArgIndex;
 	}
 }
