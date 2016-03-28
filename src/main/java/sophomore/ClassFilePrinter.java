@@ -24,7 +24,6 @@ import sophomore.classfile.attributes.MethodParameters;
 import sophomore.classfile.attributes.Signature;
 import sophomore.classfile.attributes.SourceDebugExtension;
 import sophomore.classfile.attributes.SourceFile;
-import sophomore.classfile.attributes.Synthetic;
 import sophomore.classfile.attributes.annotation.Annotation;
 import sophomore.classfile.attributes.annotation.AnnotationDefault;
 import sophomore.classfile.attributes.annotation.ElementValue;
@@ -37,11 +36,35 @@ import sophomore.classfile.attributes.annotation.RuntimeInvisibleTypeAnnotations
 import sophomore.classfile.attributes.annotation.RuntimeVisibleAnnotations;
 import sophomore.classfile.attributes.annotation.RuntimeVisibleParameterAnnotations;
 import sophomore.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
+import sophomore.classfile.attributes.annotation.TargetInfo;
+//import sophomore.classfile.attributes.annotation.TargetInfoType;
+import sophomore.classfile.attributes.annotation.TypePath;
+import sophomore.classfile.attributes.annotation.CatchTarget;
+import sophomore.classfile.attributes.annotation.EmptyTarget;
+import sophomore.classfile.attributes.annotation.LocalVarTarget;
+import sophomore.classfile.attributes.annotation.MethodFormalParameterTarget;
+import sophomore.classfile.attributes.annotation.OffsetTarget;
+import sophomore.classfile.attributes.annotation.SuperTypeTarget;
+import sophomore.classfile.attributes.annotation.ThrowsTarget;
+import sophomore.classfile.attributes.annotation.TypeArgumentTarget;
+import sophomore.classfile.attributes.annotation.TypeParameterTarget;
+import sophomore.classfile.attributes.annotation.TypeParameterBoundTarget;
 import sophomore.classfile.attributes.annotation.TypeAnnotation;
+import sophomore.classfile.attributes.stackmap.AppendFrame;
+import sophomore.classfile.attributes.stackmap.ChopFrame;
+import sophomore.classfile.attributes.stackmap.FullFrame;
+import sophomore.classfile.attributes.stackmap.ObjectVariableInfo;
+import sophomore.classfile.attributes.stackmap.SameFrameExtended;
+import sophomore.classfile.attributes.stackmap.SameLocals1StackItemFrame;
+import sophomore.classfile.attributes.stackmap.SameLocals1StackItemFrameExtended;
 import sophomore.classfile.attributes.stackmap.StackMapTable;
+import sophomore.classfile.attributes.stackmap.StackMapFrame;
+//import sophomore.classfile.attributes.stackmap.StackMapFrameType;
+import sophomore.classfile.attributes.stackmap.UninitializedVariableInfo;
+import sophomore.classfile.attributes.stackmap.VerificationTypeInfo;
+//import sophomore.classfile.attributes.stackmap.VerificationInfoType;
 import sophomore.classfile.bytecode.Bipush;
 import sophomore.classfile.bytecode.BranchOpcode;
-import sophomore.classfile.bytecode.BranchWideOpcode;
 import sophomore.classfile.bytecode.CpRefOpcode;
 import sophomore.classfile.bytecode.Iinc;
 import sophomore.classfile.bytecode.IndexOpcode;
@@ -73,7 +96,7 @@ import sophomore.classfile.constantpool.Utf8Info;
 import static sophomore.classfile.constantpool.ConstantType.*;
 
 /**
- *
+ * This class for debugging.
  * @author inagaki
  */
 public class ClassFilePrinter {
@@ -88,6 +111,9 @@ public class ClassFilePrinter {
 
 	public ClassFilePrinter() {}
 
+	/**
+	 * 
+	 */
 	public void print() {
 		try {
 			printNumber();
@@ -104,23 +130,35 @@ public class ClassFilePrinter {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	public void printNumber() {
 		out.println("*** Major Version *** " + sep + cf.majorVersion);
 		out.println("*** Minor Version *** " + sep + cf.minorVersion);
 		out.println(sep);
 	}
 
+	/**
+	 * 
+	 */
 	public void printConstantPool() {
 		out.println(pool);
 		out.println(sep);
 	}
 
+	/**
+	 * 
+	 */
 	public void printAccessFlag() {
 		out.println("*** Access Flag *** ");
 		out.println(AccessFlags.get(cf.accessFlag));
 		out.println(sep);
 	}
 
+	/**
+	 * 
+	 */
 	public void printThisClass() {
 		out.println("*** This Class *** ");
 		if(!checkRange(cf.thisClass)) {
@@ -131,6 +169,9 @@ public class ClassFilePrinter {
 		out.println(sep);
 	}
 
+	/**
+	 * 
+	 */
 	public void printSuperClass() {
 		out.println("*** Super Class *** ");
 		if(!checkRange(cf.superClass)) {
@@ -141,6 +182,9 @@ public class ClassFilePrinter {
 		out.println(sep);
 	}
 
+	/**
+	 * 
+	 */
 	public void printInterface() {
 		out.println("*** Interface *** ");
 		if(cf.interfaces.length == 0) {
@@ -148,13 +192,15 @@ public class ClassFilePrinter {
 			return;
 		}
 		for(int i : cf.interfaces) {
-			ClassInfo info = (ClassInfo)pool.get(i-1);
-			Utf8Info utf = (Utf8Info)pool.get(info.getNameIndex()-1);
-			out.println(utf.getValue());
+			out.println(getUtf8Value(pool.get(i-1)));
 		}
 		out.println(sep);
 	}
 
+	/**
+	 * 
+	 * @throws IOException 
+	 */
 	public void printFields() throws IOException {
 		out.println("*** Fields *** ");
 		if(cf.fields.getSize() == 0) {
@@ -170,6 +216,10 @@ public class ClassFilePrinter {
 		out.println(sep);
 	}
 
+	/**
+	 * 
+	 * @throws IOException 
+	 */
 	public void printMethods() throws IOException {
 		out.println("*** Methods *** ");
 		if(cf.methods.getSize() == 0) {
@@ -185,6 +235,10 @@ public class ClassFilePrinter {
 		out.println(sep);
 	}
 
+	/**
+	 * 
+	 * @throws IOException 
+	 */
 	public void printAttributes() throws IOException {
 		out.println("*** Attributes *** ");
 		if(cf.attr.getSize() == 0) {
@@ -197,6 +251,11 @@ public class ClassFilePrinter {
 		out.println(sep);
 	}
 
+	/**
+	 * 
+	 * @param info
+	 * @throws IOException 
+	 */
 	public void printAttributeInfo(AttributeInfo info) throws IOException {
 		out.println("   [attribute type]: " + info.getType().toString());
 		switch(info.getType()) {
@@ -265,15 +324,7 @@ public class ClassFilePrinter {
 			case ConstantValue:
 				ConstantValue cv = (ConstantValue)info;
 				int index = cv.getConstantValueIndex();
-				switch(index) {
-					case C_LONG:
-//						LongInfo longInfo = (LongInfo)pool.
-					case C_FLOAT:
-					case C_DOUBLE:
-					case C_STRING:
-					case C_INTEGER:
-					default:
-				}
+				out.println("\tconstant_value"+getUtf8Value(pool.get(index-1)));
 				break;
 			case Deprecated:
 				// do nothing.
@@ -324,21 +375,23 @@ public class ClassFilePrinter {
 			case LocalVariableTable:
 				LocalVariableTable lvt = (LocalVariableTable)info;
 				for(LocalVariable.LVTable t : lvt.getTable()) {
-					out.println("\tstart_pc: " + t.getNumber("start_pc")
-								+ ", length: " + t.getNumber("length") + "\t");
-					out.println("\t" + getUtf8Value(pool.get(t.getNumber("name_index")-1))
-								+ getUtf8Value(pool.get(t.getNumber("descriptor")-1)));
-					out.println("\tindex: " + t.getNumber("index"));
+					out.println("\tpc    : " + t.getNumber("start_pc")
+							+ "-" + (t.getNumber("start_pc")+t.getNumber("length")-1));
+					out.println("\tname  : " + getUtf8Value(pool.get(t.getNumber("name_index")-1)));
+					out.println("\tdesc  : "
+							+ DescriptorParser.parse(getUtf8Value(pool.get(t.getNumber("descriptor")-1))));
+					out.println("\tindex : " + t.getNumber("index"));
 				}
 				break;
 			case LocalVariableTypeTable:
 				LocalVariableTypeTable lvtt = (LocalVariableTypeTable)info;
 				for(LocalVariable.LVTable t : lvtt.getTable()) {
-					out.println("\tstart_pc: " + t.getNumber("start_pc")
-								+ ", length: " + t.getNumber("length"));
-					out.println("\t" + getUtf8Value(pool.get(t.getNumber("name_index")-1))
-								+ getUtf8Value(pool.get(t.getNumber("descriptor")-1)));
-					out.println("\tindex: " + t.getNumber("index"));
+					out.println("\tpc    : " + t.getNumber("start_pc")
+							+ "-" + (t.getNumber("start_pc")+t.getNumber("length")-1));
+					out.println("\tname  : " + getUtf8Value(pool.get(t.getNumber("name_index")-1)));
+					out.println("\tdesc  : "
+							+ DescriptorParser.parse(getUtf8Value(pool.get(t.getNumber("descriptor")-1))));
+					out.println("\tindex : " + t.getNumber("index"));
 				}
 				break;
 			case MethodParameters:
@@ -365,8 +418,8 @@ public class ClassFilePrinter {
 			case RuntimeInvisibleTypeAnnotations:
 				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations)info;
 				for(TypeAnnotation pa : rita.getAnnotations()) {
-					pa.getTargetInfo();
-					pa.getTargetPath();
+					printTargetInfo(pa.getTargetInfo());
+					printTypePath(pa.getTargetPath());
 					for(ElementValuePair evp : pa.getElementValuePairs()) {
 						printElementValuePair(evp);
 					}
@@ -389,8 +442,8 @@ public class ClassFilePrinter {
 			case RuntimeVisibleTypeAnnotations:
 				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations)info;
 				for(TypeAnnotation pa : rvta.getAnnotations()) {
-					pa.getTargetInfo();
-					pa.getTargetPath();
+					printTargetInfo(pa.getTargetInfo());
+					printTypePath(pa.getTargetPath());
 					for(ElementValuePair e : pa.getElementValuePairs()) {
 						printElementValuePair(e);
 					}
@@ -398,8 +451,7 @@ public class ClassFilePrinter {
 				break;
 			case Signature:
 				Signature sig = (Signature)info;
-				Utf8Info sigUtf = (Utf8Info)pool.get(sig.getSignatureIndex()-1);
-				out.println("\t" + sigUtf.getValue());
+				out.println("\t" + getUtf8Value(pool.get(sig.getSignatureIndex()-1)));
 				break;
 			case SourceDebugExtension:
 				SourceDebugExtension sde = (SourceDebugExtension)info;
@@ -415,44 +467,252 @@ public class ClassFilePrinter {
 				break;
 			case StackMapTable:
 				StackMapTable smt = (StackMapTable)info;
+				for(StackMapFrame frame : smt.getEntries()) {
+					printStackMapFrame(frame);
+				}
 				break;
 			default:
-				System.out.println("unknow attribute type: " + info.getType().name());
+				System.out.println("unknown attribute type: " + info.getType().name());
 				break;
 		}
 	}
 
+	/**
+	 * 
+	 * @param e 
+	 */
 	private void printElementValuePair(ElementValuePair e) {
 		if(e == null) {
 			return;
 		}
-		e.getElementNameIndex();
+		out.println("\t  element_name: "+getUtf8Value(pool.get(e.getElementNameIndex()-1)));
 		printElementValue(e.getValue());
 	}
 
+	/**
+	 * 
+	 * @param e 
+	 */
 	private void printElementValue(ElementValue e) {
 		if(e == null) {
 			return;
 		}
-		printAnnotation(e.getAnnotationValue());
-		for(ElementValue ev : e.getArrayValue().getValues()) {
-			printElementValue(ev);
+		switch((char)e.getTag()) {
+			case 'B':
+			case 'C':
+			case 'D':
+			case 'F':
+			case 'I':
+			case 'J':
+			case 'S':
+			case 'Z':
+			case 's':
+				out.println("\t\tconst_value: " + getUtf8Value(pool.get(e.getConstValueIndex()-1)));
+				break;
+			case 'e':
+				EnumConstValue ecv = e.getEnumConstValue();
+				out.println("\t\ttype_name : "+getUtf8Value(pool.get(ecv.getTypeNameIndex()-1)));
+				out.println("\t\tconst_name: "+getUtf8Value(pool.get(ecv.getConstNameIndex()-1)));
+				break;
+			case 'c':
+				out.println("\t\ttype_name : "+getUtf8Value(pool.get(e.getClassInfoIndex()-1)));
+				break;
+			case '@':
+				printAnnotation(e.getAnnotationValue());
+				break;
+			case '[':
+				for(ElementValue ev : e.getArrayValue().getValues()) {
+					printElementValue(ev);
+				}
+				break;
 		}
 	}
 
+	/**
+	 * 
+	 * @param annotation 
+	 */
 	private void printAnnotation(Annotation annotation) {
 		if(annotation == null) {
 			return;
 		}
+		out.println("\t\ttype_name : "+getUtf8Value(pool.get(annotation.getTypeIndex()-1)));
 		for(ElementValuePair evp : annotation.getElementValuePairs()) {
 			printElementValuePair(evp);
 		}
 	}
 
+	/**
+	 * 
+	 * @param frame 
+	 */
+	private void printStackMapFrame(StackMapFrame frame) {
+		out.println("\t  stack_map_frame_type: " + frame.getFrameType());
+		switch(frame.getFrameType()) {
+			case SameFrame: break;
+			case SameLocals1StackItemFrame:
+				SameLocals1StackItemFrame slsif = (SameLocals1StackItemFrame)frame;
+				printVerificationTypeInfo(slsif.getStack());
+				break;
+			case SameLocals1StackItemFrameExtended:
+				SameLocals1StackItemFrameExtended slsife = (SameLocals1StackItemFrameExtended)frame;
+				printVerificationTypeInfo(slsife.getStack());
+				break;
+			case ChopFrame:
+				ChopFrame cFrame = (ChopFrame)frame;
+				out.println("\t  offset_delta: " + cFrame.getOffset());
+				break;
+			case SameFrameExtended:
+				SameFrameExtended sfe = (SameFrameExtended)frame;
+				sfe.getOffset();
+				break;
+			case AppendFrame:
+				AppendFrame af = (AppendFrame)frame;
+				out.println("\t  offset_delta: " + af.getOffset());
+				for(VerificationTypeInfo info : af.getLocals()) {
+					printVerificationTypeInfo(info);
+				}
+				break;
+			case FullFrame:
+				FullFrame ff = (FullFrame)frame;
+				out.println("\t  offset_delta: " + ff.getOffset());
+				for(VerificationTypeInfo info : ff.getLocals()) {
+					printVerificationTypeInfo(info);
+				}
+				for(VerificationTypeInfo info : ff.getStack()) {
+					printVerificationTypeInfo(info);
+				}
+				break;
+			default:
+				System.out.println("unknown stack-map-frame type: " + frame.getFrameType());
+				break;
+		}
+	}
+
+	/**
+	 * 
+	 * @param info 
+	 */
+	private void printVerificationTypeInfo(VerificationTypeInfo info) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("\t\tverification_info_type: ").append(info.getType()).append(sep);
+		switch(info.getType()) {
+			case TopVariableInfo:
+			case IntegerVariableInfo:
+			case FloatVariableInfo:
+			case LongVariableInfo:
+			case DoubleVariableInfo:
+			case NullVariableInfo:
+			case UninitializedThisVariableInfo: break;
+			case ObjectVariableInfo:
+				ObjectVariableInfo ovi = (ObjectVariableInfo)info;
+				sb.append("\t\tcpool_index: ").append(ovi.getCPoolIndex()).append(sep);
+				sb.append("\t\t\tvalue: ").append(getUtf8Value(pool.get(ovi.getCPoolIndex()-1))).append(sep);
+				break;
+			case UninitializedVariableInfo:
+				UninitializedVariableInfo uvi = (UninitializedVariableInfo)info;
+				sb.append("\t\toffset: ").append(uvi.getOffset()).append(sep);
+				break;
+			default:
+				System.out.println("unknown varification-info type: " + info.getType());
+				break;
+		}
+		out.print(sb.toString());
+	}
+
+	/**
+	 * 
+	 * @param info 
+	 */
+	private void printTargetInfo(TargetInfo info) {
+		out.println("\t  target_info_type: " + info.getType());
+		switch(info.getType()) {
+			case TypeParameterTarget:
+				TypeParameterTarget tpt = (TypeParameterTarget)info;
+				out.println("\t\tindex: "+tpt.getIndex());
+				break;
+			case SuperTypeTarget:
+				SuperTypeTarget stt = (SuperTypeTarget)info;
+				out.println("\t\tindex: "+stt.getIndex());
+				break;
+			case TypeParameterBoundTarget:
+				TypeParameterBoundTarget tpbt = (TypeParameterBoundTarget)info;
+				out.println("\t\tbound_index         : "+tpbt.getBoundIndex());
+				out.println("\t\ttype_parameter_index: "+tpbt.getTPI());
+				break;
+			case EmptyTarget:
+				EmptyTarget et = (EmptyTarget)info;
+				break;
+			case MethodFormalParameterTarget:
+				MethodFormalParameterTarget mfpt = (MethodFormalParameterTarget)info;
+				out.println("\t\tindex: "+mfpt.getIndex());
+				break;
+			case ThrowsTarget:
+				ThrowsTarget tt = (ThrowsTarget)info;
+				out.println("\t\tindex: "+tt.getIndex());
+				break;
+			case LocalVarTarget:
+				LocalVarTarget lvt = (LocalVarTarget)info;
+				for(LocalVarTarget.LVTTable t : lvt.getTable()) {
+					out.println("\t\tindex: " + t.getIndex());
+					out.println("\t\tpc   : " + t.getStartPc()
+								+ (t.getStartPc()+t.getLen()-1));
+				}
+				break;
+			case CatchTarget:
+				CatchTarget ct = (CatchTarget)info;
+				out.println("\t\tindex: "+ct.getIndex());
+				break;
+			case OffsetTarget:
+				OffsetTarget ot = (OffsetTarget) info;
+				out.println("\t\toffset: "+ot.getOffset());
+				break;
+			case TypeArgumentTarget:
+				TypeArgumentTarget tat = (TypeArgumentTarget)info;
+				out.println("\t\tindex : "+tat.getIndex());
+				out.println("\t\toffset: "+tat.getOffset());
+				break;
+			default:
+				System.out.println("unknown target-info type: " + info.getType());
+				break;
+		}
+	}
+
+	/**
+	 * 
+	 * @param path 
+	 */
+	private void printTypePath(TypePath path) {
+		out.print("\t  type_path_type: ");
+		for(int i = 0; i < path.getArgIndex().length; i++) {
+			int pk = path.getPathKind()[i];
+			int ai = path.getArgIndex()[i];
+			switch(pk) {
+				case 0:  out.println("Annotation is deeper in an array type."); break;
+				case 1:  out.println("Annotation is deeper in a nested type."); break;
+				case 2:  out.println("Annotation is on the bound of a "
+									+ "wildcard type argument of a parameterized type."); break;
+				case 3:  out.println("Annotation is on a type argument of a parameterized type."); break;
+				default: out.println("unknown type_path_kind: " + pk); break;
+			}
+			out.println("\t  type_arg_index: " + ai);
+		}
+	}
+
+	/**
+	 * 
+	 * @param index
+	 * @return 
+	 */
 	private boolean checkRange(int index) {
 		return (0 <= index) && (index < pool.getSize());
 	}
 
+	/**
+	 * 
+	 * @param info
+	 * @return 
+	 */
 	private String getUtf8Value(ConstantInfo info) {
 		if(info.getTag() == C_UTF8) {
 			return ((Utf8Info)info).getValue();
@@ -504,6 +764,11 @@ public class ClassFilePrinter {
 		}
 	}
 
+	/**
+	 * 
+	 * @param info
+	 * @return 
+	 */
 	private String getUtf8Value(MemberInfo info) {
 		return getUtf8Value(pool.get(info.getNameIndex()-1))
 			+ DescriptorParser.parse(getUtf8Value(pool.get(info.getDescriptorIndex()-1)));

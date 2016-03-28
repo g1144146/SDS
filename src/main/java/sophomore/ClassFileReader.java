@@ -75,7 +75,6 @@ public class ClassFileReader {
 		cf.magicNumber  = raf.readInt(); // 4byte
 		cf.minorVersion = raf.readShort(); // 2byte
 		cf.majorVersion = raf.readShort(); // 2byte
-		System.out.println(cf);
 	}
 
 	/**
@@ -187,13 +186,11 @@ public class ClassFileReader {
 		for(int i = 0; i < attrCount; i++) {
 			int nameIndex = raf.readShort();
 			int length = raf.readInt();
-			System.out.println(nameIndex + ", " + length);
 			String attrName = ((Utf8Info)cf.pool.get(nameIndex-1)).getValue();
 			AttributeInfo info = builder.build(attrName, nameIndex, length);
 			// System.out.println(info.getType());
 			if(info.getType() == AttributeType.Code) {
 				((Code)info).read(raf, cf.pool);
-				new ClassFilePrinter().printAttributeInfo(info);
 			} else {
 				info.read(raf);
 			}
