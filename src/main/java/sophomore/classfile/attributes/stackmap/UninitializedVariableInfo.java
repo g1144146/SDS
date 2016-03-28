@@ -14,4 +14,8 @@ public class UninitializedVariableInfo extends AbstractVerificationTypeInfo {
 		super(tag, VerificationInfoType.UninitializedVariableInfo);
 		this.offset = offset;
 	}
+
+	public int getOffset() {
+		return offset;
+	}
 }

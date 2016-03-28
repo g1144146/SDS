@@ -14,4 +14,8 @@ public class ObjectVariableInfo extends AbstractVerificationTypeInfo {
 		super(tag, VerificationInfoType.ObjectVariableInfo);
 		this.cpoolIndex = cpoolIndex;
 	}
+
+	public int getCPoolIndex() {
+		return cpoolIndex;
+	}
 }
