@@ -23,19 +23,21 @@ public class DescriptorParser {
 	public static String parse(String desc) {
 		String primPattern = "(B|\\[B|C|\\[C|D|\\[D|F|\\[F|V|I|\\[I"
 								+ "|J|\\[J|S|\\[S|Z|\\[Z|\\(|\\))";
+		String genericsPattern = "T[A-Z]";
 		desc = desc.replace("/", ".");
 		String obj = "(" + objPattern + "|\\[" + objPattern + ")";
-		Matcher m = Pattern.compile(obj + "|" + primPattern).matcher(desc);
+		String gen = "(" + genericsPattern + "|\\[" + genericsPattern + ")";
+		Matcher m = Pattern.compile(obj + "|" + primPattern + "|" + gen).matcher(desc);
 		StringBuilder sb = new StringBuilder();
 		while(m.find()) {
 			String s = m.group();
 			if(s.startsWith("[")) { // primitive array
 				if(s.length() == 2) {
 					sb.append(parseType(s.substring(1))).append("[]");
-				} else { // object array
+				} else { // object or generics array
 					sb.append(s.subSequence(2, s.length())).append("[]");
 				}
-			} else if(s.startsWith("L")) { // object
+			} else if(s.startsWith("L") || s.startsWith("T")) { // object or generics
 				sb.append(s.subSequence(1, s.length()));
 			} else if(s.equals("V")) { // void
 				sb.append(parseType(s));
@@ -89,7 +91,11 @@ public class DescriptorParser {
 			case "S": return "short";
 			case "Z": return "boolean";
 			case "V": return "void";
-			default : return "";
+			case "(":
+			case ")": return "";
+			default :
+				System.out.println(">>> unknown type \""+head+"\".");
+				return "";
 		}
 	}
 }
