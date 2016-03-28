@@ -41,7 +41,8 @@ public class AttributeInfoBuilder {
 	public AttributeInfo build(String attrName, int nameIndex, int length)
 	throws AttributeTypeException {
 		switch(attrName) {
-			case "AnnotationDefault":return new AnnotationDefault(nameIndex, length);
+			case "AnnotationDefault":
+				return new AnnotationDefault(nameIndex, length);
 			case "BootstrapMethods":
 				return new BootstrapMethods(nameIndex, length);
 			case "Code":

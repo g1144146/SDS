@@ -89,16 +89,11 @@ public abstract class LocalVariable extends AttributeInfo {
 		 */
 		public int getNumber(String key) {
 			switch(key) {
-				case "start_pc":
-					return startPc;
-				case "length":
-					return length;
-				case "name_index":
-					return nameIndex;
-				case "descriptor":
-					return descriptorIndex;
-				case "index":
-					return index;
+				case "start_pc":   return startPc;
+				case "length":     return length;
+				case "name_index": return nameIndex;
+				case "descriptor": return descriptorIndex;
+				case "index":      return index;
 				default:
 					System.out.println("Invalid key: " + key);
 					return -10000;

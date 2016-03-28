@@ -79,7 +79,7 @@ public class ConstantType {
 			case C_NAME_AND_TYPE:       return "CONSTANT_NAME_AND_TYPE";
 			case C_METHOD_HANDLE:       return "CONSTANT_METHOD_HANDLE";
 			case C_METHOD_TYPE:         return "CONSTANT_METHOD_TYPE";
-			case C_INVOKE_DYNAMIC:return "CONSTANT_INVOKE_DYNAMIC";
+			case C_INVOKE_DYNAMIC:      return "CONSTANT_INVOKE_DYNAMIC";
 			default:
 				System.out.println("invalid type: " + type);
 				return " >>> unknown type <<<";

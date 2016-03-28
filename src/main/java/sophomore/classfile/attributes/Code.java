@@ -93,7 +93,6 @@ public class Code extends AttributeInfo {
 		int codeLen = raf.readInt();
 		int p = (int)raf.getFilePointer();
 		this.opcodes = new Opcodes();
-//		System.out.println(codeLen + ", " + p);
 		try {
 			int i;
 			while((i = (int)raf.getFilePointer()) < codeLen + p) {
@@ -106,7 +105,6 @@ public class Code extends AttributeInfo {
 		} catch(UndefinedOpcodeException e) {
 			e.printStackTrace();
 		}
-//		raf.readFully(code);
 		int tableLen = raf.readShort();
 		this.exceptionTable = new ExceptionTable[tableLen];
 		for(int i = 0; i < tableLen; i++) {
@@ -120,7 +118,6 @@ public class Code extends AttributeInfo {
 			int length = raf.readInt();
 			String attrName = ((Utf8Info)pool.get(index-1)).getValue();
 			AttributeInfo info = builder.build(attrName, index, length);
-			System.out.println(index + ", " + length + ", "+info.getType());
 			info.read(raf);
 			attr.add(i, info);
 		}
