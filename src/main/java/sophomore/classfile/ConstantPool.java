@@ -21,7 +21,7 @@ public class ConstantPool implements ArrayInfo<ConstantInfo> {
 	}
 
 	@Override
-	public int getSize() {
+	public int size() {
 		return pool.length;
 	}
 

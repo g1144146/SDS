@@ -1,17 +1,19 @@
 package sophomore.classfile;
 
+import java.util.RandomAccess;
+
 /**
  *
  * @author inagaki
  * @param <T>
  */
-public interface ArrayInfo<T extends Info> {
+public interface ArrayInfo<T extends Info> extends RandomAccess {
 
 	/**
 	 * 
 	 * @return 
 	 */
-	abstract int getSize();
+	abstract int size();
 
 	/**
 	 * 

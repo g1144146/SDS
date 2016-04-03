@@ -25,7 +25,7 @@ public class Attributes implements ArrayInfo<AttributeInfo> {
 	}
 
 	@Override
-	public int getSize() {
+	public int size() {
 		return info.length;
 	}
 

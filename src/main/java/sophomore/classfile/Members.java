@@ -13,7 +13,7 @@ public class Members implements ArrayInfo<MemberInfo> {
 	Members() {}
 
 	@Override
-	public int getSize() {
+	public int size() {
 		return elements.length;
 	}
 

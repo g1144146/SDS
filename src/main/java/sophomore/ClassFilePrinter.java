@@ -203,7 +203,7 @@ public class ClassFilePrinter {
 	 */
 	public void printFields() throws IOException {
 		out.println("*** Fields *** ");
-		if(cf.fields.getSize() == 0) {
+		if(cf.fields.size() == 0) {
 			out.println(sep);
 			return;
 		}
@@ -222,7 +222,7 @@ public class ClassFilePrinter {
 	 */
 	public void printMethods() throws IOException {
 		out.println("*** Methods *** ");
-		if(cf.methods.getSize() == 0) {
+		if(cf.methods.size() == 0) {
 			out.println(sep);
 			return;
 		}
@@ -241,7 +241,7 @@ public class ClassFilePrinter {
 	 */
 	public void printAttributes() throws IOException {
 		out.println("*** Attributes *** ");
-		if(cf.attr.getSize() == 0) {
+		if(cf.attr.size() == 0) {
 			out.println(sep);
 			return;
 		}
@@ -536,7 +536,8 @@ public class ClassFilePrinter {
 		if(annotation == null) {
 			return;
 		}
-		out.println("\t\ttype_name : "+getUtf8Value(pool.get(annotation.getTypeIndex()-1)));
+		out.println("\t\ttype_name : "+
+					DescriptorParser.parse(getUtf8Value(pool.get(annotation.getTypeIndex()-1))));
 		for(ElementValuePair evp : annotation.getElementValuePairs()) {
 			printElementValuePair(evp);
 		}
@@ -705,7 +706,7 @@ public class ClassFilePrinter {
 	 * @return 
 	 */
 	private boolean checkRange(int index) {
-		return (0 <= index) && (index < pool.getSize());
+		return (0 <= index) && (index < pool.size());
 	}
 
 	/**

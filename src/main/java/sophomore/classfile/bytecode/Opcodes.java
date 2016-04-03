@@ -24,7 +24,7 @@ public class Opcodes implements ArrayInfo<OpcodeInfo> {
 	}
 
 	@Override
-	public int getSize() {
+	public int size() {
 		return opcodes.length;
 	}
 
