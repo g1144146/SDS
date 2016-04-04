@@ -102,21 +102,30 @@ public class AccessFlags {
 	public static final int METHOD_FLAG = ACC_PUBLIC | ACC_PRIVATE | ACC_PROTECTED
 		| ACC_STATIC | ACC_FINAL | ACC_SYNCHRONIZED | ACC_BRIDGE | ACC_VARARGS
 		| ACC_NATIVE | ACC_ABSTRACT | ACC_STRICT | ACC_SYNTHETIC;
+	/**
+	 * 
+	 */
+	public static final int NESTED_CLASS = ACC_PUBLIC | ACC_PRIVATE | ACC_PROTECTED | ACC_STATIC
+		| ACC_FINAL | ACC_INTERFACE | ACC_ABSTRACT | ACC_SYNTHETIC | ACC_ANNOTATION | ACC_ENUM;
 
 	/**
 	 * 
 	 * @param accessFlag
+	 * @param type
 	 * @return 
 	 */
-	public static String get(int accessFlag) {
-		if((accessFlag | CLASS_FLAG) == CLASS_FLAG) {
+	public static String get(int accessFlag, String type) {
+		if(type.equals("class") && ((accessFlag | CLASS_FLAG) == CLASS_FLAG)) {
 			return getClassAccessFlag(accessFlag);
-		} else if((accessFlag | FIELD_FLAG) == FIELD_FLAG) {
+		} else if(type.equals("field")  && (accessFlag | FIELD_FLAG  ) == FIELD_FLAG) {
 			return getFieldAccessFlag(accessFlag);
-		} else if((accessFlag | METHOD_FLAG) == METHOD_FLAG) {
+		} else if(type.equals("method") && (accessFlag | METHOD_FLAG ) == METHOD_FLAG) {
 			return getMethodAccessFlag(accessFlag);
+		} else if(type.equals("nested") && (accessFlag | NESTED_CLASS) == NESTED_CLASS) {
+			return getClassAccessFlag(accessFlag);
 		}
-		System.out.println("unknown access flag: " + accessFlag);
+		System.out.println("unknown access flag : " + accessFlag);
+		System.out.println("type                : " + type);
 		return " >>> unknown access flag <<<";
 	}
 
@@ -130,9 +139,9 @@ public class AccessFlags {
 		if(checkFlag(accessFlag, ACC_PUBLIC))     sb.append("public ");
 		if(checkFlag(accessFlag, ACC_FINAL))      sb.append("final ");
 		if(checkFlag(accessFlag, ACC_SYNTHETIC))  sb.append("synthetic ");
-		if(checkFlag(accessFlag, ACC_ANNOTATION)) sb.append("@annotation ");
+		if(checkFlag(accessFlag, ACC_ANNOTATION)) sb.append("@interface ");
 		if(checkFlag(accessFlag, ACC_ENUM))       sb.append("enum ");
-		if(checkFlag(accessFlag, ACC_INTERFACE) && (checkFlag(accessFlag, ACC_ABSTRACT))) {
+		if(checkFlag(accessFlag, ACC_INTERFACE) && ((accessFlag & ACC_ANNOTATION) == 0)) {
 			sb.append("interface ");
 		}
 		if((accessFlag & (ACC_INTERFACE | ACC_ENUM | ACC_ANNOTATION)) == 0) {
