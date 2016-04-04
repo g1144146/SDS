@@ -1,13 +1,12 @@
-package sophomore;
+package sophomore.util;
 
 import java.io.IOException;
 import java.io.PrintStream;
 
-import sophomore.classfile.AccessFlags;
+import sophomore.classfile.Attributes;
 import sophomore.classfile.ConstantPool;
-import sophomore.classfile.DescriptorParser;
-import sophomore.classfile.FieldInfo;
-import sophomore.classfile.MethodInfo;
+import sophomore.classfile.Fields;
+import sophomore.classfile.Methods;
 import sophomore.classfile.MemberInfo;
 import sophomore.classfile.attributes.AttributeInfo;
 import sophomore.classfile.attributes.BootstrapMethods;
@@ -59,10 +58,8 @@ import sophomore.classfile.attributes.stackmap.SameLocals1StackItemFrame;
 import sophomore.classfile.attributes.stackmap.SameLocals1StackItemFrameExtended;
 import sophomore.classfile.attributes.stackmap.StackMapTable;
 import sophomore.classfile.attributes.stackmap.StackMapFrame;
-//import sophomore.classfile.attributes.stackmap.StackMapFrameType;
 import sophomore.classfile.attributes.stackmap.UninitializedVariableInfo;
 import sophomore.classfile.attributes.stackmap.VerificationTypeInfo;
-//import sophomore.classfile.attributes.stackmap.VerificationInfoType;
 import sophomore.classfile.bytecode.Bipush;
 import sophomore.classfile.bytecode.BranchOpcode;
 import sophomore.classfile.bytecode.CpRefOpcode;
@@ -100,42 +97,21 @@ import static sophomore.classfile.constantpool.ConstantType.*;
  * @author inagaki
  */
 public class ClassFilePrinter {
-	private ClassFile cf;
 	private PrintStream out = System.out;
 	private ConstantPool pool;
 	private String sep = System.getProperty("line.separator");
-	public ClassFilePrinter(ClassFile cf) {
-		this.cf = cf;
-		this.pool = cf.pool;
-	}
-
-	public ClassFilePrinter() {}
-
-	/**
-	 * 
-	 */
-	public void print() {
-		try {
-			printNumber();
-			printConstantPool();
-			printAccessFlag();
-			printThisClass();
-			printSuperClass();
-			printInterface();
-			printFields();
-			printMethods();
-			printAttributes();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+	public ClassFilePrinter(ConstantPool pool) {
+		this.pool = pool;
 	}
 
 	/**
 	 * 
+	 * @param majorVersion
+	 * @param minorVersion
 	 */
-	public void printNumber() {
-		out.println("*** Major Version *** " + sep + cf.majorVersion);
-		out.println("*** Minor Version *** " + sep + cf.minorVersion);
+	public void printNumber(int majorVersion, int minorVersion) {
+		out.println("*** Major Version *** " + sep + majorVersion);
+		out.println("*** Minor Version *** " + sep + minorVersion);
 		out.println(sep);
 	}
 
@@ -149,49 +125,53 @@ public class ClassFilePrinter {
 
 	/**
 	 * 
+	 * @param accessFlag
 	 */
-	public void printAccessFlag() {
+	public void printAccessFlag(int accessFlag) {
 		out.println("*** Access Flag *** ");
-		out.println(AccessFlags.get(cf.accessFlag));
+		out.println(AccessFlags.get(accessFlag, "class"));
 		out.println(sep);
 	}
 
 	/**
 	 * 
+	 * @param thisClass
 	 */
-	public void printThisClass() {
+	public void printThisClass(int thisClass) {
 		out.println("*** This Class *** ");
-		if(!checkRange(cf.thisClass)) {
+		if(!checkRange(thisClass)) {
 			out.println(sep);
 			return;
 		}
-		out.println(getUtf8Value(pool.get(cf.thisClass-1)));
+		out.println(getUtf8Value(pool.get(thisClass-1)));
 		out.println(sep);
 	}
 
 	/**
 	 * 
+	 * @param superClass
 	 */
-	public void printSuperClass() {
+	public void printSuperClass(int superClass) {
 		out.println("*** Super Class *** ");
-		if(!checkRange(cf.superClass)) {
+		if(!checkRange(superClass)) {
 			out.println(sep);
 			return;
 		}
-		out.println(getUtf8Value(pool.get(cf.superClass-1)));
+		out.println(getUtf8Value(pool.get(superClass-1)));
 		out.println(sep);
 	}
 
 	/**
 	 * 
+	 * @param interfaces
 	 */
-	public void printInterface() {
+	public void printInterface(int[] interfaces) {
 		out.println("*** Interface *** ");
-		if(cf.interfaces.length == 0) {
+		if(interfaces.length == 0) {
 			out.println(sep);
 			return;
 		}
-		for(int i : cf.interfaces) {
+		for(int i : interfaces) {
 			out.println(getUtf8Value(pool.get(i-1)));
 		}
 		out.println(sep);
@@ -199,18 +179,23 @@ public class ClassFilePrinter {
 
 	/**
 	 * 
+	 * @param fields
 	 * @throws IOException 
 	 */
-	public void printFields() throws IOException {
+	public void printFields(Fields fields) throws IOException {
 		out.println("*** Fields *** ");
-		if(cf.fields.size() == 0) {
+		if(fields.size() == 0) {
 			out.println(sep);
 			return;
 		}
-		for(FieldInfo info : (FieldInfo[])cf.fields.getAll()) {
-			out.println("\t"+AccessFlags.get(info.getAccessFlags()) + getUtf8Value(info));
-			for(AttributeInfo attr : info.getAttr().getAll()) {
-				printAttributeInfo(attr);
+
+		for(int i = 0; i < fields.size(); i++) {
+			MemberInfo field = fields.get(i);
+			out.println("\t"+AccessFlags.get(field.getAccessFlags(), "field")
+						+ getUtf8Value(field));
+			Attributes attr = field.getAttr();
+			for(int j = 0; j < attr.size(); j++) {
+				printAttributeInfo(attr.get(j));
 			}
 		}
 		out.println(sep);
@@ -218,18 +203,22 @@ public class ClassFilePrinter {
 
 	/**
 	 * 
+	 * @param methods
 	 * @throws IOException 
 	 */
-	public void printMethods() throws IOException {
+	public void printMethods(Methods methods) throws IOException {
 		out.println("*** Methods *** ");
-		if(cf.methods.size() == 0) {
+		if(methods.size() == 0) {
 			out.println(sep);
 			return;
 		}
-		for(MethodInfo info : (MethodInfo[])cf.methods.getAll()) {
-			out.println("["+AccessFlags.get(info.getAccessFlags()) + getUtf8Value(info) + "]");
-			for(AttributeInfo attr : info.getAttr().getAll()) {
-				printAttributeInfo(attr);
+		for(int i = 0; i < methods.size(); i++) {
+			MemberInfo method = methods.get(i);
+			out.println("["+AccessFlags.get(method.getAccessFlags(), "method")
+						+ getUtf8Value(method) + "]");
+			Attributes attr = method.getAttr();
+			for(int j = 0; j < attr.size(); j++) {
+				printAttributeInfo(attr.get(i));
 			}
 		}
 		out.println(sep);
@@ -237,16 +226,17 @@ public class ClassFilePrinter {
 
 	/**
 	 * 
+	 * @param attr
 	 * @throws IOException 
 	 */
-	public void printAttributes() throws IOException {
+	public void printAttributes(Attributes attr) throws IOException {
 		out.println("*** Attributes *** ");
-		if(cf.attr.size() == 0) {
+		if(attr.size() == 0) {
 			out.println(sep);
 			return;
 		}
-		for(AttributeInfo attr : cf.attr.getAll()) {
-			printAttributeInfo(attr);
+		for(int i = 0; i < attr.size(); i++) {
+			printAttributeInfo(attr.get(i));
 		}
 		out.println(sep);
 	}
@@ -354,7 +344,7 @@ public class ClassFilePrinter {
 					int name = c.getNumber("inner_name");
 					int accessFlag = c.getNumber("access_flag");
 					if(checkRange(inner-1)) {
-						out.println("\tinner_class: " + AccessFlags.get(accessFlag)
+						out.println("\tinner_class: " + AccessFlags.get(accessFlag, "nested")
 								+ getUtf8Value(pool.get(inner-1)));
 					}
 					if(checkRange(outer-1)) {
@@ -397,7 +387,7 @@ public class ClassFilePrinter {
 			case MethodParameters:
 				MethodParameters mp = (MethodParameters)info;
 				for(MethodParameters.Parameters p : mp.getParams()) {
-					String flag = AccessFlags.get(p.getAccessFlag());
+					String flag = AccessFlags.get(p.getAccessFlag(), "method");
 					out.println(flag + getUtf8Value(pool.get(p.getNameIndex()-1)));
 				}
 				break;
@@ -507,15 +497,15 @@ public class ClassFilePrinter {
 			case 'S':
 			case 'Z':
 			case 's':
-				out.println("\t\tconst_value: " + getUtf8Value(pool.get(e.getConstValueIndex()-1)));
+				out.println("\t\t  const_value: " + getUtf8Value(pool.get(e.getConstValueIndex()-1)));
 				break;
 			case 'e':
 				EnumConstValue ecv = e.getEnumConstValue();
-				out.println("\t\ttype_name : "+getUtf8Value(pool.get(ecv.getTypeNameIndex()-1)));
-				out.println("\t\tconst_name: "+getUtf8Value(pool.get(ecv.getConstNameIndex()-1)));
+				out.println("\t\t  type_name : "+getUtf8Value(pool.get(ecv.getTypeNameIndex()-1)));
+				out.println("\t\t  const_name: "+getUtf8Value(pool.get(ecv.getConstNameIndex()-1)));
 				break;
 			case 'c':
-				out.println("\t\ttype_name : "+getUtf8Value(pool.get(e.getClassInfoIndex()-1)));
+				out.println("\t\t  type_name : "+getUtf8Value(pool.get(e.getClassInfoIndex()-1)));
 				break;
 			case '@':
 				printAnnotation(e.getAnnotationValue());
