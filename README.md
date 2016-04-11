@@ -1,17 +1,14 @@
-# *??*
+# *SDS*
 
 ---
 # Overview
-
-This tool is for decompiling and investigating contents of java class files.
-
 
 ---
 
 # Usage
 
     $ gradle build
-    $ java -jar build/libs/xxx.jar [java class file]
+    $ java -jar build/libs/SDS.jar [java class file]
 
 
 ---
@@ -38,3 +35,4 @@ This tool is for decompiling and investigating contents of java class files.
 * [The Java® Virtual Machine Specification](https://docs.oracle.com/javase/specs/jvms/se8/html/index.html)
 * [siphon](https://github.com/tamada/siphon)
 * [classpy](https://github.com/zxh0/classpy)
+* [Java Virtual Machine Online Instruction Reference](http://cs.au.dk/~mis/dOvs/jvmspec/ref-Java.html)
