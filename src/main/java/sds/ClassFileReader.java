@@ -89,7 +89,7 @@ public class ClassFileReader {
 	 *
 	 * @param raf
 	 * @throws IOException
-	 * @throws UnknownConstantTypeException
+	 * @throws ConstantTypeException
 	 */
 	private void readConstantPool(RandomAccessFile raf, int constantPoolCount)
 	throws IOException, ConstantTypeException {
@@ -146,7 +146,7 @@ public class ClassFileReader {
 	 * @param raf
 	 * @param fieldCount
 	 * @throws IOException
-	 * @throws UnknownAttributeTypeException
+	 * @throws AttributeTypeException
 	 */
 	private void readFields(RandomAccessFile raf, int fieldCount)
 	throws IOException, AttributeTypeException {
@@ -165,7 +165,7 @@ public class ClassFileReader {
 	 * @param raf
 	 * @param methodCount
 	 * @throws IOException
-	 * @throws UnknownAttributeTypeException
+	 * @throws AttributeTypeException
 	 */
 	private void readMethods(RandomAccessFile raf, int methodCount)
 	throws IOException, AttributeTypeException {
@@ -185,7 +185,7 @@ public class ClassFileReader {
 	 * @param attrCount
 	 * @return
 	 * @throws IOException
-	 * @throws UnknownAttributeTypeException
+	 * @throws AttributeTypeException
 	 */
 	private Attributes readAttributes(RandomAccessFile raf, int attrCount)
 	throws IOException, AttributeTypeException {
