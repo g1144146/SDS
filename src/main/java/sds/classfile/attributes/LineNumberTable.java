@@ -35,6 +35,11 @@ public class LineNumberTable extends AttributeInfo {
 		this.lineNumberTable = new LNTable[raf.readShort()];
 		for(int i = 0; i < lineNumberTable.length; i++) {
 			lineNumberTable[i] = new LNTable(raf);
+			if(i == lineNumberTable.length-1) {
+				lineNumberTable[i].endPc = 0;
+			} else if(i > 0) {
+				lineNumberTable[i-1].endPc = lineNumberTable[i].startPc;
+			}
 		}
 	}
 
@@ -46,6 +51,10 @@ public class LineNumberTable extends AttributeInfo {
 		 * start number of opcode.
 		 */
 		int startPc;
+		/**
+		 * 
+		 */
+		int endPc;
 		/**
 		 * line number in source file.
 		 */
@@ -67,6 +76,10 @@ public class LineNumberTable extends AttributeInfo {
 
 		public int getLineNumber() {
 			return lineNumber;
+		}
+
+		public int getEndPc() {
+			return endPc;
 		}
 	}
 }
