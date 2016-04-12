@@ -50,10 +50,8 @@ public abstract class MemberRefInfo extends ConstantInfo {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		String sep = System.getProperty("line.separator");
-		sb.append(super.toString()).append(sep).append("\t")
-			.append("class index        : ").append(classIndex).append(sep).append("\t")
-			.append("name and type index: ").append(nameAndTypeIndex);
+		sb.append(super.toString()).append("\t#")
+			.append(classIndex).append(".#").append(nameAndTypeIndex);
 		return sb.toString();
 	}
 }

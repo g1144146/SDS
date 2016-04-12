@@ -38,9 +38,7 @@ abstract class IntOrFloatInfo extends ConstantInfo {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		String sep = System.getProperty("line.separator");
-		sb.append(super.toString()).append(sep).append("\t")
-			.append("bytes: ").append(bytes);
+		sb.append(super.toString()).append("\t").append(bytes);
 		return sb.toString();
 	}
 }

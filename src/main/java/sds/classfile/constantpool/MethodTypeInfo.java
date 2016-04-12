@@ -36,9 +36,7 @@ public class MethodTypeInfo extends ConstantInfo {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		String sep = System.getProperty("line.separator");
-		sb.append(super.toString()).append(sep).append("\t")
-			.append("descriptor index: ").append(descriptorIndex);
+		sb.append(super.toString()).append("\t#").append(descriptorIndex);
 		return sb.toString();
 	}
 }

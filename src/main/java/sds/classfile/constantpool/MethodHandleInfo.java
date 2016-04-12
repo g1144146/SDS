@@ -68,10 +68,8 @@ public class MethodHandleInfo extends ConstantInfo {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		String sep = System.getProperty("line.separator");
-		sb.append(super.toString()).append(sep).append("\t")
-			.append("reference kind : ").append(referenceKind).append(sep).append("\t")
-			.append("reference index: ").append(referenceIndex);
+		sb.append(super.toString()).append("\t#").append(referenceKind)
+			.append(":#").append(referenceIndex);
 		return sb.toString();
 	}
 }

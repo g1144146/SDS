@@ -30,6 +30,6 @@ public abstract class ConstantInfo implements Info {
 
 	@Override
 	public String toString() {
-		return "Constant Type: " + ConstantType.get(tag);
+		return ConstantType.get(tag);
 	}
 }

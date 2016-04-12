@@ -51,10 +51,7 @@ public class Utf8Info extends ConstantInfo {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		String sep = System.getProperty("line.separator");
-		sb.append(super.toString()).append(sep).append("\t")
-			.append("length : ").append(length).append(sep).append("\t")
-			.append("value  : ").append(value);
+		sb.append(super.toString()).append("\t").append(value);
 		return sb.toString();
 	}
 }

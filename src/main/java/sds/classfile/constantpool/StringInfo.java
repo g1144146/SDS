@@ -36,9 +36,7 @@ public class StringInfo extends ConstantInfo {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		String sep = System.getProperty("line.separator");
-		sb.append(super.toString()).append(sep).append("\t")
-			.append("string index: ").append(stringIndex);
+		sb.append(super.toString()).append("\t#").append(stringIndex);
 		return sb.toString();
 	}
 }
