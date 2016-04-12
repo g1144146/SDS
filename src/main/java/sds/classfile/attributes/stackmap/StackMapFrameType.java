@@ -5,7 +5,7 @@ package sds.classfile.attributes.stackmap;
  * @author inagaki
  */
 public enum StackMapFrameType {
-	SameFrame("same_rame"),
+	SameFrame("same_frame"),
 	SameLocals1StackItemFrame("same_locals_1_stack_item_frame"),
 	SameLocals1StackItemFrameExtended("same_locals_1_stack_item_frame_extended"),
 	ChopFrame("chop_frame"),
