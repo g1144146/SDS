@@ -18,8 +18,9 @@ public class TableSwitch extends SwitchOpcode {
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
 		super.read(raf);
-		// low, low + n - 1
-		this.jumpOffsets = new int[raf.readInt() - raf.readInt() + 1];
+		int low = raf.readInt();
+		int high = raf.readInt();
+		this.jumpOffsets = new int[high - low + 1];
 		for(int i = 0; i < jumpOffsets.length; i++) {
 			jumpOffsets[i] = raf.readInt();
 		}
