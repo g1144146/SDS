@@ -6,10 +6,8 @@ import sds.classfile.Fields;
 import sds.classfile.Methods;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.BootstrapMethods;
-import sds.classfile.attributes.Code;
-import sds.classfile.attributes.EnclosingMethod;
-import sds.classfile.attributes.Exceptions;
 import sds.classfile.attributes.InnerClasses;
+import sds.classfile.attributes.SourceFile;
 import sds.util.ClassFilePrinter;
 
 /**
@@ -29,6 +27,14 @@ public class ClassContent extends BaseContent {
 	 * 
 	 */
 	NestedClass[] nested;
+	/**
+	 * 
+	 */
+	String sourceFile;
+	/**
+	 * 
+	 */
+	String[] bootstrapMethods;
 
 	public ClassContent(ClassFile cf) {
 		Methods method = cf.getMethods();
@@ -66,16 +72,16 @@ public class ClassContent extends BaseContent {
 		switch(info.getType()) {
 			case BootstrapMethods:
 				BootstrapMethods bsm = (BootstrapMethods)info;
-//				for(BootstrapMethods.BSM b : bsm.getBSM()) {
-//					out.println("\t" + getUtf8Value(pool.get(b.getBSMRef()-1)));
-//					for(int i : b.getBSMArgs()) {
-//						out.println("\t" + getUtf8Value(pool.get(i-1)));
-//					}
-//				}
+				this.bootstrapMethods = new String[bsm.getBSM().length];
+				for(BootstrapMethods.BSM b : bsm.getBSM()) {
+					for(int i = 0; i < b.getBSMArgs().length; i++) {
+						bootstrapMethods[i] = cfp.getUtf8Value(pool.get(b.getBSMArgs()[i]-1));
+					}
+				}
 				break;
 			case InnerClasses:
 				InnerClasses ic = (InnerClasses)info;
-//				for(InnerClasses.Classes c : ic.getClasses()) {
+				for(InnerClasses.Classes c : ic.getClasses()) {
 //					int inner = c.getNumber("inner");
 //					int outer = c.getNumber("outer");
 //					int name = c.getNumber("inner_name");
@@ -90,7 +96,10 @@ public class ClassContent extends BaseContent {
 //					if(checkRange(name-1)) {
 //						out.println("\t" + getUtf8Value(pool.get(name-1)));
 //					}
-//				}
+				}
+			case SourceFile:
+				SourceFile sf = (SourceFile)info;
+				this.sourceFile = cfp.getUtf8Value(pool.get(sf.getSourceFileIndex()-1));
 				break;
 		}
 	}

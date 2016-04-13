@@ -1,5 +1,7 @@
 package sds;
 
+import sds.assemble.ClassContent;
+
 /**
  * 
  * @author inagaki
@@ -25,6 +27,7 @@ public class SDS {
 		for(String arg : args) {
 			ClassFileReader reader = new ClassFileReader(arg);
 			reader.read();
+//			ClassContent cc = new ClassContent(reader.getClassFile());
 		}
 	}
 }

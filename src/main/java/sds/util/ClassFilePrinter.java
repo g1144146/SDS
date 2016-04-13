@@ -105,7 +105,7 @@ public class ClassFilePrinter {
 	public ClassFilePrinter() {}
 
 	/**
-	 * 
+	 *
 	 * @param majorVersion
 	 * @param minorVersion
 	 */
@@ -116,7 +116,7 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void printConstantPool() {
 		out.println(pool);
@@ -124,7 +124,7 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param accessFlag
 	 */
 	public void printAccessFlag(int accessFlag) {
@@ -134,7 +134,7 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param thisClass
 	 */
 	public void printThisClass(int thisClass) {
@@ -148,7 +148,7 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param superClass
 	 */
 	public void printSuperClass(int superClass) {
@@ -162,7 +162,7 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param interfaces
 	 */
 	public void printInterface(int[] interfaces) {
@@ -178,9 +178,9 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param fields
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void printFields(Fields fields) throws IOException {
 		out.println("*** Fields *** ");
@@ -191,8 +191,7 @@ public class ClassFilePrinter {
 
 		for(int i = 0; i < fields.size(); i++) {
 			MemberInfo field = fields.get(i);
-			out.println("\t"+AccessFlags.get(field.getAccessFlags(), "field")
-						+ getUtf8Value(field));
+			out.println(AccessFlags.get(field.getAccessFlags(), "field") + getUtf8Value(field));
 			Attributes attr = field.getAttr();
 			for(int j = 0; j < attr.size(); j++) {
 				printAttributeInfo(attr.get(j));
@@ -202,9 +201,9 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param methods
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void printMethods(Methods methods) throws IOException {
 		out.println("*** Methods *** ");
@@ -225,9 +224,9 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param attr
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void printAttributes(Attributes attr) throws IOException {
 		out.println("*** Attributes *** ");
@@ -242,9 +241,9 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param info
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void printAttributeInfo(AttributeInfo info) throws IOException {
 		out.println("   [attribute type]: " + info.getType().toString());
@@ -256,55 +255,68 @@ public class ClassFilePrinter {
 			case BootstrapMethods:
 				BootstrapMethods bsm = (BootstrapMethods)info;
 				for(BootstrapMethods.BSM b : bsm.getBSM()) {
-					out.println("\t" + getUtf8Value(pool.get(b.getBSMRef()-1)));
+					out.println("\tbsm ref: " + getUtf8Value(pool.get(b.getBSMRef()-1)));
 					for(int i : b.getBSMArgs()) {
-						out.println("\t" + getUtf8Value(pool.get(i-1)));
+						out.println("\tbsm args: " + getUtf8Value(pool.get(i-1)));
 					}
 				}
 				break;
 			case Code:
 				Code code = (Code)info;
-				out.println("\tmax_stack: " + code.getMaxStack());
+				out.print("\tmax_stack: " + code.getMaxStack());
 				out.println("\tmax_locals: " + code.maxLocals());
 				for(OpcodeInfo op : code.getCode().getAll()) {
 					out.print("\topcode: "+op.getPc()+" - "+op.getOpcodeType());
 					if(op instanceof Bipush) {
 						Bipush bi = (Bipush)op;
-						out.println(", operand: " + bi.getByte());
+						out.println("  " + bi.getByte());
 					} else if(op instanceof BranchOpcode) {
 						BranchOpcode branch = (BranchOpcode)op;
-						out.println(", operand: " + branch.getBranch());
+						out.println("  " + branch.getBranch());
 					} else if(op instanceof Iinc) {
 						Iinc iinc = (Iinc)op;
-						out.println(", operand: " + iinc.getIndex() +","+iinc.getConst());
+						out.println("  " + iinc.getIndex() +","+iinc.getConst());
 					} else if(op instanceof IndexOpcode) {
 						IndexOpcode io = (IndexOpcode)op;
-						out.println(", operand: " + io.getIndex());
+						out.println("  " + io.getIndex());
 					} else if(op instanceof InvokeDynamic) {
 						InvokeDynamic id = (InvokeDynamic)op;
-						out.println(", operand: " + "#" + id.getIndexByte());
+						out.println("  " + "#" + id.getIndexByte());
 					} else if(op instanceof InvokeInterface) {
 						InvokeInterface ii = (InvokeInterface)op;
-						out.println(", operand: " + "#" + ii.getIndexByte() + ","+ii.getCount());
+						out.println("  " + "#" + ii.getIndexByte() + ","+ii.getCount());
 					} else if(op instanceof LookupSwitch) {
 						LookupSwitch ls = (LookupSwitch)op;
+						int[] match = ls.getMatch();
+						int[] offset = ls.getOffset();
+						out.print(sep);
+						for(int i = 0; i < match.length; i++) {
+							out.println("\t\t  " + match[i] + ", " + (offset[i]+ls.getPc()));
+						}
+						out.println("\t\tdefault: " + (ls.getDefault()+ls.getPc()));
 					} else if(op instanceof MultiANewArray) {
 						MultiANewArray mana = (MultiANewArray)op;
-						out.println(", operand: " + "#" +mana.getIndexByte());
+						out.println("  " + "#" +mana.getIndexByte());
 					} else if(op instanceof NewArray) {
 						NewArray na = (NewArray)op;
-						out.println(", operand: " + na.getType());
+						out.println("  " + na.getType());
 					} else if(op instanceof Sipush) {
 						Sipush si = (Sipush)op;
-						out.println(", operand: " + si.getShort());
+						out.println("  " + si.getShort());
 					} else if(op instanceof TableSwitch) {
 						TableSwitch ts = (TableSwitch)op;
+						int[] jump = ts.getJumpOffsets();
+						out.print(sep);
+						for(int i = 0; i < jump.length; i++) {
+							out.println("\t\t  " + (jump[i]+ts.getPc()));
+						}
+						out.println("\t\tdefault: " + (ts.getDefault()+ts.getPc()));
 					} else if(op instanceof Wide) {
 						Wide wide = (Wide)op;
-						out.println(", operand: " + "#" +wide.getIndexByte() +","+ wide.getConst());
+						out.println("  " + "#" +wide.getIndexByte() +","+ wide.getConst());
 					} else if(op instanceof CpRefOpcode) {
 						CpRefOpcode cp = (CpRefOpcode)op;
-						out.println(", operand: #" + cp.getIndexByte());
+						out.println("  #" + cp.getIndexByte());
 					} else {
 						out.println("");
 					}
@@ -476,25 +488,19 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
-	 * @param e 
+	 *
+	 * @param e
 	 */
 	private void printElementValuePair(ElementValuePair e) {
-		if(e == null) {
-			return;
-		}
 		out.println("\t  element_name: "+getUtf8Value(pool.get(e.getElementNameIndex()-1)));
 		printElementValue(e.getValue());
 	}
 
 	/**
-	 * 
-	 * @param e 
+	 *
+	 * @param e
 	 */
 	private void printElementValue(ElementValue e) {
-		if(e == null) {
-			return;
-		}
 		switch((char)e.getTag()) {
 			case 'B':
 			case 'C':
@@ -527,13 +533,10 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
-	 * @param annotation 
+	 *
+	 * @param annotation
 	 */
 	private void printAnnotation(Annotation annotation) {
-		if(annotation == null) {
-			return;
-		}
 		out.println("\t\ttype_name : "+
 					DescriptorParser.parse(getUtf8Value(pool.get(annotation.getTypeIndex()-1))));
 		for(ElementValuePair evp : annotation.getElementValuePairs()) {
@@ -542,8 +545,8 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
-	 * @param frame 
+	 *
+	 * @param frame
 	 */
 	private void printStackMapFrame(StackMapFrame frame) {
 		out.println("\t  stack_map_frame_type: " + frame.getFrameType());
@@ -589,8 +592,8 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
-	 * @param info 
+	 *
+	 * @param info
 	 */
 	private void printVerificationTypeInfo(VerificationTypeInfo info) {
 		StringBuilder sb = new StringBuilder();
@@ -620,8 +623,8 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
-	 * @param info 
+	 *
+	 * @param info
 	 */
 	private void printTargetInfo(TargetInfo info) {
 		out.println("\t  target_info_type: " + info.getType());
@@ -678,8 +681,8 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
-	 * @param path 
+	 *
+	 * @param path
 	 */
 	private void printTypePath(TypePath path) {
 		out.print("\t  type_path_type: ");
@@ -699,18 +702,18 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param index
-	 * @return 
+	 * @return
 	 */
 	private boolean checkRange(int index) {
 		return (0 <= index) && (index < pool.size());
 	}
 
 	/**
-	 * 
+	 *
 	 * @param info
-	 * @return 
+	 * @return
 	 */
 	public String getUtf8Value(ConstantInfo info) {
 		if(info.getTag() == C_UTF8) {
@@ -718,13 +721,13 @@ public class ClassFilePrinter {
 		}
 		switch(info.getTag()) {
 			case C_INTEGER:
-				return ""+((IntegerInfo)info).getBytes();
+				return ""+((IntegerInfo)info).getValue();
 			case C_FLOAT:
-				return ""+((FloatInfo)info).getBytes();
+				return ""+((FloatInfo)info).getValue();
 			case C_LONG:
-				return ((LongInfo)info).getHighBytes() + "," + ((LongInfo)info).getLowBytes();
+				return ""+((LongInfo)info).getValue();
 			case C_DOUBLE:
-				return ((DoubleInfo)info).getHighBytes() + "," + ((DoubleInfo)info).getLowBytes();
+				return ""+((DoubleInfo)info).getValue();
 			case C_CLASS:
 				ClassInfo ci = (ClassInfo)info;
 				return getUtf8Value(pool.get(ci.getNameIndex()-1)).replace("/", ".");
@@ -741,7 +744,7 @@ public class ClassFilePrinter {
 					+ getUtf8Value(pool.get(mi.getNameAndTypeIndex()-1));
 			case C_INTERFACE_METHODREF:
 				InterfaceMethodrefInfo imi = (InterfaceMethodrefInfo)info;
-				return getUtf8Value(pool.get(imi.getClassIndex()-1)) + "." 
+				return getUtf8Value(pool.get(imi.getClassIndex()-1)) + "."
 					+ getUtf8Value(pool.get(imi.getNameAndTypeIndex()-1));
 			case C_NAME_AND_TYPE:
 				NameAndTypeInfo nati = (NameAndTypeInfo)info;
@@ -749,8 +752,8 @@ public class ClassFilePrinter {
 					+ DescriptorParser.parse(getUtf8Value(pool.get(nati.getDescriptorIndex()-1)));
 			case C_METHOD_HANDLE:
 				MethodHandleInfo mhi = (MethodHandleInfo)info;
-				return mhi.getRefKindValue() + ": "
-					+ getUtf8Value(pool.get(mhi.getReferenceIndex()-1));
+				return //mhi.getRefKindValue() + ":"+
+						getUtf8Value(pool.get(mhi.getReferenceIndex()-1));
 			case C_METHOD_TYPE:
 				MethodTypeInfo mti = (MethodTypeInfo)info;
 				return DescriptorParser.parse(getUtf8Value(pool.get(mti.getDescriptorIndex()-1)));
@@ -764,9 +767,9 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param info
-	 * @return 
+	 * @return
 	 */
 	private String getUtf8Value(MemberInfo info) {
 		return DescriptorParser.parse(getUtf8Value(pool.get(info.getDescriptorIndex()-1))) + " "

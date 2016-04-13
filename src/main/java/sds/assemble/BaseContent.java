@@ -16,7 +16,6 @@ import sds.classfile.attributes.LocalVariableTypeTable;
 import sds.classfile.attributes.MethodParameters;
 import sds.classfile.attributes.Signature;
 import sds.classfile.attributes.SourceDebugExtension;
-import sds.classfile.attributes.SourceFile;
 import sds.classfile.attributes.annotation.Annotation;
 import sds.classfile.attributes.annotation.AnnotationDefault;
 import sds.classfile.attributes.annotation.ElementValuePair;
@@ -38,7 +37,6 @@ import sds.util.ClassFilePrinter;
  */
 public abstract class BaseContent {
 	boolean hasAnnotation;
-	String sourceFile;
 	Map<String, String> genericsMap = new HashMap<>();
 
 	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
@@ -152,10 +150,6 @@ public abstract class BaseContent {
 				break;
 			case SourceDebugExtension:
 				SourceDebugExtension sde = (SourceDebugExtension)info;
-				break;
-			case SourceFile:
-				SourceFile sf = (SourceFile)info;
-				this.sourceFile = cfp.getUtf8Value(pool.get(sf.getSourceFileIndex()-1));
 				break;
 			case Synthetic:
 				// do nothing.
