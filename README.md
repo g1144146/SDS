@@ -27,5 +27,4 @@
 
 * [The Java® Virtual Machine Specification](https://docs.oracle.com/javase/specs/jvms/se8/html/index.html)
 * [siphon](https://github.com/tamada/siphon)
-* [classpy](https://github.com/zxh0/classpy)
 * [Java Virtual Machine Online Instruction Reference](http://cs.au.dk/~mis/dOvs/jvmspec/ref-Java.html)
