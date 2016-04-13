@@ -13,5 +13,5 @@ public interface Info {
 	 * @param raf
 	 * @throws IOException 
 	 */
-	abstract void read(RandomAccessFile raf) throws IOException;
+	abstract void read(RandomAccessFile raf) throws Exception;
 }

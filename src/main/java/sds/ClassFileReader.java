@@ -14,7 +14,6 @@ import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeInfoBuilder;
 import sds.classfile.attributes.AttributeType;
 import sds.classfile.attributes.Code;
-import sds.classfile.attributes.AttributeTypeException;
 import sds.classfile.constantpool.ConstantInfo;
 import sds.classfile.constantpool.ConstantInfoBuilder;
 import sds.classfile.constantpool.ConstantType;
@@ -69,7 +68,7 @@ public class ClassFileReader {
 			printer.printFields(cf.fields);
 			printer.printMethods(cf.methods);
 			printer.printAttributes(cf.attr);
-		} catch(IOException | ConstantTypeException | AttributeTypeException e) {
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -88,11 +87,9 @@ public class ClassFileReader {
 	/**
 	 *
 	 * @param raf
-	 * @throws IOException
-	 * @throws ConstantTypeException
+	 * @throws Exception
 	 */
-	private void readConstantPool(RandomAccessFile raf, int constantPoolCount)
-	throws IOException, ConstantTypeException {
+	private void readConstantPool(RandomAccessFile raf, int constantPoolCount) throws Exception {
 		ConstantPool pool = new ConstantPool(constantPoolCount);
 		ConstantInfoBuilder builder = ConstantInfoBuilder.getInstance();
 		for(int i = 0; i < constantPoolCount; i++) {
@@ -145,11 +142,9 @@ public class ClassFileReader {
 	 *
 	 * @param raf
 	 * @param fieldCount
-	 * @throws IOException
-	 * @throws AttributeTypeException
+	 * @throws Exception
 	 */
-	private void readFields(RandomAccessFile raf, int fieldCount)
-	throws IOException, AttributeTypeException {
+	private void readFields(RandomAccessFile raf, int fieldCount) throws Exception {
 		cf.fields = new Fields(fieldCount);
 		for(int i = 0; i < fieldCount; i++) {
 			FieldInfo info = new FieldInfo();
@@ -164,11 +159,9 @@ public class ClassFileReader {
 	 *
 	 * @param raf
 	 * @param methodCount
-	 * @throws IOException
-	 * @throws AttributeTypeException
+	 * @throws Exception
 	 */
-	private void readMethods(RandomAccessFile raf, int methodCount)
-	throws IOException, AttributeTypeException {
+	private void readMethods(RandomAccessFile raf, int methodCount) throws Exception {
 		cf.methods = new Methods(methodCount);
 		for(int i = 0; i < methodCount; i++) {
 			MethodInfo info = new MethodInfo();
@@ -184,11 +177,9 @@ public class ClassFileReader {
 	 * @param raf
 	 * @param attrCount
 	 * @return
-	 * @throws IOException
-	 * @throws AttributeTypeException
+	 * @throws Exception
 	 */
-	private Attributes readAttributes(RandomAccessFile raf, int attrCount)
-	throws IOException, AttributeTypeException {
+	private Attributes readAttributes(RandomAccessFile raf, int attrCount) throws Exception {
 		Attributes attrs = new Attributes(attrCount);
 		AttributeInfoBuilder builder = AttributeInfoBuilder.getInstance();
 		for(int i = 0; i < attrCount; i++) {

@@ -86,8 +86,13 @@ public class Code extends AttributeInfo {
 		return attr;
 	}
 
-	public void read(RandomAccessFile raf, ConstantPool pool)
-	throws IOException, AttributeTypeException {
+	/**
+	 * 
+	 * @param raf
+	 * @param pool
+	 * @throws Exception 
+	 */
+	public void read(RandomAccessFile raf, ConstantPool pool) throws Exception {
 		this.maxStack = raf.readShort();
 		this.maxLocals = raf.readShort();
 		int codeLen = raf.readInt();
@@ -170,7 +175,7 @@ public class Code extends AttributeInfo {
 				case "catch_type": return catchType;
 				default:
 					System.out.println("invalid key: " + key);
-					return -10000;
+					return -1;
 			}
 		}
 	}
