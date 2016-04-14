@@ -254,8 +254,9 @@ public enum MnemonicTable {
 			return new OpcodeInfo(values()[opcode], pc);
 		}
 		switch(opcode) {
-			case 0x10: return new Bipush(pc);
-			case 0x11: return new Sipush(pc);
+			case 0x10: /** bipush **/
+			case 0x11: /** sipush **/
+				return new PushOpcode(values()[opcode], pc);
 			case 0x12: /** ldc **/
 			case 0x13: /** ldc_w **/
 			case 0x14: /** ldc2_w **/
