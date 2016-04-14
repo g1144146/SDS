@@ -6,19 +6,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * This class is for parsing member's descriptor.
  * @author inagaki
  */
 public class DescriptorParser {
 	/**
-	 *
+	 * regular expression of object type.
 	 */
 	private static final String objPattern  = "L[a-z\\\\.]*[0-9a-zA-Z_\\$\\.]+";
 
 	/**
-	 *
-	 * @param desc
-	 * @return
+	 * returns parsed descriptor.
+	 * @param desc descriptor
+	 * @return parsed descriptor
 	 */
 	public static String parse(String desc) {
 		String primPattern = "(B|\\[B|C|\\[C|D|\\[D|F|\\[F|V|I|\\[I"
@@ -55,9 +55,9 @@ public class DescriptorParser {
 	}
 
 	/**
-	 *
-	 * @param desc
-	 * @return
+	 * returns import classes from descriptor.
+	 * @param desc descriptor
+	 * @return import classes
 	 */
 	public static String[] parseImportClass(String desc) {
 		List<String> classes = new ArrayList<>();
@@ -76,9 +76,9 @@ public class DescriptorParser {
 	}
 
 	/**
-	 *
-	 * @param head
-	 * @return
+	 * returns primitive type.
+	 * @param head head of descriptor
+	 * @return primitive type
 	 */
 	private static String parseType(String head) {
 		switch(head) {

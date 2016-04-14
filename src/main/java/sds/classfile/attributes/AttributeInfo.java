@@ -1,38 +1,30 @@
 package sds.classfile.attributes;
 
-//import java.io.IOException;
-//import java.io.ByteArrayInputStream;
-//import java.io.DataInputStream;
-//import java.io.RandomAccessFile;
 import sds.classfile.Info;
 
 /**
- *
+ * This adapter class is for info of class has attribute.
  * @author inagaki
  */
 public abstract class AttributeInfo implements Info {
 	/**
-	 * 
+	 * constant-pool entry index of attribute name.
 	 */
 	int nameIndex;
 	/**
-	 * 
+	 * attribute length.
 	 */
 	int attrLen;
 	/**
-	 * 
-	 */
-	byte[] data;
-	/**
-	 * 
+	 * attribute type.
 	 */
 	private AttributeType type;
 
 	/**
-	 * 
-	 * @param type
-	 * @param nameIndex
-	 * @param length 
+	 * constructor.
+	 * @param type attribute type
+	 * @param nameIndex constant-pool entry index of attribute name
+	 * @param length attribute length
 	 */
 	public AttributeInfo(AttributeType type, int nameIndex, int length) {
 		this.type = type;
@@ -41,32 +33,24 @@ public abstract class AttributeInfo implements Info {
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns constant-pool entry index of attribute name.
+	 * @return constant-pool entry index of attribute name
 	 */
 	public int getNameIndex() {
 		return nameIndex;
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns attribute length.
+	 * @return length
 	 */
 	public int getAttrLen() {
 		return attrLen;
 	}
 
 	/**
-	 * 
-	 * @return 
-	 */
-	public byte[] getData() {
-		return data;
-	}
-
-	/**
-	 * 
-	 * @return 
+	 * returns attribute type.
+	 * @return type
 	 */
 	public AttributeType getType() {
 		return type;

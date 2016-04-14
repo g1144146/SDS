@@ -4,27 +4,27 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.6">InnerClasses Attribute</a>.
  * @author inagaki
  */
 public class InnerClasses extends AttributeInfo {
 	/**
-	 * 
+	 * inner classes.
 	 */
 	Classes[] classes;
 
 	/**
-	 * 
-	 * @param nameIndex
-	 * @param length 
+	 * constructor.
+	 * @param nameIndex constant-pool entry index of attribute name
+	 * @param length attribute length
 	 */
 	public InnerClasses(int nameIndex, int length) {
 		super(AttributeType.InnerClasses, nameIndex, length);
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns inner classes.
+	 * @return classes
 	 */
 	public Classes[] getClasses() {
 		return classes;
@@ -37,28 +37,31 @@ public class InnerClasses extends AttributeInfo {
 			classes[i] = new Classes(raf);
 		}
 	}
-	
+
+	/**
+	 * This class is for inner class.
+	 */
 	public class Classes {
 		/**
-		 * The constant_pool entry at that index must be a CONSTANT_Class_info structure.
+		 * constant-pool entry index of inner class.
 		 */
 		int innerClassInfoIndex;
 		/**
-		 * the entry at that index must be a CONSTANT_Class_info structure.
+		 * constant-pool entry index of class has this inner class.
 		 */
 		int outerClassInfoIndex;
 		/**
-		 * the entry at that index must be a CONSTANT_Utf8_info structure.
+		 * constant-pool entry index of inner class name.
 		 */
 		int innerNameIndex;
 		/**
-		 *
+		 * access flag of inner class.
 		 */
 		int innerClassAccessFlags;
 		
 		/**
-		 * 
-		 * @param raf
+		 * constructor.
+		 * @param raf classfile stream
 		 * @throws IOException 
 		 */
 		public Classes(RandomAccessFile raf) throws IOException {
@@ -69,9 +72,9 @@ public class InnerClasses extends AttributeInfo {
 		}
 
 		/**
-		 * 
-		 * @param key
-		 * @return 
+		 * returns constant-pool entry index.
+		 * @param key value name
+		 * @return constant-pool entry index
 		 */
 		public int getNumber(String key) {
 			switch(key) {

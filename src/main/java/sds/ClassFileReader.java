@@ -22,22 +22,22 @@ import sds.classfile.constantpool.ConstantTypeException;
 import sds.util.ClassFilePrinter;
 
 /**
- *
+ * This class is for reading classfile contents.
  * @author inagaki
  */
 public class ClassFileReader {
 	/**
-	 *
+	 * classfile name.
 	 */
 	private String fileName;
 	/**
-	 *
+	 * classfile contents.
 	 */
 	private ClassFile cf;
 
 	/**
-	 *
-	 * @param file
+	 * constructor.
+	 * @param file classfile name
 	 */
 	public ClassFileReader(String file) {
 		this.fileName = file;
@@ -45,7 +45,7 @@ public class ClassFileReader {
 	}
 
 	/**
-	 *
+	 * reads classfile.
 	 */
 	public void read() {
 		try(RandomAccessFile raf = new RandomAccessFile(new File(fileName), "r")) {
@@ -74,8 +74,8 @@ public class ClassFileReader {
 	}
 
 	/**
-	 *
-	 * @param raf
+	 * reads headers of classfile.
+	 * @param raf classfile stream
 	 * @throws IOException
 	 */
 	private void readHeaders(RandomAccessFile raf) throws IOException {
@@ -85,8 +85,8 @@ public class ClassFileReader {
 	}
 
 	/**
-	 *
-	 * @param raf
+	 * reads constant-pool of classfile.
+	 * @param raf classfile stream
 	 * @throws Exception
 	 */
 	private void readConstantPool(RandomAccessFile raf, int constantPoolCount) throws Exception {
@@ -106,8 +106,8 @@ public class ClassFileReader {
 	}
 
 	/**
-	 *
-	 * @param raf
+	 * reads access flag of class.
+	 * @param raf classfile stream
 	 * @throws IOException
 	 */
 	private void readAccessFlag(RandomAccessFile raf) throws IOException {
@@ -115,8 +115,8 @@ public class ClassFileReader {
 	}
 
 	/**
-	 *
-	 * @param raf
+	 * reads constant-pool entry index of class and super-class.
+	 * @param raf classfile stream
 	 * @throws IOException
 	 */
 	private void readClass(RandomAccessFile raf) throws IOException {
@@ -125,9 +125,9 @@ public class ClassFileReader {
 	}
 
 	/**
-	 *
-	 * @param raf
-	 * @param interfaceCount
+	 * reads constant-pool entry indexes of interface.
+	 * @param raf classfile stream
+	 * @param interfaceCount interface count
 	 * @throws IOException
 	 */
 	private void readInterfaces(RandomAccessFile raf, int interfaceCount) throws IOException {
@@ -139,9 +139,9 @@ public class ClassFileReader {
 	}
 
 	/**
-	 *
-	 * @param raf
-	 * @param fieldCount
+	 * reads fields of class.
+	 * @param raf classfile stream
+	 * @param fieldCount field count
 	 * @throws Exception
 	 */
 	private void readFields(RandomAccessFile raf, int fieldCount) throws Exception {
@@ -156,9 +156,9 @@ public class ClassFileReader {
 	}
 
 	/**
-	 *
-	 * @param raf
-	 * @param methodCount
+	 * reads methods of class.
+	 * @param raf classfile stream
+	 * @param methodCount method count
 	 * @throws Exception
 	 */
 	private void readMethods(RandomAccessFile raf, int methodCount) throws Exception {
@@ -173,10 +173,10 @@ public class ClassFileReader {
 	}
 
 	/**
-	 *
-	 * @param raf
-	 * @param attrCount
-	 * @return
+	 * reads attributes of class.
+	 * @param raf classfile stream
+	 * @param attrCount attribute count
+	 * @return attributes
 	 * @throws Exception
 	 */
 	private Attributes readAttributes(RandomAccessFile raf, int attrCount) throws Exception {
@@ -197,8 +197,8 @@ public class ClassFileReader {
 	}
 
 	/**
-	 *
-	 * @return
+	 * returns classfile contents.
+	 * @return classfile
 	 */
 	public ClassFile getClassFile() {
 		return cf;

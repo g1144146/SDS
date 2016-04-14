@@ -1,7 +1,7 @@
 package sds.classfile.attributes;
 
 /**
- *
+ * This enum class is for type of {@link AttributeInfo <code>AttributeInfo</code>}.
  * @author inagaki
  */
 public enum AttributeType {

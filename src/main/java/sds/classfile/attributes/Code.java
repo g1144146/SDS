@@ -12,28 +12,28 @@ import sds.classfile.bytecode.UndefinedOpcodeException;
 import sds.classfile.constantpool.Utf8Info;
 
 /**
- *
+ * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.3">Code Attribute</a>.
  * @author inagaki
  */
 public class Code extends AttributeInfo {
 	/**
-	 *
+	 * maximum depth of the operand stack of method.
 	 */
 	int maxStack;
 	/**
-	 *
+	 * number of local variables.
 	 */
 	int maxLocals;
 	/**
-	 *
+	 * opcode sequence of method.
 	 */
 	Opcodes opcodes;
 	/**
-	 *
+	 * exceptions of method.
 	 */
 	ExceptionTable[] exceptionTable;
 	/**
-	 *
+	 * attributes of method.
 	 */
 	Attributes attr;
 
@@ -47,54 +47,55 @@ public class Code extends AttributeInfo {
 	}
 
 	/**
-	 *
-	 * @return
+	 * returns maximum depth of the operand stack of method.
+	 * @return maximum depth.
 	 */
 	public int getMaxStack() {
 		return maxStack;
 	}
 
 	/**
-	 *
-	 * @return
+	 * returns number of local variables.
+	 * @return number of local variables.
 	 */
 	public int maxLocals() {
 		return maxLocals;
 	}
 
 	/**
-	 *
-	 * @return
+	 * returns opcode sequence of method.
+	 * @return opcode sequence
 	 */
 	public Opcodes getCode() {
 		return opcodes;
 	}
 
 	/**
-	 *
-	 * @return
+	 * returns exceptions of method.
+	 * @return exceptions
 	 */
 	public ExceptionTable[] getExceptionTable() {
 		return exceptionTable;
 	}
 
 	/**
-	 *
-	 * @return
+	 * returns attributes of method.
+	 * @return attributes
 	 */
 	public Attributes getAttr() {
 		return attr;
 	}
 
 	/**
-	 * 
-	 * @param raf
-	 * @param pool
+	 * reads Code Attribute from classfile.
+	 * @param raf classfile stream
+	 * @param pool constant-pool
 	 * @throws Exception 
 	 */
 	public void read(RandomAccessFile raf, ConstantPool pool) throws Exception {
 		this.maxStack = raf.readShort();
 		this.maxLocals = raf.readShort();
+		// extract opcode
 		int codeLen = raf.readInt();
 		int p = (int)raf.getFilePointer();
 		this.opcodes = new Opcodes();
@@ -130,23 +131,23 @@ public class Code extends AttributeInfo {
 	public void read(RandomAccessFile raf) throws IOException {}
 
 	/**
-	 *
+	 * This class is for exception table of method.
 	 */
 	public class ExceptionTable {
 		/**
-		 *
+		 * start value of ranges in the code array at which the exception handler is active.
 		 */
 		int startPc;
 		/**
-		 *
+		 * end value of ranges in the code array at which the exception handler is active.
 		 */
 		int endPc;
 		/**
-		 *
+		 * value of start of exception handler.
 		 */
 		int handlerPc;
 		/**
-		 *
+		 * constant-pool entry index exception class.
 		 */
 		int catchType;
 
@@ -163,9 +164,9 @@ public class Code extends AttributeInfo {
 		}
 
 		/**
-		 *
-		 * @param key
-		 * @return
+		 * return value.
+		 * @param key value name
+		 * @return value
 		 */
 		public int getNumber(String key) {
 			switch(key) {

@@ -4,18 +4,19 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This builder class is for {@link TargetInfo <code>TargetInfo</code>}.<br>
+ * This class is designed singleton.
  * @author inagaki
  */
 public class TargetInfoBuilder {
 	/**
-	 * 
+	 * instance of builder class.
 	 */
 	private static TargetInfoBuilder builder = null;
 
 	/**
-	 * 
-	 * @return 
+	 * returns own instance.
+	 * @return instance
 	 */
 	public static TargetInfoBuilder getInstance() {
 		if(builder == null) {
@@ -25,9 +26,9 @@ public class TargetInfoBuilder {
 	}
 
 	/**
-	 * 
-	 * @param raf
-	 * @return
+	 * returns target info.
+	 * @param raf classfile stream
+	 * @return target info
 	 * @throws IOException
 	 * @throws TargetTypeException 
 	 */

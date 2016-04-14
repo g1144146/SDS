@@ -10,6 +10,10 @@ public class TypeParameterTarget extends AbstractTargetInfo {
 	 */
 	int typeParameterIndex;
 
+	/**
+	 * 
+	 * @param typeParameterIndex 
+	 */
 	public TypeParameterTarget(int typeParameterIndex) {
 		super(TargetInfoType.TypeParameterTarget);
 		this.typeParameterIndex = typeParameterIndex;

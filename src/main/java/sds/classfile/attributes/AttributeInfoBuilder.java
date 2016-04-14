@@ -10,18 +10,19 @@ import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
 import sds.classfile.attributes.stackmap.StackMapTable;
 
 /**
- *
+ * This builder class is for {@link AttributeInfo <code>AttributeInfo</code>}.<br>
+ * This class is designed singleton.
  * @author inagaki
  */
 public class AttributeInfoBuilder {
 	/**
-	 * 
+	 * instance of builder class.
 	 */
 	private static AttributeInfoBuilder builder = null;
 
 	/**
-	 * 
-	 * @return 
+	 * returns own instance.
+	 * @return instance
 	 */
 	public static AttributeInfoBuilder getInstance() {
 		if(builder == null) {
@@ -31,11 +32,11 @@ public class AttributeInfoBuilder {
 	}
 
 	/**
-	 * 
-	 * @param attrName
-	 * @param nameIndex
-	 * @param length
-	 * @return
+	 * returns attribute info.
+	 * @param attrName attribute name
+	 * @param nameIndex constant-pool entry index of attribute name.
+	 * @param length attribute length.
+	 * @return attribute info
 	 * @throws AttributeTypeException 
 	 */
 	public AttributeInfo build(String attrName, int nameIndex, int length)

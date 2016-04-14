@@ -3,18 +3,18 @@ package sds.classfile;
 import sds.classfile.constantpool.ConstantInfo;
 
 /**
- *
+ * This class is for constant-pool of classfile.
  * @author inagaki
  */
 public class ConstantPool implements ArrayInfo<ConstantInfo> {
 	/**
-	 *
+	 * constant-pool.
 	 */
 	private ConstantInfo[] pool;
 
 	/**
-	 *
-	 * @param size
+	 * constructor.
+	 * @param size constant-pool size
 	 */
 	public ConstantPool(int size) {
 		this.pool = new ConstantInfo[size];

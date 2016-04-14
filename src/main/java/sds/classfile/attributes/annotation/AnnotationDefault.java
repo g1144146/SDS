@@ -7,19 +7,19 @@ import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeType;
 
 /**
- *
+ * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.22">AnnotationDefault Attribute</a>.
  * @author inagaki
  */
 public class AnnotationDefault extends AttributeInfo {
 	/**
-	 * 
+	 * default value of the annotation type element.
 	 */
 	ElementValue defaultValue;
 
 	/**
-	 * 
-	 * @param nameIndex
-	 * @param length 
+	 * constructor.
+	 * @param nameIndex constant-pool entry index of attribute name
+	 * @param length attribute length
 	 */
 	public AnnotationDefault(int nameIndex, int length) {
 		super(AttributeType.AnnotationDefault, nameIndex, length);
@@ -34,6 +34,10 @@ public class AnnotationDefault extends AttributeInfo {
 		}
 	}
 
+	/**
+	 * returns default value of the annotation type element.
+	 * @return default value of the annotation type element
+	 */
 	public ElementValue getDefaultValue() {
 		return defaultValue;
 	}

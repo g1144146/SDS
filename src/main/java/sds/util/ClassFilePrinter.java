@@ -59,7 +59,7 @@ import sds.classfile.attributes.stackmap.StackMapTable;
 import sds.classfile.attributes.stackmap.StackMapFrame;
 import sds.classfile.attributes.stackmap.UninitializedVariableInfo;
 import sds.classfile.attributes.stackmap.VerificationTypeInfo;
-import sds.classfile.bytecode.Bipush;
+import sds.classfile.bytecode.PushOpcode;
 import sds.classfile.bytecode.BranchOpcode;
 import sds.classfile.bytecode.CpRefOpcode;
 import sds.classfile.bytecode.Iinc;
@@ -70,7 +70,6 @@ import sds.classfile.bytecode.LookupSwitch;
 import sds.classfile.bytecode.MultiANewArray;
 import sds.classfile.bytecode.NewArray;
 import sds.classfile.bytecode.OpcodeInfo;
-import sds.classfile.bytecode.Sipush;
 import sds.classfile.bytecode.TableSwitch;
 import sds.classfile.bytecode.Wide;
 import sds.classfile.constantpool.ClassInfo;
@@ -267,9 +266,9 @@ public class ClassFilePrinter {
 				out.println("\tmax_locals: " + code.maxLocals());
 				for(OpcodeInfo op : code.getCode().getAll()) {
 					out.print("\topcode: "+op.getPc()+" - "+op.getOpcodeType());
-					if(op instanceof Bipush) {
-						Bipush bi = (Bipush)op;
-						out.println("  " + bi.getByte());
+					if(op instanceof PushOpcode) {
+						PushOpcode push = (PushOpcode)op;
+						out.println("  " + push.getValue());
 					} else if(op instanceof BranchOpcode) {
 						BranchOpcode branch = (BranchOpcode)op;
 						out.println("  " + branch.getBranch());
@@ -300,9 +299,6 @@ public class ClassFilePrinter {
 					} else if(op instanceof NewArray) {
 						NewArray na = (NewArray)op;
 						out.println("  " + na.getType());
-					} else if(op instanceof Sipush) {
-						Sipush si = (Sipush)op;
-						out.println("  " + si.getShort());
 					} else if(op instanceof TableSwitch) {
 						TableSwitch ts = (TableSwitch)op;
 						int[] jump = ts.getJumpOffsets();
@@ -465,8 +461,9 @@ public class ClassFilePrinter {
 				break;
 			case SourceDebugExtension:
 				SourceDebugExtension sde = (SourceDebugExtension)info;
-				String de = new String(sde.getDebugExtension(), "UTF-8");
-				out.println("\t" + de);
+				for(int i : sde.getDebugExtension()) {
+					out.println("\t" + getUtf8Value(pool.get(i-1)));
+				}
 				break;
 			case SourceFile:
 				SourceFile sf = (SourceFile)info;

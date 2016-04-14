@@ -4,18 +4,22 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This class is for annotations table.<br>
+ * {@link RuntimeVisibleParameterAnnotations <code>RuntimeVisibleParameterAnnotations</code>}
+ * and 
+ * {@link RuntimeInvisibleParameterAnnotations <code>RuntimeInvisibleParameterAnnotations</code>}
+ * have item.
  * @author inagaki
  */
 public class ParameterAnnotations {
 	/**
-	 *
+	 * runtime parameter annotations.
 	 */
 	Annotation[] annotations;
 
 	/**
-	 *
-	 * @param raf
+	 * constructor.
+	 * @param raf classfile stream
 	 * @throws IOException
 	 */
 	ParameterAnnotations(RandomAccessFile raf) throws IOException, ElementValueException {
@@ -25,6 +29,10 @@ public class ParameterAnnotations {
 		}
 	}
 
+	/**
+	 * returns runtime parameter annotations.
+	 * @return runtime parameter annotations
+	 */
 	public Annotation[] getAnnotations() {
 		return annotations;
 	}

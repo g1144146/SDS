@@ -4,19 +4,19 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.23">BootstrapMethods Attribute</a>.
  * @author inagaki
  */
 public class BootstrapMethods extends AttributeInfo {
 	/**
-	 * 
+	 * bootstrap methods table.
 	 */
 	BSM[] bsm;
 
 	/**
-	 * 
-	 * @param nameIndex
-	 * @param length 
+	 * constructor.
+	 * @param nameIndex constant-pool entry index of attribute name.
+	 * @param length attribute length
 	 */
 	public BootstrapMethods(int nameIndex, int length) {
 		super(AttributeType.BootstrapMethods, nameIndex, length);
@@ -30,28 +30,30 @@ public class BootstrapMethods extends AttributeInfo {
 		}
 	}
 
+	/**
+	 * returns bootstrap methods table.
+	 * @return bootstrap methods table
+	 */
 	public BSM[] getBSM() {
 		return bsm;
 	}
 
 	/**
-	 * 
+	 * This class is for entry in the bootstrap methods table.
 	 */
 	public class BSM {
 		/**
-		 * The constant_pool entry at that index must be a CONSTANT_MethodHandle_info structure.
+		 * reference index of bootstrap method.
 		 */
 		int bsmRef;
 		/**
-		 * The constant_pool entry at that index must be a CONSTANT_String_info
-		 * , CONSTANT_Class_info, CONSTANT_Integer_info, CONSTANT_Long_info, CONSTANT_Float_info
-		 * , CONSTANT_Double_info, CONSTANT_MethodHandle_info, or CONSTANT_MethodType_info structure.
+		 * index of bootstrap method arguments.
 		 */
 		int[] bootstrapArgs;
 
 		/**
-		 * 
-		 * @param raf
+		 * contructor.
+		 * @param raf classfile stream
 		 * @throws IOException 
 		 */
 		BSM(RandomAccessFile raf) throws IOException {
@@ -62,10 +64,18 @@ public class BootstrapMethods extends AttributeInfo {
 			}
 		}
 
+		/**
+		 * reference index of bootstrap method.
+		 * @return reference index
+		 */
 		public int getBSMRef() {
 			return bsmRef;
 		}
 
+		/**
+		 * index of bootstrap method arguments.
+		 * @return index of bootstrap method arguments
+		 */
 		public int[] getBSMArgs() {
 			return bootstrapArgs;
 		}

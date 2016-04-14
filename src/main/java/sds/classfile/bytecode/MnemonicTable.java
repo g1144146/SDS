@@ -1,7 +1,7 @@
 package sds.classfile.bytecode;
 
 /**
- *
+ * This enum class is for mnemonic table of JVM instructions.
  * @author inagaki
  */
 public enum MnemonicTable {
@@ -213,36 +213,53 @@ public enum MnemonicTable {
 	impdep2(0xff);
 	
 	/**
-	 *
+	 * byte of opcode.
 	 */
 	int opcode;
 	/**
-	 *
+	 * operand count.
 	 */
 	int operand;
-	
+
+	/**
+	 * constructor.
+	 * @param opcode byte of opcode 
+	 */
 	MnemonicTable(int opcode) {
 		this(opcode, 0);
 	}
-	
+
+	/**
+	 * constructor.
+	 * @param opcode byte of opcode.
+	 * @param operand operand count
+	 */
 	MnemonicTable(int opcode, int operand) {
 		this.opcode = opcode;
 		this.operand = operand;
 	}
-	
+
+	/**
+	 * returns operand count.
+	 * @return operand count
+	 */
 	public int getOperand() {
 		return operand;
 	}
 
+	/**
+	 * returns byte of opcode.
+	 * @return opcode
+	 */
 	public int getOpcode() {
 		return opcode;
 	}
 
 	/**
-	 *
-	 * @param opcode
-	 * @param pc
-	 * @return
+	 * returns opcode info.
+	 * @param opcode byte of opcode
+	 * @param pc index into the code array
+	 * @return opcode info
 	 * @throws UndefinedOpcodeException
 	 */
 	public static OpcodeInfo get(int opcode, int pc) throws UndefinedOpcodeException {

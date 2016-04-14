@@ -6,12 +6,27 @@ import java.io.RandomAccessFile;
 import static sds.classfile.constantpool.ConstantType.*;
 
 /**
- *
+ * This adapter class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.4">
+ * Constant_Integer_Info</a>,
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.4">
+ * Constant_Float_Info</a>,
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.5">
+ * Constant_Long_Info</a> and
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.5">
+ * Constant_Double_Info</a>.
  * @author inagakikenichi
  */
 abstract class NumberInfo extends ConstantInfo {
+	/**
+	 * value of which constant info has.
+	 */
 	Number number;
 
+	/**
+	 * constructor.
+	 * @param tag constant info tag
+	 */
 	NumberInfo(int tag) {
 		super(tag);
 	}

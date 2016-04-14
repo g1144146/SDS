@@ -4,37 +4,39 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * 
+ * This class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.6">
+ * Constant_NameAndType_Info</a>.
  * @author inagaki
  */
 public class NameAndTypeInfo extends ConstantInfo {
 	/**
-	 * 
+	 * constant-pool entry index of name.
 	 */
 	private int nameIndex;
 	/**
-	 * 
+	 * constant-pool entry index of descriptor.
 	 */
 	private int descriptorIndex;
 
 	/**
-	 * 
+	 * constructor.
 	 */
 	public NameAndTypeInfo() {
 		super(ConstantType.C_NAME_AND_TYPE);
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns constant-pool entry index of name
+	 * @return constant-pool entry index of name
 	 */
 	public int getNameIndex() {
 		return nameIndex;
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns constant-pool entry index of descriptor.
+	 * @return constant-pool entry index of descriptor
 	 */
 	public int getDescriptorIndex() {
 		return descriptorIndex;

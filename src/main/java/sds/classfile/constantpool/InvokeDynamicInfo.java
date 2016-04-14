@@ -4,37 +4,39 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * 
+ * This class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.10">
+ * Constant_InvokeDynamic_Info</a>.
  * @author inagaki
  */
 public class InvokeDynamicInfo extends ConstantInfo {
 	/**
-	 * 
+	 * entry index of bootstrap method attribute.
 	 */
 	int bootstrapMethodAttrIndex;
 	/**
-	 * 
+	 * constant-pool entry index of name and type.
 	 */
 	int nameAndTypeIndex;
 
 	/**
-	 * 
+	 * constructor.
 	 */
 	public InvokeDynamicInfo() {
 		super(ConstantType.C_INVOKE_DYNAMIC);
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns entry index of bootstrap method attribute.
+	 * @return entry index of bootstrap method attribute
 	 */
 	public int getBMAI() {
 		return bootstrapMethodAttrIndex;
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns constant-pool entry index of name and type.
+	 * @return constant-pool entry index of name and type
 	 */
 	public int getNameAndTypeIndex() {
 		return nameAndTypeIndex;

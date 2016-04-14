@@ -7,20 +7,22 @@ import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeType;
 
 /**
- *
- * @author inagakikenichi
+ * This adapter class is for
+ * {@link RuntimeVisibleAnnotations <code>RuntimeVisibleAnnotations</code>} and 
+ * {@link RuntimeInvisibleAnnotations <code>RuntimeInvisibleAnnotations</code>}.
+ * @author inagaki
  */
 abstract class RuntimeAnnotations extends AttributeInfo {
 	/**
-	 * 
+	 * runtime annotations.
 	 */
 	Annotation[] annotations;
 
 	/**
-	 * 
-	 * @param type
-	 * @param nameIndex
-	 * @param length 
+	 * constructor.
+	 * @param type attribute type
+	 * @param nameIndex constant-pool entry index of attribute name
+	 * @param length attribute length
 	 */
 	RuntimeAnnotations(AttributeType type, int nameIndex, int length) {
 		super(type, nameIndex, length);
@@ -38,6 +40,10 @@ abstract class RuntimeAnnotations extends AttributeInfo {
 		}
 	}
 
+	/**
+	 * returns runtime annotations.
+	 * @return runtime annotations
+	 */
 	public Annotation[] getAnnotations() {
 		return annotations;
 	}

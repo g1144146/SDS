@@ -4,22 +4,22 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
- * @author inagakikenichi
+ * This class is for element-value pair in the annotation.
+ * @author inagaki
  */
 public class ElementValuePair {
 	/**
-	 *
+	 * constant-pool entry index of element name.
 	 */
 	int elementNameIndex;
 	/**
-	 *
+	 * single element-value in the annotation.
 	 */
 	ElementValue value;
 	
 	/**
-	 *
-	 * @param raf
+	 * constructor.
+	 * @param raf classfile stream
 	 * @throws IOException
 	 */
 	ElementValuePair(RandomAccessFile raf) throws IOException, ElementValueException {
@@ -28,16 +28,16 @@ public class ElementValuePair {
 	}
 	
 	/**
-	 *
-	 * @return
+	 * returns constant-pool entry index of element name.
+	 * @return constant-pool entry index of element name
 	 */
 	public int getElementNameIndex() {
 		return elementNameIndex;
 	}
 	
 	/**
-	 *
-	 * @return
+	 * returns single element-value in the annotation.
+	 * @return single element-value
 	 */
 	public ElementValue getValue() {
 		return value;

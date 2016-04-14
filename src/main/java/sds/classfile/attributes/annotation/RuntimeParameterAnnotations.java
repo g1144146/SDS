@@ -7,18 +7,20 @@ import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeType;
 
 /**
- *
- * @author inagakikenichi
+ * This adapter class is for RuntimeParameterAnnotations Attribute.
+ * @author inagaki
  */
 abstract class RuntimeParameterAnnotations extends AttributeInfo {
 	/**
-	 *
+	 * runtime parameter annotations.
 	 */
 	ParameterAnnotations[] parameterAnnotations;
 
 	/**
-	 *
-	 * @param type
+	 * constructor.
+	 * @param type attribute type
+	 * @param nameIndex constant-pool entry index of attribute name
+	 * @param length attribute length
 	 */
 	RuntimeParameterAnnotations(AttributeType type, int nameIndex, int length) {
 		super(type, nameIndex, length);
@@ -36,6 +38,10 @@ abstract class RuntimeParameterAnnotations extends AttributeInfo {
 		}
 	}
 
+	/**
+	 * returns runtime parameter annotations.
+	 * @return runtime parameter annotations
+	 */
 	public ParameterAnnotations[] getParamAnnotations() {
 		return parameterAnnotations;
 	}

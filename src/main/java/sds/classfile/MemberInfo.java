@@ -4,82 +4,82 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This adapter class is for info of class has member.
  * @author inagaki
  */
 public class MemberInfo implements Info {
 	/**
-	 * 
+	 * access flag of member.
 	 */
 	int accessFlags;
 	/**
-	 * 
+	 * constant-pool entry index of member name.
 	 */
 	int nameIndex;
 	/**
-	 * 
+	 * constant-pool entry index of member's descriptor.
 	 */
 	int descriptorIndex;
 	/**
-	 * 
+	 * attributes of member.
 	 */
 	Attributes attr;
 	/**
-	 * 
+	 * type of member.
 	 */
 	private String type;
 
 	/**
-	 * 
-	 * @param type 
+	 * constructor.
+	 * @param type type of member.
 	 */
 	MemberInfo(String type) {
 		this.type = type;
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns access flag of member.
+	 * @return access flag
 	 */
 	public int getAccessFlags() {
 		return accessFlags;
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns constant-pool entry index of member name.
+	 * @return constant-pool entry index of member name
 	 */
 	public int getNameIndex() {
 		return nameIndex;
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns constant-pool entry index of member descriptor.
+	 * @return constant-pool entry index of member descriptor
 	 */
 	public int getDescriptorIndex() {
 		return descriptorIndex;
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns attributes of member.
+	 * @return attributes
 	 */
 	public Attributes getAttr() {
 		return attr;
 	}
 
 	/**
-	 * 
-	 * @param attr 
+	 * sets attributes of member.
+	 * @param attr attributes
 	 */
 	public void setAttr(Attributes attr) {
 		this.attr = attr;
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns type of member.
+	 * @return type
 	 */
 	public String getType() {
 		return type;

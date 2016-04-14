@@ -3,22 +3,18 @@ package sds.classfile;
 import sds.classfile.attributes.AttributeInfo;
 
 /**
- * 
+ * This class is for attributes of class.
  * @author inagaki
  */
 public class Attributes implements ArrayInfo<AttributeInfo> {
 	/**
-	 * 
-	 */
-	int attrNameIndex;
-	/**
-	 * 
+	 * array of attributes.
 	 */
 	AttributeInfo[] info;
 
 	/**
-	 * 
-	 * @param size
+	 * constructor.
+	 * @param size size of array
 	 */
 	public Attributes(int size) {
 		this.info = new AttributeInfo[size];

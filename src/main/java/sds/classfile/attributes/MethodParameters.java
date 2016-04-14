@@ -4,24 +4,28 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+  * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.24">MethodParameters Attribute</a>.
  * @author inagaki
  */
 public class MethodParameters extends AttributeInfo {
 	/**
-	 * 
+	 * method parameters.
 	 */
 	Parameters[] params;
 
 	/**
-	 * 
-	 * @param nameIndex
-	 * @param length 
+	 * constructor.
+	 * @param nameIndex constant-pool entry index of attribute name
+	 * @param length attribute length
 	 */
 	public MethodParameters(int nameIndex, int length) {
 		super(AttributeType.MethodParameters, nameIndex, length);
 	}
 
+	/**
+	 * returns method parameters.
+	 * @return method parameters
+	 */
 	public Parameters[] getParams() {
 		return params;
 	}
@@ -35,21 +39,21 @@ public class MethodParameters extends AttributeInfo {
 	}
 
 	/**
-	 * 
+	 * This class is for method parameter.
 	 */
 	public class Parameters {
 		/**
-		 * 
+		 * constant-pool entry index of method parameter.
 		 */
 		int nameIndex;
 		/**
-		 * 
+		 * access flag of method parameter.
 		 */
 		int accessFlag;
 
 		/**
-		 * 
-		 * @param raf
+		 * constructor.
+		 * @param raf classfile stream
 		 * @throws IOException 
 		 */
 		Parameters(RandomAccessFile raf) throws IOException {
@@ -57,10 +61,18 @@ public class MethodParameters extends AttributeInfo {
 			this.accessFlag = raf.readShort();
 		}
 
+		/**
+		 * returns constant-pool entry index of method parameter.
+		 * @return constant-pool entry index of method parameter
+		 */
 		public int getNameIndex() {
 			return nameIndex;
 		}
 
+		/**
+		 * returns access flag of method parameter.
+		 * @return access flag
+		 */
 		public int getAccessFlag() {
 			return accessFlag;
 		}

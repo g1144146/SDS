@@ -1,13 +1,13 @@
 package sds.classfile;
 
 /**
- * 
- * @author inagakikenichi
- * @param <T>
+ * This adapter class is for class has members.
+ * @author inagaki
+ * @param <T> type extends {@link MemberInfo <code>MemberInfo</code>}
  */
 public class Members<T extends MemberInfo> implements ArrayInfo<MemberInfo> {
 	/**
-	 * 
+	 * members.
 	 */
 	MemberInfo[] elements;
 

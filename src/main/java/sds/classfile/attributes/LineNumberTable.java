@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.12">LineNumberTable Attribute</a>.
  * @author inagaki
  */
 public class LineNumberTable extends AttributeInfo {
 	/**
-	 * array of line number table.
+	 * line number table.
 	 */
 	LNTable[] lineNumberTable;
 
@@ -23,8 +23,8 @@ public class LineNumberTable extends AttributeInfo {
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns line number table.
+	 * @return line number table
 	 */
 	public LNTable[] getLineNumberTable() {
 		return lineNumberTable;
@@ -52,7 +52,7 @@ public class LineNumberTable extends AttributeInfo {
 		 */
 		int startPc;
 		/**
-		 * 
+		 * end number of opcode.
 		 */
 		int endPc;
 		/**
@@ -70,14 +70,26 @@ public class LineNumberTable extends AttributeInfo {
 			this.lineNumber = raf.readShort();
 		}
 
+		/**
+		 * returns start number of opcode.
+		 * @return start number
+		 */
 		public int getStartPc() {
 			return startPc;
 		}
 
+		/**
+		 * returns line number in source file.
+		 * @return line number
+		 */
 		public int getLineNumber() {
 			return lineNumber;
 		}
 
+		/**
+		 * returns end number of opcode.
+		 * @return end number
+		 */
 		public int getEndPc() {
 			return endPc;
 		}

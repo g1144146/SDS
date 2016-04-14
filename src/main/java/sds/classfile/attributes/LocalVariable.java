@@ -4,29 +4,29 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
- * @author inagakikenichi
+ * This adapter class is for LocalVariable Attribute.
+ * @author inagaki
  */
 public abstract class LocalVariable extends AttributeInfo {
 
 	/**
-	 * 
+	 * local variable table.
 	 */
 	LVTable[] localVariableTable;
 
 	/**
-	 * 
-	 * @param type
-	 * @param nameIndex
-	 * @param length 
+	 * constructor.
+	 * @param type attribute type
+	 * @param nameIndex constant-pool entry index of attribute name
+	 * @param length attribute length
 	 */
 	LocalVariable(AttributeType type, int nameIndex, int length) {
 		super(type, nameIndex, length);
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * return local variable table.
+	 * @return local variable table
 	 */
 	public LVTable[] getTable() {
 		return localVariableTable;
@@ -41,37 +41,37 @@ public abstract class LocalVariable extends AttributeInfo {
 	}
 
 	/**
-	 * 
+	 * This class is for local variable table.
 	 */
 	public class LVTable {
 		/**
-		 * 
+		 * start value of ranges in the code array at which local variable is active.
 		 */
 		int startPc;
 		/**
-		 * 
+		 * range in the code array at which local variable is active.
 		 */
 		int length;
 		/**
-		 * 
+		 * constant-pool entry index of local variable name.
 		 */
 		int nameIndex;
 		/**
-		 * 
+		 * constant-pool entry index of local variable's descriptor.
 		 */
 		int descriptorIndex;
 		/**
-		 * 
+		 *  index in the local variable array of the current frame.
 		 */
 		int index;
 
 		/**
-		 * 
-		 * @param startPc
-		 * @param length
-		 * @param nameIndex
-		 * @param descriptorIndex
-		 * @param index 
+		 *  constructor.
+		 * @param startPc start value of ranges in the code array at which local variable is active
+		 * @param length range in the code array at which local variable is active
+		 * @param nameIndex constant-pool entry index of local variable name
+		 * @param descriptorIndex constant-pool entry index of local variable's descriptor
+		 * @param index index in the local variable array of the current frame
 		 */
 		LVTable(RandomAccessFile raf) throws IOException {
 			this.startPc = raf.readShort();
@@ -82,9 +82,9 @@ public abstract class LocalVariable extends AttributeInfo {
 		}
 
 		/**
-		 * 
-		 * @param key
-		 * @return 
+		 * returns value.
+		 * @param key value name
+		 * @return value
 		 */
 		public int getNumber(String key) {
 			switch(key) {

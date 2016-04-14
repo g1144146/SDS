@@ -4,18 +4,18 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
- * @author inagakikenichi
+ * This class is for array as the value of this element-value.
+ * @author inagaki
  */
 public class ArrayValue {
 	/**
-	 *
+	 * array of element.
 	 */
 	ElementValue[] values;
-	
+
 	/**
-	 *
-	 * @param raf
+	 * constructor
+	 * @param raf classfile stream
 	 * @throws IOException
 	 */
 	ArrayValue(RandomAccessFile raf) throws IOException, ElementValueException {
@@ -24,6 +24,11 @@ public class ArrayValue {
 			values[i] = new ElementValue(raf);
 		}
 	}
+
+	/**
+	 * returns array of element.
+	 * @return array of element
+	 */
 	public ElementValue[] getValues() {
 		return values;
 	}
