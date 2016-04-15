@@ -13,10 +13,7 @@ import java.io.RandomAccessFile;
  * @author inagakikenichi
  */
 public class SourceDebugExtension extends AttributeInfo {
-	/**
-	 * constant-pool entry index of debugging information.
-	 */
-	int[] debugExtension;
+	private int[] debugExtension;
 
 	/**
 	 * constructor.
@@ -37,8 +34,8 @@ public class SourceDebugExtension extends AttributeInfo {
 
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
-		this.debugExtension = new int[this.attrLen];
-		for(int i = 0; i < this.attrLen; i++) {
+		this.debugExtension = new int[this.getAttrLen()];
+		for(int i = 0; i < this.getAttrLen(); i++) {
 			debugExtension[i] = raf.readUnsignedByte();
 		}
 	}

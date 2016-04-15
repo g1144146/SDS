@@ -7,10 +7,7 @@ import sds.classfile.attributes.AttributeInfo;
  * @author inagaki
  */
 public class Attributes implements ArrayInfo<AttributeInfo> {
-	/**
-	 * array of attributes.
-	 */
-	AttributeInfo[] info;
+	private AttributeInfo[] info;
 
 	/**
 	 * constructor.

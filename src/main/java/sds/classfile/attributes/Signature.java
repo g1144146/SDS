@@ -8,10 +8,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class Signature extends AttributeInfo {
-	/**
-	 * constant-pool entry index of signature.
-	 */
-	int signatureIndex;
+	private int signatureIndex;
 
 	/**
 	 * constructor.

@@ -10,21 +10,10 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class Annotation {
-	/**
-	 * constant-pool entry index of annotation type.
-	 */
 	int typeIndex;
-	/**
-	 * element-value pair in the annotation.
-	 */
 	ElementValuePair[] elementValuePairs;
 	
 	Annotation() {}
-	/**
-	 * constructor
-	 * @param raf classfile stream
-	 * @throws IOException
-	 */
 	Annotation(RandomAccessFile raf) throws IOException, ElementValueException {
 		this.typeIndex = raf.readShort();
 		this.elementValuePairs = new ElementValuePair[raf.readShort()];

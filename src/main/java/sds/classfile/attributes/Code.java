@@ -16,26 +16,11 @@ import sds.classfile.constantpool.Utf8Info;
  * @author inagaki
  */
 public class Code extends AttributeInfo {
-	/**
-	 * maximum depth of the operand stack of method.
-	 */
-	int maxStack;
-	/**
-	 * number of local variables.
-	 */
-	int maxLocals;
-	/**
-	 * opcode sequence of method.
-	 */
-	Opcodes opcodes;
-	/**
-	 * exceptions of method.
-	 */
-	ExceptionTable[] exceptionTable;
-	/**
-	 * attributes of method.
-	 */
-	Attributes attr;
+	private int maxStack;
+	private int maxLocals;
+	private Opcodes opcodes;
+	private ExceptionTable[] exceptionTable;
+	private Attributes attr;
 
 	/**
 	 *
@@ -134,28 +119,11 @@ public class Code extends AttributeInfo {
 	 * This class is for exception table of method.
 	 */
 	public class ExceptionTable {
-		/**
-		 * start value of ranges in the code array at which the exception handler is active.
-		 */
-		int startPc;
-		/**
-		 * end value of ranges in the code array at which the exception handler is active.
-		 */
-		int endPc;
-		/**
-		 * value of start of exception handler.
-		 */
-		int handlerPc;
-		/**
-		 * constant-pool entry index exception class.
-		 */
-		int catchType;
+		private int startPc;
+		private int endPc;
+		private int handlerPc;
+		private int catchType;
 
-		/**
-		 *
-		 * @param raf
-		 * @throws IOException
-		 */
 		ExceptionTable(RandomAccessFile raf) throws IOException {
 			this.startPc = raf.readShort();
 			this.endPc = raf.readShort();
@@ -164,7 +132,18 @@ public class Code extends AttributeInfo {
 		}
 
 		/**
-		 * return value.
+		 * returns value.<br><br>
+		 * if key is "start_pc", it returns start value of
+		 * ranges in the code array at which the exception
+		 * handler is active.<br>
+		 * if key is "end_pc", it returns end value of ranges
+		 * in the code array at which the exception handler
+		 * is active.<br>
+		 * if key is "handler_pc", it returns value of start
+		 * of exception handler.<br>
+		 * if key is "catch_type", it returns constant-pool
+		 * entry index exception class.<br>
+		 * by default, it returns -1.
 		 * @param key value name
 		 * @return value
 		 */

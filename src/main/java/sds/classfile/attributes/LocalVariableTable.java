@@ -5,7 +5,6 @@ package sds.classfile.attributes;
  * @author inagaki
  */
 public class LocalVariableTable extends LocalVariable {
-
 	/**
 	 * constructor.
 	 * @param nameIndex constant-pool entry index of attribute name

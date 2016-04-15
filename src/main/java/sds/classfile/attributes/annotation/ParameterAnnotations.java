@@ -12,16 +12,8 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class ParameterAnnotations {
-	/**
-	 * runtime parameter annotations.
-	 */
-	Annotation[] annotations;
+	private Annotation[] annotations;
 
-	/**
-	 * constructor.
-	 * @param raf classfile stream
-	 * @throws IOException
-	 */
 	ParameterAnnotations(RandomAccessFile raf) throws IOException, ElementValueException {
 		this.annotations = new Annotation[raf.readByte()];
 		for(int i = 0; i < annotations.length; i++) {

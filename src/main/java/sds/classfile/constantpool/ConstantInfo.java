@@ -7,10 +7,7 @@ import sds.classfile.Info;
  * @author inagaki
  */
 public abstract class ConstantInfo implements Info {
-	/**
-	 * constant info tag.
-	 */
-	int tag;
+	private int tag;
 
 	/**
 	 * constructor.

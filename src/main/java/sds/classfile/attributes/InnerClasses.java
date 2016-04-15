@@ -8,10 +8,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class InnerClasses extends AttributeInfo {
-	/**
-	 * inner classes.
-	 */
-	Classes[] classes;
+	private Classes[] classes;
 
 	/**
 	 * constructor.
@@ -42,29 +39,12 @@ public class InnerClasses extends AttributeInfo {
 	 * This class is for inner class.
 	 */
 	public class Classes {
-		/**
-		 * constant-pool entry index of inner class.
-		 */
-		int innerClassInfoIndex;
-		/**
-		 * constant-pool entry index of class has this inner class.
-		 */
-		int outerClassInfoIndex;
-		/**
-		 * constant-pool entry index of inner class name.
-		 */
-		int innerNameIndex;
-		/**
-		 * access flag of inner class.
-		 */
-		int innerClassAccessFlags;
-		
-		/**
-		 * constructor.
-		 * @param raf classfile stream
-		 * @throws IOException 
-		 */
-		public Classes(RandomAccessFile raf) throws IOException {
+		private int innerClassInfoIndex;
+		private int outerClassInfoIndex;
+		private int innerNameIndex;
+		private int innerClassAccessFlags;
+
+		Classes(RandomAccessFile raf) throws IOException {
 			this.innerClassInfoIndex = raf.readShort();
 			this.outerClassInfoIndex = raf.readShort();
 			this.innerNameIndex = raf.readShort();
@@ -72,7 +52,16 @@ public class InnerClasses extends AttributeInfo {
 		}
 
 		/**
-		 * returns constant-pool entry index.
+		 * returns constant-pool entry index.<br><br>
+		 * if key is "inner", it returns constant-pool entry
+		 * index of inner class.<br>
+		 * if key is "outer", it returns constant-pool entry
+		 * index of class has this inner class.<br>
+		 * if key is "inner_name", it returns constant-pool
+		 * entry index of inner class name.<br>
+		 * if key is "access_flag", it returns access flag 
+		 * of inner class.<br>
+		 * by default, it returns -1.
 		 * @param key value name
 		 * @return constant-pool entry index
 		 */

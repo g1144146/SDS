@@ -212,28 +212,13 @@ public enum MnemonicTable {
 	impdep1(0xfe),
 	impdep2(0xff);
 	
-	/**
-	 * byte of opcode.
-	 */
-	int opcode;
-	/**
-	 * operand count.
-	 */
-	int operand;
+	private int opcode;
+	private int operand;
 
-	/**
-	 * constructor.
-	 * @param opcode byte of opcode 
-	 */
 	MnemonicTable(int opcode) {
 		this(opcode, 0);
 	}
 
-	/**
-	 * constructor.
-	 * @param opcode byte of opcode.
-	 * @param operand operand count
-	 */
 	MnemonicTable(int opcode, int operand) {
 		this.opcode = opcode;
 		this.operand = operand;

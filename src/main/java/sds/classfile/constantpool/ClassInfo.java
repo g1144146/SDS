@@ -9,10 +9,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class ClassInfo extends ConstantInfo {
-	/**
-	 * constant-pool entry index of class name.
-	 */
-	int nameIndex;
+	private int nameIndex;
 
 	/**
 	 * constructor.

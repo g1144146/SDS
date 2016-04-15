@@ -10,14 +10,8 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class Utf8Info extends ConstantInfo {
-	/**
-	 * string length.
-	 */
-	int length;
-	/**
-	 * string of this constant info has.
-	 */
-	String value;
+	private int length;
+	private String value;
 	
 	/**
 	 * constructor.

@@ -8,14 +8,8 @@ import static sds.classfile.constantpool.ConstantType.*;
  * @author inagaki
  */
 public class ConstantInfoBuilder {
-	/**
-	 * builder class of instance.
-	 */
 	private static ConstantInfoBuilder builder = new ConstantInfoBuilder();
 
-	/**
-	 * constructor.
-	 */
 	private ConstantInfoBuilder() {}
 
 	/**

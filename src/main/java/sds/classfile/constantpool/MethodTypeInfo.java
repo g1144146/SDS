@@ -10,10 +10,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class MethodTypeInfo extends ConstantInfo {
-	/**
-	 * constant-pool entry index of descriptor of method type.
-	 */
-	int descriptorIndex;
+	private int descriptorIndex;
 
 	/**
 	 * constructor.

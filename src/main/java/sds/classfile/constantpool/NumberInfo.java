@@ -18,27 +18,20 @@ import static sds.classfile.constantpool.ConstantType.*;
  * @author inagakikenichi
  */
 abstract class NumberInfo extends ConstantInfo {
-	/**
-	 * value of which constant info has.
-	 */
 	Number number;
 
-	/**
-	 * constructor.
-	 * @param tag constant info tag
-	 */
 	NumberInfo(int tag) {
 		super(tag);
 	}
 
 	@Override
 	public void read(RandomAccessFile raf) throws IOException, NumberTypeException {
-		switch(tag) {
+		switch(this.getTag()) {
 			case C_INTEGER: this.number = raf.readInt();    break;
 			case C_FLOAT:   this.number = raf.readFloat();  break;
 			case C_LONG:    this.number = raf.readLong();   break;
 			case C_DOUBLE:  this.number = raf.readDouble(); break;
-			default: throw new NumberTypeException("unknown number type: " + tag);
+			default: throw new NumberTypeException("unknown number type: " + this.getTag());
 		}
 	}
 
@@ -46,7 +39,7 @@ abstract class NumberInfo extends ConstantInfo {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(super.toString()).append("\t");
-		switch(tag) {
+		switch(this.getTag()) {
 			case C_INTEGER: sb.append(number.intValue());      break;
 			case C_FLOAT:   sb.append(number.floatValue());    break;
 			case C_LONG:    sb.append(number.longValue());     break;

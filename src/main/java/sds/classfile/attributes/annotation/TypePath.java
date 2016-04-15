@@ -4,24 +4,16 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This class is for 
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.20.2">
+ * type_path</a>.<br>
+ * This item is one of {@link TypeAnnotation <code>TypeAnnotation</code>}.<br>
  * @author inagaki
  */
 public class TypePath {
-	/**
-	 * 
-	 */
-	int[] typePathKind;
-	/**
-	 * 
-	 */
-	int[] typeArgIndex;
+	private int[] typePathKind;
+	private int[] typeArgIndex;
 
-	/**
-	 * 
-	 * @param raf
-	 * @throws IOException 
-	 */
 	TypePath(RandomAccessFile raf) throws IOException {
 		this.typeArgIndex = new int[raf.readUnsignedByte()];
 		this.typePathKind = new int[typeArgIndex.length];
@@ -32,16 +24,19 @@ public class TypePath {
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns kind index of location of the annotation.
+	 * the kind index of location of the annotation in an array type,
+	 * nested type, or parameterized type.<br>
+	 * 0~3.
+	 * @return  kind index of location of the annotation
 	 */
 	public int[] getPathKind() {
 		return typePathKind;
 	}
 
 	/**
-	 * 
-	 * @return 
+	 * returns index of type argument of a parameterized type is annotated.
+	 * @return index of type argument
 	 */
 	public int[] getArgIndex() {
 		return typeArgIndex;

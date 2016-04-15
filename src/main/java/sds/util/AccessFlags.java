@@ -6,37 +6,37 @@ package sds.util;
  */
 public class AccessFlags {
 	/**
-	 * public.
+	 * hex of public.
 	 * class, field and method
 	 * value: 1
 	 */
 	public static final int ACC_PUBLIC = 0x0001;
 	/**
-	 * private.
+	 * hex of private.
 	 * field and method
 	 * value: 2
 	 */
 	public static final int ACC_PRIVATE = 0x0002;
 	/**
-	 * protected.
+	 * hex of protected.
 	 * field and method
 	 * value: 4
 	 */
 	public static final int ACC_PROTECTED = 0x0004;
 	/**
-	 * static.
+	 * hex of static.
 	 * field and method
 	 * value: 8
 	 */
 	public static final int ACC_STATIC = 0x0008;
 	/**
-	 * final.
+	 * hex of final.
 	 * class, field and method
 	 * value: 16
 	 */
 	public static final int ACC_FINAL = 0x0010;
 	/**
-	 * super, synchronized.
+	 * hex of super, synchronized.
 	 * class
 	 * method
 	 * value: 32
@@ -44,7 +44,7 @@ public class AccessFlags {
 	public static final int ACC_SUPER        = 0x0020,
 							ACC_SYNCHRONIZED = 0x0020;
 	/**
-	 * valtile, bridge.
+	 * hex of valtile, bridge.
 	 * field
 	 * method
 	 * value: 64
@@ -52,7 +52,7 @@ public class AccessFlags {
 	public static final int ACC_VOLATILE = 0x0040,
 							ACC_BRIDGE   = 0x0040;
 	/**
-	 * transient, varargs.
+	 * hex of transient, varargs.
 	 * field
 	 * method
 	 * value: 128
@@ -60,7 +60,7 @@ public class AccessFlags {
 	public static final int ACC_TRANSIENT = 0x0080,
 							ACC_VARARGS   = 0x0080;
 	/**
-	 * native.
+	 * hex of native.
 	 * method
 	 * value: 256
 	 */
@@ -72,13 +72,13 @@ public class AccessFlags {
 	 */
 	public static final int ACC_INTERFACE = 0x0200;
 	/**
-	 * abstract.
+	 * hex of abstract.
 	 * class, method
 	 * value: 1024
 	 */
 	public static final int ACC_ABSTRACT = 0x0400;
 	/**
-	 * strict.
+	 * hex of strict.
 	 * method
 	 * value: 2048
 	 */
@@ -90,13 +90,13 @@ public class AccessFlags {
 	 */
 	public static final int ACC_SYNTHETIC = 0x1000;
 	/**
-	 * annotation.
+	 * hex of annotation.
 	 * class
 	 * value: 8192
 	 */
 	public static final int ACC_ANNOTATION = 0x2000;
 	/**
-	 * enum.
+	 * hex of enum.
 	 * class, field
 	 * value: 16384
 	 */
@@ -144,11 +144,6 @@ public class AccessFlags {
 		return " >>> unknown access flag <<<";
 	}
 
-	/**
-	 * returns access flags for class.
-	 * @param accessFlag bit sequence of access flags
-	 * @return access flags
-	 */
 	private static String getClassAccessFlag(int accessFlag) {
 		StringBuilder sb = new StringBuilder();
 		if(checkFlag(accessFlag, ACC_PUBLIC))     sb.append("public ");
@@ -165,11 +160,6 @@ public class AccessFlags {
 		return sb.toString();
 	}
 
-	/**
-	 * returns access flags for field.
-	 * @param accessFlag bit sequence of access flags
-	 * @return access flags
-	 */
 	private static String getFieldAccessFlag(int accessFlag) {
 		StringBuilder sb = new StringBuilder();
 		if(checkFlag(accessFlag, ACC_PUBLIC))     sb.append("public ");
@@ -184,11 +174,6 @@ public class AccessFlags {
 		return sb.toString();
 	}
 
-	/**
-	 * returns access flags for method.
-	 * @param accessFlag bit sequence of access flags
-	 * @return access flags
-	 */
 	private static String getMethodAccessFlag(int accessFlag) {
 		StringBuilder sb = new StringBuilder();
 		if(checkFlag(accessFlag, ACC_PUBLIC))         sb.append("public ");
@@ -205,12 +190,6 @@ public class AccessFlags {
 		return sb.toString();
 	}
 
-	/**
-	 * checks whether flagged or not.
-	 * @param accessFlag bit sequence of access flags
-	 * @param target check target of bit sequence of access flag
-	 * @return whether flagged or not
-	 */
 	private static boolean checkFlag(int accessFlag, int target) {
 		return (accessFlag & target) == target;
 	}

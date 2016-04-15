@@ -7,9 +7,6 @@ import sds.classfile.constantpool.ConstantInfo;
  * @author inagaki
  */
 public class ConstantPool implements ArrayInfo<ConstantInfo> {
-	/**
-	 * constant-pool.
-	 */
 	private ConstantInfo[] pool;
 
 	/**

@@ -7,9 +7,6 @@ import sds.assemble.ClassContent;
  * @author inagaki
  */
 public class SDS {
-	/**
-	 * command line arguments.
-	 */
 	private String[] args;
 
 	/**

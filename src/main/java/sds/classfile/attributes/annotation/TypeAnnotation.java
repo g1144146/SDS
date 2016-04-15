@@ -10,20 +10,9 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class TypeAnnotation extends Annotation {
-	/**
-	 * type in a declaration or expression is annotated.
-	 */
-	TargetInfo targetInfo;
-	/**
-	 * part of the type indicated by target_info is annotated.
-	 */
-	TypePath targetPath;
+	private TargetInfo targetInfo;
+	private TypePath targetPath;
 
-	/**
-	 * constructor
-	 * @param raf classfile stream
-	 * @throws IOException
-	 */
 	TypeAnnotation(RandomAccessFile raf)
 	throws IOException, TargetTypeException, ElementValueException {
 		TargetInfoBuilder builder = TargetInfoBuilder.getInstance();

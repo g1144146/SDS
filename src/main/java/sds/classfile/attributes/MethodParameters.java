@@ -8,10 +8,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class MethodParameters extends AttributeInfo {
-	/**
-	 * method parameters.
-	 */
-	Parameters[] params;
+	private Parameters[] params;
 
 	/**
 	 * constructor.
@@ -42,20 +39,9 @@ public class MethodParameters extends AttributeInfo {
 	 * This class is for method parameter.
 	 */
 	public class Parameters {
-		/**
-		 * constant-pool entry index of method parameter.
-		 */
 		int nameIndex;
-		/**
-		 * access flag of method parameter.
-		 */
 		int accessFlag;
 
-		/**
-		 * constructor.
-		 * @param raf classfile stream
-		 * @throws IOException 
-		 */
 		Parameters(RandomAccessFile raf) throws IOException {
 			this.nameIndex = raf.readShort();
 			this.accessFlag = raf.readShort();

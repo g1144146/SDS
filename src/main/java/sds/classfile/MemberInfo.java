@@ -8,25 +8,10 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class MemberInfo implements Info {
-	/**
-	 * access flag of member.
-	 */
-	int accessFlags;
-	/**
-	 * constant-pool entry index of member name.
-	 */
-	int nameIndex;
-	/**
-	 * constant-pool entry index of member's descriptor.
-	 */
-	int descriptorIndex;
-	/**
-	 * attributes of member.
-	 */
-	Attributes attr;
-	/**
-	 * type of member.
-	 */
+	private int accessFlags;
+	private int nameIndex;
+	private int descriptorIndex;
+	private Attributes attr;
 	private String type;
 
 	/**

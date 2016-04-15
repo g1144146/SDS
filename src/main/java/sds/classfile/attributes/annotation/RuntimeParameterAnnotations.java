@@ -11,17 +11,8 @@ import sds.classfile.attributes.AttributeType;
  * @author inagaki
  */
 abstract class RuntimeParameterAnnotations extends AttributeInfo {
-	/**
-	 * runtime parameter annotations.
-	 */
-	ParameterAnnotations[] parameterAnnotations;
+	private ParameterAnnotations[] parameterAnnotations;
 
-	/**
-	 * constructor.
-	 * @param type attribute type
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
-	 */
 	RuntimeParameterAnnotations(AttributeType type, int nameIndex, int length) {
 		super(type, nameIndex, length);
 	}

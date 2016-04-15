@@ -8,36 +8,13 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class ElementValue {
-	/**
-	 *  ASCII character to indicate the type of the value of the element-value.
-	 */
-	char tag;
-	/**
-	 * primitive constant value or a String literal as the value of this element-value.
-	 */
-	int constValueIndex;
-	/**
-	 * enum constant as the value of this element-value.
-	 */
-	EnumConstValue enumConstValue;
-	/**
-	 * constant-pool entry index of class.
-	 */
-	int classInfoIndex;
-	/**
-	 * nested annotation.
-	 */
-	Annotation annotationValue;
-	/**
-	 * array as the value of this element-value.
-	 */
-	ArrayValue arrayValue;
-	
-	/**
-	 * constructor.
-	 * @param raf classfile stream
-	 * @throws IOException
-	 */
+	private char tag;
+	private int constValueIndex;
+	private EnumConstValue enumConstValue;
+	private int classInfoIndex;
+	private Annotation annotationValue;
+	private ArrayValue arrayValue;
+
 	ElementValue(RandomAccessFile raf) throws IOException, ElementValueException {
 		this.tag = (char)raf.readByte();
 		switch(tag) {
@@ -59,7 +36,8 @@ public class ElementValue {
 	}
 
 	/**
-	 * returns ASCII character to indicate the type of the value of the element-value.
+	 * returns ASCII character to indicate the type of the value
+	 * of the element-value.
 	 * @return ASCII character
 	 */
 	public char getTag() {
@@ -67,7 +45,8 @@ public class ElementValue {
 	}
 
 	/**
-	 * returns primitive constant value or a String literal as the value of this element-value.
+	 * returns primitive constant value or a String literal
+	 * as the value of this element-value.
 	 * @return primitive constant value
 	 */
 	public int getConstValueIndex() {

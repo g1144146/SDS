@@ -1,18 +1,17 @@
 package sds.classfile.attributes.annotation;
 
 /**
- *
+ * This class is for type_parameter_target which
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.20.1">
+ * target_info</a> union has.<br>
  * @author inagaki
  */
 public class TypeParameterTarget extends AbstractTargetInfo {
-	/**
-	 * 
-	 */
-	int typeParameterIndex;
+	private int typeParameterIndex;
 
 	/**
-	 * 
-	 * @param typeParameterIndex 
+	 * constructor.
+	 * @param typeParameterIndex index of type parameter declaration is annotated
 	 */
 	public TypeParameterTarget(int typeParameterIndex) {
 		super(TargetInfoType.TypeParameterTarget);
@@ -20,8 +19,8 @@ public class TypeParameterTarget extends AbstractTargetInfo {
 	}
 
 	/**
-	 * returns type-parameter-index.
-	 * @return 
+	 * returns index of type parameter declaration is annotated.
+	 * @return index of type parameter declaration
 	 */
 	public int getIndex() {
 		return typeParameterIndex;

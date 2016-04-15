@@ -8,28 +8,19 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class EnumConstValue {
-	/**
-	 * constant-pool entry index of internal form of the binary name of the type of the enum constant.
-	 */
-	int typeNameIndex;
-	/**
-	 * constant-pool entry index of name of the enum constant.
-	 */
-	int constNameIndex;
-	
-	/**
-	 * constructor
-	 * @param raf classfile stream
-	 * @throws IOException
-	 */
+	private int typeNameIndex;
+	private int constNameIndex;
+
 	EnumConstValue(RandomAccessFile raf) throws IOException {
 		this.typeNameIndex = raf.readShort();
 		this.constNameIndex = raf.readShort();
 	}
 
 	/**
-	 * returns constant-pool entry index of internal form of the binary name of the type of the enum constant.
-	 * @return constant-pool entry index of internal form of the binary name of the type of the enum constant
+	 * returns constant-pool entry index of internal form of
+	 * the binary name of the type of the enum constant.
+	 * @return constant-pool entry index of internal form of
+	 * the binary name of the type of the enum constant
 	 */
 	public int getTypeNameIndex()  {
 		return typeNameIndex;

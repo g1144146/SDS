@@ -8,9 +8,6 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class Exceptions extends AttributeInfo {
-	/**
-	 * constant-pool entry indexes of exception classes.
-	 */
 	int[] exceptionIndexTable;
 
 	/**

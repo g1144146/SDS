@@ -10,10 +10,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class StringInfo extends ConstantInfo {
-	/**
-	 * constant-pool entry index of string.
-	 */
-	int stringIndex;
+	private int stringIndex;
 
 	/**
 	 * constructor.

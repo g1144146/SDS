@@ -10,49 +10,16 @@ import sds.classfile.Methods;
  * @author inagaki
  */
 public class ClassFile {
-	/**
-	 * magic number.
-	 */
 	int magicNumber = -1;
-	/**
-	 * major version.
-	 */
 	int majorVersion = -1;
-	/**
-	 * minor version.
-	 */
 	int minorVersion = -1;
-	/**
-	 * constant-pool.
-	 */
 	ConstantPool pool;
-	/**
-	 * access flag of this class.
-	 */
 	int accessFlag = -1;
-	/**
-	 * contant-pool entry index of this class.
-	 */
 	int thisClass = -1;
-	/**
-	 * constant-pool entry index of super class.
-	 */
 	int superClass = -1;
-	/**
-	 * constant-pool entry indexes of interface.
-	 */
 	int[] interfaces;
-	/**
-	 * fields of this class.
-	 */
 	Fields fields;
-	/**
-	 * methods of this class.
-	 */
 	Methods methods;
-	/**
-	 * attributes of this class.
-	 */
 	Attributes attr;
 
 	/**

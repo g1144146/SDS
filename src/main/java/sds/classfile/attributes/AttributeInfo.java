@@ -10,11 +10,11 @@ public abstract class AttributeInfo implements Info {
 	/**
 	 * constant-pool entry index of attribute name.
 	 */
-	int nameIndex;
+	private int nameIndex;
 	/**
 	 * attribute length.
 	 */
-	int attrLen;
+	private int attrLen;
 	/**
 	 * attribute type.
 	 */

@@ -8,9 +8,6 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class BootstrapMethods extends AttributeInfo {
-	/**
-	 * bootstrap methods table.
-	 */
 	BSM[] bsm;
 
 	/**
@@ -42,20 +39,9 @@ public class BootstrapMethods extends AttributeInfo {
 	 * This class is for entry in the bootstrap methods table.
 	 */
 	public class BSM {
-		/**
-		 * reference index of bootstrap method.
-		 */
 		int bsmRef;
-		/**
-		 * index of bootstrap method arguments.
-		 */
 		int[] bootstrapArgs;
 
-		/**
-		 * contructor.
-		 * @param raf classfile stream
-		 * @throws IOException 
-		 */
 		BSM(RandomAccessFile raf) throws IOException {
 			this.bsmRef = raf.readShort();
 			this.bootstrapArgs = new int[raf.readShort()];

@@ -10,9 +10,6 @@ import java.util.regex.Pattern;
  * @author inagaki
  */
 public class DescriptorParser {
-	/**
-	 * regular expression of object type.
-	 */
 	private static final String objPattern  = "L[a-z\\\\.]*[0-9a-zA-Z_\\$\\.]+";
 
 	/**
@@ -75,11 +72,6 @@ public class DescriptorParser {
 		return classes.toArray(new String[0]);
 	}
 
-	/**
-	 * returns primitive type.
-	 * @param head head of descriptor
-	 * @return primitive type
-	 */
 	private static String parseType(String head) {
 		switch(head) {
 			case "B": return "byte";

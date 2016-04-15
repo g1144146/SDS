@@ -11,10 +11,7 @@ import sds.classfile.attributes.AttributeType;
  * @author inagaki
  */
 public class AnnotationDefault extends AttributeInfo {
-	/**
-	 * default value of the annotation type element.
-	 */
-	ElementValue defaultValue;
+	private ElementValue defaultValue;
 
 	/**
 	 * constructor.

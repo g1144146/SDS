@@ -11,7 +11,7 @@ public class LineNumberTable extends AttributeInfo {
 	/**
 	 * line number table.
 	 */
-	LNTable[] lineNumberTable;
+	private LNTable[] lineNumberTable;
 
 	/**
 	 * 
@@ -47,24 +47,10 @@ public class LineNumberTable extends AttributeInfo {
 	 * 
 	 */
 	public class LNTable {
-		/**
-		 * start number of opcode.
-		 */
-		int startPc;
-		/**
-		 * end number of opcode.
-		 */
-		int endPc;
-		/**
-		 * line number in source file.
-		 */
-		int lineNumber;
+		private int startPc;
+		private int endPc;
+		private int lineNumber;
 
-		/**
-		 * 
-		 * @param startPc
-		 * @param lineNumber 
-		 */
 		LNTable(RandomAccessFile raf) throws IOException {
 			this.startPc = raf.readShort();
 			this.lineNumber = raf.readShort();

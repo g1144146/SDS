@@ -8,11 +8,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public abstract class LocalVariable extends AttributeInfo {
-
-	/**
-	 * local variable table.
-	 */
-	LVTable[] localVariableTable;
+	private LVTable[] localVariableTable;
 
 	/**
 	 * constructor.
@@ -44,35 +40,12 @@ public abstract class LocalVariable extends AttributeInfo {
 	 * This class is for local variable table.
 	 */
 	public class LVTable {
-		/**
-		 * start value of ranges in the code array at which local variable is active.
-		 */
-		int startPc;
-		/**
-		 * range in the code array at which local variable is active.
-		 */
-		int length;
-		/**
-		 * constant-pool entry index of local variable name.
-		 */
-		int nameIndex;
-		/**
-		 * constant-pool entry index of local variable's descriptor.
-		 */
-		int descriptorIndex;
-		/**
-		 *  index in the local variable array of the current frame.
-		 */
-		int index;
+		private int startPc;
+		private int length;
+		private int nameIndex;
+		private int descriptorIndex;
+		private int index;
 
-		/**
-		 *  constructor.
-		 * @param startPc start value of ranges in the code array at which local variable is active
-		 * @param length range in the code array at which local variable is active
-		 * @param nameIndex constant-pool entry index of local variable name
-		 * @param descriptorIndex constant-pool entry index of local variable's descriptor
-		 * @param index index in the local variable array of the current frame
-		 */
 		LVTable(RandomAccessFile raf) throws IOException {
 			this.startPc = raf.readShort();
 			this.length = raf.readShort();
@@ -82,7 +55,22 @@ public abstract class LocalVariable extends AttributeInfo {
 		}
 
 		/**
-		 * returns value.
+		 * returns value.<br><br>
+		 * if key is "start_pc", it returns
+		 * start value of ranges in the code array at which
+		 * local variable is active.<br>
+		 * if key is "length", it returns
+		 * range in the code array at which local variable
+		 * is active.<br>
+		 * if key is "name_index", it returns
+		 * constant-pool entry index of local variable name.<br>
+		 * if key is "descriptor", it returns
+		 * constant-pool entry index of local variable's
+		 * descriptor.<br>
+		 * if key is "index", it returns
+		 * index in the local variable array of
+		 * the current frame.<br>
+		 * by default, it returns -1.
 		 * @param key value name
 		 * @return value
 		 */

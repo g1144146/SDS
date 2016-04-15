@@ -10,14 +10,8 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class InvokeDynamicInfo extends ConstantInfo {
-	/**
-	 * entry index of bootstrap method attribute.
-	 */
-	int bootstrapMethodAttrIndex;
-	/**
-	 * constant-pool entry index of name and type.
-	 */
-	int nameAndTypeIndex;
+	private int bootstrapMethodAttrIndex;
+	private int nameAndTypeIndex;
 
 	/**
 	 * constructor.

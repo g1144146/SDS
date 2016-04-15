@@ -97,6 +97,11 @@ public class ClassFilePrinter {
 	private PrintStream out = System.out;
 	private ConstantPool pool;
 	private String sep = System.getProperty("line.separator");
+
+	/**
+	 * constructor.
+	 * @param pool constant-pool
+	 */
 	public ClassFilePrinter(ConstantPool pool) {
 		this.pool = pool;
 	}
@@ -104,9 +109,9 @@ public class ClassFilePrinter {
 	public ClassFilePrinter() {}
 
 	/**
-	 *
-	 * @param majorVersion
-	 * @param minorVersion
+	 * prints major and minor version.
+	 * @param majorVersion major version
+	 * @param minorVersion minor version
 	 */
 	public void printNumber(int majorVersion, int minorVersion) {
 		out.println("*** Major Version *** " + sep + majorVersion);
@@ -115,7 +120,7 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 *
+	 * prints constant-pool.
 	 */
 	public void printConstantPool() {
 		out.println(pool);
@@ -123,7 +128,7 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 *
+	 * prints access flag of this class.
 	 * @param accessFlag
 	 */
 	public void printAccessFlag(int accessFlag) {
@@ -133,7 +138,7 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 *
+	 * prints this class.
 	 * @param thisClass
 	 */
 	public void printThisClass(int thisClass) {
@@ -147,7 +152,7 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 *
+	 * prints super class.
 	 * @param superClass
 	 */
 	public void printSuperClass(int superClass) {
@@ -161,7 +166,7 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 *
+	 * prints interfaces.
 	 * @param interfaces
 	 */
 	public void printInterface(int[] interfaces) {
@@ -177,8 +182,8 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 *
-	 * @param fields
+	 * prints fields of this class.
+	 * @param fields field
 	 * @throws IOException
 	 */
 	public void printFields(Fields fields) throws IOException {
@@ -200,8 +205,8 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 *
-	 * @param methods
+	 * prints methods of this class.
+	 * @param methods methods
 	 * @throws IOException
 	 */
 	public void printMethods(Methods methods) throws IOException {
@@ -223,7 +228,7 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 *
+	 * prints attributes of this class.
 	 * @param attr
 	 * @throws IOException
 	 */
@@ -240,7 +245,7 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 *
+	 * print an attribute.
 	 * @param info
 	 * @throws IOException
 	 */
@@ -484,19 +489,11 @@ public class ClassFilePrinter {
 		}
 	}
 
-	/**
-	 *
-	 * @param e
-	 */
 	private void printElementValuePair(ElementValuePair e) {
 		out.println("\t  element_name: "+getUtf8Value(pool.get(e.getElementNameIndex()-1)));
 		printElementValue(e.getValue());
 	}
 
-	/**
-	 *
-	 * @param e
-	 */
 	private void printElementValue(ElementValue e) {
 		switch((char)e.getTag()) {
 			case 'B':
@@ -529,10 +526,6 @@ public class ClassFilePrinter {
 		}
 	}
 
-	/**
-	 *
-	 * @param annotation
-	 */
 	private void printAnnotation(Annotation annotation) {
 		out.println("\t\ttype_name : "+
 					DescriptorParser.parse(getUtf8Value(pool.get(annotation.getTypeIndex()-1))));
@@ -541,10 +534,6 @@ public class ClassFilePrinter {
 		}
 	}
 
-	/**
-	 *
-	 * @param frame
-	 */
 	private void printStackMapFrame(StackMapFrame frame) {
 		out.println("\t  stack_map_frame_type: " + frame.getFrameType());
 		switch(frame.getFrameType()) {
@@ -588,10 +577,6 @@ public class ClassFilePrinter {
 		}
 	}
 
-	/**
-	 *
-	 * @param info
-	 */
 	private void printVerificationTypeInfo(VerificationTypeInfo info) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\t\tverification_info_type: ").append(info.getType()).append(sep);
@@ -619,10 +604,6 @@ public class ClassFilePrinter {
 		out.print(sb.toString());
 	}
 
-	/**
-	 *
-	 * @param info
-	 */
 	private void printTargetInfo(TargetInfo info) {
 		out.println("\t  target_info_type: " + info.getType());
 		switch(info.getType()) {
@@ -677,10 +658,6 @@ public class ClassFilePrinter {
 		}
 	}
 
-	/**
-	 *
-	 * @param path
-	 */
 	private void printTypePath(TypePath path) {
 		out.print("\t  type_path_type: ");
 		for(int i = 0; i < path.getArgIndex().length; i++) {
@@ -708,9 +685,13 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 *
-	 * @param info
-	 * @return
+	 * returns value of
+	 * {@link sds.classfile.constantpool.Utf8Info <code>Utf8Info</code>}
+	 * which is refered sub-class of
+	 * {@link sds.classfile.constantpool.ConstantInfo <code>ConstantInfo</code>}.
+	 * @param info constant-info
+	 * @return value of
+	 * {@link sds.classfile.constantpool.Utf8Info <code>Utf8Info</code>}
 	 */
 	public String getUtf8Value(ConstantInfo info) {
 		if(info.getTag() == C_UTF8) {
@@ -763,11 +744,6 @@ public class ClassFilePrinter {
 		}
 	}
 
-	/**
-	 *
-	 * @param info
-	 * @return
-	 */
 	private String getUtf8Value(MemberInfo info) {
 		return DescriptorParser.parse(getUtf8Value(pool.get(info.getDescriptorIndex()-1))) + " "
 			+ getUtf8Value(pool.get(info.getNameIndex()-1));

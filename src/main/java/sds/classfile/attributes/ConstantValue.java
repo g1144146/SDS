@@ -8,10 +8,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class ConstantValue extends AttributeInfo {
-	/**
-	 * constant-pool entry index of constant value.
-	 */
-	int constantValueIndex;
+	private int constantValueIndex;
 
 	/**
 	 * constructor.

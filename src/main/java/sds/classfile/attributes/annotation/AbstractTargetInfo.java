@@ -5,23 +5,14 @@ package sds.classfile.attributes.annotation;
  * @author inagaki
  */
 public class AbstractTargetInfo implements TargetInfo {
-	/**
-	 * target info type.
-	 */
-	TargetInfoType type;
+	private TargetInfoType type;
 
-	/**
-	 * constructor.
-	 * @param type target info type
-	 */
 	AbstractTargetInfo(TargetInfoType type) {
 		this.type = type;
 	}
-
 
 	@Override
 	public TargetInfoType getType() {
 		return type;
 	}
-	
 }

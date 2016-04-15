@@ -8,7 +8,6 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class Synthetic extends AttributeInfo {
-
 	/**
 	 * constructor.
 	 * @param nameIndex constant-pool entry index of attribute name

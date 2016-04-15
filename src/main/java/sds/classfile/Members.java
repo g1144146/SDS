@@ -6,9 +6,6 @@ package sds.classfile;
  * @param <T> type extends {@link MemberInfo <code>MemberInfo</code>}
  */
 public class Members<T extends MemberInfo> implements ArrayInfo<MemberInfo> {
-	/**
-	 * members.
-	 */
 	MemberInfo[] elements;
 
 	Members() {}

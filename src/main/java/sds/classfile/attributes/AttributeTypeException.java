@@ -5,7 +5,6 @@ package sds.classfile.attributes;
  * @author inagaki
  */
 public class AttributeTypeException extends Exception {
-
 	/**
 	 * constructor.
 	 * @param type attribute name

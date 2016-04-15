@@ -8,10 +8,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class SourceFile extends AttributeInfo {
-	/**
-	 * constant-pool entry index of source file.
-	 */
-	int sourceFileIndex;
+	private int sourceFileIndex;
 
 	/**
 	 * constructor.

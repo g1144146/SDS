@@ -10,17 +10,11 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class MethodHandleInfo extends ConstantInfo {
-	/**
-	 * kind of this method handle.
-	 */
-	int referenceKind;
-	/**
-	 * constant-pool entry index of constant info.
-	 */
-	int referenceIndex;
+	private int referenceKind;
+	private int referenceIndex;
 	
 	 /**
-	  * 
+	  * constructor.
 	  */
 	public MethodHandleInfo() {
 		super(ConstantType.C_METHOD_HANDLE);

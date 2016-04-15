@@ -8,13 +8,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class EnclosingMethod extends AttributeInfo {
-	/**
-	 * constant-pool entry index of class has this method.
-	 */
 	int classIndex;
-	/**
-	 * constant-pool entry index of this method.
-	 */
 	int methodIndex;
 	
 	/**

@@ -5,7 +5,6 @@ package sds.classfile;
  * @author inagaki
  */
 public class Fields extends Members<FieldInfo> {
-
 	/**
 	 * constructor.
 	 * @param size field count

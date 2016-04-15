@@ -10,13 +10,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class NameAndTypeInfo extends ConstantInfo {
-	/**
-	 * constant-pool entry index of name.
-	 */
 	private int nameIndex;
-	/**
-	 * constant-pool entry index of descriptor.
-	 */
 	private int descriptorIndex;
 
 	/**

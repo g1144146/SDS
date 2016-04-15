@@ -14,14 +14,8 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public abstract class MemberRefInfo extends ConstantInfo {
-	/**
-	 * constant-pool entry index of class has member.
-	 */
-	int classIndex;
-	/**
-	 * constant-pool entry index of member's name and type.
-	 */
-	int nameAndTypeIndex;
+	private int classIndex;
+	private int nameAndTypeIndex;
 
 	/**
 	 * constructor.

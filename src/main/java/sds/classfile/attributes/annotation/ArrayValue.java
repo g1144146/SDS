@@ -8,16 +8,8 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class ArrayValue {
-	/**
-	 * array of element.
-	 */
-	ElementValue[] values;
+	private ElementValue[] values;
 
-	/**
-	 * constructor
-	 * @param raf classfile stream
-	 * @throws IOException
-	 */
 	ArrayValue(RandomAccessFile raf) throws IOException, ElementValueException {
 		this.values = new ElementValue[raf.readShort()];
 		for(int i = 0; i < values.length; i++) {

@@ -8,20 +8,9 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class ElementValuePair {
-	/**
-	 * constant-pool entry index of element name.
-	 */
-	int elementNameIndex;
-	/**
-	 * single element-value in the annotation.
-	 */
-	ElementValue value;
-	
-	/**
-	 * constructor.
-	 * @param raf classfile stream
-	 * @throws IOException
-	 */
+	private int elementNameIndex;
+	private ElementValue value;
+
 	ElementValuePair(RandomAccessFile raf) throws IOException, ElementValueException {
 		this.elementNameIndex = raf.readShort();
 		this.value = new ElementValue(raf);

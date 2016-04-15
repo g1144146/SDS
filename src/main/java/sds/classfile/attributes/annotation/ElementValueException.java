@@ -7,7 +7,8 @@ package sds.classfile.attributes.annotation;
 public class ElementValueException extends Exception {
 	/**
 	 * constructor.
-	 * @param tag ASCII character to indicate the type of the value of the element-value
+	 * @param tag ASCII character to indicate the type of
+	 * the value of the element-value
 	 */
 	public ElementValueException(char tag) {
 		super(""+tag);
