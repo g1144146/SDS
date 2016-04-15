@@ -72,22 +72,6 @@ import sds.classfile.bytecode.NewArray;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.TableSwitch;
 import sds.classfile.bytecode.Wide;
-import sds.classfile.constantpool.ClassInfo;
-import sds.classfile.constantpool.ConstantInfo;
-import sds.classfile.constantpool.DoubleInfo;
-import sds.classfile.constantpool.FieldrefInfo;
-import sds.classfile.constantpool.FloatInfo;
-import sds.classfile.constantpool.IntegerInfo;
-import sds.classfile.constantpool.InterfaceMethodrefInfo;
-import sds.classfile.constantpool.InvokeDynamicInfo;
-import sds.classfile.constantpool.LongInfo;
-import sds.classfile.constantpool.MethodHandleInfo;
-import sds.classfile.constantpool.MethodrefInfo;
-import sds.classfile.constantpool.MethodTypeInfo;
-import sds.classfile.constantpool.NameAndTypeInfo;
-import sds.classfile.constantpool.StringInfo;
-import sds.classfile.constantpool.Utf8Info;
-import static sds.classfile.constantpool.ConstantType.*;
 
 /**
  * This class is for debugging.
@@ -147,7 +131,7 @@ public class ClassFilePrinter {
 			out.print(sep);
 			return;
 		}
-		out.println(getUtf8Value(pool.get(thisClass-1)));
+		out.println(Utf8ValueExtractor.extract(pool.get(thisClass-1), pool));
 		out.print(sep);
 	}
 
@@ -161,7 +145,7 @@ public class ClassFilePrinter {
 			out.print(sep);
 			return;
 		}
-		out.println(getUtf8Value(pool.get(superClass-1)));
+		out.println(Utf8ValueExtractor.extract(pool.get(superClass-1), pool));
 		out.print(sep);
 	}
 
@@ -176,7 +160,7 @@ public class ClassFilePrinter {
 			return;
 		}
 		for(int i : interfaces) {
-			out.println(getUtf8Value(pool.get(i-1)));
+			out.println(Utf8ValueExtractor.extract(pool.get(i-1), pool));
 		}
 		out.print(sep);
 	}
@@ -195,7 +179,8 @@ public class ClassFilePrinter {
 
 		for(int i = 0; i < fields.size(); i++) {
 			MemberInfo field = fields.get(i);
-			out.println(AccessFlags.get(field.getAccessFlags(), "field") + getUtf8Value(field));
+			out.println(AccessFlags.get(field.getAccessFlags(), "field")
+					+ Utf8ValueExtractor.extract(field, pool));
 			Attributes attr = field.getAttr();
 			for(int j = 0; j < attr.size(); j++) {
 				printAttributeInfo(attr.get(j));
@@ -218,7 +203,7 @@ public class ClassFilePrinter {
 		for(int i = 0; i < methods.size(); i++) {
 			MemberInfo method = methods.get(i);
 			out.println("["+AccessFlags.get(method.getAccessFlags(), "method")
-						+ getUtf8Value(method) + "]");
+						+ Utf8ValueExtractor.extract(method, pool) + "]");
 			Attributes attr = method.getAttr();
 			for(int j = 0; j < attr.size(); j++) {
 				printAttributeInfo(attr.get(j));
@@ -259,9 +244,10 @@ public class ClassFilePrinter {
 			case BootstrapMethods:
 				BootstrapMethods bsm = (BootstrapMethods)info;
 				for(BootstrapMethods.BSM b : bsm.getBSM()) {
-					out.println("\tbsm ref: " + getUtf8Value(pool.get(b.getBSMRef()-1)));
+					out.println("\tbsm ref: "
+							+ Utf8ValueExtractor.extract(pool.get(b.getBSMRef()-1), pool));
 					for(int i : b.getBSMArgs()) {
-						out.println("\tbsm args: " + getUtf8Value(pool.get(i-1)));
+						out.println("\tbsm args: " + Utf8ValueExtractor.extract(pool.get(i-1), pool));
 					}
 				}
 				break;
@@ -326,7 +312,8 @@ public class ClassFilePrinter {
 					out.println("\tpc        : " + t.getNumber("start_pc") + "~" + t.getNumber("end_pc"));
 					out.println("\thandler   : " + t.getNumber("handler_pc"));
 					if(checkRange(t.getNumber("catch_type")-1))
-						out.println("\tcatch_type: " + getUtf8Value(pool.get(t.getNumber("catch_type")-1)));
+						out.println("\tcatch_type: "
+								+ Utf8ValueExtractor.extract(pool.get(t.getNumber("catch_type")-1), pool));
 				}
 				for(AttributeInfo ai : code.getAttr().getAll()) {
 					printAttributeInfo(ai);
@@ -335,7 +322,7 @@ public class ClassFilePrinter {
 			case ConstantValue:
 				ConstantValue cv = (ConstantValue)info;
 				int index = cv.getConstantValueIndex();
-				out.println("\tconstant_value"+getUtf8Value(pool.get(index-1)));
+				out.println("\tconstant_value"+Utf8ValueExtractor.extract(pool.get(index-1), pool));
 				break;
 			case Deprecated:
 				// do nothing.
@@ -343,17 +330,20 @@ public class ClassFilePrinter {
 			case EnclosingMethod:
 				EnclosingMethod em = (EnclosingMethod)info;
 				if(checkRange(em.classIndex()-1)) {
-					out.println("\t" + getUtf8Value(pool.get(em.classIndex()-1)));
+					out.println("\t"
+							+ Utf8ValueExtractor.extract(pool.get(em.classIndex()-1), pool));
 				}
 				if(checkRange(em.methodIndex()-1)) {
-					out.println("\t" + getUtf8Value(pool.get(em.methodIndex()-1)));
+					out.println("\t"
+							+ Utf8ValueExtractor.extract(pool.get(em.methodIndex()-1), pool));
 				}
 				break;
 			case Exceptions:
 				Exceptions ex = (Exceptions)info;
 				for(int i : ex.getExceptionIndexTable()) {
 					if(checkRange(i-1)) {
-						out.println("\t" + getUtf8Value(pool.get(i-1)).replace("/", "."));
+						out.println("\t"
+								+ Utf8ValueExtractor.extract(pool.get(i-1), pool).replace("/", "."));
 					}
 				}
 				break;
@@ -366,13 +356,14 @@ public class ClassFilePrinter {
 					int accessFlag = c.getNumber("access_flag");
 					if(checkRange(inner-1)) {
 						out.println("\tinner_class: " + AccessFlags.get(accessFlag, "nested")
-								+ getUtf8Value(pool.get(inner-1)));
+								+ Utf8ValueExtractor.extract(pool.get(inner-1), pool));
 					}
 					if(checkRange(outer-1)) {
-						out.println("\touter_class: " + getUtf8Value(pool.get(outer-1)));
+						out.println("\touter_class: "
+								+ Utf8ValueExtractor.extract(pool.get(outer-1), pool));
 					}
 					if(checkRange(name-1)) {
-						out.println("\t" + getUtf8Value(pool.get(name-1)));
+						out.println("\t" + Utf8ValueExtractor.extract(pool.get(name-1), pool));
 					}
 				}
 				break;
@@ -388,9 +379,11 @@ public class ClassFilePrinter {
 				for(LocalVariable.LVTable t : lvt.getTable()) {
 					out.println("\tpc    : " + t.getNumber("start_pc")
 							+ "-" + (t.getNumber("start_pc")+t.getNumber("length")-1));
-					out.println("\tname  : " + getUtf8Value(pool.get(t.getNumber("name_index")-1)));
+					out.println("\tname  : "
+							+ Utf8ValueExtractor.extract(pool.get(t.getNumber("name_index")-1), pool));
 					out.println("\tdesc  : "
-							+ DescriptorParser.parse(getUtf8Value(pool.get(t.getNumber("descriptor")-1))));
+							+ DescriptorParser.parse(
+								Utf8ValueExtractor.extract(pool.get(t.getNumber("descriptor")-1), pool)));
 					out.println("\tindex : " + t.getNumber("index"));
 				}
 				break;
@@ -399,9 +392,11 @@ public class ClassFilePrinter {
 				for(LocalVariable.LVTable t : lvtt.getTable()) {
 					out.println("\tpc    : " + t.getNumber("start_pc")
 							+ "-" + (t.getNumber("start_pc")+t.getNumber("length")-1));
-					out.println("\tname  : " + getUtf8Value(pool.get(t.getNumber("name_index")-1)));
+					out.println("\tname  : "
+							+ Utf8ValueExtractor.extract(pool.get(t.getNumber("name_index")-1), pool));
 					out.println("\tdesc  : "
-							+ DescriptorParser.parse(getUtf8Value(pool.get(t.getNumber("descriptor")-1))));
+							+ DescriptorParser.parse(
+								Utf8ValueExtractor.extract(pool.get(t.getNumber("descriptor")-1), pool)));
 					out.println("\tindex : " + t.getNumber("index"));
 				}
 				break;
@@ -409,7 +404,7 @@ public class ClassFilePrinter {
 				MethodParameters mp = (MethodParameters)info;
 				for(MethodParameters.Parameters p : mp.getParams()) {
 					String flag = AccessFlags.get(p.getAccessFlag(), "method");
-					out.println(flag + getUtf8Value(pool.get(p.getNameIndex()-1)));
+					out.println(flag + Utf8ValueExtractor.extract(pool.get(p.getNameIndex()-1), pool));
 				}
 				break;
 			case RuntimeInvisibleAnnotations:
@@ -462,17 +457,19 @@ public class ClassFilePrinter {
 				break;
 			case Signature:
 				Signature sig = (Signature)info;
-				out.println("\t" + getUtf8Value(pool.get(sig.getSignatureIndex()-1)));
+				out.println("\t"
+						+ Utf8ValueExtractor.extract(pool.get(sig.getSignatureIndex()-1), pool));
 				break;
 			case SourceDebugExtension:
 				SourceDebugExtension sde = (SourceDebugExtension)info;
 				for(int i : sde.getDebugExtension()) {
-					out.println("\t" + getUtf8Value(pool.get(i-1)));
+					out.println("\t" + Utf8ValueExtractor.extract(pool.get(i-1), pool));
 				}
 				break;
 			case SourceFile:
 				SourceFile sf = (SourceFile)info;
-				out.println("\tsource file: " + getUtf8Value(pool.get(sf.getSourceFileIndex()-1)));
+				out.println("\tsource file: "
+						+ Utf8ValueExtractor.extract(pool.get(sf.getSourceFileIndex()-1), pool));
 				break;
 			case Synthetic:
 				// do nothing.
@@ -490,7 +487,8 @@ public class ClassFilePrinter {
 	}
 
 	private void printElementValuePair(ElementValuePair e) {
-		out.println("\t  element_name: "+getUtf8Value(pool.get(e.getElementNameIndex()-1)));
+		out.println("\t  element_name: "
+				+ Utf8ValueExtractor.extract(pool.get(e.getElementNameIndex()-1), pool));
 		printElementValue(e.getValue());
 	}
 
@@ -505,15 +503,19 @@ public class ClassFilePrinter {
 			case 'S':
 			case 'Z':
 			case 's':
-				out.println("\t\t  const_value: " + getUtf8Value(pool.get(e.getConstValueIndex()-1)));
+				out.println("\t\t  const_value: "
+						+ Utf8ValueExtractor.extract(pool.get(e.getConstValueIndex()-1), pool));
 				break;
 			case 'e':
 				EnumConstValue ecv = e.getEnumConstValue();
-				out.println("\t\t  type_name : "+getUtf8Value(pool.get(ecv.getTypeNameIndex()-1)));
-				out.println("\t\t  const_name: "+getUtf8Value(pool.get(ecv.getConstNameIndex()-1)));
+				out.println("\t\t  type_name : "
+						+ Utf8ValueExtractor.extract(pool.get(ecv.getTypeNameIndex()-1), pool));
+				out.println("\t\t  const_name: "
+						+ Utf8ValueExtractor.extract(pool.get(ecv.getConstNameIndex()-1), pool));
 				break;
 			case 'c':
-				out.println("\t\t  type_name : "+getUtf8Value(pool.get(e.getClassInfoIndex()-1)));
+				out.println("\t\t  type_name : "
+						+ Utf8ValueExtractor.extract(pool.get(e.getClassInfoIndex()-1), pool));
 				break;
 			case '@':
 				printAnnotation(e.getAnnotationValue());
@@ -528,7 +530,8 @@ public class ClassFilePrinter {
 
 	private void printAnnotation(Annotation annotation) {
 		out.println("\t\ttype_name : "+
-					DescriptorParser.parse(getUtf8Value(pool.get(annotation.getTypeIndex()-1))));
+					DescriptorParser.parse(
+						Utf8ValueExtractor.extract(pool.get(annotation.getTypeIndex()-1), pool)));
 		for(ElementValuePair evp : annotation.getElementValuePairs()) {
 			printElementValuePair(evp);
 		}
@@ -591,7 +594,9 @@ public class ClassFilePrinter {
 			case ObjectVariableInfo:
 				ObjectVariableInfo ovi = (ObjectVariableInfo)info;
 				sb.append("\t\tcpool_index: ").append(ovi.getCPoolIndex()).append(sep);
-				sb.append("\t\t\tvalue: ").append(getUtf8Value(pool.get(ovi.getCPoolIndex()-1))).append(sep);
+				sb.append("\t\t\tvalue: ")
+					.append(Utf8ValueExtractor.extract(pool.get(ovi.getCPoolIndex()-1), pool))
+					.append(sep);
 				break;
 			case UninitializedVariableInfo:
 				UninitializedVariableInfo uvi = (UninitializedVariableInfo)info;
@@ -682,70 +687,5 @@ public class ClassFilePrinter {
 	 */
 	private boolean checkRange(int index) {
 		return (0 <= index) && (index < pool.size());
-	}
-
-	/**
-	 * returns value of
-	 * {@link sds.classfile.constantpool.Utf8Info <code>Utf8Info</code>}
-	 * which is refered sub-class of
-	 * {@link sds.classfile.constantpool.ConstantInfo <code>ConstantInfo</code>}.
-	 * @param info constant-info
-	 * @return value of
-	 * {@link sds.classfile.constantpool.Utf8Info <code>Utf8Info</code>}
-	 */
-	public String getUtf8Value(ConstantInfo info) {
-		if(info.getTag() == C_UTF8) {
-			return ((Utf8Info)info).getValue();
-		}
-		switch(info.getTag()) {
-			case C_INTEGER:
-				return ""+((IntegerInfo)info).getValue();
-			case C_FLOAT:
-				return ""+((FloatInfo)info).getValue();
-			case C_LONG:
-				return ""+((LongInfo)info).getValue();
-			case C_DOUBLE:
-				return ""+((DoubleInfo)info).getValue();
-			case C_CLASS:
-				ClassInfo ci = (ClassInfo)info;
-				return getUtf8Value(pool.get(ci.getNameIndex()-1)).replace("/", ".");
-			case C_STRING:
-				StringInfo si = (StringInfo)info;
-				return getUtf8Value(pool.get(si.getStringIndex()-1));
-			case C_FIELDREF:
-				FieldrefInfo fi = (FieldrefInfo)info;
-				return getUtf8Value(pool.get(fi.getClassIndex()-1)) + "."
-					+ getUtf8Value(pool.get(fi.getNameAndTypeIndex()-1));
-			case C_METHODREF:
-				MethodrefInfo mi = (MethodrefInfo)info;
-				return getUtf8Value(pool.get(mi.getClassIndex()-1)) + "."
-					+ getUtf8Value(pool.get(mi.getNameAndTypeIndex()-1));
-			case C_INTERFACE_METHODREF:
-				InterfaceMethodrefInfo imi = (InterfaceMethodrefInfo)info;
-				return getUtf8Value(pool.get(imi.getClassIndex()-1)) + "."
-					+ getUtf8Value(pool.get(imi.getNameAndTypeIndex()-1));
-			case C_NAME_AND_TYPE:
-				NameAndTypeInfo nati = (NameAndTypeInfo)info;
-				return getUtf8Value(pool.get(nati.getNameIndex()-1))
-					+ DescriptorParser.parse(getUtf8Value(pool.get(nati.getDescriptorIndex()-1)));
-			case C_METHOD_HANDLE:
-				MethodHandleInfo mhi = (MethodHandleInfo)info;
-				return //mhi.getRefKindValue() + ":"+
-						getUtf8Value(pool.get(mhi.getReferenceIndex()-1));
-			case C_METHOD_TYPE:
-				MethodTypeInfo mti = (MethodTypeInfo)info;
-				return DescriptorParser.parse(getUtf8Value(pool.get(mti.getDescriptorIndex()-1)));
-			case C_INVOKE_DYNAMIC:
-				InvokeDynamicInfo idi = (InvokeDynamicInfo)info;
-				return getUtf8Value(pool.get(idi.getNameAndTypeIndex()));
-			default:
-				System.out.println("invalid type: " + info);
-				return " >>> unknown type <<<";
-		}
-	}
-
-	private String getUtf8Value(MemberInfo info) {
-		return DescriptorParser.parse(getUtf8Value(pool.get(info.getDescriptorIndex()-1))) + " "
-			+ getUtf8Value(pool.get(info.getNameIndex()-1));
 	}
 }

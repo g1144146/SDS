@@ -8,7 +8,7 @@ import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.BootstrapMethods;
 import sds.classfile.attributes.InnerClasses;
 import sds.classfile.attributes.SourceFile;
-import sds.util.ClassFilePrinter;
+import sds.util.Utf8ValueExtractor;
 
 /**
  *
@@ -68,14 +68,14 @@ public class ClassContent extends BaseContent {
 	@Override
 	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
 		super.investigateAttribute(info, pool);
-		ClassFilePrinter cfp = new ClassFilePrinter();
 		switch(info.getType()) {
 			case BootstrapMethods:
 				BootstrapMethods bsm = (BootstrapMethods)info;
 				this.bootstrapMethods = new String[bsm.getBSM().length];
 				for(BootstrapMethods.BSM b : bsm.getBSM()) {
 					for(int i = 0; i < b.getBSMArgs().length; i++) {
-						bootstrapMethods[i] = cfp.getUtf8Value(pool.get(b.getBSMArgs()[i]-1));
+						bootstrapMethods[i]
+							= Utf8ValueExtractor.extract(pool.get(b.getBSMArgs()[i]-1), pool);
 					}
 				}
 				break;
@@ -88,18 +88,19 @@ public class ClassContent extends BaseContent {
 //					int accessFlag = c.getNumber("access_flag");
 //					if(checkRange(inner-1)) {
 //						out.println("\tinner_class: " + AccessFlags.get(accessFlag, "nested")
-//								+ getUtf8Value(pool.get(inner-1)));
+//								+ Utf8ValueExtractor.extract(pool.get(inner-1)));
 //					}
 //					if(checkRange(outer-1)) {
-//						out.println("\touter_class: " + getUtf8Value(pool.get(outer-1)));
+//						out.println("\touter_class: " + Utf8ValueExtractor.extract(pool.get(outer-1)));
 //					}
 //					if(checkRange(name-1)) {
-//						out.println("\t" + getUtf8Value(pool.get(name-1)));
+//						out.println("\t" + Utf8ValueExtractor.extract(pool.get(name-1)));
 //					}
 				}
 			case SourceFile:
 				SourceFile sf = (SourceFile)info;
-				this.sourceFile = cfp.getUtf8Value(pool.get(sf.getSourceFileIndex()-1));
+				this.sourceFile
+					= Utf8ValueExtractor.extract(pool.get(sf.getSourceFileIndex()-1), pool);
 				break;
 		}
 	}

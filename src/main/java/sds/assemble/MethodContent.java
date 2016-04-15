@@ -9,7 +9,7 @@ import sds.classfile.attributes.Exceptions;
 import sds.classfile.attributes.LineNumberTable;
 import sds.classfile.attributes.stackmap.StackMapTable;
 import sds.classfile.bytecode.Opcodes;
-import sds.util.ClassFilePrinter;
+import sds.util.Utf8ValueExtractor;
 
 /**
  *
@@ -33,7 +33,6 @@ public class MethodContent extends MemberContent {
 	@Override
 	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
 		super.investigateAttribute(info, pool);
-		ClassFilePrinter cfp = new ClassFilePrinter();
 		switch(info.getType()) {
 			case Code:
 				Code code = (Code)info;
@@ -52,7 +51,8 @@ public class MethodContent extends MemberContent {
 				int[] exp = ((Exceptions)info).getExceptionIndexTable();
 				this.exceptions = new String[exp.length];
 				for(int i = 0; i < exp.length; i++) {
-					exceptions[i] = cfp.getUtf8Value(pool.get(exp[i]-1)).replace("/", ".");
+					exceptions[i] = Utf8ValueExtractor.extract(pool.get(exp[i]-1), pool)
+									.replace("/", ".");
 				}
 				break;
 			case LineNumberTable:

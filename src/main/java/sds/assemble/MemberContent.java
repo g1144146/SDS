@@ -3,7 +3,7 @@ package sds.assemble;
 import sds.classfile.ConstantPool;
 import sds.classfile.MemberInfo;
 import sds.util.AccessFlags;
-import sds.util.ClassFilePrinter;
+import sds.util.Utf8ValueExtractor;
 
 /**
  *
@@ -14,9 +14,8 @@ public abstract class MemberContent extends BaseContent {
 	String desc;
 	String name;
 	MemberContent(MemberInfo info, ConstantPool pool) {
-		ClassFilePrinter cfp = new ClassFilePrinter();
 		this.accessFlag = AccessFlags.get(info.getAccessFlags(), info.getType());
-		this.desc = cfp.getUtf8Value(pool.get(info.getDescriptorIndex()-1));
-		this.name = cfp.getUtf8Value(pool.get(info.getNameIndex()-1));
+		this.desc = Utf8ValueExtractor.extract(pool.get(info.getDescriptorIndex()-1), pool);
+		this.name = Utf8ValueExtractor.extract(pool.get(info.getNameIndex()-1), pool);
 	}
 }

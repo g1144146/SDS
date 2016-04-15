@@ -29,7 +29,7 @@ import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.TypeAnnotation;
 import sds.classfile.attributes.stackmap.StackMapFrame;
 import sds.classfile.attributes.stackmap.StackMapTable;
-import sds.util.ClassFilePrinter;
+import sds.util.Utf8ValueExtractor;
 
 /**
  *
@@ -40,7 +40,6 @@ public abstract class BaseContent {
 	Map<String, String> genericsMap = new HashMap<>();
 
 	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
-		ClassFilePrinter cfp = new ClassFilePrinter();
 		switch(info.getType()) {
 			case AnnotationDefault:
 				AnnotationDefault ad = (AnnotationDefault)info;
@@ -49,7 +48,7 @@ public abstract class BaseContent {
 			case ConstantValue:
 //				ConstantValue cv = (ConstantValue)info;
 //				int index = cv.getConstantValueIndex();
-//				out.println("\tconstant_value"+getUtf8Value(pool.get(index-1)));
+//				out.println("\tconstant_value"+Utf8ValueExtractor.extract(pool.get(index-1)));
 				break;
 			case Deprecated:
 				// do nothing.
@@ -59,9 +58,9 @@ public abstract class BaseContent {
 //				for(LocalVariable.LVTable t : lvt.getTable()) {
 //					out.println("\tpc    : " + t.getNumber("start_pc")
 //							+ "-" + (t.getNumber("start_pc")+t.getNumber("length")-1));
-//					out.println("\tname  : " + getUtf8Value(pool.get(t.getNumber("name_index")-1)));
+//					out.println("\tname  : " + Utf8ValueExtractor.extract(pool.get(t.getNumber("name_index")-1)));
 //					out.println("\tdesc  : "
-//							+ DescriptorParser.parse(getUtf8Value(pool.get(t.getNumber("descriptor")-1))));
+//							+ DescriptorParser.parse(Utf8ValueExtractor.extract(pool.get(t.getNumber("descriptor")-1))));
 //					out.println("\tindex : " + t.getNumber("index"));
 //				}
 				break;
@@ -70,9 +69,9 @@ public abstract class BaseContent {
 //				for(LocalVariable.LVTable t : lvtt.getTable()) {
 //					out.println("\tpc    : " + t.getNumber("start_pc")
 //							+ "-" + (t.getNumber("start_pc")+t.getNumber("length")-1));
-//					out.println("\tname  : " + getUtf8Value(pool.get(t.getNumber("name_index")-1)));
+//					out.println("\tname  : " + Utf8ValueExtractor.extract(pool.get(t.getNumber("name_index")-1)));
 //					out.println("\tdesc  : "
-//							+ DescriptorParser.parse(getUtf8Value(pool.get(t.getNumber("descriptor")-1))));
+//							+ DescriptorParser.parse(Utf8ValueExtractor.extract(pool.get(t.getNumber("descriptor")-1))));
 //					out.println("\tindex : " + t.getNumber("index"));
 //				}
 				break;
@@ -80,7 +79,7 @@ public abstract class BaseContent {
 				MethodParameters mp = (MethodParameters)info;
 //				for(MethodParameters.Parameters p : mp.getParams()) {
 //					String flag = AccessFlags.get(p.getAccessFlag(), "method");
-//					out.println(flag + getUtf8Value(pool.get(p.getNameIndex()-1)));
+//					out.println(flag + Utf8ValueExtractor.extract(pool.get(p.getNameIndex()-1)));
 //				}
 				break;
 			case RuntimeInvisibleAnnotations:
@@ -133,7 +132,8 @@ public abstract class BaseContent {
 				break;
 			case Signature:
 				Signature sig = (Signature)info;
-				String signature = cfp.getUtf8Value(pool.get(sig.getSignatureIndex()-1));
+				String signature
+					= Utf8ValueExtractor.extract(pool.get(sig.getSignatureIndex()-1), pool);
 				signature = signature.substring(signature.indexOf("<"), signature.indexOf(">"));
 				String key = null, value = null;
 				for(String s : signature.split(":")) {
