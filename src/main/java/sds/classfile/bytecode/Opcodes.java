@@ -4,12 +4,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
- *
+ * This class is for
+ * {@link OpcodeInfo <code>OpcodeInfo</code>}
+ * sequence of method.
  * @author inagaki
  */
 public class Opcodes {
 	private Map<Integer, OpcodeInfo> opcodeMap;
 
+	/**
+	 * constructor.
+	 */
 	public Opcodes() {
 		this.opcodeMap = new ConcurrentSkipListMap<>();
 	}
