@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.tableswitch">
+ * tableswitch
+ * </a>.
  * @author inagaki
  */
 public class TableSwitch extends SwitchOpcode {
-
-	int[] jumpOffsets;
+	private int[] jumpOffsets;
 
 	TableSwitch(int pc) {
 		super(MnemonicTable.tableswitch, pc);
@@ -26,6 +28,11 @@ public class TableSwitch extends SwitchOpcode {
 		}
 	}
 
+	/**
+	 * returns jump offsets.<br>
+	 * jump point of each case keyword is "jump offset + pc".
+	 * @return offset
+	 */
 	public int[] getJumpOffsets() {
 		return jumpOffsets;
 	}

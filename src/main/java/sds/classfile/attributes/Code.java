@@ -90,7 +90,7 @@ public class Code extends AttributeInfo {
 				int pc = (i - p);
 				OpcodeInfo info = MnemonicTable.get(Byte.toUnsignedInt(raf.readByte()), pc);
 				info.read(raf);
-				opcodes.add(info);
+				opcodes.add(info.getPc(), info);
 			}
 		} catch(UndefinedOpcodeException e) {
 			e.printStackTrace();

@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * This adapter class is for LocalVariable Attribute.
+ * This adapter class is for
+ * {@link LocalVariableTable <code>LocalVariableTable</code>}
+ * and
+ * {@link LocalVariableTypeTable <code>LocalVariableTypeTable</code>}.
  * @author inagaki
  */
 public abstract class LocalVariable extends AttributeInfo {

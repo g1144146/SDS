@@ -6,18 +6,12 @@ import java.io.RandomAccessFile;
 import sds.classfile.Info;
 
 /**
- * This class is for opcode that has no operand.
+ * This class is for opcode has no operand.
  * @author inagaki
  */
 public class OpcodeInfo implements Info {
-	/**
-	 * 
-	 */
-	MnemonicTable opcodeType;
-	/**
-	 * 
-	 */
-	int pc;
+	private MnemonicTable opcodeType;
+	private int pc;
 
 	OpcodeInfo(MnemonicTable opcodeType, int pc) {
 		this.opcodeType = opcodeType;
@@ -27,10 +21,18 @@ public class OpcodeInfo implements Info {
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {}
 
+	/**
+	 * returns opcode type.
+	 * @return opcode type.
+	 */
 	public MnemonicTable getOpcodeType() {
 		return opcodeType;
 	}
 
+	/**
+	 * returns index into the code array.
+	 * @return index
+	 */
 	public int getPc() {
 		return pc;
 	}

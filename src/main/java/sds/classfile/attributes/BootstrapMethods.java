@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.23">BootstrapMethods Attribute</a>.
+ * This class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.23">
+ * BootstrapMethods Attribute</a>.
  * @author inagaki
  */
 public class BootstrapMethods extends AttributeInfo {
-	BSM[] bsm;
+	private BSM[] bsm;
 
 	/**
 	 * constructor.
@@ -39,8 +41,8 @@ public class BootstrapMethods extends AttributeInfo {
 	 * This class is for entry in the bootstrap methods table.
 	 */
 	public class BSM {
-		int bsmRef;
-		int[] bootstrapArgs;
+		private int bsmRef;
+		private int[] bootstrapArgs;
 
 		BSM(RandomAccessFile raf) throws IOException {
 			this.bsmRef = raf.readShort();

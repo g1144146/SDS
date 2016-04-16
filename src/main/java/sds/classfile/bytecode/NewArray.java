@@ -4,13 +4,19 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.newarray">
+ * newarray
+ * </a>.
  * @author inagaki
  */
 public class NewArray extends OpcodeInfo {
+	private String atype;
 
-	String atype;
-
+	/**
+	 * constructor.
+	 * @param pc index into the code array
+	 */
 	public NewArray(int pc) {
 		super(MnemonicTable.newarray, pc);
 	}
@@ -33,6 +39,10 @@ public class NewArray extends OpcodeInfo {
 		}
 	}
 
+	/**
+	 * returns array type.
+	 * @return array type
+	 */
 	public String getType() {
 		return atype;
 	}

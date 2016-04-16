@@ -15,9 +15,6 @@ import sds.classfile.attributes.stackmap.StackMapTable;
  * @author inagaki
  */
 public class AttributeInfoBuilder {
-	/**
-	 * instance of builder class.
-	 */
 	private static AttributeInfoBuilder builder = null;
 
 	/**

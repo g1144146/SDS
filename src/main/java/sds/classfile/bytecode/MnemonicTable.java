@@ -255,6 +255,7 @@ public enum MnemonicTable {
 			(opcode == 0xc2 || opcode == 0xc3  ||  opcode == 0xca)) {
 			return new OpcodeInfo(values()[opcode], pc);
 		}
+		// has operand or undefined opcode
 		switch(opcode) {
 			case 0x10: /** bipush **/
 			case 0x11: /** sipush **/

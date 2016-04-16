@@ -7,17 +7,8 @@ import sds.classfile.Info;
  * @author inagaki
  */
 public abstract class AttributeInfo implements Info {
-	/**
-	 * constant-pool entry index of attribute name.
-	 */
 	private int nameIndex;
-	/**
-	 * attribute length.
-	 */
 	private int attrLen;
-	/**
-	 * attribute type.
-	 */
 	private AttributeType type;
 
 	/**

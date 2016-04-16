@@ -1,56 +1,51 @@
 package sds.classfile.bytecode;
 
-import java.util.Arrays;
-
-import sds.classfile.ArrayInfo;
+import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  *
  * @author inagaki
  */
-public class Opcodes implements ArrayInfo<OpcodeInfo> {
-
-	OpcodeInfo[] opcodes;
-	int position;
-
-	public Opcodes(int size) {
-		this.opcodes = new OpcodeInfo[size];
-		this.position = 0;
-	}
+public class Opcodes {
+	private Map<Integer, OpcodeInfo> opcodeMap;
 
 	public Opcodes() {
-		// default size is 10.
-		this(10);
+		this.opcodeMap = new ConcurrentSkipListMap<>();
 	}
 
-	@Override
-	public int size() {
-		return opcodes.length;
+	/**
+	 * adds opcode to map.
+	 * @param key key of map
+	 * @param element opcode
+	 */
+	public void add(int key, OpcodeInfo element) {
+		opcodeMap.put(key, element);
 	}
 
-	public void add(OpcodeInfo element) {
-		add(position, element);
+	/**
+	 * returns opcode of specified pc.
+	 * @param pc
+	 * @return opcode
+	 */
+	public OpcodeInfo get(int pc) {
+		return opcodeMap.get(pc);
 	}
 
-	@Override
-	public void add(int index, OpcodeInfo element) {
-		if(index >= opcodes.length) {
-			this.opcodes = Arrays.copyOf(opcodes, opcodes.length+1, opcodes.getClass());
-		}
-		opcodes[position++] = element;
-	}
-
-	@Override
-	public OpcodeInfo get(int index) {
-		if(index >= opcodes.length) {
-			throw new ArrayIndexOutOfBoundsException(index);
-		}
-		return opcodes[index];
-	}
-
-	@Override
+	/**
+	 * returns opcodes.
+	 * @return opcodes.
+	 */
 	public OpcodeInfo[] getAll() {
-		return Arrays.copyOfRange(opcodes, 0, position);
+		return opcodeMap.values().toArray(new OpcodeInfo[0]);
 	}
-	
+
+	/**
+	 * returns values of pc of opcode.
+	 * @return values
+	 */
+	public int[] getKeys() {
+		return opcodeMap.keySet()
+			.stream().mapToInt(Integer::intValue).toArray();
+	}
 }

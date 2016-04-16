@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.7">EnclosingMethod Attribute</a>.
+ * This class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.7">
+ * EnclosingMethod Attribute</a>.
  * @author inagaki
  */
 public class EnclosingMethod extends AttributeInfo {
-	int classIndex;
-	int methodIndex;
+	private int classIndex;
+	private int methodIndex;
 	
 	/**
 	 * constructor.

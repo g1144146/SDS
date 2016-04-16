@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.lookupswitch">
+ * lookupswitch
+ * </a>.
  * @author inagaki
  */
 public class LookupSwitch extends SwitchOpcode {
-	int[] match;
-	int[] offset;
+	private int[] match;
+	private int[] offset;
 
 	LookupSwitch(int pc) {
 		super(MnemonicTable.lookupswitch, pc);
@@ -26,10 +29,19 @@ public class LookupSwitch extends SwitchOpcode {
 		}
 	}
 
+	/**
+	 * returns values of case keyword.
+	 * @return values
+	 */
 	public int[] getMatch() {
 		return match;
 	}
 
+	/**
+	 * returns offsets.<br>
+	 * jump point of each case keyword is "offset + pc".
+	 * @return offsets
+	 */
 	public int[] getOffset() {
 		return offset;
 	}
