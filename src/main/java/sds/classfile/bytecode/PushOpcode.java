@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * This class is for opcode has push value.<br>
+ * This class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.bipush">
  * bipush
- * </a>, 
+ * </a>
+ * and
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.sipush">
  * sipush
  * </a>

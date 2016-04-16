@@ -7,43 +7,43 @@ import java.io.RandomAccessFile;
  * This class is for opcode has constant-pool entry index.<br>
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.ldc">
  * ldc
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.ldc_w">
  * ldc_w
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.ldc2_w">
  * ldc2_w
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.getstatic">
  * getstatic
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.putstatic">
  * putstatic
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.getfield">
  * getfield
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.putfield">
  * putfield
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.invokevirtual">
  * invokevirtual
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.invokespecial">
  * invokespecial
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.invokestatic">
  * invokestatic
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.new">
  * new
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.checkcast">
  * checkcast
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.anewarray">
  * anewarray
- * </a>, 
+ * </a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.instanceof">
  * instanceof
  * </a>

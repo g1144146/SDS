@@ -21,7 +21,7 @@ public class Opcodes {
 
 	/**
 	 * adds opcode to map.
-	 * @param key key of map
+	 * @param key index into the code array
 	 * @param element opcode
 	 */
 	public void add(int key, OpcodeInfo element) {
@@ -30,7 +30,7 @@ public class Opcodes {
 
 	/**
 	 * returns opcode of specified pc.
-	 * @param pc
+	 * @param pc index into the code array
 	 * @return opcode
 	 */
 	public OpcodeInfo get(int pc) {

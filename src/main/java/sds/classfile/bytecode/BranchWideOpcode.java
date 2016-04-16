@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * This class is for opcode has branch (wide index).<br>
+ * This class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.goto_w">
  * goto_w
- * </a>, 
+ * </a>
+ * and
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.jsr_w">
  * jsr_w
  * </a>
