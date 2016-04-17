@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This class is for append_frame which
+ * {@link StackMapFrame <code>SrackMapFrame</code>} has.
  * @author inagaki
  */
 public class AppendFrame extends ChopFrame {
-	/**
-	 *
-	 */
-	VerificationTypeInfo[] locals;
+	private VerificationTypeInfo[] locals;
 
 	public AppendFrame(int tag, RandomAccessFile raf) throws IOException {
 		super(StackMapFrameType.AppendFrame, tag, raf);
@@ -26,6 +24,10 @@ public class AppendFrame extends ChopFrame {
 		}
 	}
 
+	/**
+	 * returns verification type info.
+	 * @return verification type info
+	 */
 	public VerificationTypeInfo[] getLocals() {
 		return locals;
 	}

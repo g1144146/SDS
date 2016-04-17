@@ -1,7 +1,8 @@
 package sds.classfile.attributes.stackmap;
 
 /**
- *
+ * This enum class is for
+ * {@link StackMapFrame <code>StackMapFrame</code>}.
  * @author inagaki
  */
 public enum StackMapFrameType {
@@ -13,10 +14,7 @@ public enum StackMapFrameType {
 	AppendFrame("append_frame"),
 	FullFrame("full_frame");
 
-	/**
-	 * 
-	 */
-	String type;
+	private String type;
 
 	StackMapFrameType(String type) {
 		this.type = type;

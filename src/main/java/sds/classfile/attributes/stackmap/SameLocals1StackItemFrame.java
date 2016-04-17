@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This class is for same_locals_1_stack_item_frame which
+ * {@link StackMapFrame <code>SrackMapFrame</code>} has.
  * @author inagaki
  */
 public class SameLocals1StackItemFrame extends SameFrame {
-	/**
-	 *
-	 */
-	VerificationTypeInfo stack;
+	private VerificationTypeInfo stack;
 
 	SameLocals1StackItemFrame(int tag, RandomAccessFile raf) throws IOException {
 		super(StackMapFrameType.SameLocals1StackItemFrame, tag);
@@ -23,6 +21,10 @@ public class SameLocals1StackItemFrame extends SameFrame {
 		}
 	}
 
+	/**
+	 * returns verification type info.
+	 * @return verification type info
+	 */
 	public VerificationTypeInfo getStack() {
 		return stack;
 	}

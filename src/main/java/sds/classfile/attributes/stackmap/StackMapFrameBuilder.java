@@ -4,18 +4,16 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This builder class is for {@link StackMapFrame <code>StackMapFrame</code>}.<br>
+ * This class is designed singleton.
  * @author inagaki
  */
 public class StackMapFrameBuilder {
-	/**
-	 * 
-	 */
 	private static StackMapFrameBuilder builder = null;
 
 	/**
-	 * 
-	 * @return 
+	 * returns own instance.
+	 * @return instance
 	 */
 	public static StackMapFrameBuilder getInstance() {
 		if(builder == null) {
@@ -24,6 +22,13 @@ public class StackMapFrameBuilder {
 		return builder;
  	}
 
+	/**
+	 * returns stack-map-frame.
+	 * @param raf classfile stream
+	 * @return stack-map-frame
+	 * @throws IOException
+	 * @throws StackMapFrameException 
+	 */
 	public StackMapFrame build(RandomAccessFile raf)
 	throws IOException, StackMapFrameException {
 		int tag = raf.readUnsignedByte();

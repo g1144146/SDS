@@ -1,26 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package sds.classfile.attributes.stackmap;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This class is for same_locals_stack_item_frame_extended which
+ * {@link StackMapFrame <code>SrackMapFrame</code>} has.
  * @author inagakikenichi
  */
 public class SameLocals1StackItemFrameExtended extends SameFrame {
-	/**
-	 *
-	 */
-	int offsetDelta;
-	/**
-	 *
-	 */
-	VerificationTypeInfo stack;
+	private int offsetDelta;
+	private VerificationTypeInfo stack;
 
 	SameLocals1StackItemFrameExtended(int tag, RandomAccessFile raf) throws IOException {
 		super(StackMapFrameType.SameLocals1StackItemFrameExtended, tag);
@@ -33,10 +23,18 @@ public class SameLocals1StackItemFrameExtended extends SameFrame {
 		}
 	}
 
+	/**
+	 * returns offset.
+	 * @return offset
+	 */
 	public int getOffset() {
 		return offsetDelta;
 	}
 
+	/**
+	 * returns verification type info.
+	 * @return verification type info
+	 */
 	public VerificationTypeInfo getStack() {
 		return stack;
 	}

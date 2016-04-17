@@ -1,19 +1,20 @@
 package sds.classfile.attributes.stackmap;
 
 /**
- *
+ * This interface is for stack-map-frame which
+ * {@link StackMapTable <code>StackMapTable</code>} has union.
  * @author inagaki
  */
 public interface StackMapFrame {
 	/**
-	 * 
-	 * @return 
+	 * returns type of stack-map-frame.
+	 * @return type
 	 */
-	public StackMapFrameType getFrameType();
+	abstract StackMapFrameType getFrameType();
 
 	/**
-	 * 
-	 * @return 
+	 * returns discrimination tag of item of union.
+	 * @return discrimination tag
 	 */
-	public int getTag();
+	abstract int getTag();
 }

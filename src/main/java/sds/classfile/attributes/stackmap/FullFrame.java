@@ -4,19 +4,20 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This class is for full_frame which
+ * {@link StackMapFrame <code>SrackMapFrame</code>} has.
  * @author inagaki
  */
 public class FullFrame extends ChopFrame {
-	/**
-	 * 
-	 */
-	VerificationTypeInfo[] locals;
-	/**
-	 * 
-	 */
-	VerificationTypeInfo[] stack;
+	private VerificationTypeInfo[] locals;
+	private VerificationTypeInfo[] stack;
 
+	/**
+	 * constructor.
+	 * @param tag discrimination tag
+	 * @param raf classfile stream
+	 * @throws IOException 
+	 */
 	public FullFrame(int tag, RandomAccessFile raf) throws IOException {
 		super(StackMapFrameType.FullFrame, tag, raf);
 		try {
@@ -34,10 +35,18 @@ public class FullFrame extends ChopFrame {
 		}
 	}
 
+	/**
+	 * returns verification type info of locals.
+	 * @return verification type info
+	 */
 	public VerificationTypeInfo[] getLocals() {
 		return locals;
 	}
 
+	/**
+	 * returns verification type info of stack.
+	 * @return verificatino type info
+	 */
 	public VerificationTypeInfo[] getStack() {
 		return stack;
 	}
