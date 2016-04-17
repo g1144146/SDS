@@ -4,18 +4,17 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * This builder class is for
+ * {@link VerificationTypeInfo <code>VerificationTypeInfo</code>}.<br>
+ * This class is designed singleton.
  * @author inagaki
  */
 public class VerificationTypeInfoBuilder {
-	/**
-	 * 
-	 */
 	private static VerificationTypeInfoBuilder builder = null;
 
 	/**
-	 * 
-	 * @return 
+	 * returns own instance.
+	 * @return instance
 	 */
 	public static VerificationTypeInfoBuilder getInstance() {
 		if(builder == null) {
@@ -24,6 +23,13 @@ public class VerificationTypeInfoBuilder {
 		return builder;
 	}
 
+	/**
+	 * returns verification type info.
+	 * @param raf classfile stream
+	 * @return verification type info
+	 * @throws IOException
+	 * @throws VerificationTypeException 
+	 */
 	public VerificationTypeInfo build(RandomAccessFile raf)
 	throws IOException, VerificationTypeException {
 		int tag = raf.readUnsignedByte();

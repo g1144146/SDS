@@ -1,7 +1,7 @@
 package sds.classfile.attributes.stackmap;
 
 /**
- * This enum class is for
+ * This enum class is for type of
  * {@link StackMapFrame <code>StackMapFrame</code>}.
  * @author inagaki
  */

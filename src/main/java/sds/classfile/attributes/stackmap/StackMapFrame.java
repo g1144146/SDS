@@ -1,7 +1,7 @@
 package sds.classfile.attributes.stackmap;
 
 /**
- * This interface is for stack-map-frame which
+ * This interface is for stack_map_frame which
  * {@link StackMapTable <code>StackMapTable</code>} has union.
  * @author inagaki
  */

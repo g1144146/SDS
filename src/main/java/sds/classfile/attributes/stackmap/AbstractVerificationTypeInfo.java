@@ -1,23 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package sds.classfile.attributes.stackmap;
 
 /**
- *
- * @author inagakikenichi
+ * This adapter class is for
+ * {@link VerificationTypeInfo <code>VerificationTypeInfo</code>}.
+ * @author inagaki
  */
 public abstract class AbstractVerificationTypeInfo implements VerificationTypeInfo {
-	/**
-	 * 
-	 */
-	int tag;
-	/**
-	 * 
-	 */
-	VerificationInfoType type;
+	private int tag;
+	private VerificationInfoType type;
 
 	AbstractVerificationTypeInfo(int tag, VerificationInfoType type) {
 		this.tag = tag;
