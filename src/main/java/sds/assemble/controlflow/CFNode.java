@@ -46,11 +46,11 @@ public class CFNode {
 	}
 
 	/**
-	 * returns whether this node has dominator nodes.
-	 * @return if this node has dominator nodes, this method returns true.<br>
-	 * Otherwise, it returns false.
+	 * returns whether this node exist dominator nodes.
+	 * @return if this node exist dominator nodes, this method returns TRUE.<br>
+	 * Otherwise, it returns FALSE.
 	 */
-	public boolean haveDominators() {
+	public boolean existDominators() {
 		return dominators.size() > 0;
 	}
 }

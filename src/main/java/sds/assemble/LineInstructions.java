@@ -9,8 +9,8 @@ import sds.classfile.bytecode.Opcodes;
  * @author inagaki
  */
 public class LineInstructions {
-	LineNumberTable.LNTable table;
-	Opcodes opcodes;
+	private LineNumberTable.LNTable table;
+	private Opcodes opcodes;
 
 	public LineInstructions(LineNumberTable.LNTable table) {
 		this.table = table;
@@ -18,7 +18,7 @@ public class LineInstructions {
 	}
 
 	public void addOpcode(OpcodeInfo opcode) {
-		opcodes.add(opcode);
+		opcodes.add(opcode.getPc(), opcode);
 	}
 
 	public LineNumberTable.LNTable getTable() {
@@ -27,5 +27,9 @@ public class LineInstructions {
 
 	public Opcodes getOpcodes() {
 		return opcodes;
+	}
+
+	public boolean isInPcRange(int pc) {
+		return table.getStartPc() <= pc && pc <= table.getEndPc();
 	}
 }

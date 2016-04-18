@@ -8,6 +8,7 @@ import sds.classfile.attributes.EnclosingMethod;
 import sds.classfile.attributes.Exceptions;
 import sds.classfile.attributes.LineNumberTable;
 import sds.classfile.attributes.stackmap.StackMapTable;
+import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
 import sds.util.Utf8ValueExtractor;
 
@@ -59,16 +60,11 @@ public class MethodContent extends MemberContent {
 				LineNumberTable.LNTable[] table = ((LineNumberTable)info).getLineNumberTable();
 				this.inst = new LineInstructions[table.length];
 				int index = 0;
-				for(int i = 0; i < inst.length; i++) {
-					inst[i] = new LineInstructions(table[i]);
-					if(table[i].getEndPc() != 0) {
-						while(opcodes.get(index).getPc() != table[i].getEndPc()) {
-							inst[i].addOpcode(opcodes.get(index++));
-						}
+				for(OpcodeInfo op : opcodes.getAll()) {
+					if(op.getPc() != table[index].getEndPc()) {
+						inst[index].addOpcode(op);
 					} else {
-						for(int j = index; j < opcodes.size(); j++) {
-							inst[i].addOpcode(opcodes.get(j));
-						}
+						index++;
 					}
 				}
 				break;
