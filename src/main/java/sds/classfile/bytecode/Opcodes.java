@@ -20,6 +20,14 @@ public class Opcodes {
 	}
 
 	/**
+	 * returns opcode map size.
+	 * @return size
+	 */
+	public int size() {
+		return opcodeMap.size();
+	}
+
+	/**
 	 * adds opcode to map.
 	 * @param key index into the code array
 	 * @param element opcode
@@ -52,5 +60,13 @@ public class Opcodes {
 	public int[] getKeys() {
 		return opcodeMap.keySet()
 			.stream().mapToInt(Integer::intValue).toArray();
+	}
+
+	/**
+	 * returns opcode map.
+	 * @return opcode map
+	 */
+	public ConcurrentSkipListMap<Integer, OpcodeInfo> getMap() {
+		return (ConcurrentSkipListMap<Integer, OpcodeInfo>)opcodeMap;
 	}
 }
