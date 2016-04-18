@@ -233,7 +233,7 @@ public enum MnemonicTable {
 	}
 
 	/**
-	 * returns byte of opcode.
+	 * returns hex of opcode.
 	 * @return opcode
 	 */
 	public int getOpcode() {
@@ -242,7 +242,7 @@ public enum MnemonicTable {
 
 	/**
 	 * returns opcode info.
-	 * @param opcode byte of opcode
+	 * @param opcode hex of opcode
 	 * @param pc index into the code array
 	 * @return opcode info
 	 * @throws UndefinedOpcodeException

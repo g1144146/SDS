@@ -27,7 +27,7 @@ public class Utf8ValueExtractor {
 	/**
 	 * returns value of
 	 * {@link sds.classfile.constantpool.Utf8Info <code>Utf8Info</code>}
-	 * which is refered sub-class of
+	 * which is refered by sub-class of
 	 * {@link sds.classfile.constantpool.ConstantInfo <code>ConstantInfo</code>}.
 	 * @param info constant info
 	 * @param pool ponstant-pool
@@ -81,7 +81,7 @@ public class Utf8ValueExtractor {
 	/**
 	 * returns value of
 	 * {@link sds.classfile.constantpool.Utf8Info <code>Utf8Info</code>}
-	 * which is refered sub-class of
+	 * which is refered by sub-class of
 	 * {@link sds.classfile.MemberInfo <code>MemberInfo</code>}.
 	 * @param info member's info
 	 * @param pool ponstant-pool

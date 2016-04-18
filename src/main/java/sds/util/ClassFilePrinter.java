@@ -681,9 +681,11 @@ public class ClassFilePrinter {
 	}
 
 	/**
-	 *
-	 * @param index
-	 * @return
+	 * returns whether the index is in range of constant-pool size.
+	 * @param index index
+	 * @return if the index is in range of constant-pool size,
+	 * this method returns true.<br>
+	 * Otherwise, it returns false.
 	 */
 	private boolean checkRange(int index) {
 		return (0 <= index) && (index < pool.size());
