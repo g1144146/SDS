@@ -13,7 +13,7 @@ import java.io.RandomAccessFile;
  * </a>.
  * @author inagaki
  */
-abstract class SwitchOpcode extends OpcodeInfo {
+public abstract class SwitchOpcode extends OpcodeInfo {
 	int defaultByte;
 
 	public SwitchOpcode(MnemonicTable opcodeType, int pc) {
