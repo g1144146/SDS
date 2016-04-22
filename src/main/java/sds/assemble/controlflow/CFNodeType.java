@@ -3,6 +3,7 @@ package sds.assemble.controlflow;
 import sds.classfile.bytecode.BranchOpcode;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
+import sds.classfile.bytecode.SwitchOpcode;
 
 /**
  * This enum class is for type of {@link CFNode <code>CFNode</code>}.
@@ -38,6 +39,8 @@ public enum CFNodeType {
 				default:
 					return Entry;
 			}
+		} else if(op instanceof SwitchOpcode) {
+			return Entry;
 		}
 		return Normal;
 	}
