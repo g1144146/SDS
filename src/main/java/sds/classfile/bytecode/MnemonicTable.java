@@ -30,7 +30,6 @@ public enum MnemonicTable {
 	lload(0x16, 1),
 	fload(0x17, 1),
 	dload(0x18, 1),
-	// index
 	aload(0x19, 1),
 	iload_0(0x1a),
 	iload_1(0x1b),
