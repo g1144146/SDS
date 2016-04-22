@@ -38,7 +38,8 @@ public class LineNumberTable extends AttributeInfo {
 		for(int i = 0; i < lineNumberTable.length; i++) {
 			lineNumberTable[i] = new LNTable(raf);
 			if(i == lineNumberTable.length-1) {
-				lineNumberTable[i].endPc = 0;
+				lineNumberTable[i].endPc = lineNumberTable[i].getStartPc();
+				lineNumberTable[i-1].endPc = lineNumberTable[i].getStartPc();
 			} else if(i > 0) {
 				lineNumberTable[i-1].endPc = lineNumberTable[i].startPc;
 			}
