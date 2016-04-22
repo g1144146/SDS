@@ -4,26 +4,38 @@ import sds.classfile.ConstantPool;
 import sds.classfile.MemberInfo;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.Code;
-import sds.classfile.attributes.EnclosingMethod;
 import sds.classfile.attributes.Exceptions;
 import sds.classfile.attributes.LineNumberTable;
+import sds.classfile.attributes.LocalVariableTable;
+import sds.classfile.attributes.LocalVariableTypeTable;
+import sds.classfile.attributes.MethodParameters;
+import sds.classfile.attributes.annotation.AnnotationDefault;
+import sds.classfile.attributes.annotation.RuntimeInvisibleAnnotations;
+import sds.classfile.attributes.annotation.RuntimeVisibleAnnotations;
+import sds.classfile.attributes.annotation.RuntimeInvisibleParameterAnnotations;
+import sds.classfile.attributes.annotation.RuntimeVisibleParameterAnnotations;
 import sds.classfile.attributes.stackmap.StackMapTable;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
 import sds.util.Utf8ValueExtractor;
 
 /**
- *
+ * This class is for contents of method.
  * @author inagaki
  */
 public class MethodContent extends MemberContent {
-	String args;
-	String[] exceptions;
-	int maxStack;
-	int maxLocals;
-	LineInstructions[] inst;
-	Opcodes opcodes;
+	private String args;
+	private String[] exceptions;
+	private int maxStack;
+	private int maxLocals;
+	private LineInstructions[] inst;
+	private Opcodes opcodes;
 
+	/**
+	 * constructor.
+	 * @param info method info
+	 * @param pool constant-pool
+	 */
 	public MethodContent(MemberInfo info, ConstantPool pool) {
 		super(info, pool);
 		for(AttributeInfo attr : info.getAttr().getAll()) {
@@ -33,8 +45,10 @@ public class MethodContent extends MemberContent {
 
 	@Override
 	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
-		super.investigateAttribute(info, pool);
 		switch(info.getType()) {
+			case AnnotationDefault:
+				AnnotationDefault ad = (AnnotationDefault)info;
+				break;
 			case Code:
 				Code code = (Code)info;
 				this.maxStack  = code.getMaxStack();
@@ -44,9 +58,6 @@ public class MethodContent extends MemberContent {
 				for(AttributeInfo ai : code.getAttr().getAll()) {
 					investigateAttribute(ai, pool);
 				}
-				break;
-			case EnclosingMethod:
-				EnclosingMethod em = (EnclosingMethod)info;
 				break;
 			case Exceptions:
 				int[] exp = ((Exceptions)info).getExceptionIndexTable();
@@ -68,8 +79,28 @@ public class MethodContent extends MemberContent {
 					}
 				}
 				break;
+			case LocalVariableTable:
+				LocalVariableTable lvt = (LocalVariableTable)info;
+				break;
+			case LocalVariableTypeTable:
+				LocalVariableTypeTable lvtt = (LocalVariableTypeTable)info;
+				break;
+			case MethodParameters:
+				MethodParameters mp = (MethodParameters)info;
+				break;
+			case RuntimeInvisibleParameterAnnotations:
+				RuntimeInvisibleParameterAnnotations ripa
+					= (RuntimeInvisibleParameterAnnotations)info;
+				break;
+			case RuntimeVisibleParameterAnnotations:
+				RuntimeVisibleParameterAnnotations rvpa
+					= (RuntimeVisibleParameterAnnotations)info;
+				break;
 			case StackMapTable:
 				StackMapTable smt = (StackMapTable)info;
+				break;
+			default:
+				super.investigateAttribute(info, pool);
 				break;
 		}
 	}
