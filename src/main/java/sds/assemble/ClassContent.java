@@ -11,31 +11,20 @@ import sds.classfile.attributes.SourceFile;
 import sds.util.Utf8ValueExtractor;
 
 /**
- *
+ * This class is for contents of class.
  * @author inagaki
  */
 public class ClassContent extends BaseContent {
-	/**
-	 * 
-	 */
-	MethodContent[] methods;
-	/**
-	 * 
-	 */
-	FieldContent[] fields;
-	/**
-	 * 
-	 */
-	NestedClass[] nested;
-	/**
-	 * 
-	 */
-	String sourceFile;
-	/**
-	 * 
-	 */
-	String[] bootstrapMethods;
+	private MethodContent[] methods;
+	private FieldContent[] fields;
+	private NestedClass[] nested;
+	private String sourceFile;
+	private String[] bootstrapMethods;
 
+	/**
+	 * constructor.
+	 * @param cf classfile
+	 */
 	public ClassContent(ClassFile cf) {
 		Methods method = cf.getMethods();
 		this.methods = new MethodContent[method.size()];
@@ -67,7 +56,6 @@ public class ClassContent extends BaseContent {
 
 	@Override
 	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
-		super.investigateAttribute(info, pool);
 		switch(info.getType()) {
 			case BootstrapMethods:
 				BootstrapMethods bsm = (BootstrapMethods)info;
@@ -79,28 +67,28 @@ public class ClassContent extends BaseContent {
 					}
 				}
 				break;
+			case EnclosingMethod:
+				// to do
+				break;
 			case InnerClasses:
 				InnerClasses ic = (InnerClasses)info;
 				for(InnerClasses.Classes c : ic.getClasses()) {
-//					int inner = c.getNumber("inner");
-//					int outer = c.getNumber("outer");
-//					int name = c.getNumber("inner_name");
-//					int accessFlag = c.getNumber("access_flag");
-//					if(checkRange(inner-1)) {
-//						out.println("\tinner_class: " + AccessFlags.get(accessFlag, "nested")
-//								+ Utf8ValueExtractor.extract(pool.get(inner-1)));
-//					}
-//					if(checkRange(outer-1)) {
-//						out.println("\touter_class: " + Utf8ValueExtractor.extract(pool.get(outer-1)));
-//					}
-//					if(checkRange(name-1)) {
-//						out.println("\t" + Utf8ValueExtractor.extract(pool.get(name-1)));
-//					}
+					int inner = c.getNumber("inner");
+					int outer = c.getNumber("outer");
+					int name = c.getNumber("inner_name");
+					int accessFlag = c.getNumber("access_flag");
 				}
+				break;
+			case SourceDebugExtension:
+				// todo
+				break;
 			case SourceFile:
 				SourceFile sf = (SourceFile)info;
 				this.sourceFile
 					= Utf8ValueExtractor.extract(pool.get(sf.getSourceFileIndex()-1), pool);
+				break;
+			default:
+				super.investigateAttribute(info, pool);
 				break;
 		}
 	}
