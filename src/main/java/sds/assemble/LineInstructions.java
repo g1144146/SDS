@@ -5,31 +5,52 @@ import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
 
 /**
- *
+ * This class is for instructions of a line of method.
  * @author inagaki
  */
 public class LineInstructions {
 	private LineNumberTable.LNTable table;
 	private Opcodes opcodes;
 
+	/**
+	 * constructor.
+	 * @param table line number table 
+	 */
 	public LineInstructions(LineNumberTable.LNTable table) {
 		this.table = table;
 		this.opcodes = new Opcodes();
 	}
 
+	/**
+	 * adds opcode.
+	 * @param opcode opcode 
+	 */
 	public void addOpcode(OpcodeInfo opcode) {
 		opcodes.add(opcode.getPc(), opcode);
 	}
 
+	/**
+	 * returns line number table.
+	 * @return line number table
+	 */
 	public LineNumberTable.LNTable getTable() {
 		return table;
 	}
 
+	/**
+	 * returns opcodes of this line.
+	 * @return opcodes
+	 */
 	public Opcodes getOpcodes() {
 		return opcodes;
 	}
 
-	public boolean isInPcRange(int pc) {
-		return table.getStartPc() <= pc && pc <= table.getEndPc();
+	/**
+	 * returns opcode from specified pc.
+	 * @param pc index into the code array.
+	 * @return opcode
+	 */
+	public OpcodeInfo get(int pc) {
+		return opcodes.get(pc);
 	}
 }
