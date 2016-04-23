@@ -53,4 +53,13 @@ public class LineInstructions {
 	public OpcodeInfo get(int pc) {
 		return opcodes.get(pc);
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for(OpcodeInfo op : opcodes.getMap().values()) {
+			sb.append(op.getPc()).append(":").append(op).append("\n");
+		}
+		return sb.toString();
+	}
 }
