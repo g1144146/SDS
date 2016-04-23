@@ -26,5 +26,6 @@
 # References
 
 * [The Java® Virtual Machine Specification](https://docs.oracle.com/javase/specs/jvms/se8/html/index.html)
-* [siphon](https://github.com/tamada/siphon)
 * [Java Virtual Machine Online Instruction Reference](http://cs.au.dk/~mis/dOvs/jvmspec/ref-Java.html)
+* [ループ並列化の為のリタイミングによる最適化](http://www.is.titech.ac.jp/~sassa/lab/papers-written/09M37040-ikarashi.pdf)
+* [siphon](https://github.com/tamada/siphon)
