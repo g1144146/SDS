@@ -6,7 +6,8 @@ import sds.classfile.bytecode.Opcodes;
 import sds.classfile.bytecode.SwitchOpcode;
 
 /**
- * This enum class is for type of {@link CFNode <code>CFNode</code>}.
+ * This enum class is for type of
+ * {@link CFNode <code>CFNode</code>}.
  * @author inagaki
  */
 public enum CFNodeType {
@@ -18,11 +19,10 @@ public enum CFNodeType {
 
 	/**
 	 * returns type of control flow node.
-	 * @param opcodes opcode sequence
+	 * @param op opcodes
 	 * @return node type
 	 */
-	public static CFNodeType getType(Opcodes opcodes) {
-		OpcodeInfo op = opcodes.getMap().lastEntry().getValue();
+	public static CFNodeType getType(OpcodeInfo op) {
 		if(op instanceof BranchOpcode) {
 			BranchOpcode branch = (BranchOpcode)op;
 			switch(branch.getOpcodeType()) {
@@ -32,7 +32,7 @@ public enum CFNodeType {
 					break;
 				case _goto:
 				case goto_w:
-					if(branch.getBranch() > branch.getPc())
+					if(branch.getBranch() > 0)
 						return Exit;
 					else
 						return LoopExit;

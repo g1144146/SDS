@@ -42,7 +42,7 @@ public class BranchOpcode extends OpcodeInfo {
 
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
-		this.branch = raf.readUnsignedShort();
+		this.branch = raf.readShort();
 	}
 
 	/**
@@ -52,5 +52,10 @@ public class BranchOpcode extends OpcodeInfo {
 	 */
 	public int getBranch() {
 		return branch;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ": " + branch;
 	}
 }
