@@ -1,5 +1,7 @@
 package sds.assemble;
 
+import sds.assemble.controlflow.CFGBuilder;
+import sds.assemble.controlflow.CFNode;
 import sds.classfile.ConstantPool;
 import sds.classfile.MemberInfo;
 import sds.classfile.attributes.AttributeInfo;
@@ -10,8 +12,6 @@ import sds.classfile.attributes.LocalVariableTable;
 import sds.classfile.attributes.LocalVariableTypeTable;
 import sds.classfile.attributes.MethodParameters;
 import sds.classfile.attributes.annotation.AnnotationDefault;
-import sds.classfile.attributes.annotation.RuntimeInvisibleAnnotations;
-import sds.classfile.attributes.annotation.RuntimeVisibleAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleParameterAnnotations;
 import sds.classfile.attributes.stackmap.StackMapTable;
@@ -40,6 +40,11 @@ public class MethodContent extends MemberContent {
 		super(info, pool);
 		for(AttributeInfo attr : info.getAttr().getAll()) {
 			investigateAttribute(attr, pool);
+		}
+		CFGBuilder builder = CFGBuilder.getInstance();
+		CFNode[] nodes = builder.build(inst);
+		for(CFNode n : nodes) {
+			System.out.println(n.toString());
 		}
 	}
 
@@ -70,12 +75,18 @@ public class MethodContent extends MemberContent {
 			case LineNumberTable:
 				LineNumberTable.LNTable[] table = ((LineNumberTable)info).getLineNumberTable();
 				this.inst = new LineInstructions[table.length];
+				for(int i = 0; i < inst.length; i++) {
+					inst[i] = new LineInstructions(table[i]);
+				}
 				int index = 0;
 				for(OpcodeInfo op : opcodes.getAll()) {
 					if(op.getPc() != table[index].getEndPc()) {
 						inst[index].addOpcode(op);
 					} else {
 						index++;
+						if(index < inst.length) {
+							inst[index].addOpcode(op);
+						}
 					}
 				}
 				break;
