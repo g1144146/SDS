@@ -1,7 +1,7 @@
 package sds.classfile.bytecode;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.LinkedHashMap;
 
 /**
  * This class is for
@@ -16,7 +16,7 @@ public class Opcodes {
 	 * constructor.
 	 */
 	public Opcodes() {
-		this.opcodeMap = new ConcurrentSkipListMap<>();
+		this.opcodeMap = new LinkedHashMap<>();
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class Opcodes {
 	 * returns opcode map.
 	 * @return opcode map
 	 */
-	public ConcurrentSkipListMap<Integer, OpcodeInfo> getMap() {
-		return (ConcurrentSkipListMap<Integer, OpcodeInfo>)opcodeMap;
+	public Map<Integer, OpcodeInfo> getMap() {
+		return opcodeMap;
 	}
 }
