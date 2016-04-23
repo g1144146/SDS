@@ -10,9 +10,6 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class LineNumberTable extends AttributeInfo {
-	/**
-	 * line number table.
-	 */
 	private LNTable[] lineNumberTable;
 
 	/**
@@ -39,7 +36,7 @@ public class LineNumberTable extends AttributeInfo {
 			lineNumberTable[i] = new LNTable(raf);
 			if(i == lineNumberTable.length-1) {
 				lineNumberTable[i].endPc = lineNumberTable[i].getStartPc();
-				if(lineNumberTable.length != 1) {
+				if(lineNumberTable.length > 1) {
 					lineNumberTable[i-1].endPc = lineNumberTable[i].getStartPc();
 				}
 			} else if(i > 0) {
@@ -49,7 +46,7 @@ public class LineNumberTable extends AttributeInfo {
 	}
 
 	/**
-	 * 
+	 * This class is for line number table.
 	 */
 	public class LNTable {
 		private int startPc;
