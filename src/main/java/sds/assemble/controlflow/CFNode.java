@@ -1,8 +1,7 @@
 package sds.assemble.controlflow;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.Comparator;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import sds.assemble.LineInstructions;
 import sds.classfile.bytecode.OpcodeInfo;
@@ -12,9 +11,9 @@ import sds.classfile.bytecode.OpcodeInfo;
  * @author inagaki
  */
 public class CFNode {
-	private Set<CFNode> dominators;
 	private Set<CFEdge> parents;
 	private Set<CFEdge> children;
+	private CFNode dominator;
 	private CFNode  immediateDominator;
 	private OpcodeInfo start;
 	private OpcodeInfo end;
@@ -25,17 +24,16 @@ public class CFNode {
 	 * @param inst instrcutions of a line.
 	 */
 	public CFNode(LineInstructions inst) {
-		this.nodeType = CFNodeType.getType(inst.getOpcodes());
-		Comparator<CFEdge> edgeComparator
-			= (CFEdge x, CFEdge y) -> (x.getDest().start.getPc() - y.getDest().start.getPc());
-		Comparator<CFNode> nodeComparator
-			= (CFNode x, CFNode y) -> (x.start.getPc() - y.start.getPc());
-		this.dominators = new ConcurrentSkipListSet<>(nodeComparator);
-		this.parents    = new ConcurrentSkipListSet<>(edgeComparator);
-		this.children   = new ConcurrentSkipListSet<>(edgeComparator);
-
-		this.start = inst.get(inst.getTable().getStartPc());
-		this.end   = inst.get(inst.getTable().getEndPc());
+		int size = inst.getOpcodes().size();
+		this.start = inst.getOpcodes().getAll()[0];
+		if(size == 1) {
+			this.end = start;
+		} else {
+			this.end = inst.getOpcodes().getAll()[size-1];
+		}
+		this.nodeType   = CFNodeType.getType(end);
+		this.parents    = new LinkedHashSet<>();
+		this.children   = new LinkedHashSet<>();
 	}
 
 	/**
@@ -47,18 +45,59 @@ public class CFNode {
 	}
 
 	/**
+	 * returns parent nodes.
+	 * @return parent nodes
+	 */
+	public Set<CFEdge> getParents() {
+		return parents;
+	}
+
+	/**
+	 * returns immediate dominator node.
+	 * @return immediate dominator node
+	 */
+	public CFNode getImmediateDominator() {
+		return immediateDominator;
+	}
+
+	/**
+	 * returns dominator node.
+	 * @return dominator node
+	 */
+	public CFNode getDominator() {
+		return dominator;
+	}
+
+	/**
+	 * sets immediate dominator node.
+	 * @param node immediate dominator node
+	 */
+	public void setImmediateDominator(CFNode node) {
+		this.immediateDominator = node;
+	}
+
+	/**
+	 * sets dominator node.
+	 * @param node dominator node
+	 */
+	public void setDominator(CFNode node) {
+		this.dominator = node;
+	}
+
+	/**
 	 * adds parent node of this.
 	 * @param parent parent node
 	 */
 	public void addParent(CFNode parent) {
 		if(!isRoot()) {
-			this.immediateDominator = parent;
-		} else {
-			if(immediateDominator != null && !immediateDominator.equals(parent)) {
-				this.immediateDominator = null;
-			}
-			if(!parents.contains(new CFEdge(this, parent))) {
-				parents.add(new CFEdge(this, parent));
+			CFEdge edge = new CFEdge(this, parent);
+			if(parents.isEmpty()) {
+				this.immediateDominator = parent;
+				this.parents.add(edge);
+			} else {
+				if(!parents.contains(edge)) {
+					parents.add(edge);
+				}
 			}
 		}
 	}
@@ -69,16 +108,9 @@ public class CFNode {
 	 */
 	public void addChild(CFNode child) {
 		CFEdge edge = new CFEdge(this, child);
-		children.add(edge);
-	}
-
-	/**
-	 * returns whether this node exist dominator nodes.
-	 * @return if this node exist dominator nodes, this method returns true.<br>
-	 * Otherwise, this method returns false.
-	 */
-	public boolean existDominators() {
-		return !dominators.isEmpty();
+		if(!children.contains(edge)) {
+			children.add(edge);
+		}
 	}
 
 	/**
@@ -97,7 +129,7 @@ public class CFNode {
 	 * Otherwise, this method returns false.
 	 */
 	public boolean isRoot() {
-		return immediateDominator == null && parents.isEmpty();
+		return start.getPc() == 0;
 	}
 
 	/**
@@ -114,5 +146,64 @@ public class CFNode {
 	 */
 	public OpcodeInfo getEnd() {
 		return end;
+	}
+
+	@Override
+	public int hashCode() {
+		int h = 0;
+		char[] val1 = String.valueOf(start.getPc()).toCharArray();
+		char[] val2 = String.valueOf(end.getPc()).toCharArray();
+		char[] val3 = start.getOpcodeType().toString().toCharArray();
+		char[] val4 = end.getOpcodeType().toString().toCharArray();
+		for(int i = 0; i < val1.length; i++) {
+			h = 31 * h + val1[i];
+		}
+		for(int i = 0; i < val2.length; i++) {
+			h = 31 * h + val2[i];
+		}
+		for(int i = 0; i < val3.length; i++) {
+			h = 31 * h + val3[i];
+		}
+		for(int i = 0; i < val4.length; i++) {
+			h = 31 * h + val4[i];
+		}
+		return h;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof CFNode)) {
+			return false;
+		}
+		CFNode node = (CFNode)obj;
+		return start.getPc() == node.getStart().getPc()
+			&& end.getPc() == node.getEnd().getPc();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("#").append(start.getPc()).append("-").append(end.getPc())
+			.append(" [").append(nodeType).append("]").append("\n");
+		if(parents.size() == 1) {
+		 	sb.append("  immediate dominator: ")
+		 		.append(immediateDominator.getStart().getPc()).append("-")
+		 		.append(immediateDominator.getEnd().getPc());
+		} else if(parents.size() > 1) {
+			sb.append("  dominator: ")
+				.append(dominator.getStart().getPc()).append("-")
+		 		.append(dominator.getEnd().getPc())
+				.append("\n  parents: ");
+			for(CFEdge edge : parents) {
+				sb.append(edge.toString()).append(" ");
+			}
+		} else {
+			sb.append("  parents: not exist");
+		}
+		sb.append("\n  children: ");
+		for(CFEdge edge : children) {
+			sb.append(edge.toString()).append(" ");
+		}
+		return sb.toString();
 	}
 }
