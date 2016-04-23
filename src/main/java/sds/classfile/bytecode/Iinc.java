@@ -43,4 +43,9 @@ public class Iinc extends OpcodeInfo {
 	public int getConst() {
 		return _const;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ": " + index + ", " + _const;
+	}
 }

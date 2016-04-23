@@ -36,4 +36,14 @@ public class TableSwitch extends SwitchOpcode {
 	public int[] getJumpOffsets() {
 		return jumpOffsets;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < jumpOffsets.length; i++) {
+			sb.append(jumpOffsets[i]+getPc()).append("\n");
+		}
+		sb.append(getDefault()+getPc());
+		return super.toString() + ": " + sb.toString();
+	}
 }

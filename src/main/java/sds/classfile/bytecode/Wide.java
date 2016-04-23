@@ -38,4 +38,9 @@ public class Wide extends CpRefOpcode {
 	public int getConst() {
 		return constByte;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ", " + constByte;
+	}
 }

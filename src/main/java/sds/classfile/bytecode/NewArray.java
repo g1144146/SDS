@@ -46,4 +46,9 @@ public class NewArray extends OpcodeInfo {
 	public String getType() {
 		return atype;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ": " + atype;
+	}
 }

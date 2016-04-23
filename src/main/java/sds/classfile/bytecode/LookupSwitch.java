@@ -45,4 +45,15 @@ public class LookupSwitch extends SwitchOpcode {
 	public int[] getOffset() {
 		return offset;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < match.length; i++) {
+			sb.append(match[i]).append(", ")
+				.append(offset[i]+getPc()).append("\n");
+		}
+		sb.append(getDefault()+getPc());
+		return super.toString() + ": " + sb.toString();
+	}
 }

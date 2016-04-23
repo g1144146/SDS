@@ -77,4 +77,9 @@ public class CpRefOpcode extends OpcodeInfo {
 	public int getIndexByte() {
 		return index;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ": #" + index;
+	}
 }

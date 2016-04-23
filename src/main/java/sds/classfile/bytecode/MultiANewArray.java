@@ -34,4 +34,9 @@ public class MultiANewArray extends CpRefOpcode {
 	public int getDemensions() {
 		return dimensions;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ", " + dimensions;
+	}
 }

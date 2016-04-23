@@ -42,4 +42,9 @@ public class PushOpcode extends OpcodeInfo {
 	public int getValue() {
 		return value;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ": " + value;
+	}
 }

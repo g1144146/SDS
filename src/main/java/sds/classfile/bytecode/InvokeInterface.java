@@ -34,4 +34,9 @@ public class InvokeInterface extends CpRefOpcode {
 	public int getCount() {
 		return count;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ", " + count;
+	}
 }
