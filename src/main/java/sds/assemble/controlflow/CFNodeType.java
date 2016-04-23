@@ -2,7 +2,6 @@ package sds.assemble.controlflow;
 
 import sds.classfile.bytecode.BranchOpcode;
 import sds.classfile.bytecode.OpcodeInfo;
-import sds.classfile.bytecode.Opcodes;
 import sds.classfile.bytecode.SwitchOpcode;
 
 /**
