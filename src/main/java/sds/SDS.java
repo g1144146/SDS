@@ -24,7 +24,7 @@ public class SDS {
 		for(String arg : args) {
 			ClassFileReader reader = new ClassFileReader(arg);
 			reader.read();
-//			ClassContent cc = new ClassContent(reader.getClassFile());
+			ClassContent cc = new ClassContent(reader.getClassFile());
 		}
 	}
 }
