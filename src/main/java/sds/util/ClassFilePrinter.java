@@ -93,11 +93,13 @@ public class ClassFilePrinter {
 	public ClassFilePrinter() {}
 
 	/**
-	 * prints major and minor version.
+	 * prints magic number, major and minor version.
+	 * @param magicNum magic number
 	 * @param majorVersion major version
 	 * @param minorVersion minor version
 	 */
-	public void printNumber(int majorVersion, int minorVersion) {
+	public void printNumber(int magicNum, int majorVersion, int minorVersion) {
+		out.println("*** Magic Number  *** " + sep + Integer.toHexString(magicNum));
 		out.println("*** Major Version *** " + sep + majorVersion);
 		out.println("*** Minor Version *** " + sep + minorVersion);
 		out.print(sep);
