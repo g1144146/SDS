@@ -1,7 +1,12 @@
-# *SDS*
+# SDS
 
 ---
 # Overview
+
+* for decompiling
+    * branch "master"
+* for disassembling
+    * branch "disassemble"
 
 
 # Usage
