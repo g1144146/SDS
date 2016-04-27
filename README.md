@@ -1,4 +1,4 @@
-# *SDS*
+# SDS
 
 ---
 # Overview
