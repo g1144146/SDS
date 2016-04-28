@@ -14,9 +14,6 @@ public class AnnotatedTest {
 	@RuntimeAnnotation("field")
 	private String field;
 
-	@RuntimeAnnotation("constructor")
-	public AnnotatedTest() {}
-
 	@RuntimeAnnotation("method")
 	public
 	<@RuntimeAnnotation("generics_type_definition") T extends
@@ -30,13 +27,4 @@ public class AnnotatedTest {
 	}
 
 	public <T> void testMethod(T t) {}
-
-	public <@RuntimeAnnotation("type_param") T> void typeParam1() {
-		
-	}
-
-	public <T extends @RuntimeAnnotation("type_param_extends") Object>
-	void typeParam2() {
-		
-	}
 }
