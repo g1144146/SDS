@@ -5,7 +5,6 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import org.junit.Before;
 
-import sds.classfile.attributes.annotation.*;
 import sds.classfile.attributes.stackmap.StackMapTable;
 import static sds.classfile.attributes.AttributeType.*;
 

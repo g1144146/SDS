@@ -69,7 +69,8 @@ public class CFGBuilder {
 						}
 					}
 				} else if(n.getType() == CFNodeType.LoopExit) {
-					for(int i = 0; i < index; i++) {
+					System.out.println(jumpPoint);
+					for(int i = 0; i <= index; i++) {
 						if(nodes[i].isInPcRange(jumpPoint)) {
 							nodes[i].nodeType = CFNodeType.LoopEntry;
 							n.addChild(nodes[i]);
