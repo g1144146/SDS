@@ -1,5 +1,8 @@
 package sds.assemble;
 
+import java.util.Arrays;
+import java.util.Iterator;
+
 import sds.assemble.controlflow.CFGBuilder;
 import sds.assemble.controlflow.CFNode;
 import sds.classfile.ConstantPool;
@@ -38,6 +41,7 @@ public class MethodContent extends MemberContent {
 	 */
 	public MethodContent(MemberInfo info, ConstantPool pool) {
 		super(info, pool);
+		System.out.println(this.getName());
 		for(AttributeInfo attr : info.getAttr().getAll()) {
 			investigateAttribute(attr, pool);
 		}
@@ -46,6 +50,7 @@ public class MethodContent extends MemberContent {
 		for(CFNode n : nodes) {
 			System.out.println(n.toString());
 		}
+		System.out.println("");
 	}
 
 	@Override
@@ -78,14 +83,19 @@ public class MethodContent extends MemberContent {
 				for(int i = 0; i < inst.length; i++) {
 					inst[i] = new LineInstructions(table[i]);
 				}
-				int index = 0;
-				for(OpcodeInfo op : opcodes.getAll()) {
-					if(op.getPc() != table[index].getEndPc()) {
-						inst[index].addOpcode(op);
-					} else {
-						index++;
-						if(index < inst.length) {
+				Iterator<OpcodeInfo> itr = Arrays.asList(opcodes.getAll()).iterator();
+				if(inst.length == 1) {
+					while(itr.hasNext()) {
+						inst[0].addOpcode(itr.next());
+					}
+				} else {
+					int index = 0;
+					while(itr.hasNext()) {
+						OpcodeInfo op = itr.next();
+						if(op.getPc() < table[index].getEndPc()) {
 							inst[index].addOpcode(op);
+						} else {
+							inst[++index].addOpcode(op);
 						}
 					}
 				}
