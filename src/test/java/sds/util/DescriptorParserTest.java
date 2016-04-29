@@ -11,16 +11,6 @@ import static sds.util.DescriptorParser.parseImportClass;
 public class DescriptorParserTest {
 	@Test
 	public void testParse() {
-//			case "B": return "byte";
-//			case "C": return "char";
-//			case "D": return "double";
-//			case "F": return "float";
-//			case "I": return "int";
-//			case "J": return "long";
-//			case "S": return "short";
-//			case "Z": return "boolean";
-//			case "V": return "void";
-//		assertThat(parse(""), is(""));
 		assertThat(parse("(Ljava/lang/System;)V"), is("(java.lang.System,)void"));
 		assertThat(parse("(IID)Ljava/lang/reflect/Method;")
 				, is("(int,int,double,)java.lang.reflect.Method"));
