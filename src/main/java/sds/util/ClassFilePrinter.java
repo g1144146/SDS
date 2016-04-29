@@ -677,7 +677,7 @@ public class ClassFilePrinter {
 				for(LocalVarTarget.LVTTable t : lvt.getTable()) {
 					out.print("     index: " + t.getIndex());
 					out.println(", pc: " + t.getStartPc()
-								+ (t.getStartPc()+t.getLen()-1));
+								+ "-" + (t.getStartPc()+t.getLen()-1));
 				}
 				break;
 			case CatchTarget:

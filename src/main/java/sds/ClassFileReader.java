@@ -52,7 +52,7 @@ public class ClassFileReader {
 			cf.attr = readAttributes(raf, raf.readShort());
 			
 			ClassFilePrinter printer = new ClassFilePrinter(cf.pool);
-			printer.printNumber(cf.majorVersion, cf.minorVersion);
+			printer.printNumber(cf.magicNumber, cf.majorVersion, cf.minorVersion);
 			printer.printConstantPool();
 			printer.printAccessFlag(cf.accessFlag);
 			printer.printThisClass(cf.thisClass);
