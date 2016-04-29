@@ -84,7 +84,7 @@ public class AccessFlags {
 	 */
 	public static final int ACC_STRICT = 0x0800;
 	/**
-	 * synthetic.
+	 * hex of synthetic.
 	 * class, field and method
 	 * value: 4096
 	 */
@@ -125,7 +125,7 @@ public class AccessFlags {
 
 	/**
 	 * returns access flags.
-	 * @param accessFlag bit sequence of access flag 
+	 * @param accessFlag hex of access flag 
 	 * @param type type name
 	 * @return access flags
 	 */
@@ -147,6 +147,7 @@ public class AccessFlags {
 	private static String getClassAccessFlag(int accessFlag) {
 		StringBuilder sb = new StringBuilder();
 		if(checkFlag(accessFlag, ACC_PUBLIC))     sb.append("public ");
+		if(checkFlag(accessFlag, ACC_STATIC))     sb.append("static ");
 		if(checkFlag(accessFlag, ACC_FINAL))      sb.append("final ");
 		if(checkFlag(accessFlag, ACC_SYNTHETIC))  sb.append("synthetic ");
 		if(checkFlag(accessFlag, ACC_ANNOTATION)) sb.append("@interface ");
