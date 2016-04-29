@@ -1,7 +1,7 @@
 package sds.util;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,7 +57,7 @@ public class DescriptorParser {
 	 * @return import classes
 	 */
 	public static String[] parseImportClass(String desc) {
-		List<String> classes = new ArrayList<>();
+		Set<String> classes = new LinkedHashSet<>();
 		desc = desc.replace("/", ".");
 		Matcher m = Pattern.compile("(" + objPattern + ")").matcher(desc);
 		while(m.find()) {
