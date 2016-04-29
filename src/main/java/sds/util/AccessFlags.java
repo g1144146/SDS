@@ -84,7 +84,7 @@ public class AccessFlags {
 	 */
 	public static final int ACC_STRICT = 0x0800;
 	/**
-	 * synthetic.
+	 * hex of synthetic.
 	 * class, field and method
 	 * value: 4096
 	 */
@@ -125,7 +125,7 @@ public class AccessFlags {
 
 	/**
 	 * returns access flags.
-	 * @param accessFlag bit sequence of access flag 
+	 * @param accessFlag hex of access flag 
 	 * @param type type name
 	 * @return access flags
 	 */
