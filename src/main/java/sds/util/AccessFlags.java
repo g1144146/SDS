@@ -147,6 +147,7 @@ public class AccessFlags {
 	private static String getClassAccessFlag(int accessFlag) {
 		StringBuilder sb = new StringBuilder();
 		if(checkFlag(accessFlag, ACC_PUBLIC))     sb.append("public ");
+		if(checkFlag(accessFlag, ACC_STATIC))     sb.append("static ");
 		if(checkFlag(accessFlag, ACC_FINAL))      sb.append("final ");
 		if(checkFlag(accessFlag, ACC_SYNTHETIC))  sb.append("synthetic ");
 		if(checkFlag(accessFlag, ACC_ANNOTATION)) sb.append("@interface ");
