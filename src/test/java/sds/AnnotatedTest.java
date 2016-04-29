@@ -14,6 +14,7 @@ public class AnnotatedTest {
 	@RuntimeAnnotation("field")
 	private String field;
 
+	@Deprecated
 	@RuntimeAnnotation("method")
 	public
 	<@RuntimeAnnotation("generics_type_definition") T extends
@@ -27,4 +28,6 @@ public class AnnotatedTest {
 	}
 
 	public <T> void testMethod(T t) {}
+
+	public class Inner {}
 }
