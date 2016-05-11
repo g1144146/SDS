@@ -4,7 +4,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import sds.assemble.LineInstructions;
+import sds.classfile.bytecode.BranchOpcode;
 import sds.classfile.bytecode.OpcodeInfo;
+import sds.classfile.bytecode.LookupSwitch;
+import sds.classfile.bytecode.TableSwitch;
 
 /**
  * This class is for node of control flow graph.
@@ -17,6 +20,8 @@ public class CFNode {
 	private CFNode  immediateDominator;
 	private OpcodeInfo start;
 	private OpcodeInfo end;
+	private int jumpPoint = -1;
+	private int[] switchJump = new int[0];
 	CFNodeType nodeType;
 
 	/**
@@ -31,9 +36,55 @@ public class CFNode {
 		} else {
 			this.end = inst.getOpcodes().getAll()[size-1];
 		}
-		this.nodeType   = CFNodeType.getType(end);
+		
+		this.nodeType   = CFNodeType.getType(inst.getOpcodes(), end);
+		if(nodeType == CFNodeType.Entry) { // if_xx
+			for(OpcodeInfo op : inst.getOpcodes().getAll()) {
+				if(op instanceof BranchOpcode) {
+					this.jumpPoint = ((BranchOpcode)op).getBranch() + op.getPc();
+				}
+			}
+		} else if(nodeType == CFNodeType.Exit || nodeType == CFNodeType.LoopExit) { // goto
+			this.jumpPoint = ((BranchOpcode)end).getBranch() + end.getPc();
+		} else if(nodeType == CFNodeType.Switch) { // switch
+			for(OpcodeInfo op : inst.getOpcodes().getAll()) {
+				if(op instanceof LookupSwitch) {
+					LookupSwitch look = (LookupSwitch)op;
+					this.switchJump = new int[look.getMatch().length];
+					int[] offsets = look.getOffset();
+					for(int i = 0; i < switchJump.length; i++) {
+						switchJump[i] = offsets[i] + op.getPc();
+					}
+				} else if(op instanceof TableSwitch) {
+					TableSwitch table = (TableSwitch)op;
+					this.switchJump = new int[table.getJumpOffsets().length];
+					int[] offsets = table.getJumpOffsets();
+					for(int i = 0; i < switchJump.length; i++) {
+						switchJump[i] = offsets[i] + op.getPc();
+					}
+				}
+			}
+ 		}
+		
 		this.parents    = new LinkedHashSet<>();
 		this.children   = new LinkedHashSet<>();
+	}
+
+	/**
+	 * returns index into code array of jump point.<br>
+	 * if this node type is Entry or Exit (and that of Loop), this method returns -1.
+	 * @return jump point index
+	 */
+	public int getJumpPoint() {
+		return jumpPoint;
+	}
+
+	/**
+	 * returns indexes into code array of jump point.
+	 * @return jump point indexes
+	 */
+	public int[] getSwitchJump() {
+		return switchJump;
 	}
 
 	/**
