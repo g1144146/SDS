@@ -57,27 +57,22 @@ public class CFGBuilder {
 		/** set jump point node **/
 		index = 0;
 		for(CFNode n : nodes) {
-			if(n.getEnd() instanceof BranchOpcode) {
-				BranchOpcode op = (BranchOpcode)n.getEnd();
-				int jumpPoint = op.getBranch() + op.getPc();
-				if(n.getType() == CFNodeType.Exit
-				|| n.getType() == CFNodeType.Entry
-				|| n.getType() == CFNodeType.LoopEntry) {
-					for(int i = index; i < nodes.length; i++) {
-						if(nodes[i].isInPcRange(jumpPoint)) {
-							n.addChild(nodes[i]);
-							nodes[i].addParent(n);
-							break;
-						}
+			if(n.getType() == CFNodeType.Exit
+			|| n.getType() == CFNodeType.Entry
+			|| n.getType() == CFNodeType.LoopEntry) {
+				for(int i = index; i < nodes.length; i++) {
+					if(nodes[i].isInPcRange(n.getJumpPoint())) {
+						n.addChild(nodes[i]);
+						nodes[i].addParent(n);
+						break;
 					}
-				} else if(n.getType() == CFNodeType.LoopExit) {
-					System.out.println(jumpPoint);
-					for(int i = 0; i <= index; i++) {
-						if(nodes[i].isInPcRange(jumpPoint)) {
-							nodes[i].nodeType = CFNodeType.LoopEntry;
-							n.addChild(nodes[i]);
-							break;
-						}
+				}
+			} else if(n.getType() == CFNodeType.LoopExit) {
+				for(int i = 0; i < index; i++) {
+					if(nodes[i].isInPcRange(n.getJumpPoint())) {
+						nodes[i].nodeType = CFNodeType.LoopEntry;
+						n.addChild(nodes[i]);
+						break;
 					}
 				}
 			}
