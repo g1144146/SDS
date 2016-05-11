@@ -3,6 +3,8 @@ package sds.assemble.controlflow;
 import sds.assemble.LineInstructions;
 import sds.classfile.bytecode.BranchOpcode;
 
+import static sds.assemble.controlflow.DominatorNodeSearcher.searchCommon;
+
 /**
  * This builder class is for control flow graph.<br>
  * This class is designed singleton.
@@ -93,9 +95,9 @@ public class CFGBuilder {
 				for(int j = 0; j < parents.length; j++) {
 					if(j < parents.length - 1) {
 						if(cand == null) {
-							cand = DominatorNodeSearcher.searchCommon(parents[j], parents[j+1]);
+							cand = searchCommon(parents[j], parents[j+1]);
 						} else {
-							cand = DominatorNodeSearcher.searchCommon(cand, parents[j+1]);
+							cand = searchCommon(cand, parents[j+1]);
 						}
 					}
 				}

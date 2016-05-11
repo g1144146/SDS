@@ -2,8 +2,8 @@ package sds.assemble;
 
 import sds.classfile.ConstantPool;
 import sds.classfile.MemberInfo;
-import sds.util.AccessFlags;
-import sds.util.Utf8ValueExtractor;
+import static sds.util.AccessFlags.get;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This adapter class is for
@@ -18,9 +18,9 @@ public abstract class MemberContent extends BaseContent {
 	private String name;
 
 	MemberContent(MemberInfo info, ConstantPool pool) {
-		this.accessFlag = AccessFlags.get(info.getAccessFlags(), info.getType());
-		this.desc = Utf8ValueExtractor.extract(pool.get(info.getDescriptorIndex()-1), pool);
-		this.name = Utf8ValueExtractor.extract(pool.get(info.getNameIndex()-1), pool);
+		this.accessFlag = get(info.getAccessFlags(), info.getType());
+		this.desc = extract(pool.get(info.getDescriptorIndex()-1), pool);
+		this.name = extract(pool.get(info.getNameIndex()-1), pool);
 	}
 
 	/**

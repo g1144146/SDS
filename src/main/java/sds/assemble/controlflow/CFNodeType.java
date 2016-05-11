@@ -14,7 +14,11 @@ public enum CFNodeType {
 	Entry,
 	Exit,
 	LoopEntry,
-	LoopExit;
+	LoopExit,
+	TryEntry,
+	TryExit,
+	Catch,
+	Finally;
 
 	/**
 	 * returns type of control flow node.

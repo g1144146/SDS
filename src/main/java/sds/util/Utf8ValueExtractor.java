@@ -17,6 +17,7 @@ import sds.classfile.constantpool.StringInfo;
 import sds.classfile.constantpool.Utf8Info;
 
 import static sds.classfile.constantpool.ConstantType.*;
+import static sds.util.DescriptorParser.parse;
 
 /**
  * This class is for extracting value from
@@ -62,13 +63,13 @@ public class Utf8ValueExtractor {
 			case C_NAME_AND_TYPE:
 				NameAndTypeInfo nati = (NameAndTypeInfo)info;
 				return extract(pool.get(nati.getNameIndex()-1), pool)
-					+ DescriptorParser.parse(extract(pool.get(nati.getDescriptorIndex()-1), pool));
+					+ parse(extract(pool.get(nati.getDescriptorIndex()-1), pool));
 			case C_METHOD_HANDLE:
 				MethodHandleInfo mhi = (MethodHandleInfo)info;
 				return extract(pool.get(mhi.getReferenceIndex()-1), pool);
 			case C_METHOD_TYPE:
 				MethodTypeInfo mti = (MethodTypeInfo)info;
-				return DescriptorParser.parse(extract(pool.get(mti.getDescriptorIndex()-1), pool));
+				return parse(extract(pool.get(mti.getDescriptorIndex()-1), pool));
 			case C_INVOKE_DYNAMIC:
 				InvokeDynamicInfo idi = (InvokeDynamicInfo)info;
 				return extract(pool.get(idi.getNameAndTypeIndex()), pool);
@@ -89,7 +90,7 @@ public class Utf8ValueExtractor {
 	 * {@link sds.classfile.constantpool.Utf8Info <code>Utf8Info</code>}
 	 */
 	public static String extract(MemberInfo info, ConstantPool pool) {
-		return DescriptorParser.parse(extract(pool.get(info.getDescriptorIndex()-1), pool))
+		return parse(extract(pool.get(info.getDescriptorIndex()-1), pool))
 			+ " " + extract(pool.get(info.getNameIndex()-1), pool);
 	}
 }

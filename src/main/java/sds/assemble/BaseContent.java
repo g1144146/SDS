@@ -10,7 +10,7 @@ import sds.classfile.attributes.annotation.RuntimeInvisibleAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
-import sds.util.Utf8ValueExtractor;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This adapter class is for
@@ -60,8 +60,7 @@ public abstract class BaseContent {
 				break;
 			case Signature:
 				Signature sig = (Signature)info;
-				String signature
-					= Utf8ValueExtractor.extract(pool.get(sig.getSignatureIndex()-1), pool);
+				String signature = extract(pool.get(sig.getSignatureIndex()-1), pool);
 				signature = signature.substring(signature.indexOf("<"), signature.indexOf(">"));
 				String key = null, value = null;
 				for(String s : signature.split(":")) {

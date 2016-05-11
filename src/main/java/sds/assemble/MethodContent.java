@@ -20,7 +20,8 @@ import sds.classfile.attributes.annotation.RuntimeVisibleParameterAnnotations;
 import sds.classfile.attributes.stackmap.StackMapTable;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
-import sds.util.Utf8ValueExtractor;
+
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This class is for contents of method.
@@ -73,8 +74,7 @@ public class MethodContent extends MemberContent {
 				int[] exp = ((Exceptions)info).getExceptionIndexTable();
 				this.exceptions = new String[exp.length];
 				for(int i = 0; i < exp.length; i++) {
-					exceptions[i] = Utf8ValueExtractor.extract(pool.get(exp[i]-1), pool)
-									.replace("/", ".");
+					exceptions[i] = extract(pool.get(exp[i]-1), pool).replace("/", ".");
 				}
 				break;
 			case LineNumberTable:

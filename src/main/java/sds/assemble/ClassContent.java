@@ -8,7 +8,7 @@ import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.BootstrapMethods;
 import sds.classfile.attributes.InnerClasses;
 import sds.classfile.attributes.SourceFile;
-import sds.util.Utf8ValueExtractor;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This class is for contents of class.
@@ -62,8 +62,7 @@ public class ClassContent extends BaseContent {
 				this.bootstrapMethods = new String[bsm.getBSM().length];
 				for(BootstrapMethods.BSM b : bsm.getBSM()) {
 					for(int i = 0; i < b.getBSMArgs().length; i++) {
-						bootstrapMethods[i]
-							= Utf8ValueExtractor.extract(pool.get(b.getBSMArgs()[i]-1), pool);
+						bootstrapMethods[i] = extract(pool.get(b.getBSMArgs()[i]-1), pool);
 					}
 				}
 				break;
@@ -84,8 +83,7 @@ public class ClassContent extends BaseContent {
 				break;
 			case SourceFile:
 				SourceFile sf = (SourceFile)info;
-				this.sourceFile
-					= Utf8ValueExtractor.extract(pool.get(sf.getSourceFileIndex()-1), pool);
+				this.sourceFile = extract(pool.get(sf.getSourceFileIndex()-1), pool);
 				break;
 			default:
 				super.investigateAttribute(info, pool);
