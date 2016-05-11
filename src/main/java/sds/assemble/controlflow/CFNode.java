@@ -37,7 +37,7 @@ public class CFNode {
 			this.end = inst.getOpcodes().getAll()[size-1];
 		}
 		
-		this.nodeType   = CFNodeType.getType(inst.getOpcodes(), end);
+		this.nodeType = CFNodeType.getType(inst.getOpcodes(), end);
 		if(nodeType == CFNodeType.Entry) { // if_xx
 			for(OpcodeInfo op : inst.getOpcodes().getAll()) {
 				if(op instanceof BranchOpcode) {
@@ -50,18 +50,22 @@ public class CFNode {
 			for(OpcodeInfo op : inst.getOpcodes().getAll()) {
 				if(op instanceof LookupSwitch) {
 					LookupSwitch look = (LookupSwitch)op;
-					this.switchJump = new int[look.getMatch().length];
+					this.switchJump = new int[look.getMatch().length + 1];
 					int[] offsets = look.getOffset();
-					for(int i = 0; i < switchJump.length; i++) {
-						switchJump[i] = offsets[i] + op.getPc();
+					for(int i = 0; i < switchJump.length-1; i++) {
+						switchJump[i] = offsets[i] + look.getPc();
 					}
+					switchJump[switchJump.length - 1] = look.getDefault() + look.getPc();
+					break;
 				} else if(op instanceof TableSwitch) {
 					TableSwitch table = (TableSwitch)op;
-					this.switchJump = new int[table.getJumpOffsets().length];
+					this.switchJump = new int[table.getJumpOffsets().length + 1];
 					int[] offsets = table.getJumpOffsets();
-					for(int i = 0; i < switchJump.length; i++) {
-						switchJump[i] = offsets[i] + op.getPc();
+					for(int i = 0; i < switchJump.length-1; i++) {
+						switchJump[i] = offsets[i] + table.getPc();
 					}
+					switchJump[switchJump.length - 1] = table.getDefault() + table.getPc();
+					break;
 				}
 			}
  		}

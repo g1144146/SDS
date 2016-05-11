@@ -1,7 +1,6 @@
 package sds.assemble.controlflow;
 
 import sds.assemble.LineInstructions;
-import sds.classfile.bytecode.BranchOpcode;
 
 import static sds.assemble.controlflow.DominatorNodeSearcher.searchCommon;
 
@@ -41,12 +40,15 @@ public class CFGBuilder {
 		for(CFNode n : nodes) {
 			if(index > 0) {
 				if(nodes[index-1].getType() != CFNodeType.Exit
-				&& nodes[index-1].getType() != CFNodeType.LoopExit) {
+				&& nodes[index-1].getType() != CFNodeType.LoopExit
+				&& nodes[index-1].getType() != CFNodeType.Switch) {
 					n.addParent(nodes[index-1]);
 					nodes[index-1].addChild(n);
 				}
 			} else if(index == nodes.length-1) {
-				if(n.getType() != CFNodeType.Exit && n.getType() != CFNodeType.LoopExit) {
+				if(n.getType() != CFNodeType.Exit
+				&& n.getType() != CFNodeType.LoopExit
+				&& n.getType() != CFNodeType.Switch) {
 					n.addChild(nodes[index]);
 					nodes[index].addParent(n);
 				}
@@ -73,6 +75,20 @@ public class CFGBuilder {
 						nodes[i].nodeType = CFNodeType.LoopEntry;
 						n.addChild(nodes[i]);
 						break;
+					}
+				}
+			} else if(n.getType() == CFNodeType.Switch) {
+				int[] jumpPoints = n.getSwitchJump();
+				int offsetIndex = 0;
+				for(int i = index; i < nodes.length; i++) {
+					if(nodes[i].isInPcRange(jumpPoints[offsetIndex])) {
+						System.out.println("switch: " + jumpPoints[offsetIndex]);
+						n.addChild(nodes[i]);
+						nodes[i].addParent(n);
+						offsetIndex++;
+						if(offsetIndex == jumpPoints.length) {
+							break;
+						}
 					}
 				}
 			}
