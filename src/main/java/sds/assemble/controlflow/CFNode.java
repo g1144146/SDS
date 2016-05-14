@@ -22,7 +22,11 @@ public class CFNode {
 	private OpcodeInfo end;
 	private int jumpPoint = -1;
 	private int[] switchJump = new int[0];
+	// package-private fields.
 	CFNodeType nodeType;
+	boolean inTry      = false;
+	boolean inCatch    = false;
+	boolean inFinally  = false;
 
 	/**
 	 * constructor.
@@ -144,8 +148,17 @@ public class CFNode {
 	 * @param parent parent node
 	 */
 	public void addParent(CFNode parent) {
+		addParent(parent, CFEdgeType.Normal);
+	}
+
+	/**
+	 * adds parent node of this.
+	 * @param parent parent node
+	 * @param type edge type
+	 */
+	public void addParent(CFNode parent, CFEdgeType type) {
 		if(!isRoot()) {
-			CFEdge edge = new CFEdge(this, parent);
+			CFEdge edge = new CFEdge(this, parent, type);
 			if(parents.isEmpty()) {
 				this.immediateDominator = parent;
 				this.parents.add(edge);
@@ -162,7 +175,16 @@ public class CFNode {
 	 * @param child child node
 	 */
 	public void addChild(CFNode child) {
-		CFEdge edge = new CFEdge(this, child);
+		addChild(child, CFEdgeType.Normal);
+	}
+
+	/**
+	 * adds child node of this.
+	 * @param child child node
+	 * @param type edge type
+	 */
+	public void addChild(CFNode child, CFEdgeType type) {
+		CFEdge edge = new CFEdge(this, child, type);
 		if(!children.contains(edge)) {
 			children.add(edge);
 		}
@@ -240,10 +262,11 @@ public class CFNode {
 		StringBuilder sb = new StringBuilder();
 		sb.append("#").append(start.getPc()).append("-").append(end.getPc())
 			.append(" [").append(nodeType).append("]").append("\n");
+		if(inTry)     sb.append("  in try\n");
+		if(inCatch)   sb.append("  in catch\n");
+		if(inFinally) sb.append("  in finally\n");
 		if(parents.size() == 1) {
-		 	sb.append("  immediate dominator: ")
-		 		.append(immediateDominator.getStart().getPc()).append("-")
-		 		.append(immediateDominator.getEnd().getPc());
+		 	sb.append("  immediate dominator: ").append(parents.iterator().next());
 		} else if(parents.size() > 1) {
 			sb.append("  dominator: ")
 				.append(dominator.getStart().getPc()).append("-")
