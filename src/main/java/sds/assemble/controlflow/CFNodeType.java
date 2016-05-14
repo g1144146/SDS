@@ -25,7 +25,8 @@ public enum CFNodeType {
 	
 	/**
 	 * returns type of control flow node.
-	 * @param op opcodes
+	 * @param opcodes opcode sequence
+	 * @param end end od opcode
 	 * @return node type
 	 */
 	public static CFNodeType getType(Opcodes opcodes, OpcodeInfo end) {
