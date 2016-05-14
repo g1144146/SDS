@@ -9,6 +9,7 @@ import sds.classfile.ConstantPool;
 import sds.classfile.MemberInfo;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.Code;
+import sds.classfile.attributes.Code.ExceptionTable;
 import sds.classfile.attributes.Exceptions;
 import sds.classfile.attributes.LineNumberTable;
 import sds.classfile.attributes.LocalVariableTable;
@@ -34,6 +35,7 @@ public class MethodContent extends MemberContent {
 	private int maxLocals;
 	private LineInstructions[] inst;
 	private Opcodes opcodes;
+	private ExceptionContent exContent;
 
 	/**
 	 * constructor.
@@ -47,7 +49,7 @@ public class MethodContent extends MemberContent {
 			investigateAttribute(attr, pool);
 		}
 		CFGBuilder builder = CFGBuilder.getInstance();
-		CFNode[] nodes = builder.build(inst);
+		CFNode[] nodes = builder.build(inst, exContent);
 		for(CFNode n : nodes) {
 			System.out.println(n.toString());
 		}
@@ -62,10 +64,20 @@ public class MethodContent extends MemberContent {
 				break;
 			case Code:
 				Code code = (Code)info;
-				this.maxStack  = code.getMaxStack();
-				this.maxLocals = code.maxLocals();
-				this.opcodes = code.getCode();
-//				code.getExceptionTable();
+				this.maxStack    = code.getMaxStack();
+				this.maxLocals   = code.maxLocals();
+				this.opcodes     = code.getCode();
+				ExceptionTable[] exTable = code.getExceptionTable();
+				String[] exClass = new String[exTable.length];
+				for(int i = 0; i < exTable.length; i++) {
+					ExceptionTable t = exTable[i];
+					if(t.getNumber("catch_type") == 0) {
+						exClass[i] = "any";
+					} else {
+						exClass[i] = extract(pool.get(t.getNumber("catch_type")), pool);
+					}
+				}
+				this.exContent = new ExceptionContent(exTable, exClass);
 				for(AttributeInfo ai : code.getAttr().getAll()) {
 					investigateAttribute(ai, pool);
 				}
@@ -94,8 +106,19 @@ public class MethodContent extends MemberContent {
 						OpcodeInfo op = itr.next();
 						if(op.getPc() < table[index].getEndPc()) {
 							inst[index].addOpcode(op);
-						} else {
-							inst[++index].addOpcode(op);
+						} else { // shift next line
+							index++;
+							if(index < inst.length) {
+								inst[index].addOpcode(op);
+							} else {
+								// when end line of method has some instructions, 
+								// it adds to end instruction in the line
+								// because the line doesn't have the instruction.
+								if(inst[index-1].getOpcodes().get(op.getPc()) == null) {
+									inst[index-1].addOpcode(op);
+								}
+								break;
+							}
 						}
 					}
 				}
