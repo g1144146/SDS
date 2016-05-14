@@ -1,5 +1,9 @@
 package sds.assemble.controlflow;
 
+import static sds.assemble.controlflow.CFEdgeType.Normal;
+import static sds.assemble.controlflow.CFEdgeType.JumpCatch;
+import static sds.assemble.controlflow.CFEdgeType.JumpFinally;
+
 /**
  * This class is for edge of control flow graph.
  * @author inagaki
@@ -7,6 +11,7 @@ package sds.assemble.controlflow;
 public class CFEdge {
 	private CFNode dest;
 	private CFNode source;
+	private CFEdgeType type;
 
 	/**
 	 * constructor.
@@ -14,8 +19,19 @@ public class CFEdge {
 	 * @param dest destination node
 	 */
 	public CFEdge(CFNode source, CFNode dest) {
+		this(source, dest, Normal);
+	}
+
+	/**
+	 * constructor.
+	 * @param source source node
+	 * @param dest destination node
+	 * @param type edge type
+	 */
+	public CFEdge(CFNode source, CFNode dest, CFEdgeType type) {
 		this.source = source;
 		this.dest = dest;
+		this.type = type;
 	}
 
 	/**
@@ -57,7 +73,8 @@ public class CFEdge {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(dest.getStart().getPc())
-			.append("-").append(dest.getEnd().getPc());
+			.append("-").append(dest.getEnd().getPc())
+			.append("(").append(type).append(")");
 		return sb.toString();
 	}
 }
