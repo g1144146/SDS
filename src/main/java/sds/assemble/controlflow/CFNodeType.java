@@ -17,10 +17,6 @@ public enum CFNodeType {
 	Switch,
 	LoopEntry,
 	LoopExit,
-	TryEntry,
-	TryExit,
-	Catch,
-	Finally,
 	End;
 	
 	/**
