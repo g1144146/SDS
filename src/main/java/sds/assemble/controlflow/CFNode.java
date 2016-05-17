@@ -26,8 +26,8 @@ public class CFNode {
 	// package-private fields.
 	CFNodeType nodeType;
 	boolean inTry      = false;
-	boolean inCatch    = false;
-	boolean inFinally  = false;
+	boolean isCatchEntry    = false;
+	boolean isFinallyEntry  = false;
 
 	/**
 	 * constructor.
@@ -273,8 +273,8 @@ public class CFNode {
 		sb.append("#").append(start.getPc()).append("-").append(end.getPc())
 			.append(" [").append(nodeType).append("]").append("\n");
 		if(inTry)     sb.append("  in try\n");
-		if(inCatch)   sb.append("  in catch\n");
-		if(inFinally) sb.append("  in finally\n");
+		if(isCatchEntry)   sb.append("  catch entry\n");
+		if(isFinallyEntry) sb.append("  finally entry\n");
 		if(parents.size() == 1) {
 		 	sb.append("  immediate dominator: ").append(parents.iterator().next());
 		} else if(parents.size() > 1) {

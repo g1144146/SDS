@@ -62,7 +62,7 @@ public class CFGBuilder {
 					int catchIndex = ex.getTarget()[ti];
 					for(int i = index; i < nodes.length; i++) {
 						if(nodes[i].isInPcRange(catchIndex)) {
-							nodes[i].inCatch = true;
+							nodes[i].isCatchEntry = true;
 							n.addChild(nodes[i], JumpCatch);
 							nodes[i].addParent(n, JumpCatch);
 							break;
@@ -75,7 +75,7 @@ public class CFGBuilder {
 					int finallyIndex = ex.getTarget()[ci];
 					for(int i = index; i < nodes.length; i++) {
 						if(nodes[i].isInPcRange(finallyIndex)) {
-							nodes[i].inFinally = true;
+							nodes[i].isFinallyEntry = true;
 							n.addChild(nodes[i], JumpFinally);
 							nodes[i].addParent(n, JumpFinally);
 							break;
@@ -86,7 +86,7 @@ public class CFGBuilder {
 			// processing for setting parent and child.
 			if(index > 0) {
 				CFNodeType type = nodes[index-1].getType();
-				if(type != Exit && type != LoopExit && type != Switch) {
+				if(type != Exit && type != LoopExit && type != Switch && type != End) {
 					n.addParent(nodes[index-1]);
 					nodes[index-1].addChild(n);
 				}
@@ -138,32 +138,27 @@ public class CFGBuilder {
 		}
 
 		/** 4. set parent and child for try-catch-finally **/
-		for(int i = 0; i < nodes.length; i++) {
-			if(nodes[i].inCatch) {
-				for(CFNode child : getChildren(nodes[i])) {
-					if(! child.inFinally) {
-						for(int j = i; j < nodes.length; j++) {
-							if(nodes[j].equals(child)) {
-								nodes[j].inCatch = true;
-								break;
-							}
-						}
-					}
-				}
-			}
-			if((! nodes[i].isRoot()) && nodes[i].getParents().isEmpty()) {
-				if(nodes[i-1].getType() != Exit && nodes[i-1].getType() != LoopExit) {
-					nodes[i].inCatch = true;
-					nodes[i].addParent(nodes[i-1]);
-					nodes[i-1].addChild(nodes[i]);
-				}
-			}
-			if(nodes[i].inFinally) {
-				for(CFNode child : getChildren(nodes[i])) {
-					child.inFinally = true;
-				}
-			}
-		}
+//		for(int i = 0; i < nodes.length; i++) {
+//			if(nodes[i].inFinally) {
+//				for(CFNode child : getChildren(nodes[i])) {
+//					child.inFinally = true;
+//				}
+//			}
+//			if(nodes[i].inCatch) {
+//				for(CFNode child : getChildren(nodes[i])) {
+//					if(! child.inFinally) {
+//						for(int j = i; j < nodes.length; j++) {
+//							if(nodes[j].equals(child)) {
+//								nodes[j].inCatch = true;
+//								break;
+//							}
+//						}
+//					} else {
+//						break;
+//					}
+//				}
+//			}
+//		}
 
 		/** 5. decide dominator **/
 		for(int i = nodes.length - 1; i > 0; i--) {
