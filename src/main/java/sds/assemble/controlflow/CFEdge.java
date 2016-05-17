@@ -50,6 +50,14 @@ public class CFEdge {
 		return source;
 	}
 
+	/**
+	 * returns this edge type.
+	 * @return edge type
+	 */
+	public CFEdgeType getType() {
+		return type;
+	}
+
 	@Override
 	public int hashCode() {
 		return source.hashCode() + dest.hashCode();
