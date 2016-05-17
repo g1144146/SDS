@@ -22,6 +22,7 @@ public class CFNode {
 	private OpcodeInfo end;
 	private int jumpPoint = -1;
 	private int[] switchJump = new int[0];
+	private int hash;
 	// package-private fields.
 	CFNodeType nodeType;
 	boolean inTry      = false;
@@ -73,7 +74,25 @@ public class CFNode {
 				}
 			}
  		}
-		
+
+		// calc hash
+		char[] val1 = String.valueOf(start.getPc()).toCharArray();
+		char[] val2 = String.valueOf(end.getPc()).toCharArray();
+		char[] val3 = start.getOpcodeType().toString().toCharArray();
+		char[] val4 = end.getOpcodeType().toString().toCharArray();
+		for(int i = 0; i < val1.length; i++) {
+			hash = 31 * hash + val1[i];
+		}
+		for(int i = 0; i < val2.length; i++) {
+			hash = 31 * hash + val2[i];
+		}
+		for(int i = 0; i < val3.length; i++) {
+			hash = 31 * hash + val3[i];
+		}
+		for(int i = 0; i < val4.length; i++) {
+			hash = 31 * hash + val4[i];
+		}
+
 		this.parents    = new LinkedHashSet<>();
 		this.children   = new LinkedHashSet<>();
 	}
@@ -109,6 +128,14 @@ public class CFNode {
 	 */
 	public Set<CFEdge> getParents() {
 		return parents;
+	}
+
+	/**
+	 * returns child nodes.
+	 * @return child nodes
+	 */
+	public Set<CFEdge> getChildren() {
+		return children;
 	}
 
 	/**
@@ -227,24 +254,7 @@ public class CFNode {
 
 	@Override
 	public int hashCode() {
-		int h = 0;
-		char[] val1 = String.valueOf(start.getPc()).toCharArray();
-		char[] val2 = String.valueOf(end.getPc()).toCharArray();
-		char[] val3 = start.getOpcodeType().toString().toCharArray();
-		char[] val4 = end.getOpcodeType().toString().toCharArray();
-		for(int i = 0; i < val1.length; i++) {
-			h = 31 * h + val1[i];
-		}
-		for(int i = 0; i < val2.length; i++) {
-			h = 31 * h + val2[i];
-		}
-		for(int i = 0; i < val3.length; i++) {
-			h = 31 * h + val3[i];
-		}
-		for(int i = 0; i < val4.length; i++) {
-			h = 31 * h + val4[i];
-		}
-		return h;
+		return hash;
 	}
 
 	@Override
