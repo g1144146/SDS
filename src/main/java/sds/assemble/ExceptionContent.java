@@ -1,5 +1,7 @@
 package sds.assemble;
 
+import java.util.Arrays;
+
 import sds.classfile.attributes.Code.ExceptionTable;
 
 /**
@@ -55,27 +57,30 @@ public class ExceptionContent {
 	}
 
 	/**
-	 * returns array index which specified pc is
+	 * returns array indexes which specified pc is
 	 * in range between from-index and (to-index - 1).<br>
-	 * if the array index didn't find, this method returns -1.
+	 * if the array index didn't find, this method returns empty array.
 	 * @param pc index into code array
 	 * @param isAny whether the range has no exception
-	 * @return array index
+	 * @return array indexes
 	 */
-	public int getIndexInRange(int pc, boolean isAny) {
+	public int[] getIndexInRange(int pc, boolean isAny) {
+		int range = 0;
+		int[] indexes = new int[from.length];
 		for(int i = 0; i < from.length; i++) {
 			if(from[i] <= pc && pc < to[i]) {
 				if(isAny) {
 					if(exception[i].equals("any")) {
-						return i;
+						indexes[range++] = i;
 					}
 				} else {
 					if(! exception[i].equals("any")) {
-						return i;
+						indexes[range++] = i;
+						
 					}
 				}
 			}
 		}
-		return -1;
+		return range != 0 ? Arrays.copyOf(indexes, range) : new int[0];
 	}
 }
