@@ -37,15 +37,20 @@ public class DominatorNodeSearcher {
 	public static CFNode searchCommon(CFNode node1, CFNode node2) {
 		Set<CFNode> nodeSet = new HashSet<>();
 		nodeSet.add(node1);
-		while((node1 = node1.getImmediateDominator()) != null) {
-			nodeSet.add(node1);
+		CFNode n1 = node1;
+		while((n1 = n1.getImmediateDominator()) != null) {
+			nodeSet.add(n1);
 		}
 		nodeSet.add(node2);
-		while((node2 = node2.getImmediateDominator()) != null) {
-			if(nodeSet.contains(node2)) {
-				return node2;
+		CFNode n2 = node2;
+		while((n2 = n2.getImmediateDominator()) != null) {
+			if(nodeSet.contains(n2)) {
+				return n2;
 			}
 		}
-		throw new CFNodeException("not found common dominator node.");
+		throw new CFNodeException("not found common dominator node between "
+					+ node1.getStart().getPc() + "-" + node1.getEnd().getPc()
+					+ " and "
+					+ node2.getStart().getPc() + "-" + node2.getEnd().getPc());
 	}
 }
