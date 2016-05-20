@@ -15,8 +15,10 @@ import static sds.assemble.controlflow.CFNodeType.Exit;
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
 import static sds.assemble.controlflow.CFNodeType.LoopExit;
 import static sds.assemble.controlflow.CFNodeType.Switch;
-import static sds.assemble.controlflow.CFEdgeType.JumpCatch;
-import static sds.assemble.controlflow.CFEdgeType.JumpFinally;
+import static sds.assemble.controlflow.CFEdgeType.JumpToCatch;
+import static sds.assemble.controlflow.CFEdgeType.JumpToFinally;
+import static sds.classfile.bytecode.MnemonicTable._goto;
+import static sds.classfile.bytecode.MnemonicTable.goto_w;
 
 /**
  * This builder class is for control flow graph.<br>
@@ -54,8 +56,10 @@ public class CFGBuilder {
 		int index = 0;
 		for(CFNode n : nodes) {
 			// processing for try-catch-finally
-			int[] tryIndex = ex.getIndexInRange(n.getStart().getPc(), false);
-			int[] catchTypeIndex = ex.getIndexInRange(n.getStart().getPc(), true);
+			boolean isGoto = (n.getStart().getOpcodeType() == _goto)
+						  || (n.getStart().getOpcodeType() == goto_w);
+			int[] tryIndex= ex.getIndexInRange(n.getStart().getPc(), false, isGoto);
+			int[] catchTypeIndex = ex.getIndexInRange(n.getStart().getPc(), true, isGoto);
 			if(tryIndex.length > 0) { // for catch
 				n.inTry = true;
 				for(int ti : tryIndex) {
@@ -63,8 +67,8 @@ public class CFGBuilder {
 					for(int i = index; i < nodes.length; i++) {
 						if(nodes[i].isInPcRange(catchIndex)) {
 							nodes[i].isCatchEntry = true;
-							n.addChild(nodes[i], JumpCatch);
-							nodes[i].addParent(n, JumpCatch);
+							n.addChild(nodes[i], JumpToCatch);
+							nodes[i].addParent(n, JumpToCatch);
 							break;
 						}
 					}
@@ -76,8 +80,8 @@ public class CFGBuilder {
 					for(int i = index; i < nodes.length; i++) {
 						if(nodes[i].isInPcRange(finallyIndex)) {
 							nodes[i].isFinallyEntry = true;
-							n.addChild(nodes[i], JumpFinally);
-							nodes[i].addParent(n, JumpFinally);
+							n.addChild(nodes[i], JumpToFinally);
+							nodes[i].addParent(n, JumpToFinally);
 							break;
 						}
 					}
@@ -107,7 +111,7 @@ public class CFGBuilder {
 			if(type == Exit || type == Entry) {
 				for(int i = index; i < nodes.length; i++) {
 					if(nodes[i].isInPcRange(n.getJumpPoint())) {
-						n.addChild(nodes[i]);
+ 						n.addChild(nodes[i]);
 						nodes[i].addParent(n);
 						break;
 					}
@@ -137,30 +141,7 @@ public class CFGBuilder {
 			index++;
 		}
 
-		/** 4. set parent and child for try-catch-finally **/
-//		for(int i = 0; i < nodes.length; i++) {
-//			if(nodes[i].inFinally) {
-//				for(CFNode child : getChildren(nodes[i])) {
-//					child.inFinally = true;
-//				}
-//			}
-//			if(nodes[i].inCatch) {
-//				for(CFNode child : getChildren(nodes[i])) {
-//					if(! child.inFinally) {
-//						for(int j = i; j < nodes.length; j++) {
-//							if(nodes[j].equals(child)) {
-//								nodes[j].inCatch = true;
-//								break;
-//							}
-//						}
-//					} else {
-//						break;
-//					}
-//				}
-//			}
-//		}
-
-		/** 5. decide dominator **/
+		/** 4. decide dominator **/
 		for(int i = nodes.length - 1; i > 0; i--) {
 			if(nodes[i].getParents().size() == 1) { // immediate dominator
 				CFNode n = nodes[i].getParents().iterator().next().getDest();
@@ -184,8 +165,8 @@ public class CFGBuilder {
 	}
 
 	private Set<CFNode> getChildren(CFNode node) {
-		Set<CFNode> set = new LinkedHashSet();
-		Deque<CFNode> queue = new ArrayDeque();
+		Set<CFNode> set = new LinkedHashSet<>();
+		Deque<CFNode> queue = new ArrayDeque<>();
 		queue.push(node);
 		while(! queue.isEmpty()) {
 			CFNode n = queue.pop();

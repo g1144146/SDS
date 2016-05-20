@@ -58,29 +58,35 @@ public class ExceptionContent {
 
 	/**
 	 * returns array indexes which specified pc is
-	 * in range between from-index and (to-index - 1).<br>
+	 * in range between from_index and to_index (or to_index-1).<br>
 	 * if the array index didn't find, this method returns empty array.
 	 * @param pc index into code array
 	 * @param isAny whether the range has no exception
+	 * @param gotoStart whether start instruction of node is goto
 	 * @return array indexes
 	 */
-	public int[] getIndexInRange(int pc, boolean isAny) {
+	public int[] getIndexInRange(int pc, boolean isAny, boolean gotoStart) {
 		int range = 0;
 		int[] indexes = new int[from.length];
 		for(int i = 0; i < from.length; i++) {
-			if(from[i] <= pc && pc < to[i]) {
-				if(isAny) {
-					if(exception[i].equals("any")) {
-						indexes[range++] = i;
+			if(gotoStart) {
+				if(from[i] <= pc && pc <= to[i]) {
+					if(isAny) {
+						if(exception[i].equals("any"))   indexes[range++] = i;
+					} else {
+						if(! exception[i].equals("any")) indexes[range++] = i;
 					}
-				} else {
-					if(! exception[i].equals("any")) {
-						indexes[range++] = i;
-						
+				}
+			} else {
+				if(from[i] <= pc && pc < to[i]) {
+					if(isAny) {
+						if(exception[i].equals("any"))   indexes[range++] = i;
+					} else {
+						if(! exception[i].equals("any")) indexes[range++] = i;
 					}
 				}
 			}
 		}
-		return range != 0 ? Arrays.copyOf(indexes, range) : new int[0];
+		return (range != 0) ? Arrays.copyOf(indexes, range) : new int[0];
 	}
 }
