@@ -163,26 +163,26 @@ public class CFGBuilder {
 		}
 		return nodes;
 	}
-
-	private Set<CFNode> getChildren(CFNode node) {
-		Set<CFNode> set = new LinkedHashSet<>();
-		Deque<CFNode> queue = new ArrayDeque<>();
-		queue.push(node);
-		while(! queue.isEmpty()) {
-			CFNode n = queue.pop();
-			if(n.getType() == End) {
-				set.add(n);
-				break;
-			}
-			set.add(n);
-			for(CFEdge e : n.getChildren()) {
-				CFNode dest = e.getDest();
-				if(! set.contains(dest)) {
-					set.add(dest);
-					queue.push(dest);
-				}
-			}
-		}
-		return set;
-	}
+//
+//	private Set<CFNode> getChildren(CFNode node) {
+//		Set<CFNode> set = new LinkedHashSet<>();
+//		Deque<CFNode> queue = new ArrayDeque<>();
+//		queue.push(node);
+//		while(! queue.isEmpty()) {
+//			CFNode n = queue.pop();
+//			if(n.getType() == End) {
+//				set.add(n);
+//				break;
+//			}
+//			set.add(n);
+//			for(CFEdge e : n.getChildren()) {
+//				CFNode dest = e.getDest();
+//				if(! set.contains(dest)) {
+//					set.add(dest);
+//					queue.push(dest);
+//				}
+//			}
+//		}
+//		return set;
+//	}
 }
