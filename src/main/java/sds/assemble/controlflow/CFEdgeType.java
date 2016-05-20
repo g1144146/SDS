@@ -6,6 +6,7 @@ package sds.assemble.controlflow;
  */
 public enum CFEdgeType {
 	Normal,
-	JumpCatch,
-	JumpFinally;
+	JumpToCatch,
+	JumpToFinally,
+	JumpFromTry;
 }
