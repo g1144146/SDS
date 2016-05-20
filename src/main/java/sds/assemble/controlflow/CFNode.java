@@ -23,6 +23,7 @@ public class CFNode {
 	private int jumpPoint = -1;
 	private int[] switchJump = new int[0];
 	private int hash;
+	private String instStr;
 	// package-private fields.
 	CFNodeType nodeType;
 	boolean inTry      = false;
@@ -41,6 +42,12 @@ public class CFNode {
 		} else {
 			this.end = inst.getOpcodes().getAll()[size-1];
 		}
+		StringBuilder sb = new StringBuilder();
+		for(OpcodeInfo info : inst.getOpcodes().getAll()) {
+			sb.append(info.getOpcodeType()).append(" ");
+		}
+		this.instStr = sb.toString();
+		
 		
 		this.nodeType = CFNodeType.getType(inst.getOpcodes(), end);
 		if(nodeType == CFNodeType.Entry) { // if_xx
@@ -275,6 +282,7 @@ public class CFNode {
 		if(inTry)     sb.append("  in try\n");
 		if(isCatchEntry)   sb.append("  catch entry\n");
 		if(isFinallyEntry) sb.append("  finally entry\n");
+		sb.append("  opcodes: ").append(instStr).append("\n");
 		if(parents.size() == 1) {
 		 	sb.append("  immediate dominator: ").append(parents.iterator().next());
 		} else if(parents.size() > 1) {
