@@ -1,8 +1,8 @@
 package sds.assemble.controlflow;
 
 import static sds.assemble.controlflow.CFEdgeType.Normal;
-import static sds.assemble.controlflow.CFEdgeType.JumpCatch;
-import static sds.assemble.controlflow.CFEdgeType.JumpFinally;
+import static sds.assemble.controlflow.CFEdgeType.JumpToCatch;
+import static sds.assemble.controlflow.CFEdgeType.JumpToFinally;
 
 /**
  * This class is for edge of control flow graph.
