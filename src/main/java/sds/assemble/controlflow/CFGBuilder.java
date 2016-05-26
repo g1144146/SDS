@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import sds.assemble.ExceptionContent;
+import sds.assemble.MethodContent.ExceptionContent;
 import sds.assemble.LineInstructions;
 
 import static sds.assemble.controlflow.DominatorNodeSearcher.searchCommon;
