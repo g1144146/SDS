@@ -15,6 +15,7 @@ import sds.classfile.attributes.LineNumberTable;
 import sds.classfile.attributes.LocalVariableTable;
 import sds.classfile.attributes.LocalVariableTypeTable;
 import sds.classfile.attributes.MethodParameters;
+import sds.classfile.attributes.MethodParameters.Parameters;
 import sds.classfile.attributes.annotation.AnnotationDefault;
 import sds.classfile.attributes.annotation.RuntimeInvisibleParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleParameterAnnotations;
@@ -23,13 +24,14 @@ import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
 
 import static sds.util.Utf8ValueExtractor.extract;
+import static sds.util.AccessFlags.get;
 
 /**
  * This class is for contents of method.
  * @author inagaki
  */
 public class MethodContent extends MemberContent {
-	private String args;
+	private String[][] args;
 	private String[] exceptions;
 	private int maxStack;
 	private int maxLocals;
@@ -111,7 +113,7 @@ public class MethodContent extends MemberContent {
 							if(index < inst.length) {
 								inst[index].addOpcode(op);
 							} else {
-								// when end line of method has some instructions, 
+								// when end line of method has some instructions,
 								// it adds to end instruction in the line
 								// because the line doesn't have the instruction.
 								if(inst[index-1].getOpcodes().get(op.getPc()) == null) {
@@ -130,7 +132,12 @@ public class MethodContent extends MemberContent {
 				LocalVariableTypeTable lvtt = (LocalVariableTypeTable)info;
 				break;
 			case MethodParameters:
-				MethodParameters mp = (MethodParameters)info;
+				Parameters[] param = ((MethodParameters)info).getParams();
+				this.args = new String[param.length][2];
+				for(int i = 0; i < param.length; i++) {
+					args[i][0] = get(param[i].getAccessFlag(), "local");
+					args[i][1] = extract(pool.get(param[i].getNameIndex()-1), pool);
+				}
 				break;
 			case RuntimeInvisibleParameterAnnotations:
 				RuntimeInvisibleParameterAnnotations ripa
