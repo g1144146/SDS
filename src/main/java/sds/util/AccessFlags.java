@@ -102,6 +102,12 @@ public class AccessFlags {
 	 */
 	public static final int ACC_ENUM = 0x4000;
 	/**
+	 * hex of mandated
+	 * local_val
+	 * value: 32768
+	 */
+	public static final int ACC_MANDATED = 0x8000;
+	/**
 	 * access flags for class.
 	 */
 	public static final int CLASS_FLAG = ACC_PUBLIC | ACC_FINAL | ACC_SUPER
@@ -122,10 +128,14 @@ public class AccessFlags {
 	 */
 	public static final int NESTED_CLASS = ACC_PUBLIC | ACC_PRIVATE | ACC_PROTECTED | ACC_STATIC
 		| ACC_FINAL | ACC_INTERFACE | ACC_ABSTRACT | ACC_SYNTHETIC | ACC_ANNOTATION | ACC_ENUM;
+	/**
+	 * access flags for local variable.
+	 */
+	public static final int LOCAL_VAL = ACC_FINAL | ACC_SYNTHETIC | ACC_MANDATED;
 
 	/**
 	 * returns access flags.
-	 * @param accessFlag hex of access flag 
+	 * @param accessFlag hex of access flag
 	 * @param type type name
 	 * @return access flags
 	 */
@@ -138,6 +148,8 @@ public class AccessFlags {
 			return getMethodAccessFlag(accessFlag);
 		} else if(type.equals("nested") && (accessFlag | NESTED_CLASS) == NESTED_CLASS) {
 			return getClassAccessFlag(accessFlag);
+		} else if(type.equals("local") && (accessFlag | LOCAL_VAL) == LOCAL_VAL) {
+			return getLocalValAccessFlag(accessFlag);
 		}
 		System.out.println("unknown access flag : " + accessFlag);
 		System.out.println("type                : " + type);
@@ -188,6 +200,14 @@ public class AccessFlags {
 		if(checkFlag(accessFlag, ACC_ABSTRACT))       sb.append("abstract ");
 		if(checkFlag(accessFlag, ACC_STRICT))         sb.append("strict ");
 		if(checkFlag(accessFlag, ACC_SYNTHETIC))      sb.append("synthetic ");
+		return sb.toString();
+	}
+
+	private static String getLocalValAccessFlag(int accessFlag) {
+		StringBuilder sb = new StringBuilder("");
+		if(checkFlag(accessFlag, ACC_FINAL))     sb.append("final ");
+		if(checkFlag(accessFlag, ACC_SYNTHETIC)) sb.append("synthetic ");
+		if(checkFlag(accessFlag, ACC_MANDATED))  sb.append("mandated ");
 		return sb.toString();
 	}
 
