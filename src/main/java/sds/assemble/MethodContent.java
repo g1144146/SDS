@@ -23,8 +23,9 @@ import sds.classfile.attributes.stackmap.StackMapTable;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
 
-import static sds.util.Utf8ValueExtractor.extract;
 import static sds.util.AccessFlags.get;
+import static sds.util.DescriptorParser.parse;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This class is for contents of method.
@@ -38,6 +39,7 @@ public class MethodContent extends MemberContent {
 	private LineInstructions[] inst;
 	private Opcodes opcodes;
 	private ExceptionContent exContent;
+	private LocalVariableContent valContent;
 
 	/**
 	 * constructor.
@@ -127,10 +129,11 @@ public class MethodContent extends MemberContent {
 				break;
 			case LocalVariableTable:
 				LocalVariableTable lvt = (LocalVariableTable)info;
-
+				this.valContent = new LocalVariableContent(lvt.getTable(), pool);
 				break;
 			case LocalVariableTypeTable:
 				LocalVariableTypeTable lvtt = (LocalVariableTypeTable)info;
+				valContent.setType(lvtt.getTable(), pool);
 				break;
 			case MethodParameters:
 				Parameters[] param = ((MethodParameters)info).getParams();
@@ -166,8 +169,8 @@ public class MethodContent extends MemberContent {
 	public class ExceptionContent {
 		private int[] from, to, target;
 		private String[] exception;
-		
-		public ExceptionContent(ExceptionTable[] table, String[] exception) {
+
+		ExceptionContent(ExceptionTable[] table, String[] exception) {
 			this.from   = new int[table.length];
 			this.to     = new int[table.length];
 			this.target = new int[table.length];
@@ -178,7 +181,7 @@ public class MethodContent extends MemberContent {
 			}
 			this.exception = exception;
 		}
-		
+
 		/**
 		 * returns from-indexes into code array.
 		 * @return from-indexes
@@ -186,7 +189,7 @@ public class MethodContent extends MemberContent {
 		public int[] getFrom() {
 			return from;
 		}
-		
+
 		/**
 		 * returns to-indexes into code array.
 		 * @return to-indexes
@@ -194,7 +197,7 @@ public class MethodContent extends MemberContent {
 		public int[] getTo() {
 			return to;
 		}
-		
+
 		/**
 		 * returns target indexes into code array.
 		 * @return target indexes
@@ -202,7 +205,7 @@ public class MethodContent extends MemberContent {
 		public int[] getTarget() {
 			return target;
 		}
-		
+
 		/**
 		 * returns exception class names.
 		 * @return exception class names
@@ -210,7 +213,7 @@ public class MethodContent extends MemberContent {
 		public String[] getException() {
 			return exception;
 		}
-		
+
 		/**
 		 * returns array indexes which specified pc is
 		 * in range between from_index and to_index (or to_index-1).<br>
@@ -250,6 +253,123 @@ public class MethodContent extends MemberContent {
 	 * This class is for local variables in method.
 	 */
 	public class LocalVariableContent {
-		
+		private int[][] range;
+		private String[][] variable;
+		private int[] index;
+		private boolean hasValType;
+
+		LocalVariableContent(LocalVariableTable.LVTable[] table, ConstantPool pool) {
+			this.range = new int[table.length][2];
+			this.variable = new String[table.length][2];
+			this.index = new int[table.length];
+			this.hasValType = false;
+			int i = 0;
+			for(LocalVariableTable.LVTable t: table) {
+				range[i][0] = t.getNumber("start_pc");
+				range[i][1] = t.getNumber("length") + range[i][0];
+				variable[i][0] = extract(pool.get(t.getNumber("name_index")-1), pool);
+				variable[i][1] = extract(pool.get(t.getNumber("descriptor")-1), pool);
+				index[i] = t.getNumber("index");
+				i++;
+			}
+		}
+
+		void setType(LocalVariableTypeTable.LVTable[] table, ConstantPool pool) {
+			this.hasValType = true;
+			for(LocalVariableTypeTable.LVTable t : table) {
+				int lvIndex = t.getNumber("index");
+				for(int i = 0; i < index.length; i++) {
+					if(lvIndex == index[i]) {
+						String desc = extract(pool.get(t.getNumber("descriptor")-1), pool);
+						String genericsType = desc.substring(desc.indexOf("<")+1, desc.indexOf(">"));
+						variable[i][1] += "," + parse(genericsType);
+						break;
+					}
+				}
+			}
+		}
+
+		/**
+		 * returns valid ranges of variable.
+		 * @return 
+		 */
+		public int[][] getRanges() {
+			return range;
+		}
+
+		/**
+		 * returns valid range of variable.
+		 * @param index 
+		 * @return 
+		 */
+		public int[] getRange(int index) {
+			for(int i = 0; i < this.index.length; i++) {
+				if(index == this.index[i]) {
+					return range[i];
+				}
+			}
+			throw new NotFoundSpecifiedIndex(index);
+		}
+
+		/**
+		 * returns variables.
+		 * @return 
+		 */
+		public String[][] getVariables() {
+			return variable;
+		}
+
+		/**
+		 * returns variable of specified index.
+		 * @param index index
+		 * @return variable
+		 */
+		public String[] getVariable(int index) {
+			for(int i = 0; i < this.index.length; i++) {
+				if(index == this.index[i]) {
+					return variable[i];
+				}
+			}
+			throw new NotFoundSpecifiedIndex(index);
+		}
+
+		/**
+		 * returns variable indexes.
+		 * @return variable indexes
+		 */
+		public int[] getIndexes() {
+			return index;
+		}
+
+		/**
+		 * returns variable index of specified index.
+		 * @param index index
+		 * @return variable index
+		 */
+		public int getIndex(int index) {
+			for(int i = 0; i < this.index.length; i++) {
+				if(index == this.index[i]) {
+					return this.index[i];
+				}
+			}
+			throw new NotFoundSpecifiedIndex(index);
+		}
+
+		/**
+		 * return whether the method has
+		 * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.14">
+		 * LocalVariableTypeTable Attribute</a>.
+		 * @return if the method has the attribute, this method returns true.<br>
+		 * Otherwise, it returns false.
+		 */
+		public boolean hasValType() {
+			return hasValType;
+		}
+
+		class NotFoundSpecifiedIndex extends RuntimeException {
+			NotFoundSpecifiedIndex(int index) {
+				super("not found the specified index: " + index);
+			}
+		}
 	}
 }
