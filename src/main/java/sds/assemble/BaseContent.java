@@ -61,7 +61,7 @@ public abstract class BaseContent {
 			case Signature:
 				Signature sig = (Signature)info;
 				String signature = extract(pool.get(sig.getSignatureIndex()-1), pool);
-				signature = signature.substring(signature.indexOf("<"), signature.indexOf(">"));
+				signature = signature.substring(signature.indexOf("<")+1, signature.indexOf(">"));
 				String key = null, value = null;
 				for(String s : signature.split(":")) {
 					if(s.length() != 0) {
