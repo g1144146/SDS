@@ -38,7 +38,7 @@ public class DescriptorParser {
 		StringBuilder pattern = new StringBuilder();
 		pattern.append(obj).append("|").append(primPattern).append("|")
 				.append(gen).append("|").append(colon).append("|").append(wildcard)
-				.append("|").append(diamondOperator).append("|(;)");
+				.append("|").append(diamondOperator).append("|([A-Z])|(;)");
 		desc = desc.replace("/", ".").replace(";>", ">").replace(";)", ")");
 		Matcher m = Pattern.compile(pattern.toString()).matcher(desc);
 		StringBuilder sb = new StringBuilder();
