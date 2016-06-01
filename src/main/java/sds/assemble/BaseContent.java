@@ -10,6 +10,8 @@ import sds.classfile.attributes.annotation.RuntimeInvisibleAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
+
+import static sds.util.DescriptorParser.parse;
 import static sds.util.Utf8ValueExtractor.extract;
 
 /**
@@ -60,20 +62,12 @@ public abstract class BaseContent {
 				break;
 			case Signature:
 				Signature sig = (Signature)info;
-				String signature = extract(pool.get(sig.getSignatureIndex()-1), pool);
-				signature = signature.substring(signature.indexOf("<")+1, signature.indexOf(">"));
-				String key = null, value = null;
-				for(String s : signature.split(":")) {
-					if(s.length() != 0) {
-						if(key == null) {
-							key = s;
-						} else if(value == null) {
-							value = s;
-							break;
-						}
-					}
+				String parsedSig = parse(extract(pool.get(sig.getSignatureIndex()-1), pool), true);
+				String genericsType = parsedSig.substring(1, parsedSig.indexOf(")")-1);
+				for(String type : genericsType.split(",")) {
+					String[] typeAndExtends = type.split(" extends ");
+					genericsMap.put(typeAndExtends[0], typeAndExtends[1]);
 				}
-				genericsMap.put(key, value);
 				break;
 			case Synthetic: break;
 			default:        break;

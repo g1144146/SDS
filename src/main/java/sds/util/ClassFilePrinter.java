@@ -479,7 +479,10 @@ public class ClassFilePrinter {
 				break;
 			case Signature:
 				Signature sig = (Signature)info;
-				out.println("     " + extract(pool.get(sig.getSignatureIndex()-1), pool));
+				String parsedSig = parse(extract(pool.get(sig.getSignatureIndex()-1), pool), true);
+				String genericsType = parsedSig.substring(0, parsedSig.indexOf(">") + 1);
+				String returnType = parse(parsedSig.substring(parsedSig.indexOf("(")));
+				out.println("     " + genericsType + returnType);
 				break;
 			case SourceDebugExtension:
 				SourceDebugExtension sde = (SourceDebugExtension)info;
