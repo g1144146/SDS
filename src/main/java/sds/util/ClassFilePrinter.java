@@ -9,6 +9,7 @@ import sds.classfile.Fields;
 import sds.classfile.Methods;
 import sds.classfile.MemberInfo;
 import sds.classfile.attributes.AttributeInfo;
+import sds.classfile.attributes.AttributeType;
 import sds.classfile.attributes.BootstrapMethods;
 import sds.classfile.attributes.Code;
 import sds.classfile.attributes.ConstantValue;
@@ -186,7 +187,14 @@ public class ClassFilePrinter {
 			out.println(i+1 + ". " + get(field.getAccessFlags(), "field") + extract(field, pool));
 			Attributes attr = field.getAttr();
 			for(int j = 0; j < attr.size(); j++) {
-				printAttributeInfo(attr.get(j));
+				AttributeInfo info = attr.get(j);
+				if(info.getType() != AttributeType.Signature) {
+					printAttributeInfo(attr.get(j));
+				} else {
+					out.println("  " + info.getType().toString());
+					Signature sig = (Signature)info;
+					out.println("     " + extract(pool.get(sig.getSignatureIndex()-1), pool));
+				}
 			}
 			out.print(sep);
 		}
@@ -479,9 +487,9 @@ public class ClassFilePrinter {
 				break;
 			case Signature:
 				Signature sig = (Signature)info;
-				String parsedSig = parse(extract(pool.get(sig.getSignatureIndex()-1), pool), true);
-				String genericsType = parsedSig.substring(0, parsedSig.indexOf(">") + 1);
-				String returnType = parse(parsedSig.substring(parsedSig.indexOf("(")));
+				String desc = extract(pool.get(sig.getSignatureIndex()-1), pool);
+				String genericsType = parse(desc.substring(0, desc.lastIndexOf(">") + 1), true);
+				String returnType = parse(desc.substring(desc.lastIndexOf(">") + 1));
 				out.println("     " + genericsType + returnType);
 				break;
 			case SourceDebugExtension:

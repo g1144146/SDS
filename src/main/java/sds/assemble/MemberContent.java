@@ -17,10 +17,11 @@ public abstract class MemberContent extends BaseContent {
 	private String desc;
 	private String name;
 
-	MemberContent(MemberInfo info, ConstantPool pool) {
+	MemberContent(MemberInfo info, ConstantPool pool, Type contentType) {
 		this.accessFlag = get(info.getAccessFlags(), info.getType());
 		this.desc = extract(pool.get(info.getDescriptorIndex()-1), pool);
 		this.name = extract(pool.get(info.getNameIndex()-1), pool);
+		this.contentType = contentType;
 	}
 
 	/**

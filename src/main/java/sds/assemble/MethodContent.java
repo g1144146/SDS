@@ -47,7 +47,7 @@ public class MethodContent extends MemberContent {
 	 * @param pool constant-pool
 	 */
 	public MethodContent(MemberInfo info, ConstantPool pool) {
-		super(info, pool);
+		super(info, pool, Type.Method);
 		System.out.println(this.getName());
 		for(AttributeInfo attr : info.getAttr().getAll()) {
 			investigateAttribute(attr, pool);

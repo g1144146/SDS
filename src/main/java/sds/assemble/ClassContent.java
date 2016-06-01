@@ -26,6 +26,7 @@ public class ClassContent extends BaseContent {
 	 * @param cf classfile
 	 */
 	public ClassContent(ClassFile cf) {
+		this.contentType = Type.Class;
 		Methods method = cf.getMethods();
 		this.methods = new MethodContent[method.size()];
 		for(int i = 0; i < methods.length; i++) {
@@ -42,8 +43,8 @@ public class ClassContent extends BaseContent {
 		for(AttributeInfo info : cf.getAttr().getAll()) {
 			if(info instanceof InnerClasses) {
 				ic = (InnerClasses)info;
-				break;
 			}
+//			investigateAttribute(info, cf.getPool());
 		}
 		if(ic != null) {
 			this.nested = new NestedClass[ic.getClasses().length];

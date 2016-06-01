@@ -24,6 +24,13 @@ import static sds.util.Utf8ValueExtractor.extract;
 public abstract class BaseContent {
 	private boolean hasAnnotation;
 	private Map<String, String> genericsMap = new HashMap<>();
+	Type contentType;
+	public static enum Type {
+		Class,
+		Nested,
+		Method,
+		Field;
+	}
 
 	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
 		switch(info.getType()) {
@@ -61,12 +68,16 @@ public abstract class BaseContent {
 //				}
 				break;
 			case Signature:
-				Signature sig = (Signature)info;
-				String parsedSig = parse(extract(pool.get(sig.getSignatureIndex()-1), pool), true);
-				String genericsType = parsedSig.substring(1, parsedSig.indexOf(")")-1);
-				for(String type : genericsType.split(",")) {
-					String[] typeAndExtends = type.split(" extends ");
-					genericsMap.put(typeAndExtends[0], typeAndExtends[1]);
+				if(contentType != Type.Field) {
+					Signature sig = (Signature)info;
+					String desc = extract(pool.get(sig.getSignatureIndex()-1), pool);
+					System.out.println(desc);
+					String parsedSig = parse(desc, true);
+					String genericsType = parsedSig.substring(1, parsedSig.lastIndexOf(">"));
+					for(String type : genericsType.split(",")) {
+						String[] typeAndExtends = type.split(" extends ");
+						genericsMap.put(typeAndExtends[0], typeAndExtends[1]);
+					}
 				}
 				break;
 			case Synthetic: break;
