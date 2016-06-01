@@ -52,6 +52,11 @@ public class MethodContent extends MemberContent {
 		for(AttributeInfo attr : info.getAttr().getAll()) {
 			investigateAttribute(attr, pool);
 		}
+		if(valContent != null) {
+			System.out.println("index    : " + Arrays.toString(valContent.index));
+			System.out.println("ranges   : " + Arrays.deepToString(valContent.range));
+			System.out.println("variables: " + Arrays.deepToString(valContent.variable));
+		}
 		CFGBuilder builder = CFGBuilder.getInstance();
 		CFNode[] nodes = builder.build(inst, exContent);
 		for(CFNode n : nodes) {
@@ -160,7 +165,7 @@ public class MethodContent extends MemberContent {
 		}
 	}
 
-	
+
 	/***** Nested Classes *****/
 
 	/**
@@ -268,7 +273,7 @@ public class MethodContent extends MemberContent {
 				range[i][0] = t.getNumber("start_pc");
 				range[i][1] = t.getNumber("length") + range[i][0];
 				variable[i][0] = extract(pool.get(t.getNumber("name_index")-1), pool);
-				variable[i][1] = extract(pool.get(t.getNumber("descriptor")-1), pool);
+				variable[i][1] = parse(extract(pool.get(t.getNumber("descriptor")-1), pool));
 				index[i] = t.getNumber("index");
 				i++;
 			}
@@ -281,8 +286,8 @@ public class MethodContent extends MemberContent {
 				for(int i = 0; i < index.length; i++) {
 					if(lvIndex == index[i]) {
 						String desc = extract(pool.get(t.getNumber("descriptor")-1), pool);
-						String genericsType = desc.substring(desc.indexOf("<")+1, desc.indexOf(">"));
-						variable[i][1] += "," + parse(genericsType);
+						String valType = parse(desc);
+						variable[i][1] += valType.substring(valType.indexOf("<"));
 						break;
 					}
 				}
@@ -290,8 +295,11 @@ public class MethodContent extends MemberContent {
 		}
 
 		/**
-		 * returns valid ranges of variable.
-		 * @return 
+		 * returns valid ranges of variable.<br>
+		 * returned array: int[variable_count][2]<br>
+		 * int[variable_count][0]: start pc<br>
+		 * int[variable_count][1]: end pc
+		 * @return ranges
 		 */
 		public int[][] getRanges() {
 			return range;
@@ -299,8 +307,8 @@ public class MethodContent extends MemberContent {
 
 		/**
 		 * returns valid range of variable.
-		 * @param index 
-		 * @return 
+		 * @param index
+		 * @return range
 		 */
 		public int[] getRange(int index) {
 			for(int i = 0; i < this.index.length; i++) {
@@ -312,8 +320,11 @@ public class MethodContent extends MemberContent {
 		}
 
 		/**
-		 * returns variables.
-		 * @return 
+		 * returns variables.<br>
+		 * returned array: String[variable_count][2]<br>
+		 * String[variable_count][0]: variable name<br>
+		 * String[variable_count][1]: variable descriptor
+		 * @return variables
 		 */
 		public String[][] getVariables() {
 			return variable;
