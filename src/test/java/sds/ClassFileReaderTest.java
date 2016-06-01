@@ -122,7 +122,7 @@ public class ClassFileReaderTest {
 		MemberInfo method = cfAnnotation.methods.get(1);
 		{
 			assertThat(get(method.getAccessFlags(), "method"), is("public "));
-			assertThat(extract(method, pool), is("(int,)void method"));
+			assertThat(extract(method, pool), is("(int)void method"));
 			// code attribute in method.
 			Code code = (Code)method.getAttr().get(0);
 			{ // attributes in code attribute and opcodes.
@@ -281,10 +281,10 @@ public class ClassFileReaderTest {
 						+ ",java.lang.invoke.MethodType"
 						+ ",java.lang.invoke.MethodType"
 						+ ",java.lang.invoke.MethodHandle"
-						+ ",java.lang.invoke.MethodType,)"
+						+ ",java.lang.invoke.MethodType)"
 					+ "java.lang.invoke.CallSite"));
-		assertThat(extract(pool.get(bsm[0].getBSMArgs()[0]-1), pool), is("(java.lang.Object,)void"));
+		assertThat(extract(pool.get(bsm[0].getBSMArgs()[0]-1), pool), is("(java.lang.Object)void"));
 		assertThat(extract(pool.get(bsm[0].getBSMArgs()[1]-1), pool)
-				, is("sds.AnnotatedTest.lambda$method$0(java.lang.Object,)void"));
+				, is("sds.AnnotatedTest.lambda$method$0(java.lang.Object)void"));
 	}
 }
