@@ -1,7 +1,7 @@
 package sds.util;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,17 +14,33 @@ public class DescriptorParser {
 
 	/**
 	 * returns parsed descriptor.
-	 * @param desc descriptor
-	 * @return parsed descriptor
+	 * @param desc
+	 * @return 
 	 */
 	public static String parse(String desc) {
-		String primPattern = "(B|\\[B|C|\\[C|D|\\[D|F|\\[F|V|I|\\[I"
-								+ "|J|\\[J|S|\\[S|Z|\\[Z|\\(|\\))";
-		String genericsPattern = "T[A-Z]";
-		desc = desc.replace("/", ".");
+		return parse(desc, false);
+	}
+
+	/**
+	 * returns parsed descriptor.
+	 * @param desc descriptor
+	 * @param isAttribute whether descriptor of attribute
+	 * @return parsed descriptor
+	 */
+	public static String parse(String desc, boolean isAttribute) {
 		String obj = "(" + objPattern + "|\\[" + objPattern + ")";
+		String primPattern = "(B|\\[B|C|\\[C|D|\\[D|F|\\[F|V|I|\\[I|J|\\[J|S|\\[S|Z|\\[Z|\\(|\\))";
+		String genericsPattern = "T[A-Z]";
 		String gen = "(" + genericsPattern + "|\\[" + genericsPattern + ")";
-		Matcher m = Pattern.compile(obj + "|" + primPattern + "|" + gen).matcher(desc);
+		String colon = "(;:|::|:)"; // for Signature Attribute
+		String wildcard = "(\\+|\\*)";
+		String diamondOperator = "(<|>)";
+		StringBuilder pattern = new StringBuilder();
+		pattern.append(obj).append("|").append(primPattern).append("|")
+				.append(gen).append("|").append(colon).append("|").append(wildcard)
+				.append("|").append(diamondOperator).append("|([A-Z])|(;)");
+		desc = desc.replace("/", ".").replace(";>", ">").replace(";)", ")");
+		Matcher m = Pattern.compile(pattern.toString()).matcher(desc);
 		StringBuilder sb = new StringBuilder();
 		while(m.find()) {
 			String s = m.group();
@@ -34,21 +50,30 @@ public class DescriptorParser {
 				} else { // object or generics array
 					sb.append(s.subSequence(2, s.length())).append("[]");
 				}
-			} else if(s.startsWith("L") || s.startsWith("T")) { // object or generics
+			} else if(s.startsWith("L") || s.matches("T[A-Z]+")) { // object or generics
 				sb.append(s.subSequence(1, s.length()));
-			} else if(s.equals("V")) { // void
-				sb.append(parseType(s));
-			} else if(!parseType(s).equals("")) { // primitive
-				sb.append(parseType(s));
-			} else if(s.matches("\\(|\\)")) {
+			} else if(s.matches("\\(|\\)|<|>")) { // parentheses and diamond operator
 				sb.append(s);
-				continue;
-			} else {
-				continue;
+			} else if(s.equals(";:")) { // generics contains some extended interfaces
+				sb.append(" & ");
+			} else if(s.matches("::|:")) { // generics contains extended class or interface
+				sb.append(" extends ");
+			} else if(s.equals("*")) { // wildcard
+				sb.append("?");
+			} else if(s.equals("+")) { // wildcard contains extended class
+				sb.append("? extends ");
+			} else if(s.equals(";")) { // separator
+				sb.append(",");
+			} else if(isAttribute && s.matches("[A-Z]")) { // generics type on Signature
+				sb.append(s);
+			} else if(!parseType(s).equals("")) { // primitive or void
+				sb.append(parseType(s));
 			}
-			sb.append(",");
 		}
-		return sb.toString().substring(0, sb.toString().length()-1);
+		String parsed = sb.toString().substring(0, sb.toString().length());
+		if(parsed.endsWith(","))  parsed =  parsed.substring(0, parsed.length()-1);
+		if(parsed.contains(",)")) parsed = parsed.replace(",)", ")");
+		return parsed;
 	}
 
 	/**
@@ -74,17 +99,15 @@ public class DescriptorParser {
 
 	private static String parseType(String head) {
 		switch(head) {
-			case "B": return "byte";
-			case "C": return "char";
-			case "D": return "double";
-			case "F": return "float";
-			case "I": return "int";
-			case "J": return "long";
-			case "S": return "short";
-			case "Z": return "boolean";
+			case "B": return "byte,";
+			case "C": return "char,";
+			case "D": return "double,";
+			case "F": return "float,";
+			case "I": return "int,";
+			case "J": return "long,";
+			case "S": return "short,";
+			case "Z": return "boolean,";
 			case "V": return "void";
-			case "(":
-			case ")": return "";
 			default :
 				System.out.println(">>> unknown type \""+head+"\".");
 				return "";
