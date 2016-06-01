@@ -9,6 +9,7 @@ import sds.classfile.Fields;
 import sds.classfile.Methods;
 import sds.classfile.MemberInfo;
 import sds.classfile.attributes.AttributeInfo;
+import sds.classfile.attributes.AttributeType;
 import sds.classfile.attributes.BootstrapMethods;
 import sds.classfile.attributes.Code;
 import sds.classfile.attributes.ConstantValue;
@@ -121,7 +122,7 @@ public class ClassFilePrinter {
 	 */
 	public void printAccessFlag(int accessFlag) {
 		out.println("*** Access Flag *** ");
-		out.println(get(accessFlag, "class"));
+		out.println(AccessFlags.get(accessFlag, "class"));
 		out.print(sep);
 	}
 
@@ -186,7 +187,14 @@ public class ClassFilePrinter {
 			out.println(i+1 + ". " + get(field.getAccessFlags(), "field") + extract(field, pool));
 			Attributes attr = field.getAttr();
 			for(int j = 0; j < attr.size(); j++) {
-				printAttributeInfo(attr.get(j));
+				AttributeInfo info = attr.get(j);
+				if(info.getType() != AttributeType.Signature) {
+					printAttributeInfo(attr.get(j));
+				} else {
+					out.println("  " + info.getType().toString());
+					Signature sig = (Signature)info;
+					out.println("     " + extract(pool.get(sig.getSignatureIndex()-1), pool));
+				}
 			}
 			out.print(sep);
 		}
@@ -205,7 +213,7 @@ public class ClassFilePrinter {
 		}
 		for(int i = 0; i < methods.size(); i++) {
 			MemberInfo method = methods.get(i);
-			out.println(i+1 + ". "+get(method.getAccessFlags(), "method") + extract(method, pool));
+			out.println(i+1 + ". " + get(method.getAccessFlags(), "method") + extract(method, pool));
 			Attributes attr = method.getAttr();
 			for(int j = 0; j < attr.size(); j++) {
 				printAttributeInfo(attr.get(j));
@@ -318,8 +326,7 @@ public class ClassFilePrinter {
 								+ "-" + t.getNumber("end_pc"));
 					out.print(", handler: " + t.getNumber("handler_pc"));
 					if(checkRange(t.getNumber("catch_type")-1))
-						out.println(", catch_type: "
-								+ extract(pool.get(t.getNumber("catch_type")-1), pool));
+						out.println(", catch_type: " + extract(pool.get(t.getNumber("catch_type")-1), pool));
 					else
 						out.print(sep);
 					codeIndex++;
@@ -331,7 +338,7 @@ public class ClassFilePrinter {
 			case ConstantValue:
 				ConstantValue cv = (ConstantValue)info;
 				int index = cv.getConstantValueIndex();
-				out.println("     "+extract(pool.get(index-1), pool));
+				out.println("     " + extract(pool.get(index-1), pool));
 				break;
 			case Deprecated:
 				// do nothing.
@@ -373,8 +380,8 @@ public class ClassFilePrinter {
 				LineNumberTable lnt = (LineNumberTable)info;
 				int lineIndex = 1;
 				for(LineNumberTable.LNTable t : lnt.getLineNumberTable()) {
-					out.println("     " + lineIndex + ". "
-							+"start_pc: " + t.getStartPc() + ", line_number: " + t.getLineNumber());
+					out.println("     " + lineIndex + ". start_pc: " + t.getStartPc()
+							+ ", line_number: " + t.getLineNumber());
 					lineIndex++;
 				}
 				break;
@@ -382,8 +389,7 @@ public class ClassFilePrinter {
 				LocalVariableTable lvt = (LocalVariableTable)info;
 				int localIndex = 1;
 				for(LocalVariable.LVTable t : lvt.getTable()) {
-					out.print("     " + localIndex + ". "
-							+ "pc: " + t.getNumber("start_pc")
+					out.print("     " + localIndex + ". pc: " + t.getNumber("start_pc")
 							+ "-" + (t.getNumber("start_pc")+t.getNumber("length")-1));
 					out.print(", name: " + extract(pool.get(t.getNumber("name_index")-1), pool));
 					out.print(", index : " + t.getNumber("index"));
@@ -395,8 +401,7 @@ public class ClassFilePrinter {
 				LocalVariableTypeTable lvtt = (LocalVariableTypeTable)info;
 				int varIndex = 1;
 				for(LocalVariable.LVTable t : lvtt.getTable()) {
-					out.print("     "+ varIndex + ". "
-							+ "pc: " + t.getNumber("start_pc")
+					out.print("     "+ varIndex + ". pc: " + t.getNumber("start_pc")
 							+ "-" + (t.getNumber("start_pc")+t.getNumber("length")-1));
 					out.print(", name: " + extract(pool.get(t.getNumber("name_index")-1), pool));
 					out.println(", index: " + t.getNumber("index"));
@@ -409,7 +414,8 @@ public class ClassFilePrinter {
 				int methodIndex = 1;
 				for(MethodParameters.Parameters p : mp.getParams()) {
 					String flag = get(p.getAccessFlag(), "method");
-					out.println("   " + methodIndex + ". " + flag + extract(pool.get(p.getNameIndex()-1), pool));
+					out.println("   " + methodIndex + ". " + flag
+							+ extract(pool.get(p.getNameIndex()-1), pool));
 					methodIndex++;
 				}
 				break;
@@ -481,9 +487,9 @@ public class ClassFilePrinter {
 				break;
 			case Signature:
 				Signature sig = (Signature)info;
-				String parsedSig = parse(extract(pool.get(sig.getSignatureIndex()-1), pool), true);
-				String genericsType = parsedSig.substring(0, parsedSig.indexOf(">") + 1);
-				String returnType = parse(parsedSig.substring(parsedSig.indexOf("(")));
+				String desc = extract(pool.get(sig.getSignatureIndex()-1), pool);
+				String genericsType = parse(desc.substring(0, desc.lastIndexOf(">") + 1), true);
+				String returnType = parse(desc.substring(desc.lastIndexOf(">") + 1));
 				out.println("     " + genericsType + returnType);
 				break;
 			case SourceDebugExtension:
@@ -516,8 +522,7 @@ public class ClassFilePrinter {
 	}
 
 	private void printElementValuePair(ElementValuePair e) {
-		out.println("       element_name: "
-				+ extract(pool.get(e.getElementNameIndex()-1), pool));
+		out.println("       element_name: " + extract(pool.get(e.getElementNameIndex()-1), pool));
 		printElementValue(e.getValue());
 	}
 
@@ -554,7 +559,7 @@ public class ClassFilePrinter {
 	}
 
 	private void printAnnotation(Annotation annotation) {
-		out.println("       type_name : "+ parse(extract(pool.get(annotation.getTypeIndex()-1), pool)));
+		out.println("       type_name : " + parse(extract(pool.get(annotation.getTypeIndex()-1), pool)));
 		for(ElementValuePair evp : annotation.getElementValuePairs()) {
 			printElementValuePair(evp);
 		}
@@ -618,7 +623,8 @@ public class ClassFilePrinter {
 				ObjectVariableInfo ovi = (ObjectVariableInfo)info;
 				sb.append("            cpool_index: ").append(ovi.getCPoolIndex());
 				sb.append(", value: ")
-					.append(extract(pool.get(ovi.getCPoolIndex()-1), pool)).append(sep);
+					.append(extract(pool.get(ovi.getCPoolIndex()-1), pool))
+					.append(sep);
 				break;
 			case UninitializedVariableInfo:
 				UninitializedVariableInfo uvi = (UninitializedVariableInfo)info;
@@ -667,16 +673,16 @@ public class ClassFilePrinter {
 				break;
 			case CatchTarget:
 				CatchTarget ct = (CatchTarget)info;
-				out.println("       index: " + ct.getIndex());
+				out.println("       index: "+ct.getIndex());
 				break;
 			case OffsetTarget:
 				OffsetTarget ot = (OffsetTarget) info;
-				out.println("       offset: " + ot.getOffset());
+				out.println("       offset: "+ot.getOffset());
 				break;
 			case TypeArgumentTarget:
 				TypeArgumentTarget tat = (TypeArgumentTarget)info;
 				out.print("          index: "+tat.getIndex());
-				out.println(", offset: " + tat.getOffset());
+				out.println(", offset: "+tat.getOffset());
 				break;
 			default:
 				System.out.println("unknown target-info type: " + info.getType());
