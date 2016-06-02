@@ -292,8 +292,11 @@ public class MethodContent extends MemberContent {
 					if(lvIndex == index[i]) {
 						String desc = extract(pool.get(t.getNumber("descriptor")-1), pool);
 						String valType = parse(desc);
-						System.out.println(desc + " || " + valType);
-						variable[i][1] += valType.substring(valType.indexOf("<"));
+						if(valType.contains("<")) {
+							variable[i][1] += valType.substring(valType.indexOf("<"));
+						} else {
+							variable[i][1] = valType;
+						}
 						break;
 					}
 				}
