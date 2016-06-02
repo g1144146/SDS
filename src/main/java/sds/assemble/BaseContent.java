@@ -89,7 +89,7 @@ public abstract class BaseContent {
 	 * return generics map.
 	 * @return map
 	 */
-	public Map<String, String> geGenericsMap() {
+	public Map<String, String> getGenericsMap() {
 		return genericsMap;
 	}
 }
