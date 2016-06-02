@@ -16,7 +16,9 @@ import sds.classfile.attributes.LocalVariableTable;
 import sds.classfile.attributes.LocalVariableTypeTable;
 import sds.classfile.attributes.MethodParameters;
 import sds.classfile.attributes.MethodParameters.Parameters;
+import sds.classfile.attributes.annotation.Annotation;
 import sds.classfile.attributes.annotation.AnnotationDefault;
+import sds.classfile.attributes.annotation.ParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleParameterAnnotations;
 import sds.classfile.attributes.stackmap.StackMapTable;
@@ -40,6 +42,7 @@ public class MethodContent extends MemberContent {
 	private Opcodes opcodes;
 	private ExceptionContent exContent;
 	private LocalVariableContent valContent;
+	private ParamAnnotationContent paContent;
 
 	/**
 	 * constructor.
@@ -155,6 +158,8 @@ public class MethodContent extends MemberContent {
 			case RuntimeVisibleParameterAnnotations:
 				RuntimeVisibleParameterAnnotations rvpa
 					= (RuntimeVisibleParameterAnnotations)info;
+				ParameterAnnotations[] pa = rvpa.getParamAnnotations();
+				this.paContent = new ParamAnnotationContent(pa);
 				break;
 			case StackMapTable:
 				StackMapTable smt = (StackMapTable)info;
@@ -287,6 +292,7 @@ public class MethodContent extends MemberContent {
 					if(lvIndex == index[i]) {
 						String desc = extract(pool.get(t.getNumber("descriptor")-1), pool);
 						String valType = parse(desc);
+						System.out.println(desc + " || " + valType);
 						variable[i][1] += valType.substring(valType.indexOf("<"));
 						break;
 					}
@@ -380,6 +386,16 @@ public class MethodContent extends MemberContent {
 		class NotFoundSpecifiedIndex extends RuntimeException {
 			NotFoundSpecifiedIndex(int index) {
 				super("not found the specified index: " + index);
+			}
+		}
+	}
+
+	public class ParamAnnotationContent {
+		ParamAnnotationContent(ParameterAnnotations[] pa) {
+			for(ParameterAnnotations p : pa) {
+				for(Annotation a : p.getAnnotations()) {
+//					a.
+				}
 			}
 		}
 	}
