@@ -18,6 +18,10 @@ import sds.classfile.attributes.MethodParameters;
 import sds.classfile.attributes.MethodParameters.Parameters;
 import sds.classfile.attributes.annotation.Annotation;
 import sds.classfile.attributes.annotation.AnnotationDefault;
+import sds.classfile.attributes.annotation.ElementValue;
+import sds.classfile.attributes.annotation.ElementValueException;
+import sds.classfile.attributes.annotation.ElementValuePair;
+import sds.classfile.attributes.annotation.EnumConstValue;
 import sds.classfile.attributes.annotation.ParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleParameterAnnotations;
@@ -159,7 +163,9 @@ public class MethodContent extends MemberContent {
 				RuntimeVisibleParameterAnnotations rvpa
 					= (RuntimeVisibleParameterAnnotations)info;
 				ParameterAnnotations[] pa = rvpa.getParamAnnotations();
-				this.paContent = new ParamAnnotationContent(pa);
+				this.paContent = new ParamAnnotationContent(pa, pool);
+				for(String[] a : paContent.annotations)
+					System.out.println(Arrays.toString(a));
 				break;
 			case StackMapTable:
 				StackMapTable smt = (StackMapTable)info;
@@ -393,13 +399,112 @@ public class MethodContent extends MemberContent {
 		}
 	}
 
+	/**
+	 * This class is for annotations of method parameters.
+	 */
 	public class ParamAnnotationContent {
-		ParamAnnotationContent(ParameterAnnotations[] pa) {
-			for(ParameterAnnotations p : pa) {
-				for(Annotation a : p.getAnnotations()) {
-//					a.
+		private String[][] annotations;
+
+		ParamAnnotationContent(ParameterAnnotations[] pa, ConstantPool pool) {
+			this.annotations = new String[pa.length][1];
+			StringBuilder sb = new StringBuilder();
+			try {
+				for(int i = 0; i < pa.length; i++) {
+					for(Annotation a : pa[i].getAnnotations()) {
+						sb.append(parseAnnotationContent(a, new StringBuilder(), pool));
 				}
+					annotations[i][0] = sb.toString();
+					sb = new StringBuilder();
 			}
+			} catch(ElementValueException e) {
+				e.printStackTrace();
+		}
+	}
+
+		/**
+		 * returns annotations.
+		 * @return annotations
+		 */
+		public String[][] getAnnotations() {
+			return annotations;
+}
+
+		/**
+		 * returns annotation of specified array index.
+		 * @param index array index
+		 * @return annotation
+		 */
+		public String[] getAnnotations(int index) {
+			if(0 <= index && index <= annotations.length) {
+				return annotations[index];
+			}
+			throw new ArrayIndexOutOfBoundsException(index);
+		}
+
+		private String parseAnnotationContent(Annotation a, StringBuilder sb, ConstantPool pool)
+		throws ElementValueException {
+			sb.append("@").append(parse(extract(pool.get(a.getTypeIndex()-1), pool)))
+				.append("(");
+			ElementValuePair[] evp = a.getElementValuePairs();
+			for(int i = 0; i < evp.length; i++) {
+				sb.append(extract(pool.get(evp[i].getElementNameIndex()-1), pool))
+					.append(" = ")
+					.append(parseElementValue(evp[i].getValue(), new StringBuilder(), pool))
+					.append(",");
+			}
+			return sb.toString().substring(0, sb.length()-1) + ")";
+		}
+
+		private String parseElementValue(ElementValue element, StringBuilder sb, ConstantPool pool)
+		throws ElementValueException {
+			switch(element.getTag()) {
+				case 'B':
+					sb.append(extract(pool.get(element.getConstValueIndex()-1), pool));
+					break;
+				case 'C':
+					sb.append("'")
+						.append(extract(pool.get(element.getConstValueIndex()-1), pool))
+						.append("'");
+					break;
+				case 'D':
+				case 'F':
+				case 'I':
+				case 'J':
+				case 'S':
+				case 'Z':
+					sb.append(extract(pool.get(element.getConstValueIndex()-1), pool));
+					break;
+				case 's':
+					sb.append("\"")
+						.append(extract(pool.get(element.getConstValueIndex()-1), pool))
+						.append("\"");
+					break;
+				case 'e':
+					EnumConstValue ecv = element.getEnumConstValue();
+					sb.append(parse(extract(pool.get(ecv.getTypeNameIndex()-1), pool)))
+						.append(".")
+						.append(extract(pool.get(ecv.getConstNameIndex()-1), pool));
+					break;
+				case 'c':
+					sb.append(extract(pool.get(element.getClassInfoIndex()-1), pool))
+						.append(".class");
+					break;
+				case '@':
+					sb.append(parseAnnotationContent(element.getAnnotationValue(), new StringBuilder(), pool));
+					break;
+				case '[':
+					sb.append("{");
+					for(ElementValue ev : element.getArrayValue().getValues()) {
+						sb.append(parseElementValue(ev, new StringBuilder(), pool))
+							.append(",");
+					}
+					sb.append(sb.toString().substring(0, sb.length()-1))
+						.append("}");
+					break;
+				default:
+					throw new ElementValueException(element.getTag());
+			}
+			return sb.toString();
 		}
 	}
 }
