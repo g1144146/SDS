@@ -47,7 +47,7 @@ public class MethodContent extends MemberContent {
 	private ExceptionContent exContent;
 	private LocalVariableContent valContent;
 	private ParamAnnotationContent paContent;
-
+	
 	/**
 	 * constructor.
 	 * @param info method info
@@ -71,7 +71,7 @@ public class MethodContent extends MemberContent {
 		}
 		System.out.println("");
 	}
-
+	
 	@Override
 	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
 		switch(info.getType()) {
@@ -94,9 +94,11 @@ public class MethodContent extends MemberContent {
 					}
 				}
 				this.exContent = new ExceptionContent(exTable, exClass);
+				this.contentType = Type.Code_In_Method;
 				for(AttributeInfo ai : code.getAttr().getAll()) {
 					investigateAttribute(ai, pool);
 				}
+				this.contentType = Type.Method;
 				break;
 			case Exceptions:
 				int[] exp = ((Exceptions)info).getExceptionIndexTable();
@@ -157,11 +159,11 @@ public class MethodContent extends MemberContent {
 				break;
 			case RuntimeInvisibleParameterAnnotations:
 				RuntimeInvisibleParameterAnnotations ripa
-					= (RuntimeInvisibleParameterAnnotations)info;
+						= (RuntimeInvisibleParameterAnnotations)info;
 				break;
 			case RuntimeVisibleParameterAnnotations:
 				RuntimeVisibleParameterAnnotations rvpa
-					= (RuntimeVisibleParameterAnnotations)info;
+						= (RuntimeVisibleParameterAnnotations)info;
 				ParameterAnnotations[] pa = rvpa.getParamAnnotations();
 				this.paContent = new ParamAnnotationContent(pa, pool);
 				for(String[] a : paContent.annotations)
@@ -176,16 +178,40 @@ public class MethodContent extends MemberContent {
 		}
 	}
 
+	/**
+	 * returns exception content of this method.
+	 * @return excpetion content
+	 */
+	public ExceptionContent getExContent() {
+		return exContent;
+	}
+
+	/**
+	 * return local variable content of this method.
+	 * @return local variable content
+	 */
+	public LocalVariableContent getValContent() {
+		return valContent;
+	}
+
+	/**
+	 * return parameter annotation content of this method.
+	 * @return parameter annotation content
+	 */
+	public ParamAnnotationContent getPAContent() {
+		return paContent;
+	}
+
 
 	/***** Nested Classes *****/
-
+	
 	/**
 	 * This class is for contents of method's try-catch-finally statement.
 	 */
 	public class ExceptionContent {
 		private int[] from, to, target;
 		private String[] exception;
-
+		
 		ExceptionContent(ExceptionTable[] table, String[] exception) {
 			this.from   = new int[table.length];
 			this.to     = new int[table.length];
@@ -197,7 +223,7 @@ public class MethodContent extends MemberContent {
 			}
 			this.exception = exception;
 		}
-
+		
 		/**
 		 * returns from-indexes into code array.
 		 * @return from-indexes
@@ -205,7 +231,7 @@ public class MethodContent extends MemberContent {
 		public int[] getFrom() {
 			return from;
 		}
-
+		
 		/**
 		 * returns to-indexes into code array.
 		 * @return to-indexes
@@ -213,7 +239,7 @@ public class MethodContent extends MemberContent {
 		public int[] getTo() {
 			return to;
 		}
-
+		
 		/**
 		 * returns target indexes into code array.
 		 * @return target indexes
@@ -221,7 +247,7 @@ public class MethodContent extends MemberContent {
 		public int[] getTarget() {
 			return target;
 		}
-
+		
 		/**
 		 * returns exception class names.
 		 * @return exception class names
@@ -229,7 +255,7 @@ public class MethodContent extends MemberContent {
 		public String[] getException() {
 			return exception;
 		}
-
+		
 		/**
 		 * returns array indexes which specified pc is
 		 * in range between from_index and to_index (or to_index-1).<br>
@@ -264,7 +290,7 @@ public class MethodContent extends MemberContent {
 			return (range != 0) ? Arrays.copyOf(indexes, range) : new int[0];
 		}
 	}
-
+	
 	/**
 	 * This class is for local variables in method.
 	 */
@@ -273,7 +299,7 @@ public class MethodContent extends MemberContent {
 		private String[][] variable;
 		private int[] index;
 		private boolean hasValType;
-
+		
 		LocalVariableContent(LocalVariableTable.LVTable[] table, ConstantPool pool) {
 			this.range = new int[table.length][2];
 			this.variable = new String[table.length][2];
@@ -289,7 +315,7 @@ public class MethodContent extends MemberContent {
 				i++;
 			}
 		}
-
+		
 		void setType(LocalVariableTypeTable.LVTable[] table, ConstantPool pool) {
 			this.hasValType = true;
 			for(LocalVariableTypeTable.LVTable t : table) {
@@ -308,7 +334,7 @@ public class MethodContent extends MemberContent {
 				}
 			}
 		}
-
+		
 		/**
 		 * returns valid ranges of variable.<br>
 		 * returned array: int[variable_count][2]<br>
@@ -319,7 +345,7 @@ public class MethodContent extends MemberContent {
 		public int[][] getRanges() {
 			return range;
 		}
-
+		
 		/**
 		 * returns valid range of variable.
 		 * @param index
@@ -333,7 +359,7 @@ public class MethodContent extends MemberContent {
 			}
 			throw new NotFoundSpecifiedIndex(index);
 		}
-
+		
 		/**
 		 * returns variables.<br>
 		 * returned array: String[variable_count][2]<br>
@@ -344,7 +370,7 @@ public class MethodContent extends MemberContent {
 		public String[][] getVariables() {
 			return variable;
 		}
-
+		
 		/**
 		 * returns variable of specified index.
 		 * @param index index
@@ -358,7 +384,7 @@ public class MethodContent extends MemberContent {
 			}
 			throw new NotFoundSpecifiedIndex(index);
 		}
-
+		
 		/**
 		 * returns variable indexes.
 		 * @return variable indexes
@@ -366,7 +392,7 @@ public class MethodContent extends MemberContent {
 		public int[] getIndexes() {
 			return index;
 		}
-
+		
 		/**
 		 * returns variable index of specified index.
 		 * @param index index
@@ -380,7 +406,7 @@ public class MethodContent extends MemberContent {
 			}
 			throw new NotFoundSpecifiedIndex(index);
 		}
-
+		
 		/**
 		 * return whether the method has
 		 * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.14">
@@ -391,20 +417,20 @@ public class MethodContent extends MemberContent {
 		public boolean hasValType() {
 			return hasValType;
 		}
-
+		
 		class NotFoundSpecifiedIndex extends RuntimeException {
 			NotFoundSpecifiedIndex(int index) {
 				super("not found the specified index: " + index);
 			}
 		}
 	}
-
+	
 	/**
 	 * This class is for annotations of method parameters.
 	 */
 	public class ParamAnnotationContent {
 		private String[][] annotations;
-
+		
 		ParamAnnotationContent(ParameterAnnotations[] pa, ConstantPool pool) {
 			this.annotations = new String[pa.length][1];
 			StringBuilder sb = new StringBuilder();
@@ -412,23 +438,23 @@ public class MethodContent extends MemberContent {
 				for(int i = 0; i < pa.length; i++) {
 					for(Annotation a : pa[i].getAnnotations()) {
 						sb.append(parseAnnotationContent(a, new StringBuilder(), pool));
-				}
+					}
 					annotations[i][0] = sb.toString();
 					sb = new StringBuilder();
-			}
+				}
 			} catch(ElementValueException e) {
 				e.printStackTrace();
+			}
 		}
-	}
-
+		
 		/**
 		 * returns annotations.
 		 * @return annotations
 		 */
 		public String[][] getAnnotations() {
 			return annotations;
-}
-
+		}
+		
 		/**
 		 * returns annotation of specified array index.
 		 * @param index array index
@@ -440,9 +466,9 @@ public class MethodContent extends MemberContent {
 			}
 			throw new ArrayIndexOutOfBoundsException(index);
 		}
-
+		
 		private String parseAnnotationContent(Annotation a, StringBuilder sb, ConstantPool pool)
-		throws ElementValueException {
+				throws ElementValueException {
 			sb.append("@").append(parse(extract(pool.get(a.getTypeIndex()-1), pool)))
 				.append("(");
 			ElementValuePair[] evp = a.getElementValuePairs();
@@ -454,9 +480,9 @@ public class MethodContent extends MemberContent {
 			}
 			return sb.toString().substring(0, sb.length()-1) + ")";
 		}
-
+		
 		private String parseElementValue(ElementValue element, StringBuilder sb, ConstantPool pool)
-		throws ElementValueException {
+				throws ElementValueException {
 			switch(element.getTag()) {
 				case 'B':
 					sb.append(extract(pool.get(element.getConstValueIndex()-1), pool));
@@ -496,7 +522,7 @@ public class MethodContent extends MemberContent {
 					sb.append("{");
 					for(ElementValue ev : element.getArrayValue().getValues()) {
 						sb.append(parseElementValue(ev, new StringBuilder(), pool))
-							.append(",");
+						.append(",");
 					}
 					sb.append(sb.toString().substring(0, sb.length()-1))
 						.append("}");
