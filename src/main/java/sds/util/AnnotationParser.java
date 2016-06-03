@@ -18,7 +18,9 @@ public class AnnotationParser {
 
 	/**
 	 * returns parsed annotation.<br>
-	 * parsed annotation format: @annotationClassName(arg1=value1, ...)
+	 * parsed annotation format is next:<br>
+	 * ex1). @annotationClassName(arg1=value1, ...)<br>
+	 * ex2). @annotationClassName1(arg1=value1, ...)|@annotationClassName2(arg1=value1, ...)|...
 	 * @param annotation target annotation
 	 * @param sb string builder for annotation info
 	 * @param pool constant-pool
@@ -34,7 +36,7 @@ public class AnnotationParser {
 			sb.append(extract(pool.get(evp[i].getElementNameIndex()-1), pool))
 				.append(" = ")
 				.append(parseElementValue(evp[i].getValue(), new StringBuilder(), pool))
-				.append(",");
+				.append("|");
 		}
 		return sb.toString().substring(0, sb.length()-1) + ")";
 	}
