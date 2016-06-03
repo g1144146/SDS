@@ -164,8 +164,8 @@ public class MethodContent extends MemberContent {
 						= (RuntimeVisibleParameterAnnotations)info;
 				ParameterAnnotations[] pa = rvpa.getParamAnnotations();
 				this.paContent = new ParamAnnotationContent(pa, pool);
-				for(String[] a : paContent.annotations)
-					System.out.println(Arrays.toString(a));
+				for(String a : paContent.annotations)
+					System.out.println(a);
 				break;
 			case StackMapTable:
 				StackMapTable smt = (StackMapTable)info;
@@ -345,20 +345,6 @@ public class MethodContent extends MemberContent {
 		}
 		
 		/**
-		 * returns valid range of variable.
-		 * @param index
-		 * @return range
-		 */
-		public int[] getRange(int index) {
-			for(int i = 0; i < this.index.length; i++) {
-				if(index == this.index[i]) {
-					return range[i];
-				}
-			}
-			throw new NotFoundSpecifiedIndex(index);
-		}
-		
-		/**
 		 * returns variables.<br>
 		 * returned array: String[variable_count][2]<br>
 		 * String[variable_count][0]: variable name<br>
@@ -370,39 +356,11 @@ public class MethodContent extends MemberContent {
 		}
 		
 		/**
-		 * returns variable of specified index.
-		 * @param index index
-		 * @return variable
-		 */
-		public String[] getVariable(int index) {
-			for(int i = 0; i < this.index.length; i++) {
-				if(index == this.index[i]) {
-					return variable[i];
-				}
-			}
-			throw new NotFoundSpecifiedIndex(index);
-		}
-		
-		/**
 		 * returns variable indexes.
 		 * @return variable indexes
 		 */
 		public int[] getIndexes() {
 			return index;
-		}
-		
-		/**
-		 * returns variable index of specified index.
-		 * @param index index
-		 * @return variable index
-		 */
-		public int getIndex(int index) {
-			for(int i = 0; i < this.index.length; i++) {
-				if(index == this.index[i]) {
-					return this.index[i];
-				}
-			}
-			throw new NotFoundSpecifiedIndex(index);
 		}
 		
 		/**
@@ -427,38 +385,30 @@ public class MethodContent extends MemberContent {
 	 * This class is for annotations of method parameters.
 	 */
 	public class ParamAnnotationContent {
-		private String[][] annotations;
+		private String[] annotations;
 		
 		ParamAnnotationContent(ParameterAnnotations[] pa, ConstantPool pool) {
-			this.annotations = new String[pa.length][1];
+			this.annotations = new String[pa.length];
 			StringBuilder sb = new StringBuilder();
 			try {
 				for(int i = 0; i < pa.length; i++) {
 					for(Annotation a : pa[i].getAnnotations()) {
 						sb.append(parseAnnotation(a, new StringBuilder(), pool));
 					}
-					annotations[i][0] = sb.toString();
+					annotations[i] = sb.toString();
 					sb = new StringBuilder();
 				}
 			} catch(ElementValueException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		/**
-		 * returns annotations.
-		 * @return annotations
-		 */
-		public String[][] getAnnotations() {
-			return annotations;
-		}
-		
+
 		/**
 		 * returns annotation of specified array index.
 		 * @param index array index
 		 * @return annotation
 		 */
-		public String[] getAnnotations(int index) {
+		public String getAnnotation(int index) {
 			if(0 <= index && index <= annotations.length) {
 				return annotations[index];
 			}
