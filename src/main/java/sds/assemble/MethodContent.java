@@ -396,7 +396,7 @@ public class MethodContent extends MemberContent {
 						sb.append(parseAnnotation(a, new StringBuilder(), pool));
 					}
 					annotations[i] = sb.toString();
-					sb = new StringBuilder();
+					sb.delete(0, sb.length());
 				}
 			} catch(ElementValueException e) {
 				e.printStackTrace();
