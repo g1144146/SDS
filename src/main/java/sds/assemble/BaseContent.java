@@ -6,11 +6,15 @@ import java.util.Map;
 import sds.classfile.ConstantPool;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.Signature;
+import sds.classfile.attributes.annotation.Annotation;
+import sds.classfile.attributes.annotation.ElementValueException;
 import sds.classfile.attributes.annotation.RuntimeInvisibleAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
+import sds.classfile.attributes.annotation.TypeAnnotation;
 
+import static sds.util.AnnotationParser.parseAnnotation;
 import static sds.util.DescriptorParser.parse;
 import static sds.util.Utf8ValueExtractor.extract;
 
@@ -24,11 +28,14 @@ import static sds.util.Utf8ValueExtractor.extract;
 public abstract class BaseContent {
 	private boolean hasAnnotation;
 	private Map<String, String> genericsMap = new HashMap<>();
+	private AnnotationContent annContent;
+	private TypeAnnotationContent taContent;
 	Type contentType;
 	public static enum Type {
 		Class,
 		Nested,
 		Method,
+		Code_In_Method,
 		Field;
 	}
 
@@ -37,6 +44,7 @@ public abstract class BaseContent {
 			case Deprecated: break;
 			case RuntimeVisibleAnnotations:
 				RuntimeVisibleAnnotations rva = (RuntimeVisibleAnnotations)info;
+				this.annContent = new AnnotationContent(rva.getAnnotations(), pool);
 //				for(Annotation a : rva.getAnnotations()) {
 //					printAnnotation(a);
 //				}
@@ -49,13 +57,8 @@ public abstract class BaseContent {
 				break;
 			case RuntimeVisibleTypeAnnotations:
 				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations)info;
-//				for(TypeAnnotation pa : rvta.getAnnotations()) {
-//					printTargetInfo(pa.getTargetInfo());
-//					printTypePath(pa.getTargetPath());
-//					for(ElementValuePair e : pa.getElementValuePairs()) {
-//						printElementValuePair(e);
-//					}
-//				}
+				this.hasAnnotation = true;
+				this.taContent = new TypeAnnotationContent(rvta.getAnnotations(), pool);
 				break;
 			case RuntimeInvisibleTypeAnnotations:
 				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations)info;
@@ -91,5 +94,43 @@ public abstract class BaseContent {
 	 */
 	public Map<String, String> getGenericsMap() {
 		return genericsMap;
+	}
+
+	/**
+	 * returns type annotations content.
+	 * @return annotations
+	 */
+	public TypeAnnotationContent getTAContent() {
+		return taContent;
+	}
+
+	public class AnnotationContent {
+		private String[] annotations;
+		AnnotationContent(Annotation[] annotations, ConstantPool pool) {
+			this.annotations = new String[annotations.length];
+			try {
+				for(int i = 0; i < annotations.length; i++) {
+					this.annotations[i] = parseAnnotation(annotations[i], new StringBuilder(), pool);
+				}
+			} catch(ElementValueException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * This class is for type annotations of class and member.
+	 */
+	public class TypeAnnotationContent {
+		TypeAnnotationContent(TypeAnnotation[] ta, ConstantPool pool) {
+			StringBuilder sb = new StringBuilder();
+			try {
+				for(TypeAnnotation t : ta) {
+					sb.append(parseAnnotation(t, new StringBuilder(), pool));
+				}
+			} catch(ElementValueException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }
