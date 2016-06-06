@@ -28,8 +28,10 @@ import static sds.util.Utf8ValueExtractor.extract;
 public abstract class BaseContent {
 	private boolean hasAnnotation;
 	private Map<String, String> genericsMap = new HashMap<>();
-	private AnnotationContent annContent;
-	private TypeAnnotationContent taContent;
+	private AnnotationContent visibleAnnotation;
+	private AnnotationContent invisibleAnnotation;
+	private TypeAnnotationContent visibleTypeAnnotation;
+	private TypeAnnotationContent invisibleTypeAnnotation;
 	Type contentType;
 	public static enum Type {
 		Class,
@@ -44,31 +46,20 @@ public abstract class BaseContent {
 			case Deprecated: break;
 			case RuntimeVisibleAnnotations:
 				RuntimeVisibleAnnotations rva = (RuntimeVisibleAnnotations)info;
-				this.annContent = new AnnotationContent(rva.getAnnotations(), pool);
-//				for(Annotation a : rva.getAnnotations()) {
-//					printAnnotation(a);
-//				}
+				this.visibleAnnotation = new AnnotationContent(rva.getAnnotations(), pool);
 				break;
 			case RuntimeInvisibleAnnotations:
 				RuntimeInvisibleAnnotations ria = (RuntimeInvisibleAnnotations)info;
-//				for(Annotation a : ria.getAnnotations()) {
-//					printAnnotation(a);
-//				}
+				this.invisibleAnnotation = new AnnotationContent(ria.getAnnotations(), pool);
 				break;
 			case RuntimeVisibleTypeAnnotations:
 				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations)info;
 				this.hasAnnotation = true;
-				this.taContent = new TypeAnnotationContent(rvta.getAnnotations(), pool);
+				this.visibleTypeAnnotation = new TypeAnnotationContent(rvta.getAnnotations(), pool);
 				break;
 			case RuntimeInvisibleTypeAnnotations:
 				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations)info;
-//				for(TypeAnnotation pa : rita.getAnnotations()) {
-//					printTargetInfo(pa.getTargetInfo());
-//					printTypePath(pa.getTargetPath());
-//					for(ElementValuePair evp : pa.getElementValuePairs()) {
-//						printElementValuePair(evp);
-//					}
-//				}
+				this.invisibleTypeAnnotation = new TypeAnnotationContent(rita.getAnnotations(), pool);
 				break;
 			case Signature:
 				if(contentType != Type.Field) {
@@ -97,11 +88,35 @@ public abstract class BaseContent {
 	}
 
 	/**
-	 * returns type annotations content.
-	 * @return annotations
+	 * returns visible annotations content.
+	 * @return visible annotation content
 	 */
-	public TypeAnnotationContent getTAContent() {
-		return taContent;
+	public AnnotationContent getVisibleAnnotation() {
+		return visibleAnnotation;
+	}
+
+	/**
+	 * returns invisible annotations content.
+	 * @return invisible annotation content
+	 */
+	public AnnotationContent getInvisibleAnnotation() {
+		return invisibleAnnotation;
+	}
+
+	/**
+	 * returns visible type annotations content.
+	 * @return visible type annotation content
+	 */
+	public TypeAnnotationContent getVisibleTypeAnnotation() {
+		return visibleTypeAnnotation;
+	}
+
+	/**
+	 * returns invisible type annotations content.
+	 * @return invisible type annotation content
+	 */
+	public TypeAnnotationContent getInvisibleTypeAnnotation() {
+		return invisibleTypeAnnotation;
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="[class] AnnotationContent">

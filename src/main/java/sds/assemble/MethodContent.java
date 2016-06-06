@@ -44,7 +44,8 @@ public class MethodContent extends MemberContent {
 	private Opcodes opcodes;
 	private ExceptionContent exContent;
 	private LocalVariableContent valContent;
-	private ParamAnnotationContent paContent;
+	private ParamAnnotationContent visibleParamAnnotation;
+	private ParamAnnotationContent invisibleParamAnnotation;
 	
 	/**
 	 * constructor.
@@ -163,8 +164,8 @@ public class MethodContent extends MemberContent {
 				RuntimeVisibleParameterAnnotations rvpa
 						= (RuntimeVisibleParameterAnnotations)info;
 				ParameterAnnotations[] pa = rvpa.getParamAnnotations();
-				this.paContent = new ParamAnnotationContent(pa, pool);
-				for(String a : paContent.annotations)
+				this.visibleParamAnnotation = new ParamAnnotationContent(pa, pool);
+				for(String a : visibleParamAnnotation.annotations)
 					System.out.println(a);
 				break;
 			case StackMapTable:
@@ -193,11 +194,19 @@ public class MethodContent extends MemberContent {
 	}
 
 	/**
-	 * return parameter annotation content of this method.
-	 * @return parameter annotation content
+	 * return visible parameter annotation content of this method.
+	 * @return visible parameter annotation content
 	 */
-	public ParamAnnotationContent getPAContent() {
-		return paContent;
+	public ParamAnnotationContent getVisibleParamAnnotation() {
+		return visibleParamAnnotation;
+	}
+
+	/**
+	 * return invisible parameter annotation content of this method.
+	 * @return invisible parameter annotation content
+	 */
+	public ParamAnnotationContent getInvisibleParamAnnotation() {
+		return invisibleParamAnnotation;
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="[class] ExceptionContent">
