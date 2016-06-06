@@ -1,5 +1,10 @@
 package sds.assemble;
 
+import sds.classfile.ConstantPool;
+import sds.classfile.attributes.annotation.Annotation;
+import sds.classfile.attributes.annotation.ElementValueException;
+import static sds.util.AnnotationParser.parseAnnotation;
+
 /**
  * This adapter class is for
  * {@link BaseContent.AnnotationContent <code>AnnotationContent</code>}
@@ -12,23 +17,15 @@ package sds.assemble;
 public abstract class AbstractAnnotationContent {
 	String[] annotations;
 
-	/**
-	 * returns annotations.
-	 * @return annotations
-	 */
-	public String[] getAnnotations() {
-		return annotations;
+	AbstractAnnotationContent(Annotation[] annotations, ConstantPool pool) {
+		try {
+			for(int i = 0; i < annotations.length; i++) {
+				this.annotations[i] = parseAnnotation(annotations[i], new StringBuilder(), pool);
+			}
+		} catch(ElementValueException e) {
+			e.printStackTrace();
+		}
 	}
 
-	/**
-	 * returns annotation of specified array index.
-	 * @param index array index
-	 * @return annotation
-	 */
-	public String getAnnotation(int index) {
-		if(0 <= index && index <= annotations.length) {
-			return annotations[index];
-		}
-		throw new ArrayIndexOutOfBoundsException(index);
-	}
+	abstract void setInvisible(Annotation[] annotations, ConstantPool pool);
 }

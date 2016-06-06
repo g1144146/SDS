@@ -1,7 +1,9 @@
 package sds.assemble;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import sds.assemble.controlflow.CFGBuilder;
 import sds.assemble.controlflow.CFNode;
@@ -16,9 +18,7 @@ import sds.classfile.attributes.LocalVariableTable;
 import sds.classfile.attributes.LocalVariableTypeTable;
 import sds.classfile.attributes.MethodParameters;
 import sds.classfile.attributes.MethodParameters.Parameters;
-import sds.classfile.attributes.annotation.Annotation;
 import sds.classfile.attributes.annotation.AnnotationDefault;
-import sds.classfile.attributes.annotation.ElementValueException;
 import sds.classfile.attributes.annotation.ParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleParameterAnnotations;
@@ -27,7 +27,6 @@ import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
 
 import static sds.util.AccessFlags.get;
-import static sds.util.AnnotationParser.parseAnnotation;
 import static sds.util.DescriptorParser.parse;
 import static sds.util.Utf8ValueExtractor.extract;
 
@@ -44,8 +43,7 @@ public class MethodContent extends MemberContent {
 	private Opcodes opcodes;
 	private ExceptionContent exContent;
 	private LocalVariableContent valContent;
-	private ParamAnnotationContent visibleParamAnnotation;
-	private ParamAnnotationContent invisibleParamAnnotation;
+	private ParamAnnotationContent paContent;
 	
 	/**
 	 * constructor.
@@ -160,19 +158,23 @@ public class MethodContent extends MemberContent {
 				RuntimeInvisibleParameterAnnotations ripa
 					= (RuntimeInvisibleParameterAnnotations)info;
 				ParameterAnnotations[] invisiblePA = ripa.getParamAnnotations();
-				this.hasAnnotation = true;
-				this.invisibleParamAnnotation = new ParamAnnotationContent(invisiblePA, pool);
-				for(String a : invisibleParamAnnotation.annotations)
-					System.out.println(a);
+				if(paContent == null) {
+				this.paContent = new ParamAnnotationContent(invisiblePA, pool, false);
+				} else {
+					paContent.setInvisible(invisiblePA, pool);
+				}
+				System.out.println("<<<Runtime Invisible Parameter Annotation>>>: ");
+				for(String[] a : paContent.invParam)
+					System.out.println("  " + Arrays.toString(a));
 				break;
 			case RuntimeVisibleParameterAnnotations:
 				RuntimeVisibleParameterAnnotations rvpa
 					= (RuntimeVisibleParameterAnnotations)info;
 				ParameterAnnotations[] visiblePA = rvpa.getParamAnnotations();
-				this.hasAnnotation = true;
-				this.visibleParamAnnotation = new ParamAnnotationContent(visiblePA, pool);
-				for(String a : visibleParamAnnotation.annotations)
-					System.out.println(a);
+				this.paContent = new ParamAnnotationContent(visiblePA, pool, true);
+				System.out.println("<<<Runtime Visible Parameter Annotation>>>: ");
+				for(String[] a : paContent.param)
+					System.out.println("  " + Arrays.toString(a));
 				break;
 			case StackMapTable:
 				StackMapTable smt = (StackMapTable)info;
@@ -200,19 +202,11 @@ public class MethodContent extends MemberContent {
 	}
 
 	/**
-	 * return visible parameter annotation content of this method.
-	 * @return visible parameter annotation content
+	 * return parameter annotation content of this method.
+	 * @return parameter annotation content
 	 */
-	public ParamAnnotationContent getVisibleParamAnnotation() {
-		return visibleParamAnnotation;
-	}
-
-	/**
-	 * return invisible parameter annotation content of this method.
-	 * @return invisible parameter annotation content
-	 */
-	public ParamAnnotationContent getInvisibleParamAnnotation() {
-		return invisibleParamAnnotation;
+	public ParamAnnotationContent getParamAnnotation() {
+		return paContent;
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="[class] ExceptionContent">
@@ -401,21 +395,52 @@ public class MethodContent extends MemberContent {
 	/**
 	 * This class is for annotations of method parameters.
 	 */
-	public class ParamAnnotationContent extends AbstractAnnotationContent {
-		ParamAnnotationContent(ParameterAnnotations[] pa, ConstantPool pool) {
-			this.annotations = new String[pa.length];
-			StringBuilder sb = new StringBuilder();
-			try {
-				for(int i = 0; i < pa.length; i++) {
-					for(Annotation a : pa[i].getAnnotations()) {
-						sb.append(parseAnnotation(a, new StringBuilder(), pool));
-					}
-					annotations[i] = sb.toString();
-					sb.delete(0, sb.length());
-				}
-			} catch(ElementValueException e) {
-				e.printStackTrace();
+	public class ParamAnnotationContent extends AnnotationContent {
+		private List<String[]> param;
+		private List<String[]> invParam;
+		private int paramCount;
+
+		ParamAnnotationContent(ParameterAnnotations[] pa, ConstantPool pool, boolean isVisible) {
+			super(isVisible);
+			this.paramCount = pa.length;
+			initAnnotation(pa, pool, isVisible);
+		}
+
+		private void setInvisible(ParameterAnnotations[] annotations, ConstantPool pool) {
+			type = type | INVISIBLE;
+			initAnnotation(annotations, pool, false);
+		}
+
+		private void initAnnotation(ParameterAnnotations[] pa, ConstantPool pool, boolean isVisible) {
+			if(isVisible) param    = new ArrayList<>();
+			else          invParam = new ArrayList<>();
+			for(int i = 0; i < paramCount; i++) {
+				super.initAnnotation(pa[i].getAnnotations(), pool, isVisible);
+				if(isVisible) param.add(visible);
+				else          invParam.add(invisible);
 			}
+		}
+
+		/**
+		 * returns parameter annotations.
+		 * @param isVisible whether runtime visible annotation
+		 * @return parameter annotations
+		*/
+		public List<String[]> getParams(boolean isVisible) {
+			return isVisible ? param : invParam;
+		}
+
+		/**
+		 * returns parameter annotation of specified array index.
+		 * @param index array index
+		 * @param isVisible whether runtime visible annotation
+		 * @return parameter annotation
+		 */
+		public String[] getParam(int index, boolean isVisible) {
+			if(0 <= index && index <= paramCount) {
+				return isVisible ? param.get(index) : invParam.get(index);
+			}
+			throw new IndexOutOfBoundsException("" + index);
 		}
 	}
 	// </editor-fold>

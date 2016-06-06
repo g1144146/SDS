@@ -27,10 +27,8 @@ import static sds.util.Utf8ValueExtractor.extract;
  */
 public abstract class BaseContent {
 	private Map<String, String> genericsMap = new HashMap<>();
-	private AnnotationContent visibleAnnotation;
-	private AnnotationContent invisibleAnnotation;
-	private TypeAnnotationContent visibleTypeAnnotation;
-	private TypeAnnotationContent invisibleTypeAnnotation;
+	private AnnotationContent annContent;
+	private TypeAnnotationContent taContent;
 	boolean hasAnnotation;
 	Type contentType;
 	public static enum Type {
@@ -46,23 +44,39 @@ public abstract class BaseContent {
 			case Deprecated: break;
 			case RuntimeVisibleAnnotations:
 				RuntimeVisibleAnnotations rva = (RuntimeVisibleAnnotations)info;
-				this.hasAnnotation = true;
-				this.visibleAnnotation = new AnnotationContent(rva.getAnnotations(), pool);
+				this.annContent = new AnnotationContent(rva.getAnnotations(), pool, true);
+				System.out.println("<Runtime Visible Annotation>: ");
+				for(String a : annContent.visible)
+					System.out.println("  " + a);
 				break;
 			case RuntimeInvisibleAnnotations:
 				RuntimeInvisibleAnnotations ria = (RuntimeInvisibleAnnotations)info;
-				this.hasAnnotation = true;
-				this.invisibleAnnotation = new AnnotationContent(ria.getAnnotations(), pool);
+				if(annContent == null) {
+					this.annContent = new AnnotationContent(ria.getAnnotations(), pool, false);
+				} else {
+					annContent.setInvisible(ria.getAnnotations(), pool);
+				}
+				System.out.println("<Runtime Invisible Annotation>: ");
+				for(String a : annContent.invisible)
+					System.out.println("  " + a);
 				break;
 			case RuntimeVisibleTypeAnnotations:
 				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations)info;
-				this.hasAnnotation = true;
-				this.visibleTypeAnnotation = new TypeAnnotationContent(rvta.getAnnotations(), pool);
+				this.taContent = new TypeAnnotationContent(rvta.getAnnotations(), pool, true);
+				System.out.println("<Runtime Visible Type Annotation>: ");
+				for(String a : taContent.visible)
+					System.out.println("  " + a);
 				break;
 			case RuntimeInvisibleTypeAnnotations:
 				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations)info;
-				this.hasAnnotation = true;
-				this.invisibleTypeAnnotation = new TypeAnnotationContent(rita.getAnnotations(), pool);
+				if(taContent == null) {
+					this.taContent = new TypeAnnotationContent(rita.getAnnotations(), pool, false);
+				} else {
+					taContent.setInvisible(rita.getAnnotations(), pool);
+				}
+				System.out.println("<Runtime Invisible Type Annotation>: ");
+				for(String a : taContent.invisible)
+					System.out.println("  " + a);
 				break;
 			case Signature:
 				if(contentType != Type.Field) {
@@ -91,51 +105,102 @@ public abstract class BaseContent {
 	}
 
 	/**
-	 * returns visible annotations content.
-	 * @return visible annotation content
+	 * returns annotations content.
+	 * @return annotation content
 	 */
-	public AnnotationContent getVisibleAnnotation() {
-		return visibleAnnotation;
+	public AnnotationContent getAnnotation() {
+		return annContent;
 	}
 
 	/**
-	 * returns invisible annotations content.
-	 * @return invisible annotation content
+	 * returns type annotations content.
+	 * @return type annotation content
 	 */
-	public AnnotationContent getInvisibleAnnotation() {
-		return invisibleAnnotation;
-	}
-
-	/**
-	 * returns visible type annotations content.
-	 * @return visible type annotation content
-	 */
-	public TypeAnnotationContent getVisibleTypeAnnotation() {
-		return visibleTypeAnnotation;
-	}
-
-	/**
-	 * returns invisible type annotations content.
-	 * @return invisible type annotation content
-	 */
-	public TypeAnnotationContent getInvisibleTypeAnnotation() {
-		return invisibleTypeAnnotation;
+	public TypeAnnotationContent getTypeAnnotation() {
+		return taContent;
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="[class] AnnotationContent">
 	/**
 	 * This class is for annotations of class and member.
 	 */
-	public class AnnotationContent extends AbstractAnnotationContent {
-		AnnotationContent(Annotation[] annotations, ConstantPool pool) {
-			this.annotations = new String[annotations.length];
+	public class AnnotationContent {
+		/**
+		 * hex of visible.
+		 */
+		public static final int VISIBLE   = 0x01;
+		/**
+		 * hex of invisible.
+		 */
+		public static final int INVISIBLE = 0x10;
+		int count;
+		int type;
+		String[] visible;
+		String[] invisible;
+
+		AnnotationContent(Annotation[] annotations, ConstantPool pool, boolean isVisible) {
+			this(isVisible);
+			initAnnotation(annotations, pool, isVisible);
+		}
+
+		AnnotationContent(boolean isVisible) {
+			hasAnnotation = true;
+			type = isVisible ? VISIBLE : INVISIBLE;
+		}
+
+		void setInvisible(Annotation[] annotations, ConstantPool pool) {
+			type = type | INVISIBLE;
+			initAnnotation(annotations, pool, false);
+		}
+
+		void initAnnotation(Annotation[] annotations, ConstantPool pool, boolean isVisible) {
+			this.count = annotations.length;
+			if(isVisible) visible   = new String[count];
+			else          invisible = new String[count];
 			try {
-				for(int i = 0; i < annotations.length; i++) {
-					this.annotations[i] = parseAnnotation(annotations[i], new StringBuilder(), pool);
+				for(int i = 0; i < count; i++) {
+					if(isVisible) {
+						this.visible[i] = parseAnnotation(annotations[i], new StringBuilder(), pool);
+					} else {
+						this.invisible[i] = parseAnnotation(annotations[i], new StringBuilder(), pool);
+					}
 				}
 			} catch(ElementValueException e) {
 				e.printStackTrace();
 			}
+		}
+
+		/**
+		 * returns annotations.
+		 * @param isVisible whether runtime visible annotation
+		 * @return annotations
+		*/
+		public String[] getAnnotations(boolean isVisible) {
+			return isVisible ? visible : invisible;
+		}
+
+		/**
+		 * returns annotation of specified array index.
+		 * @param index array index
+		 * @param isVisible whether runtime visible annotation
+		 * @return annotation
+		 */
+		public String getAnnotation(int index, boolean isVisible) {
+			if(0 <= index && index <= count) {
+				return isVisible ? visible[index] : invisible[index];
+			}
+			throw new ArrayIndexOutOfBoundsException(index);
+		}
+
+		/**
+		 * return whether specified type matches this content type.<br>
+		 * ex). chechtype(AnnotationContent.VISIBLE);
+		 * @param type hex of visible or invisible
+		 * @return if specified type matches this content type, this method returns true.<br>
+		 * Otherwise, it returns false.
+		 */
+		public boolean checkType(int type) {
+			return (type | this.type) == this.type;
 		}
 	}
 	// </editor-fold>
@@ -144,28 +209,37 @@ public abstract class BaseContent {
 	/**
 	 * This class is for type annotations of class and member.
 	 */
-	public class TypeAnnotationContent extends AbstractAnnotationContent {
+	public class TypeAnnotationContent extends AnnotationContent {
 		private TargetInfo[] targets; 
+		private TargetInfo[] invTargets;
 
-		TypeAnnotationContent(TypeAnnotation[] ta, ConstantPool pool) {
-			this.annotations = new String[ta.length];
-			this.targets = new TargetInfo[ta.length];
-			try {
-				for(int i = 0; i < ta.length; i++) {
-					annotations[i] = parseAnnotation(ta[i], new StringBuilder(), pool);
-					targets[i] = ta[i].getTargetInfo();
-				}
-			} catch(ElementValueException e) {
-				e.printStackTrace();
+		TypeAnnotationContent(TypeAnnotation[] ta, ConstantPool pool, boolean isVisible) {
+			super(ta, pool, isVisible);
+			initTarget(ta, pool, isVisible);
+		}
+
+		private void initTarget(TypeAnnotation[] ta, ConstantPool pool, boolean isVisible) {
+			if(isVisible) this.targets    = new TargetInfo[count];
+			else          this.invTargets = new TargetInfo[count];
+			for(int i = 0; i < ta.length; i++) {
+				if(isVisible) targets[i]    = ta[i].getTargetInfo();
+				else          invTargets[i] = ta[i].getTargetInfo();
 			}
+		}
+
+		@Override
+		void setInvisible(Annotation[] annotations, ConstantPool pool) {
+			super.setInvisible(annotations, pool);
+			initTarget((TypeAnnotation[])annotations, pool, false);
 		}
 
 		/**
 		 * returns target info of annotation.
+		 * @param isVisible whether runtime visible annotation
 		 * @return target info
 		 */
-		public TargetInfo[] getTargets() {
-			return targets;
+		public TargetInfo[] getTargets(boolean isVisible) {
+			return isVisible ? targets : invTargets;
 		}
 	}
 	// </editor-fold>
