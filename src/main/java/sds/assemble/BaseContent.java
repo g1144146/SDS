@@ -194,7 +194,7 @@ public abstract class BaseContent {
 
 		/**
 		 * return whether specified type matches this content type.<br>
-		 * ex). chechtype(AnnotationContent.VISIBLE);
+		 * ex). <code>checkType(AnnotationContent.VISIBLE);</code>
 		 * @param type hex of visible or invisible
 		 * @return if specified type matches this content type, this method returns true.<br>
 		 * Otherwise, it returns false.
