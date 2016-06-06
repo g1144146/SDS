@@ -200,9 +200,7 @@ public class MethodContent extends MemberContent {
 		return paContent;
 	}
 
-
-	/***** Nested Classes *****/
-	
+	// <editor-fold defaultstate="collapsed" desc="[class] ExceptionContent">
 	/**
 	 * This class is for contents of method's try-catch-finally statement.
 	 */
@@ -288,7 +286,9 @@ public class MethodContent extends MemberContent {
 			return (range != 0) ? Arrays.copyOf(indexes, range) : new int[0];
 		}
 	}
-	
+	// </editor-fold>
+
+	// <editor-fold defaultstate="collapsed" desc="[class] LocalVariableContent">
 	/**
 	 * This class is for local variables in method.
 	 */
@@ -380,13 +380,13 @@ public class MethodContent extends MemberContent {
 			}
 		}
 	}
-	
+	// </editor-fold>
+
+	// <editor-fold defaultstate="collapsed" desc="[class] ParamAnnotationContent">
 	/**
 	 * This class is for annotations of method parameters.
 	 */
-	public class ParamAnnotationContent {
-		private String[] annotations;
-		
+	public class ParamAnnotationContent extends AbstractAnnotationContent {
 		ParamAnnotationContent(ParameterAnnotations[] pa, ConstantPool pool) {
 			this.annotations = new String[pa.length];
 			StringBuilder sb = new StringBuilder();
@@ -402,17 +402,6 @@ public class MethodContent extends MemberContent {
 				e.printStackTrace();
 			}
 		}
-
-		/**
-		 * returns annotation of specified array index.
-		 * @param index array index
-		 * @return annotation
-		 */
-		public String getAnnotation(int index) {
-			if(0 <= index && index <= annotations.length) {
-				return annotations[index];
-			}
-			throw new ArrayIndexOutOfBoundsException(index);
-		}
 	}
+	// </editor-fold>
 }

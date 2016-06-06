@@ -2,7 +2,6 @@ package sds.assemble;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import sds.classfile.ConstantPool;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.Signature;
@@ -12,6 +11,7 @@ import sds.classfile.attributes.annotation.RuntimeInvisibleAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
+import sds.classfile.attributes.annotation.TargetInfo;
 import sds.classfile.attributes.annotation.TypeAnnotation;
 
 import static sds.util.AnnotationParser.parseAnnotation;
@@ -104,8 +104,11 @@ public abstract class BaseContent {
 		return taContent;
 	}
 
-	public class AnnotationContent {
-		private String[] annotations;
+	// <editor-fold defaultstate="collapsed" desc="[class] AnnotationContent">
+	/**
+	 * This class is for annotations of class and member.
+	 */
+	public class AnnotationContent extends AbstractAnnotationContent {
 		AnnotationContent(Annotation[] annotations, ConstantPool pool) {
 			this.annotations = new String[annotations.length];
 			try {
@@ -117,20 +120,35 @@ public abstract class BaseContent {
 			}
 		}
 	}
+	// </editor-fold>
 
+	// <editor-fold defaultstate="collapsed" desc="[class] TypeAnnotationContent">
 	/**
 	 * This class is for type annotations of class and member.
 	 */
-	public class TypeAnnotationContent {
+	public class TypeAnnotationContent extends AbstractAnnotationContent {
+		private TargetInfo[] targets;
+
 		TypeAnnotationContent(TypeAnnotation[] ta, ConstantPool pool) {
-			StringBuilder sb = new StringBuilder();
+			this.annotations = new String[ta.length];
+			this.targets = new TargetInfo[ta.length];
 			try {
-				for(TypeAnnotation t : ta) {
-					sb.append(parseAnnotation(t, new StringBuilder(), pool));
+				for(int i = 0; i < ta.length; i++) {
+					annotations[i] = parseAnnotation(ta[i], new StringBuilder(), pool);
+					targets[i] = ta[i].getTargetInfo();
 				}
 			} catch(ElementValueException e) {
 				e.printStackTrace();
 			}
 		}
+
+		/**
+		 * returns target info of annotation.
+		 * @return target info
+		 */
+		public TargetInfo[] getTargets() {
+			return targets;
+		}
 	}
+	// </editor-fold>
 }
