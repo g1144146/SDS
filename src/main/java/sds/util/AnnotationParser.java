@@ -80,7 +80,7 @@ public class AnnotationParser {
 					.append(extract(pool.get(ecv.getConstNameIndex()-1), pool));
 				break;
 			case 'c':
-				sb.append(extract(pool.get(element.getClassInfoIndex()-1), pool))
+				sb.append(parse(extract(pool.get(element.getClassInfoIndex()-1), pool)))
 					.append(".class");
 				break;
 			case '@':
