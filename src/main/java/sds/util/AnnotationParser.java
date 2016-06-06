@@ -93,7 +93,7 @@ public class AnnotationParser {
 					values.append(parseElementValue(ev, new StringBuilder(), pool))
 						.append(",");
 				}
-				sb.append(values.toString().substring(0, sb.length()-1))
+				sb.append(values.toString().substring(0, values.length()-1))
 					.append("}");
 				break;
 			default:
