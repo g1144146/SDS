@@ -2,11 +2,11 @@ package sds.assemble;
 
 /**
  * This adapter class is for
- * {@link AnnotationContent <code>AnnotationContent</code>}
+ * {@link BaseContent.AnnotationContent <code>AnnotationContent</code>}
  * ,
- * {@link TypeAnnotationContent <code>TypeAnnotationContent</code>}
+ * {@link BaseContent.TypeAnnotationContent <code>TypeAnnotationContent</code>}
  * and
- * {@link ParamAnnotationContent <code>ParamAnnotationContent</code>}.
+ * {@link MethodContent.ParamAnnotationContent <code>ParamAnnotationContent</code>}.
  * @author inagaki
  */
 public abstract class AbstractAnnotationContent {
@@ -14,7 +14,7 @@ public abstract class AbstractAnnotationContent {
 
 	/**
 	 * returns annotations.
-	 * @return annotationscd
+	 * @return annotations
 	 */
 	public String[] getAnnotations() {
 		return annotations;
