@@ -75,6 +75,8 @@ import sds.classfile.bytecode.TableSwitch;
 import sds.classfile.bytecode.Wide;
 
 import static sds.util.AccessFlags.get;
+import static sds.util.AnnotationParser.parseAnnotation;
+import static sds.util.AnnotationParser.parseElementValue;
 import static sds.util.DescriptorParser.parse;
 import static sds.util.Utf8ValueExtractor.extract;
 
@@ -175,7 +177,7 @@ public class ClassFilePrinter {
 	 * @param fields field
 	 * @throws IOException
 	 */
-	public void printFields(Fields fields) throws IOException {
+	public void printFields(Fields fields) throws Exception {
 		out.println("*** Fields *** ");
 		if(fields.size() == 0) {
 			out.println("has no fields." + sep);
@@ -205,7 +207,7 @@ public class ClassFilePrinter {
 	 * @param methods methods
 	 * @throws IOException
 	 */
-	public void printMethods(Methods methods) throws IOException {
+	public void printMethods(Methods methods) throws Exception {
 		out.println("*** Methods *** ");
 		if(methods.size() == 0) {
 			out.print("has no methods." + sep);
@@ -227,7 +229,7 @@ public class ClassFilePrinter {
 	 * @param attr
 	 * @throws IOException
 	 */
-	public void printAttributes(Attributes attr) throws IOException {
+	public void printAttributes(Attributes attr) throws Exception {
 		out.println("*** Attributes *** ");
 		if(attr.size() == 0) {
 			out.print("has no attributes." + sep);
@@ -242,14 +244,14 @@ public class ClassFilePrinter {
 	/**
 	 * print an attribute.
 	 * @param info
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public void printAttributeInfo(AttributeInfo info) throws IOException {
+	public void printAttributeInfo(AttributeInfo info) throws Exception {
 		out.println("  " + info.getType().toString());
 		switch(info.getType()) {
 			case AnnotationDefault:
 				AnnotationDefault ad = (AnnotationDefault)info;
-				printElementValue(ad.getDefaultValue());
+				out.println("     " + parseElementValue(ad.getDefaultValue(), new StringBuilder(), pool));
 				break;
 			case BootstrapMethods:
 				BootstrapMethods bsm = (BootstrapMethods)info;
@@ -423,8 +425,7 @@ public class ClassFilePrinter {
 				RuntimeInvisibleAnnotations ria = (RuntimeInvisibleAnnotations)info;
 				int riaIndex = 1;
 				for(Annotation a : ria.getAnnotations()) {
-					out.println("     " + riaIndex + ".");
-					printAnnotation(a);
+					out.println("     " + riaIndex + "." + parseAnnotation(a, new StringBuilder(), pool));
 					riaIndex++;
 				}
 				break;
@@ -434,7 +435,7 @@ public class ClassFilePrinter {
 				for(ParameterAnnotations pa : ripa.getParamAnnotations()) {
 					out.println("     " + ripaIndex + ".");
 					for(Annotation a : pa.getAnnotations()) {
-						printAnnotation(a);
+						out.println("       " + parseAnnotation(a, new StringBuilder(), pool));
 					}
 					ripaIndex++;
 				}
@@ -442,13 +443,10 @@ public class ClassFilePrinter {
 			case RuntimeInvisibleTypeAnnotations:
 				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations)info;
 				int ritaIndex = 1;
-				for(TypeAnnotation pa : rita.getAnnotations()) {
-					out.println("     " + ritaIndex + ".");
-					printTargetInfo(pa.getTargetInfo());
-					printTypePath(pa.getTargetPath());
-					for(ElementValuePair evp : pa.getElementValuePairs()) {
-						printElementValuePair(evp);
-					}
+				for(TypeAnnotation ta : rita.getAnnotations()) {
+					out.println("     " + ritaIndex + "." + parseAnnotation(ta, new StringBuilder(), pool));
+					printTargetInfo(ta.getTargetInfo());
+					printTypePath(ta.getTargetPath());
 					ritaIndex++;
 				}
 				break;
@@ -456,8 +454,7 @@ public class ClassFilePrinter {
 				RuntimeVisibleAnnotations rva = (RuntimeVisibleAnnotations)info;
 				int rvaIndex = 1;
 				for(Annotation a : rva.getAnnotations()) {
-					out.println("     " + rvaIndex + ".");
-					printAnnotation(a);
+					out.println("     " + rvaIndex + "." + parseAnnotation(a, new StringBuilder(), pool));
 					rvaIndex++;
 				}
 				break;
@@ -467,7 +464,7 @@ public class ClassFilePrinter {
 				for(ParameterAnnotations pa : rvpa.getParamAnnotations()) {
 					out.println("     " + rvpaIndex + ".");
 					for(Annotation a : pa.getAnnotations()) {
-						printAnnotation(a);
+						out.println("       " + parseAnnotation(a, new StringBuilder(), pool));
 					}
 					rvpaIndex++;
 				}
@@ -476,12 +473,9 @@ public class ClassFilePrinter {
 				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations)info;
 				int rvtaIndex = 1;
 				for(TypeAnnotation pa : rvta.getAnnotations()) {
-					out.println("     " + rvtaIndex + ".");
+					out.println("     " + rvtaIndex + "." + parseAnnotation(pa, new StringBuilder(), pool));
 					printTargetInfo(pa.getTargetInfo());
 					printTypePath(pa.getTargetPath());
-					for(ElementValuePair e : pa.getElementValuePairs()) {
-						printElementValuePair(e);
-					}
 					rvtaIndex++;
 				}
 				break;
@@ -518,50 +512,6 @@ public class ClassFilePrinter {
 			default:
 				System.out.println("unknown attribute type: " + info.getType().name());
 				break;
-		}
-	}
-
-	private void printElementValuePair(ElementValuePair e) {
-		out.println("       element_name: " + extract(pool.get(e.getElementNameIndex()-1), pool));
-		printElementValue(e.getValue());
-	}
-
-	private void printElementValue(ElementValue e) {
-		switch((char)e.getTag()) {
-			case 'B':
-			case 'C':
-			case 'D':
-			case 'F':
-			case 'I':
-			case 'J':
-			case 'S':
-			case 'Z':
-			case 's':
-				out.println("       const_value: " + extract(pool.get(e.getConstValueIndex()-1), pool));
-				break;
-			case 'e':
-				EnumConstValue ecv = e.getEnumConstValue();
-				out.println("       type_name : " + extract(pool.get(ecv.getTypeNameIndex()-1), pool));
-				out.println("       const_name: " + extract(pool.get(ecv.getConstNameIndex()-1), pool));
-				break;
-			case 'c':
-				out.println("       type_name : " + extract(pool.get(e.getClassInfoIndex()-1), pool));
-				break;
-			case '@':
-				printAnnotation(e.getAnnotationValue());
-				break;
-			case '[':
-				for(ElementValue ev : e.getArrayValue().getValues()) {
-					printElementValue(ev);
-				}
-				break;
-		}
-	}
-
-	private void printAnnotation(Annotation annotation) {
-		out.println("       type_name : " + parse(extract(pool.get(annotation.getTypeIndex()-1), pool)));
-		for(ElementValuePair evp : annotation.getElementValuePairs()) {
-			printElementValuePair(evp);
 		}
 	}
 
@@ -638,7 +588,7 @@ public class ClassFilePrinter {
 	}
 
 	private void printTargetInfo(TargetInfo info) {
-		out.println("     " + info.getType());
+		out.println("       " + info.getType());
 		switch(info.getType()) {
 			case TypeParameterTarget:
 				TypeParameterTarget tpt = (TypeParameterTarget)info;
@@ -667,7 +617,7 @@ public class ClassFilePrinter {
 			case LocalVarTarget:
 				LocalVarTarget lvt = (LocalVarTarget)info;
 				for(LocalVarTarget.LVTTable t : lvt.getTable()) {
-					out.print("     index: " + t.getIndex());
+					out.print("       index: " + t.getIndex());
 					out.println(", pc: " + t.getStartPc() + "-" + (t.getStartPc()+t.getLen()-1));
 				}
 				break;
