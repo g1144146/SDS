@@ -158,13 +158,19 @@ public class MethodContent extends MemberContent {
 				break;
 			case RuntimeInvisibleParameterAnnotations:
 				RuntimeInvisibleParameterAnnotations ripa
-						= (RuntimeInvisibleParameterAnnotations)info;
+					= (RuntimeInvisibleParameterAnnotations)info;
+				ParameterAnnotations[] invisiblePA = ripa.getParamAnnotations();
+				this.hasAnnotation = true;
+				this.invisibleParamAnnotation = new ParamAnnotationContent(invisiblePA, pool);
+				for(String a : invisibleParamAnnotation.annotations)
+					System.out.println(a);
 				break;
 			case RuntimeVisibleParameterAnnotations:
 				RuntimeVisibleParameterAnnotations rvpa
-						= (RuntimeVisibleParameterAnnotations)info;
-				ParameterAnnotations[] pa = rvpa.getParamAnnotations();
-				this.visibleParamAnnotation = new ParamAnnotationContent(pa, pool);
+					= (RuntimeVisibleParameterAnnotations)info;
+				ParameterAnnotations[] visiblePA = rvpa.getParamAnnotations();
+				this.hasAnnotation = true;
+				this.visibleParamAnnotation = new ParamAnnotationContent(visiblePA, pool);
 				for(String a : visibleParamAnnotation.annotations)
 					System.out.println(a);
 				break;

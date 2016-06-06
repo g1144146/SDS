@@ -26,12 +26,12 @@ import static sds.util.Utf8ValueExtractor.extract;
  * @author inagaki
  */
 public abstract class BaseContent {
-	private boolean hasAnnotation;
 	private Map<String, String> genericsMap = new HashMap<>();
 	private AnnotationContent visibleAnnotation;
 	private AnnotationContent invisibleAnnotation;
 	private TypeAnnotationContent visibleTypeAnnotation;
 	private TypeAnnotationContent invisibleTypeAnnotation;
+	boolean hasAnnotation;
 	Type contentType;
 	public static enum Type {
 		Class,
@@ -46,10 +46,12 @@ public abstract class BaseContent {
 			case Deprecated: break;
 			case RuntimeVisibleAnnotations:
 				RuntimeVisibleAnnotations rva = (RuntimeVisibleAnnotations)info;
+				this.hasAnnotation = true;
 				this.visibleAnnotation = new AnnotationContent(rva.getAnnotations(), pool);
 				break;
 			case RuntimeInvisibleAnnotations:
 				RuntimeInvisibleAnnotations ria = (RuntimeInvisibleAnnotations)info;
+				this.hasAnnotation = true;
 				this.invisibleAnnotation = new AnnotationContent(ria.getAnnotations(), pool);
 				break;
 			case RuntimeVisibleTypeAnnotations:
@@ -59,6 +61,7 @@ public abstract class BaseContent {
 				break;
 			case RuntimeInvisibleTypeAnnotations:
 				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations)info;
+				this.hasAnnotation = true;
 				this.invisibleTypeAnnotation = new TypeAnnotationContent(rita.getAnnotations(), pool);
 				break;
 			case Signature:
@@ -142,7 +145,7 @@ public abstract class BaseContent {
 	 * This class is for type annotations of class and member.
 	 */
 	public class TypeAnnotationContent extends AbstractAnnotationContent {
-		private TargetInfo[] targets;
+		private TargetInfo[] targets; 
 
 		TypeAnnotationContent(TypeAnnotation[] ta, ConstantPool pool) {
 			this.annotations = new String[ta.length];
