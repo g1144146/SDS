@@ -36,9 +36,11 @@ public class AnnotationParser {
 			sb.append(extract(pool.get(evp[i].getElementNameIndex()-1), pool))
 				.append(" = ")
 				.append(parseElementValue(evp[i].getValue(), new StringBuilder(), pool))
-				.append("|");
+				.append(",");
 		}
-		return sb.toString().substring(0, sb.length()-1) + ")";
+		return evp.length > 0 
+				? sb.toString().substring(0, sb.length()-1) + ")"
+				: sb.toString().substring(0, sb.length()-1);
 	}
 
 	/**
