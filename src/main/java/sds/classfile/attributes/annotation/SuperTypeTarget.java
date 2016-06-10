@@ -11,6 +11,7 @@ public class SuperTypeTarget extends AbstractTargetInfo {
 
 	SuperTypeTarget(int superTypeIndex) {
 		super(TargetInfoType.SuperTypeTarget);
+		this.superTypeIndex = superTypeIndex;
 	}
 
 	/**
