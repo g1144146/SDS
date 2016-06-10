@@ -8,7 +8,6 @@ import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.BootstrapMethods;
 import sds.classfile.attributes.InnerClasses;
 import sds.classfile.attributes.SourceFile;
-import sds.classfile.attributes.annotation.OffsetTarget;
 import sds.classfile.attributes.annotation.RuntimeInvisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.SuperTypeTarget;
@@ -26,6 +25,8 @@ public class ClassContent extends BaseContent {
 	private NestedClass[] nested;
 	private String sourceFile;
 	private String[] bootstrapMethods;
+	private String superClass;
+	private String[] interfaces;
 
 	/**
 	 * constructor.
@@ -33,16 +34,25 @@ public class ClassContent extends BaseContent {
 	 */
 	public ClassContent(ClassFile cf) {
 		this.contentType = Type.Class;
+		ConstantPool pool = cf.getPool();
+		this.superClass = extract(pool.get(cf.getSuperClass()-1), pool);
+		if(cf.getInterfaces().length > 0) {
+			int[] interIndex = cf.getInterfaces();
+			this.interfaces = new String[interIndex.length];
+			for(int i = 0; i < interfaces.length; i++) {
+				interfaces[i] = extract(pool.get(interIndex[i]-1), pool);
+			}
+		}
 		Methods method = cf.getMethods();
 		this.methods = new MethodContent[method.size()];
 		for(int i = 0; i < methods.length; i++) {
-			methods[i] = new MethodContent(method.get(i), cf.getPool());
+			methods[i] = new MethodContent(method.get(i), pool);
 		}
 
 		Fields field = cf.getFields();
 		this.fields = new FieldContent[field.size()];
 		for(int i = 0; i < fields.length; i++) {
-			fields[i] = new FieldContent(field.get(i), cf.getPool());
+			fields[i] = new FieldContent(field.get(i), pool);
 		}
 
 		InnerClasses ic = null;
@@ -50,7 +60,7 @@ public class ClassContent extends BaseContent {
 			if(info instanceof InnerClasses) {
 				ic = (InnerClasses)info;
 			}
-			investigateAttribute(info, cf.getPool());
+			investigateAttribute(info, pool);
 		}
 		if(ic != null) {
 			this.nested = new NestedClass[ic.getClasses().length];
@@ -136,7 +146,12 @@ public class ClassContent extends BaseContent {
 			switch(target.getType()) {
 				case SuperTypeTarget:
 					SuperTypeTarget stt = (SuperTypeTarget)target;
-					sb.append(",").append(stt.getIndex());
+					sb.append(",");
+					if(stt.getIndex() == -1) {
+						sb.append(superClass);
+					} else {
+						sb.append(interfaces[stt.getIndex()]);
+					}
 					break;
 				case TypeParameterTarget:
 					break;
