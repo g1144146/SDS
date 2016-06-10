@@ -19,9 +19,20 @@ import sds.classfile.attributes.LocalVariableTypeTable;
 import sds.classfile.attributes.MethodParameters;
 import sds.classfile.attributes.MethodParameters.Parameters;
 import sds.classfile.attributes.annotation.AnnotationDefault;
+import sds.classfile.attributes.annotation.CatchTarget;
+import sds.classfile.attributes.annotation.LocalVarTarget;
+import sds.classfile.attributes.annotation.MethodFormalParameterTarget;
+import sds.classfile.attributes.annotation.OffsetTarget;
 import sds.classfile.attributes.annotation.ParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleParameterAnnotations;
+import sds.classfile.attributes.annotation.RuntimeInvisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleParameterAnnotations;
+import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
+import sds.classfile.attributes.annotation.TargetInfo;
+import sds.classfile.attributes.annotation.ThrowsTarget;
+import sds.classfile.attributes.annotation.TypeAnnotation;
+import sds.classfile.attributes.annotation.TypeParameterBoundTarget;
+import sds.classfile.attributes.annotation.TypeParameterTarget;
 import sds.classfile.attributes.stackmap.StackMapTable;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
@@ -155,26 +166,46 @@ public class MethodContent extends MemberContent {
 				}
 				break;
 			case RuntimeInvisibleParameterAnnotations:
-				RuntimeInvisibleParameterAnnotations ripa
-					= (RuntimeInvisibleParameterAnnotations)info;
+				RuntimeInvisibleParameterAnnotations ripa = (RuntimeInvisibleParameterAnnotations)info;
 				ParameterAnnotations[] invisiblePA = ripa.getParamAnnotations();
 				if(paContent == null) {
-				this.paContent = new ParamAnnotationContent(invisiblePA, pool, false);
+					this.paContent = new ParamAnnotationContent(invisiblePA, pool, false);
 				} else {
 					paContent.setInvisible(invisiblePA, pool);
 				}
-				System.out.println("<<<Runtime Invisible Parameter Annotation>>>: ");
-				for(String[] a : paContent.invParam)
-					System.out.println("  " + Arrays.toString(a));
+//				System.out.println("<<<Runtime Invisible Parameter Annotation>>>: ");
+//				for(String[] a : paContent.invParam)
+//					System.out.println("  " + Arrays.toString(a));
 				break;
 			case RuntimeVisibleParameterAnnotations:
-				RuntimeVisibleParameterAnnotations rvpa
-					= (RuntimeVisibleParameterAnnotations)info;
+				RuntimeVisibleParameterAnnotations rvpa = (RuntimeVisibleParameterAnnotations)info;
 				ParameterAnnotations[] visiblePA = rvpa.getParamAnnotations();
 				this.paContent = new ParamAnnotationContent(visiblePA, pool, true);
-				System.out.println("<<<Runtime Visible Parameter Annotation>>>: ");
-				for(String[] a : paContent.param)
-					System.out.println("  " + Arrays.toString(a));
+//				System.out.println("<<<Runtime Visible Parameter Annotation>>>: ");
+//				for(String[] a : paContent.param)
+//					System.out.println("  " + Arrays.toString(a));
+				break;
+			case RuntimeVisibleTypeAnnotations:
+				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations)info;
+				this.taContent = new MethodTypeAnnotationContent(rvta.getAnnotations(), pool, true);
+				System.out.println("<<<Runtime Visible Type Annotation>>>: ");
+				for(int i = 0; i < taContent.count; i++) {
+					System.out.print(taContent.visible[i]);
+					System.out.println(", " + taContent.targets[i]);
+				}
+				break;
+			case RuntimeInvisibleTypeAnnotations:
+				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations)info;
+				if(taContent == null) {
+					this.taContent = new MethodTypeAnnotationContent(rita.getAnnotations(), pool, false);
+				} else {
+					taContent.setInvisible(rita.getAnnotations(), pool);
+				}
+				System.out.println("<<<Runtime Invisible Type Annotation>>>: ");
+				for(int i = 0; i < taContent.count; i++) {
+					System.out.print(taContent.invisible[i]);
+					System.out.println(", " + taContent.invTargets[i]);
+				}
 				break;
 			case StackMapTable:
 				StackMapTable smt = (StackMapTable)info;
@@ -441,6 +472,76 @@ public class MethodContent extends MemberContent {
 				return isVisible ? param.get(index) : invParam.get(index);
 			}
 			throw new IndexOutOfBoundsException("" + index);
+		}
+	}
+	// </editor-fold>
+
+	// <editor-fold defaultstate="collapsed" desc="[class] MethodTypeAnnotationContent">
+	/**
+	 * This class is
+	 * {@link TypeAnnotationContent <code>TypeAnnotationContent</code>}
+	 * for method.
+	 */
+	public class MethodTypeAnnotationContent extends TypeAnnotationContent {
+		MethodTypeAnnotationContent(TypeAnnotation[] ta, ConstantPool pool, boolean isVisible) {
+			super(ta, pool, isVisible);
+		}
+
+		@Override
+		String initTarget(TargetInfo target) {
+			StringBuilder sb = new StringBuilder(target.getType().toString());
+			switch(target.getType()) {
+				case CatchTarget:
+					CatchTarget ct = (CatchTarget)target;
+					sb.append(",").append(exContent.getException()[ct.getIndex()]);
+					break;
+				case LocalVarTarget:
+					LocalVarTarget.LVTTable table = ((LocalVarTarget)target).getTable()[0];
+					sb.append(",").append(table.getStartPc())
+						.append("-").append(table.getStartPc() + table.getLen())
+						.append(",").append(table.getIndex());
+					if(valContent != null) {
+						int index = table.getIndex();
+						int[] indexes = valContent.getIndexes();
+						for(int i = 0; i < indexes.length; i++) {
+							if(index == indexes[i]) {
+								sb.append(valContent.getVariables()[i][1])
+									.append(" ").append(valContent.getVariables()[i][0]);
+								break;
+							}
+						}
+					}
+					break;
+				case MethodFormalParameterTarget:
+					MethodFormalParameterTarget mfpt = (MethodFormalParameterTarget)target;
+					if(args != null) {
+						sb.append(args[mfpt.getIndex()][0]).append(args[mfpt.getIndex()][1]);
+					} else {
+						String desc = getDescriptor();
+						String methodArg = desc.substring(desc.indexOf("(") + 1, desc.indexOf(")"));
+						if(methodArg.contains(",")) {
+							sb.append(",").append(methodArg.split(",")[mfpt.getIndex()]);
+						} else {
+							sb.append(",").append(methodArg);
+						}
+					}
+					break;
+				case OffsetTarget:
+					OffsetTarget ot = (OffsetTarget)target;
+					sb.append(",").append(ot.getOffset());
+					break;
+				case ThrowsTarget:
+					ThrowsTarget tt = (ThrowsTarget)target;
+					sb.append(",").append(exceptions[tt.getIndex()]);
+					break;
+				case TypeParameterTarget:
+					TypeParameterTarget tpt = (TypeParameterTarget)target;
+					break;
+				case TypeParameterBoundTarget:
+					TypeParameterBoundTarget tpbt = (TypeParameterBoundTarget)target;
+					break;
+			}
+			return sb.toString();
 		}
 	}
 	// </editor-fold>
