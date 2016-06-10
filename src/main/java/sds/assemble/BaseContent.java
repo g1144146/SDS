@@ -28,7 +28,7 @@ import static sds.util.Utf8ValueExtractor.extract;
 public abstract class BaseContent {
 	private Map<String, String> genericsMap = new HashMap<>();
 	private AnnotationContent annContent;
-	private TypeAnnotationContent taContent;
+	TypeAnnotationContent taContent;
 	boolean hasAnnotation;
 	Type contentType;
 	public static enum Type {
@@ -45,9 +45,9 @@ public abstract class BaseContent {
 			case RuntimeVisibleAnnotations:
 				RuntimeVisibleAnnotations rva = (RuntimeVisibleAnnotations)info;
 				this.annContent = new AnnotationContent(rva.getAnnotations(), pool, true);
-				System.out.println("<Runtime Visible Annotation>: ");
-				for(String a : annContent.visible)
-					System.out.println("  " + a);
+//				System.out.println("<Runtime Visible Annotation>: ");
+//				for(String a : annContent.visible)
+//					System.out.println("  " + a);
 				break;
 			case RuntimeInvisibleAnnotations:
 				RuntimeInvisibleAnnotations ria = (RuntimeInvisibleAnnotations)info;
@@ -56,9 +56,9 @@ public abstract class BaseContent {
 				} else {
 					annContent.setInvisible(ria.getAnnotations(), pool);
 				}
-				System.out.println("<Runtime Invisible Annotation>: ");
-				for(String a : annContent.invisible)
-					System.out.println("  " + a);
+//				System.out.println("<Runtime Invisible Annotation>: ");
+//				for(String a : annContent.invisible)
+//					System.out.println("  " + a);
 				break;
 			case RuntimeVisibleTypeAnnotations:
 				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations)info;
@@ -210,27 +210,33 @@ public abstract class BaseContent {
 	 * This class is for type annotations of class and member.
 	 */
 	public class TypeAnnotationContent extends AnnotationContent {
-		private TargetInfo[] targets; 
-		private TargetInfo[] invTargets;
+		String[] targets; 
+		String[] invTargets;
 
 		TypeAnnotationContent(TypeAnnotation[] ta, ConstantPool pool, boolean isVisible) {
 			super(ta, pool, isVisible);
-			initTarget(ta, pool, isVisible);
+			if(isVisible) {
+				this.targets = new String[count];
+				for(int i = 0; i < count; i++) {
+					targets[i] = initTarget(ta[i].getTargetInfo());
+				}
+			} else {
+				setInvisible(ta, pool);
+			}
 		}
 
-		private void initTarget(TypeAnnotation[] ta, ConstantPool pool, boolean isVisible) {
-			if(isVisible) this.targets    = new TargetInfo[count];
-			else          this.invTargets = new TargetInfo[count];
-			for(int i = 0; i < ta.length; i++) {
-				if(isVisible) targets[i]    = ta[i].getTargetInfo();
-				else          invTargets[i] = ta[i].getTargetInfo();
-			}
+		String initTarget(TargetInfo target) {
+			return target.getType().toString();
 		}
 
 		@Override
 		void setInvisible(Annotation[] annotations, ConstantPool pool) {
 			super.setInvisible(annotations, pool);
-			initTarget((TypeAnnotation[])annotations, pool, false);
+			this.invTargets = new String[annotations.length];
+			TypeAnnotation[] ta = (TypeAnnotation[])annotations;
+			for(int i = 0; i < ta.length; i++) {
+				invTargets[i] = initTarget(ta[i].getTargetInfo());
+			}
 		}
 
 		/**
@@ -238,7 +244,7 @@ public abstract class BaseContent {
 		 * @param isVisible whether runtime visible annotation
 		 * @return target info
 		 */
-		public TargetInfo[] getTargets(boolean isVisible) {
+		public String[] getTargets(boolean isVisible) {
 			return isVisible ? targets : invTargets;
 		}
 	}
