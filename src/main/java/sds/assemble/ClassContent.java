@@ -8,6 +8,12 @@ import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.BootstrapMethods;
 import sds.classfile.attributes.InnerClasses;
 import sds.classfile.attributes.SourceFile;
+import sds.classfile.attributes.annotation.OffsetTarget;
+import sds.classfile.attributes.annotation.RuntimeInvisibleTypeAnnotations;
+import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
+import sds.classfile.attributes.annotation.SuperTypeTarget;
+import sds.classfile.attributes.annotation.TargetInfo;
+import sds.classfile.attributes.annotation.TypeAnnotation;
 import static sds.util.Utf8ValueExtractor.extract;
 
 /**
@@ -44,7 +50,7 @@ public class ClassContent extends BaseContent {
 			if(info instanceof InnerClasses) {
 				ic = (InnerClasses)info;
 			}
-//			investigateAttribute(info, cf.getPool());
+			investigateAttribute(info, cf.getPool());
 		}
 		if(ic != null) {
 			this.nested = new NestedClass[ic.getClasses().length];
@@ -59,13 +65,13 @@ public class ClassContent extends BaseContent {
 	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
 		switch(info.getType()) {
 			case BootstrapMethods:
-				BootstrapMethods bsm = (BootstrapMethods)info;
-				this.bootstrapMethods = new String[bsm.getBSM().length];
-				for(BootstrapMethods.BSM b : bsm.getBSM()) {
-					for(int i = 0; i < b.getBSMArgs().length; i++) {
-						bootstrapMethods[i] = extract(pool.get(b.getBSMArgs()[i]-1), pool);
-					}
-				}
+//				BootstrapMethods bsm = (BootstrapMethods)info;
+//				this.bootstrapMethods = new String[bsm.getBSM().length];
+//				for(BootstrapMethods.BSM b : bsm.getBSM()) {
+//					for(int i = 0; i < b.getBSMArgs().length; i++) {
+//						bootstrapMethods[i] = extract(pool.get(b.getBSMArgs()[i]-1), pool);
+//					}
+//				}
 				break;
 			case EnclosingMethod:
 				// to do
@@ -79,6 +85,28 @@ public class ClassContent extends BaseContent {
 					int accessFlag = c.getNumber("access_flag");
 				}
 				break;
+			case RuntimeVisibleTypeAnnotations:
+				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations)info;
+				this.taContent = new ClassTypeAnnotationContent(rvta.getAnnotations(), pool, true);
+				System.out.println("<<<Runtime Visible Type Annotation>>>: ");
+				for(int i = 0; i < taContent.count; i++) {
+					System.out.print(taContent.visible[i]);
+					System.out.println(", " + taContent.targets[i]);
+				}
+				break;
+			case RuntimeInvisibleTypeAnnotations:
+				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations)info;
+				if(taContent == null) {
+					this.taContent = new ClassTypeAnnotationContent(rita.getAnnotations(), pool, false);
+				} else {
+					taContent.setInvisible(rita.getAnnotations(), pool);
+				}
+				System.out.println("<<<Runtime Invisible Type Annotation>>>: ");
+				for(int i = 0; i < taContent.count; i++) {
+					System.out.print(taContent.invisible[i]);
+					System.out.println(", " + taContent.invTargets[i]);
+				}
+				break;
 			case SourceDebugExtension:
 				// todo
 				break;
@@ -89,6 +117,33 @@ public class ClassContent extends BaseContent {
 			default:
 				super.investigateAttribute(info, pool);
 				break;
+		}
+	}
+
+	/**
+	 * This class is
+	 * {@link TypeAnnotationContent <code>TypeAnnotationContent</code>}
+	 * for class.
+	 */
+	public class ClassTypeAnnotationContent extends TypeAnnotationContent {
+		ClassTypeAnnotationContent(TypeAnnotation[] ta, ConstantPool pool, boolean isVisible) {
+			super(ta, pool, isVisible);
+		}
+
+		@Override
+		String initTarget(TargetInfo target) {
+			StringBuilder sb = new StringBuilder(target.getType().toString());
+			switch(target.getType()) {
+				case SuperTypeTarget:
+					SuperTypeTarget stt = (SuperTypeTarget)target;
+					sb.append(",").append(stt.getIndex());
+					break;
+				case TypeParameterTarget:
+					break;
+				case TypeParameterBoundTarget:
+					break;
+			}
+			return sb.toString();
 		}
 	}
 }
