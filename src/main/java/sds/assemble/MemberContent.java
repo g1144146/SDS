@@ -2,7 +2,9 @@ package sds.assemble;
 
 import sds.classfile.ConstantPool;
 import sds.classfile.MemberInfo;
+
 import static sds.util.AccessFlags.get;
+import static sds.util.DescriptorParser.parse;
 import static sds.util.Utf8ValueExtractor.extract;
 
 /**
@@ -19,7 +21,7 @@ public abstract class MemberContent extends BaseContent {
 
 	MemberContent(MemberInfo info, ConstantPool pool, Type contentType) {
 		this.accessFlag = get(info.getAccessFlags(), info.getType());
-		this.desc = extract(pool.get(info.getDescriptorIndex()-1), pool);
+		this.desc = parse(extract(pool.get(info.getDescriptorIndex()-1), pool));
 		this.name = extract(pool.get(info.getNameIndex()-1), pool);
 		this.contentType = contentType;
 	}
