@@ -98,12 +98,13 @@ public class MethodContent extends MemberContent {
 			}
 		}
 		// set CFG
-		CFGBuilder builder = CFGBuilder.getInstance();
-		CFNode[] nodes = builder.build(inst, exContent);
-		for(CFNode n : nodes) {
-			System.out.println(n.toString());
+		if(! this.getAccessFlag().contains("abstract")) {
+			CFGBuilder builder = CFGBuilder.getInstance();
+			CFNode[] nodes = builder.build(inst, exContent);
+			for(CFNode n : nodes) {
+				System.out.println(n.toString());
+			}
 		}
-		System.out.println(getGenericsMap());
 		System.out.println("");
 	}
 	
