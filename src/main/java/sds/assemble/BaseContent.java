@@ -1,7 +1,9 @@
 package sds.assemble;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
 import sds.classfile.ConstantPool;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.Signature;
@@ -82,12 +84,16 @@ public abstract class BaseContent {
 				if(contentType != Type.Field) {
 					Signature sig = (Signature)info;
 					String desc = extract(pool.get(sig.getSignatureIndex()-1), pool);
-					System.out.println(desc);
-					String parsedSig = parse(desc, true);
-					String genericsType = parsedSig.substring(1, parsedSig.lastIndexOf(">"));
+					String parsedDesc = parse(desc, true);
+					String genericsType
+						= parsedDesc.substring(parsedDesc.indexOf("<") + 1, parsedDesc.lastIndexOf(">"));
 					for(String type : genericsType.split(",")) {
 						String[] typeAndExtends = type.split(" extends ");
-						genericsMap.put(typeAndExtends[0], typeAndExtends[1]);
+						if(typeAndExtends.length > 1) {
+							genericsMap.put(typeAndExtends[0], typeAndExtends[1]);
+						} else {
+							genericsMap.put(typeAndExtends[0], "java.lang.Object");
+						}
 					}
 				}
 				break;

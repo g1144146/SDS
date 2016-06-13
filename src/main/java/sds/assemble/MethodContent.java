@@ -129,7 +129,6 @@ public class MethodContent extends MemberContent {
 						exClass[i] = extract(pool.get(t.getNumber("catch_type")), pool);
 					}
 				}
-				System.out.println(">> " + Arrays.toString(exClass));
 				this.exContent = new ExceptionContent(exTable, exClass);
 				this.contentType = Type.Code_In_Method;
 				for(AttributeInfo ai : code.getAttr().getAll()) {
