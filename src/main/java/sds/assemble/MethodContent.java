@@ -64,6 +64,20 @@ public class MethodContent extends MemberContent {
 	public MethodContent(MemberInfo info, ConstantPool pool) {
 		super(info, pool, Type.Method);
 		System.out.println(this.getName());
+		String desc = getDescriptor();
+		if(desc.indexOf("(") + 1 == desc.indexOf(")")) { // has argument
+			String arg = desc.substring(desc.indexOf("(") + 1, desc.indexOf(")"));
+			if(arg.contains(",")) {
+				String[] argArray = arg.split(",");
+				this.args = new String[argArray.length][2];
+				for(int i = 0; i < argArray.length; i++) {
+					this.args[i][0] = argArray[i];
+					this.args[i][1] = "arg" + String.valueOf(i);
+				}
+			} else {
+				this.args = new String[][]{{arg, "arg0"}};
+			}
+		}
 		for(AttributeInfo attr : info.getAttr().getAll()) {
 			investigateAttribute(attr, pool);
 		}
