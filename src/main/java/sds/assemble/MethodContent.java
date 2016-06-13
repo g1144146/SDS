@@ -82,9 +82,12 @@ public class MethodContent extends MemberContent {
 			investigateAttribute(attr, pool);
 		}
 		if(valContent != null) {
-			System.out.println("index    : " + Arrays.toString(valContent.index));
-			System.out.println("ranges   : " + Arrays.deepToString(valContent.range));
-			System.out.println("variables: " + Arrays.deepToString(valContent.variable));
+			System.out.println("[local variable]");
+			System.out.println(valContent);
+		}
+		if(exContent.from.length > 0) {
+			System.out.println("[exception]");
+			System.out.println(exContent);
 		}
 		CFGBuilder builder = CFGBuilder.getInstance();
 		CFNode[] nodes = builder.build(inst, exContent);
@@ -339,6 +342,17 @@ public class MethodContent extends MemberContent {
 			}
 			return (range != 0) ? Arrays.copyOf(indexes, range) : new int[0];
 		}
+
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < from.length; i++) {
+				sb.append(from[i]).append("-").append(to[i])
+					.append(", ").append(target[i]).append(", ")
+					.append(exception[i]).append(System.getProperty("line.separator"));
+			}
+			return sb.toString();
+		}
 	}
 	// </editor-fold>
 
@@ -427,11 +441,17 @@ public class MethodContent extends MemberContent {
 		public boolean hasValType() {
 			return hasValType;
 		}
-		
-		class NotFoundSpecifiedIndex extends RuntimeException {
-			NotFoundSpecifiedIndex(int index) {
-				super("not found the specified index: " + index);
+
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < range.length; i++) {
+				sb.append(range[i][0]).append("-").append(range[i][1])
+					.append(", ").append(index[i]).append(", ")
+					.append(variable[i][1]).append(" ").append(variable[i][0])
+					.append(System.getProperty("line.separator"));
 			}
+			return sb.toString();
 		}
 	}
 	// </editor-fold>
