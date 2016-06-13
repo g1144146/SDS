@@ -218,14 +218,14 @@ public abstract class BaseContent {
 			if(isVisible) {
 				this.targets = new String[count];
 				for(int i = 0; i < count; i++) {
-					targets[i] = initTarget(ta[i].getTargetInfo());
+					targets[i] = initTarget(ta[i].getTargetInfo(), i, isVisible);
 				}
 			} else {
 				setInvisible(ta, pool);
 			}
 		}
 
-		String initTarget(TargetInfo target) {
+		String initTarget(TargetInfo target, int annIndex, boolean isVisible) {
 			return target.getType().toString();
 		}
 
@@ -235,7 +235,7 @@ public abstract class BaseContent {
 			this.invTargets = new String[annotations.length];
 			TypeAnnotation[] ta = (TypeAnnotation[])annotations;
 			for(int i = 0; i < ta.length; i++) {
-				invTargets[i] = initTarget(ta[i].getTargetInfo());
+				invTargets[i] = initTarget(ta[i].getTargetInfo(), i, false);
 			}
 		}
 

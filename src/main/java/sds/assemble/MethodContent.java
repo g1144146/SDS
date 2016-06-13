@@ -77,7 +77,7 @@ public class MethodContent extends MemberContent {
 		for(CFNode n : nodes) {
 			System.out.println(n.toString());
 		}
-		System.out.println("");
+		System.out.println(getGenericsMap());
 	}
 	
 	@Override
@@ -488,11 +488,14 @@ public class MethodContent extends MemberContent {
 		}
 
 		@Override
-		String initTarget(TargetInfo target) {
+		String initTarget(TargetInfo target, int annIndex, boolean isVisible) {
 			StringBuilder sb = new StringBuilder(target.getType().toString());
+			String annotation = isVisible ? visible[annIndex] : invisible[annIndex];
 			switch(target.getType()) {
 				case CatchTarget:
 					CatchTarget ct = (CatchTarget)target;
+					exContent.getException()[ct.getIndex()]
+						= annotation + " " + exContent.getException()[ct.getIndex()];
 					sb.append(",").append(exContent.getException()[ct.getIndex()]);
 					break;
 				case LocalVarTarget:
@@ -505,6 +508,8 @@ public class MethodContent extends MemberContent {
 						int[] indexes = valContent.getIndexes();
 						for(int i = 0; i < indexes.length; i++) {
 							if(index == indexes[i]) {
+								valContent.getVariables()[i][1]
+									= annotation + " " + valContent.getVariables()[i][1];
 								sb.append(valContent.getVariables()[i][1])
 									.append(" ").append(valContent.getVariables()[i][0]);
 								break;
@@ -515,6 +520,7 @@ public class MethodContent extends MemberContent {
 				case MethodFormalParameterTarget:
 					MethodFormalParameterTarget mfpt = (MethodFormalParameterTarget)target;
 					if(args != null) {
+						args[mfpt.getIndex()][0] = annotation + " " + args[mfpt.getIndex()][0];
 						sb.append(args[mfpt.getIndex()][0]).append(args[mfpt.getIndex()][1]);
 					} else {
 						String desc = getDescriptor();
@@ -532,6 +538,7 @@ public class MethodContent extends MemberContent {
 					break;
 				case ThrowsTarget:
 					ThrowsTarget tt = (ThrowsTarget)target;
+					exceptions[tt.getIndex()] = annotation + " " + exceptions[tt.getIndex()];
 					sb.append(",").append(exceptions[tt.getIndex()]);
 					break;
 				case TypeParameterTarget:

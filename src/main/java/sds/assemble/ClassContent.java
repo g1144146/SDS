@@ -141,16 +141,18 @@ public class ClassContent extends BaseContent {
 		}
 
 		@Override
-		String initTarget(TargetInfo target) {
+		String initTarget(TargetInfo target, int annIndex, boolean isVisible) {
 			StringBuilder sb = new StringBuilder(target.getType().toString());
+			String annotation = isVisible ? visible[annIndex] : invisible[annIndex];
 			switch(target.getType()) {
 				case SuperTypeTarget:
 					SuperTypeTarget stt = (SuperTypeTarget)target;
-					sb.append(",");
 					if(stt.getIndex() == -1) {
-						sb.append(superClass);
+						superClass = annotation + " " + superClass;
+						System.out.println(superClass);
 					} else {
-						sb.append(interfaces[stt.getIndex()]);
+						interfaces[stt.getIndex()] = annotation + " " + interfaces[stt.getIndex()];
+						System.out.println(interfaces[stt.getIndex()]);
 					}
 					break;
 				case TypeParameterTarget:
