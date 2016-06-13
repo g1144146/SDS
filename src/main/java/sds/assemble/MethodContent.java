@@ -64,6 +64,7 @@ public class MethodContent extends MemberContent {
 	public MethodContent(MemberInfo info, ConstantPool pool) {
 		super(info, pool, Type.Method);
 		System.out.println(this.getName());
+		// set arguments
 		String desc = getDescriptor();
 		if(desc.indexOf("(") + 1 == desc.indexOf(")")) { // has argument
 			String arg = desc.substring(desc.indexOf("(") + 1, desc.indexOf(")"));
@@ -78,14 +79,16 @@ public class MethodContent extends MemberContent {
 				this.args = new String[][]{{arg, "arg0"}};
 			}
 		}
+		// attriutes
 		for(AttributeInfo attr : info.getAttr().getAll()) {
 			investigateAttribute(attr, pool);
 		}
+		// print
 		if(valContent != null) {
 			System.out.println("[local variable]");
 			System.out.println(valContent);
 		}
-		if(exContent.from.length > 0) {
+		if(exContent !=null && exContent.from.length > 0) {
 			System.out.println("[exception]");
 			System.out.println(exContent);
 		}
@@ -94,6 +97,7 @@ public class MethodContent extends MemberContent {
 				System.out.println(arg[0] + " " + arg[1]);
 			}
 		}
+		// set CFG
 		CFGBuilder builder = CFGBuilder.getInstance();
 		CFNode[] nodes = builder.build(inst, exContent);
 		for(CFNode n : nodes) {
@@ -124,6 +128,7 @@ public class MethodContent extends MemberContent {
 						exClass[i] = extract(pool.get(t.getNumber("catch_type")), pool);
 					}
 				}
+				System.out.println(">> " + Arrays.toString(exClass));
 				this.exContent = new ExceptionContent(exTable, exClass);
 				this.contentType = Type.Code_In_Method;
 				for(AttributeInfo ai : code.getAttr().getAll()) {
