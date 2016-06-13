@@ -534,15 +534,13 @@ public class MethodContent extends MemberContent {
 		}
 
 		@Override
-		String initTarget(TargetInfo target, int annIndex, boolean isVisible) {
-			StringBuilder sb = new StringBuilder(target.getType().toString());
+		void initTarget(TargetInfo target, int annIndex, boolean isVisible) {
 			String annotation = isVisible ? visible[annIndex] : invisible[annIndex];
 			switch(target.getType()) {
 				case CatchTarget:
 					CatchTarget ct = (CatchTarget)target;
 					exContent.getException()[ct.getIndex()]
 						= annotation + " " + exContent.getException()[ct.getIndex()];
-					sb.append(",").append(exContent.getException()[ct.getIndex()]);
 					break;
 				case LocalVarTarget:
 //					LocalVarTarget.LVTTable table = ((LocalVarTarget)target).getTable()[0];
@@ -585,7 +583,6 @@ public class MethodContent extends MemberContent {
 				case ThrowsTarget:
 					ThrowsTarget tt = (ThrowsTarget)target;
 					exceptions[tt.getIndex()] = annotation + " " + exceptions[tt.getIndex()];
-					sb.append(",").append(exceptions[tt.getIndex()]);
 					break;
 				case TypeParameterTarget:
 //					TypeParameterTarget tpt = (TypeParameterTarget)target;
@@ -594,7 +591,6 @@ public class MethodContent extends MemberContent {
 //					TypeParameterBoundTarget tpbt = (TypeParameterBoundTarget)target;
 					break;
 			}
-			return sb.toString();
 		}
 	}
 	// </editor-fold>
