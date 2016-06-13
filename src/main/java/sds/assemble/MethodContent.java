@@ -89,12 +89,18 @@ public class MethodContent extends MemberContent {
 			System.out.println("[exception]");
 			System.out.println(exContent);
 		}
+		if(args != null) {
+			for(String[] arg : args) {
+				System.out.println(arg[0] + " " + arg[1]);
+			}
+		}
 		CFGBuilder builder = CFGBuilder.getInstance();
 		CFNode[] nodes = builder.build(inst, exContent);
 		for(CFNode n : nodes) {
 			System.out.println(n.toString());
 		}
 		System.out.println(getGenericsMap());
+		System.out.println("");
 	}
 	
 	@Override
@@ -346,11 +352,14 @@ public class MethodContent extends MemberContent {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
-			for(int i = 0; i < from.length; i++) {
+			for(int i = 0; i < from.length-1; i++) {
 				sb.append(from[i]).append("-").append(to[i])
 					.append(", ").append(target[i]).append(", ")
 					.append(exception[i]).append(System.getProperty("line.separator"));
 			}
+			sb.append(from[from.length-1]).append("-").append(to[from.length-1])
+					.append(", ").append(target[from.length-1]).append(", ")
+					.append(exception[from.length-1]);
 			return sb.toString();
 		}
 	}
@@ -445,12 +454,15 @@ public class MethodContent extends MemberContent {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
-			for(int i = 0; i < range.length; i++) {
+			for(int i = 0; i < range.length-1; i++) {
 				sb.append(range[i][0]).append("-").append(range[i][1])
 					.append(", ").append(index[i]).append(", ")
 					.append(variable[i][1]).append(" ").append(variable[i][0])
 					.append(System.getProperty("line.separator"));
 			}
+			sb.append(range[range.length-1][0]).append("-").append(range[range.length-1][1])
+					.append(", ").append(index[range.length-1]).append(", ")
+					.append(variable[range.length-1][1]).append(" ").append(variable[range.length-1][0]);
 			return sb.toString();
 		}
 	}
@@ -533,42 +545,42 @@ public class MethodContent extends MemberContent {
 					sb.append(",").append(exContent.getException()[ct.getIndex()]);
 					break;
 				case LocalVarTarget:
-					LocalVarTarget.LVTTable table = ((LocalVarTarget)target).getTable()[0];
-					sb.append(",").append(table.getStartPc())
-						.append("-").append(table.getStartPc() + table.getLen())
-						.append(",").append(table.getIndex());
-					if(valContent != null) {
-						int index = table.getIndex();
-						int[] indexes = valContent.getIndexes();
-						for(int i = 0; i < indexes.length; i++) {
-							if(index == indexes[i]) {
-								valContent.getVariables()[i][1]
-									= annotation + " " + valContent.getVariables()[i][1];
-								sb.append(valContent.getVariables()[i][1])
-									.append(" ").append(valContent.getVariables()[i][0]);
-								break;
-							}
-						}
-					}
+//					LocalVarTarget.LVTTable table = ((LocalVarTarget)target).getTable()[0];
+//					sb.append(",").append(table.getStartPc())
+//						.append("-").append(table.getStartPc() + table.getLen())
+//						.append(",").append(table.getIndex());
+//					if(valContent != null) {
+//						int index = table.getIndex();
+//						int[] indexes = valContent.getIndexes();
+//						for(int i = 0; i < indexes.length; i++) {
+//							if(index == indexes[i]) {
+//								valContent.getVariables()[i][1]
+//									= annotation + " " + valContent.getVariables()[i][1];
+//								sb.append(valContent.getVariables()[i][1])
+//									.append(" ").append(valContent.getVariables()[i][0]);
+//								break;
+//							}
+//						}
+//					}
 					break;
 				case MethodFormalParameterTarget:
-					MethodFormalParameterTarget mfpt = (MethodFormalParameterTarget)target;
-					if(args != null) {
-						args[mfpt.getIndex()][0] = annotation + " " + args[mfpt.getIndex()][0];
-						sb.append(args[mfpt.getIndex()][0]).append(args[mfpt.getIndex()][1]);
-					} else {
-						String desc = getDescriptor();
-						String methodArg = desc.substring(desc.indexOf("(") + 1, desc.indexOf(")"));
-						if(methodArg.contains(",")) {
-							sb.append(",").append(methodArg.split(",")[mfpt.getIndex()]);
-						} else {
-							sb.append(",").append(methodArg);
-						}
-					}
+//					MethodFormalParameterTarget mfpt = (MethodFormalParameterTarget)target;
+//					if(args != null) {
+//						args[mfpt.getIndex()][0] = annotation + " " + args[mfpt.getIndex()][0];
+//						sb.append(args[mfpt.getIndex()][0]).append(args[mfpt.getIndex()][1]);
+//					} else {
+//						String desc = getDescriptor();
+//						String methodArg = desc.substring(desc.indexOf("(") + 1, desc.indexOf(")"));
+//						if(methodArg.contains(",")) {
+//							sb.append(",").append(methodArg.split(",")[mfpt.getIndex()]);
+//						} else {
+//							sb.append(",").append(methodArg);
+//						}
+//					}
 					break;
 				case OffsetTarget:
-					OffsetTarget ot = (OffsetTarget)target;
-					sb.append(",").append(ot.getOffset());
+//					OffsetTarget ot = (OffsetTarget)target;
+//					sb.append(",").append(ot.getOffset());
 					break;
 				case ThrowsTarget:
 					ThrowsTarget tt = (ThrowsTarget)target;
@@ -576,10 +588,10 @@ public class MethodContent extends MemberContent {
 					sb.append(",").append(exceptions[tt.getIndex()]);
 					break;
 				case TypeParameterTarget:
-					TypeParameterTarget tpt = (TypeParameterTarget)target;
+//					TypeParameterTarget tpt = (TypeParameterTarget)target;
 					break;
 				case TypeParameterBoundTarget:
-					TypeParameterBoundTarget tpbt = (TypeParameterBoundTarget)target;
+//					TypeParameterBoundTarget tpbt = (TypeParameterBoundTarget)target;
 					break;
 			}
 			return sb.toString();

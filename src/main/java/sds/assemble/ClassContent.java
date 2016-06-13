@@ -155,10 +155,8 @@ public class ClassContent extends BaseContent {
 						System.out.println(interfaces[stt.getIndex()]);
 					}
 					break;
-				case TypeParameterTarget:
-					break;
-				case TypeParameterBoundTarget:
-					break;
+				case TypeParameterTarget:      break;
+				case TypeParameterBoundTarget: break;
 			}
 			return sb.toString();
 		}
