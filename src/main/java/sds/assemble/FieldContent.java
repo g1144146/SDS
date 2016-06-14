@@ -21,7 +21,7 @@ public class FieldContent extends MemberContent {
 	 * @param pool constant-pool
 	 */
 	public FieldContent(MemberInfo info, ConstantPool pool) {
-		super(info, pool, Type.Field);
+		super(info, pool);
 		for(AttributeInfo attr : info.getAttr().getAll()) {
 			investigateAttribute(attr, pool);
 		}

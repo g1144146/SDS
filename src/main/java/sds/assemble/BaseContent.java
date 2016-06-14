@@ -31,14 +31,6 @@ public abstract class BaseContent {
 	private AnnotationContent annContent;
 	TypeAnnotationContent taContent;
 	boolean hasAnnotation;
-	Type contentType;
-	public static enum Type {
-		Class,
-		Nested,
-		Method,
-		Code_In_Method,
-		Field;
-	}
 
 	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
 		switch(info.getType()) {
@@ -80,19 +72,17 @@ public abstract class BaseContent {
 					System.out.println("  " + a);
 				break;
 			case Signature:
-				if(contentType != Type.Field) {
-					Signature sig = (Signature)info;
-					String desc = extract(pool.get(sig.getSignatureIndex()-1), pool);
-					String parsedDesc = parse(desc, true);
-					String genericsType
-						= parsedDesc.substring(parsedDesc.indexOf("<") + 1, parsedDesc.lastIndexOf(">"));
-					for(String type : genericsType.split(",")) {
-						String[] typeAndExtends = type.split(" extends ");
-						if(typeAndExtends.length > 1) {
-							genericsMap.put(typeAndExtends[0], typeAndExtends[1]);
-						} else {
-							genericsMap.put(typeAndExtends[0], "java.lang.Object");
-						}
+				Signature sig = (Signature)info;
+				String desc = extract(pool.get(sig.getSignatureIndex()-1), pool);
+				String parsedDesc = parse(desc, true);
+				String genericsType
+					= parsedDesc.substring(parsedDesc.indexOf("<") + 1, parsedDesc.lastIndexOf(">"));
+				for(String type : genericsType.split(",")) {
+					String[] typeAndExtends = type.split(" extends ");
+					if(typeAndExtends.length > 1) {
+						genericsMap.put(typeAndExtends[0], typeAndExtends[1]);
+					} else {
+						genericsMap.put(typeAndExtends[0], "java.lang.Object");
 					}
 				}
 				break;

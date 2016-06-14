@@ -7,6 +7,5 @@ package sds.assemble;
 public class NestedClass extends ClassContent {
 	public NestedClass() {
 		super();
-		this.contentType = Type.Nested;
 	}
 }

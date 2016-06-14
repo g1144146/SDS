@@ -65,7 +65,7 @@ public class MethodContent extends MemberContent {
 	 * @param pool constant-pool
 	 */
 	public MethodContent(MemberInfo info, ConstantPool pool) {
-		super(info, pool, Type.Method);
+		super(info, pool);
 		System.out.println(this.getName());
 		// set arguments
 		String desc = getDescriptor();
@@ -138,11 +138,9 @@ public class MethodContent extends MemberContent {
 					}
 				}
 				this.exContent = new ExceptionContent(exTable, exClass);
-				this.contentType = Type.Code_In_Method;
 				for(AttributeInfo ai : code.getAttr().getAll()) {
 					investigateAttribute(ai, pool);
 				}
-				this.contentType = Type.Method;
 				break;
 			case Exceptions:
 				int[] exp = ((Exceptions)info).getExceptionIndexTable();

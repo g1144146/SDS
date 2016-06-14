@@ -37,7 +37,6 @@ public class ClassContent extends BaseContent {
 	 * @param cf classfile
 	 */
 	public ClassContent(ClassFile cf) {
-		this.contentType = Type.Class;
 		ConstantPool pool = cf.getPool();
 		this.superClass = extract(pool.get(cf.getSuperClass()-1), pool);
 		if(cf.getInterfaces().length > 0) {
