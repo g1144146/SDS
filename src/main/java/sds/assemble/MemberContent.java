@@ -16,8 +16,8 @@ import static sds.util.Utf8ValueExtractor.extract;
  */
 public abstract class MemberContent extends BaseContent {
 	private String accessFlag;
-	private String desc;
 	private String name;
+	String desc;
 
 	MemberContent(MemberInfo info, ConstantPool pool) {
 		this.accessFlag = get(info.getAccessFlags(), info.getType());
