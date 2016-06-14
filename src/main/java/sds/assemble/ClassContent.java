@@ -78,13 +78,18 @@ public class ClassContent extends BaseContent {
 	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
 		switch(info.getType()) {
 			case BootstrapMethods:
-//				BootstrapMethods bsm = (BootstrapMethods)info;
-//				this.bootstrapMethods = new String[bsm.getBSM().length];
-//				for(BootstrapMethods.BSM b : bsm.getBSM()) {
-//					for(int i = 0; i < b.getBSMArgs().length; i++) {
-//						bootstrapMethods[i] = extract(pool.get(b.getBSMArgs()[i]-1), pool);
-//					}
-//				}
+				BootstrapMethods bsm = (BootstrapMethods)info;
+				this.bootstrapMethods = new String[bsm.getBSM().length];
+				int index = 0;
+				for(BootstrapMethods.BSM b : bsm.getBSM()) {
+					for(int argIndex : b.getBSMArgs()) {
+						String method =extract(pool.get(argIndex-1), pool);
+						if(! method.startsWith("(")) {
+							bootstrapMethods[index++] = method;
+						}
+					}
+				}
+				System.out.println("bsm: "+java.util.Arrays.toString(bootstrapMethods));
 				break;
 			case EnclosingMethod:
 				EnclosingMethod em = (EnclosingMethod)info;
