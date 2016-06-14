@@ -20,6 +20,7 @@ import sds.classfile.attributes.MethodParameters;
 import sds.classfile.attributes.MethodParameters.Parameters;
 import sds.classfile.attributes.annotation.AnnotationDefault;
 import sds.classfile.attributes.annotation.CatchTarget;
+import sds.classfile.attributes.annotation.ElementValueException;
 import sds.classfile.attributes.annotation.LocalVarTarget;
 import sds.classfile.attributes.annotation.MethodFormalParameterTarget;
 import sds.classfile.attributes.annotation.OffsetTarget;
@@ -38,6 +39,7 @@ import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
 
 import static sds.util.AccessFlags.get;
+import static sds.util.AnnotationParser.parseElementValue;
 import static sds.util.DescriptorParser.parse;
 import static sds.util.Utf8ValueExtractor.extract;
 
@@ -55,6 +57,7 @@ public class MethodContent extends MemberContent {
 	private ExceptionContent exContent;
 	private LocalVariableContent valContent;
 	private ParamAnnotationContent paContent;
+	private String defaultAnn;
 	
 	/**
 	 * constructor.
@@ -113,6 +116,11 @@ public class MethodContent extends MemberContent {
 		switch(info.getType()) {
 			case AnnotationDefault:
 				AnnotationDefault ad = (AnnotationDefault)info;
+				try {
+					this.defaultAnn = parseElementValue(ad.getDefaultValue(), new StringBuilder(), pool);
+				} catch(ElementValueException e) {
+					e.printStackTrace();
+				}
 				break;
 			case Code:
 				Code code = (Code)info;
@@ -253,7 +261,7 @@ public class MethodContent extends MemberContent {
 	}
 
 	/**
-	 * return local variable content of this method.
+	 * returns local variable content of this method.
 	 * @return local variable content
 	 */
 	public LocalVariableContent getValContent() {
@@ -261,11 +269,21 @@ public class MethodContent extends MemberContent {
 	}
 
 	/**
-	 * return parameter annotation content of this method.
+	 * returns parameter annotation content of this method.
 	 * @return parameter annotation content
 	 */
 	public ParamAnnotationContent getParamAnnotation() {
 		return paContent;
+	}
+
+	/**
+	 * returns default value of annotation interface's method.<br>
+	 * when the method is not annotation interface's or default value is undefine
+	 * , this method returns null.
+	 * @return default value
+	 */
+	public String getDefaultAnn() {
+		return defaultAnn;
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="[class] ExceptionContent">
