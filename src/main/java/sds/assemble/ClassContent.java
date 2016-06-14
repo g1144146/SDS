@@ -6,6 +6,7 @@ import sds.classfile.Fields;
 import sds.classfile.Methods;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.BootstrapMethods;
+import sds.classfile.attributes.EnclosingMethod;
 import sds.classfile.attributes.InnerClasses;
 import sds.classfile.attributes.SourceFile;
 import sds.classfile.attributes.annotation.RuntimeInvisibleTypeAnnotations;
@@ -27,6 +28,9 @@ public class ClassContent extends BaseContent {
 	private String[] bootstrapMethods;
 	private String superClass;
 	private String[] interfaces;
+	private boolean isEnclosed;
+	private String enclosingClass;
+	private String enclosingMethod;
 
 	/**
 	 * constructor.
@@ -84,7 +88,10 @@ public class ClassContent extends BaseContent {
 //				}
 				break;
 			case EnclosingMethod:
-				// to do
+				EnclosingMethod em = (EnclosingMethod)info;
+				this.enclosingClass  = extract(pool.get(em.classIndex()-1), pool);
+				this.enclosingMethod = em.methodIndex() > 0
+					? extract(pool.get(em.methodIndex()-1), pool) : "";
 				break;
 			case InnerClasses:
 				InnerClasses ic = (InnerClasses)info;
