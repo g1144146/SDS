@@ -1,7 +1,9 @@
 package sds.classfile.bytecode;
 
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.Arrays;
+import java.util.Comparator;
+
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 /**
  * This class is for
@@ -10,13 +12,13 @@ import java.util.LinkedHashMap;
  * @author inagaki
  */
 public class Opcodes {
-	private Map<Integer, OpcodeInfo> opcodeMap;
+	private IntObjectHashMap<OpcodeInfo> opcodeMap;
 
 	/**
 	 * constructor.
 	 */
 	public Opcodes() {
-		this.opcodeMap = new LinkedHashMap<>();
+		this.opcodeMap = new IntObjectHashMap<>();
 	}
 
 	/**
@@ -50,7 +52,10 @@ public class Opcodes {
 	 * @return opcodes.
 	 */
 	public OpcodeInfo[] getAll() {
-		return opcodeMap.values().toArray(new OpcodeInfo[0]);
+		OpcodeInfo[] values = opcodeMap.values().toArray(new OpcodeInfo[0]);
+		Comparator<OpcodeInfo> c = this::compare;
+		Arrays.sort(values, c);
+		return values;
 	}
 
 	/**
@@ -58,15 +63,20 @@ public class Opcodes {
 	 * @return values
 	 */
 	public int[] getKeys() {
-		return opcodeMap.keySet()
-			.stream().mapToInt(Integer::intValue).toArray();
+		int keys[] = opcodeMap.keySet().toArray();
+		Arrays.sort(keys);
+		return keys;
 	}
 
 	/**
 	 * returns opcode map.
 	 * @return opcode map
 	 */
-	public Map<Integer, OpcodeInfo> getMap() {
+	public IntObjectHashMap<OpcodeInfo> getMap() {
 		return opcodeMap;
+	}
+
+	private int compare(OpcodeInfo o1, OpcodeInfo o2) {
+		return o1.getPc() - o2.getPc();
 	}
 }
