@@ -1,8 +1,7 @@
 package sds.assemble.controlflow;
 
-import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 import sds.assemble.LineInstructions;
 import sds.classfile.bytecode.BranchOpcode;
@@ -101,13 +100,8 @@ public class CFNode {
 			hash = 31 * hash + val4[i];
 		}
 
-		Comparator<CFEdge> edgeComp = this::compareEdge;
-		this.parents    = new UnifiedSet<CFEdge>().toSortedSet(edgeComp);
-		this.children   = new UnifiedSet<CFEdge>().toSortedSet(edgeComp);
-	}
-
-	private int compareEdge(CFEdge e1, CFEdge e2) {
-		return e1.getSource().getStart().getPc() - e2.getSource().getStart().getPc();
+		this.parents    = new LinkedHashSet<>();
+		this.children   = new LinkedHashSet<>();
 	}
 
 	/**
