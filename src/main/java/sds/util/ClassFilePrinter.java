@@ -2,6 +2,9 @@ package sds.util;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 import sds.classfile.Attributes;
 import sds.classfile.ConstantPool;
@@ -26,9 +29,6 @@ import sds.classfile.attributes.SourceDebugExtension;
 import sds.classfile.attributes.SourceFile;
 import sds.classfile.attributes.annotation.Annotation;
 import sds.classfile.attributes.annotation.AnnotationDefault;
-import sds.classfile.attributes.annotation.ElementValue;
-import sds.classfile.attributes.annotation.ElementValuePair;
-import sds.classfile.attributes.annotation.EnumConstValue;
 import sds.classfile.attributes.annotation.ParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleParameterAnnotations;
@@ -49,35 +49,16 @@ import sds.classfile.attributes.annotation.TypeArgumentTarget;
 import sds.classfile.attributes.annotation.TypeParameterTarget;
 import sds.classfile.attributes.annotation.TypeParameterBoundTarget;
 import sds.classfile.attributes.annotation.TypeAnnotation;
-import sds.classfile.attributes.stackmap.AppendFrame;
-import sds.classfile.attributes.stackmap.ChopFrame;
-import sds.classfile.attributes.stackmap.FullFrame;
-import sds.classfile.attributes.stackmap.ObjectVariableInfo;
-import sds.classfile.attributes.stackmap.SameFrameExtended;
-import sds.classfile.attributes.stackmap.SameLocals1StackItemFrame;
-import sds.classfile.attributes.stackmap.SameLocals1StackItemFrameExtended;
 import sds.classfile.attributes.stackmap.StackMapTable;
-import sds.classfile.attributes.stackmap.StackMapFrame;
-import sds.classfile.attributes.stackmap.UninitializedVariableInfo;
-import sds.classfile.attributes.stackmap.VerificationTypeInfo;
-import sds.classfile.bytecode.PushOpcode;
-import sds.classfile.bytecode.BranchOpcode;
-import sds.classfile.bytecode.CpRefOpcode;
-import sds.classfile.bytecode.Iinc;
-import sds.classfile.bytecode.IndexOpcode;
-import sds.classfile.bytecode.InvokeDynamic;
-import sds.classfile.bytecode.InvokeInterface;
-import sds.classfile.bytecode.LookupSwitch;
-import sds.classfile.bytecode.MultiANewArray;
-import sds.classfile.bytecode.NewArray;
 import sds.classfile.bytecode.OpcodeInfo;
-import sds.classfile.bytecode.TableSwitch;
-import sds.classfile.bytecode.Wide;
+import sds.classfile.bytecode.Opcodes;
 
 import static sds.util.AccessFlags.get;
 import static sds.util.AnnotationParser.parseAnnotation;
 import static sds.util.AnnotationParser.parseElementValue;
 import static sds.util.DescriptorParser.parse;
+import static sds.util.OperandExtractor.extractOperand;
+import static sds.util.StackMapFrameParser.parseFrame;
 import static sds.util.Utf8ValueExtractor.extract;
 
 /**
@@ -88,6 +69,7 @@ public class ClassFilePrinter {
 	private PrintStream out = System.out;
 	private ConstantPool pool;
 	private String sep = System.getProperty("line.separator");
+	private Opcodes opcodes;
 
 	/**
 	 * constructor.
@@ -266,59 +248,11 @@ public class ClassFilePrinter {
 				Code code = (Code)info;
 				out.print("     max_stack: " + code.getMaxStack());
 				out.println(", max_locals: " + code.maxLocals());
-				for(OpcodeInfo op : code.getCode().getAll()) {
+				this.opcodes = code.getCode();
+				for(OpcodeInfo op : opcodes.getAll()) {
 					out.print("     "+op.getPc()+" - "+op.getOpcodeType());
-					if(op instanceof PushOpcode) {
-						PushOpcode push = (PushOpcode)op;
-						out.println("  " + push.getValue());
-					} else if(op instanceof BranchOpcode) {
-						BranchOpcode branch = (BranchOpcode)op;
-						out.println("  " + branch.getBranch());
-					} else if(op instanceof Iinc) {
-						Iinc iinc = (Iinc)op;
-						out.println("  " + iinc.getIndex() +","+iinc.getConst());
-					} else if(op instanceof IndexOpcode) {
-						IndexOpcode io = (IndexOpcode)op;
-						out.println("  " + io.getIndex());
-					} else if(op instanceof InvokeDynamic) {
-						InvokeDynamic id = (InvokeDynamic)op;
-						out.println("  " + "#" + id.getIndexByte());
-					} else if(op instanceof InvokeInterface) {
-						InvokeInterface ii = (InvokeInterface)op;
-						out.println("  " + "#" + ii.getIndexByte() + ","+ii.getCount());
-					} else if(op instanceof LookupSwitch) {
-						LookupSwitch ls = (LookupSwitch)op;
-						int[] match = ls.getMatch();
-						int[] offset = ls.getOffset();
-						out.print(sep);
-						for(int i = 0; i < match.length; i++) {
-							out.println("            " + match[i] + ", " + (offset[i]+ls.getPc()));
+					out.println(": " + extractOperand(op, pool));
 						}
-						out.println("          default: " + (ls.getDefault()+ls.getPc()));
-					} else if(op instanceof MultiANewArray) {
-						MultiANewArray mana = (MultiANewArray)op;
-						out.println("  " + "#" +mana.getIndexByte());
-					} else if(op instanceof NewArray) {
-						NewArray na = (NewArray)op;
-						out.println("  " + na.getType());
-					} else if(op instanceof TableSwitch) {
-						TableSwitch ts = (TableSwitch)op;
-						int[] jump = ts.getJumpOffsets();
-						out.print(sep);
-						for(int i = 0; i < jump.length; i++) {
-							out.println("            " + (jump[i]+ts.getPc()));
-						}
-						out.println("          default: " + (ts.getDefault()+ts.getPc()));
-					} else if(op instanceof Wide) {
-						Wide wide = (Wide)op;
-						out.println("  " + "#" +wide.getIndexByte() +","+ wide.getConst());
-					} else if(op instanceof CpRefOpcode) {
-						CpRefOpcode cp = (CpRefOpcode)op;
-						out.println("  #" + cp.getIndexByte());
-					} else {
-						out.println("");
-					}
-				}
 				if(code.getExceptionTable().length > 0) {
 					out.println("  ExceptionTable");
 				}
@@ -504,87 +438,17 @@ public class ClassFilePrinter {
 			case StackMapTable:
 				StackMapTable smt = (StackMapTable)info;
 				int stackIndex = 1;
-				for(StackMapFrame frame : smt.getEntries()) {
-					printStackMapFrame(stackIndex, frame);
-					stackIndex++;
+				IntObjectHashMap<UnifiedMap<String, MutableList<String>>> stackMap
+					= parseFrame(smt.getEntries(), pool, opcodes);
+				for(int i : stackMap.keySet().toArray()) {
+					UnifiedMap<String, MutableList<String>> map = stackMap.get(i);
+					out.println("     " + i + ": " + map);
 				}
 				break;
 			default:
 				System.out.println("unknown attribute type: " + info.getType().name());
 				break;
 		}
-	}
-
-	private void printStackMapFrame(int index, StackMapFrame frame) {
-		out.println("     " + index + ". " + frame.getFrameType());
-		switch(frame.getFrameType()) {
-			case SameFrame: break;
-			case SameLocals1StackItemFrame:
-				SameLocals1StackItemFrame slsif = (SameLocals1StackItemFrame)frame;
-				printVerificationTypeInfo(slsif.getStack());
-				break;
-			case SameLocals1StackItemFrameExtended:
-				SameLocals1StackItemFrameExtended slsife = (SameLocals1StackItemFrameExtended)frame;
-				printVerificationTypeInfo(slsife.getStack());
-				break;
-			case ChopFrame:
-				ChopFrame cFrame = (ChopFrame)frame;
-				out.println("       offset_delta: " + cFrame.getOffset());
-				break;
-			case SameFrameExtended:
-				SameFrameExtended sfe = (SameFrameExtended)frame;
-				sfe.getOffset();
-				break;
-			case AppendFrame:
-				AppendFrame af = (AppendFrame)frame;
-				out.println("       offset_delta: " + af.getOffset());
-				for(VerificationTypeInfo info : af.getLocals()) {
-					printVerificationTypeInfo(info);
-				}
-				break;
-			case FullFrame:
-				FullFrame ff = (FullFrame)frame;
-				out.println("       offset_delta: " + ff.getOffset());
-				for(VerificationTypeInfo info : ff.getLocals()) {
-					printVerificationTypeInfo(info);
-				}
-				for(VerificationTypeInfo info : ff.getStack()) {
-					printVerificationTypeInfo(info);
-				}
-				break;
-			default:
-				System.out.println("unknown stack-map-frame type: " + frame.getFrameType());
-				break;
-		}
-	}
-
-	private void printVerificationTypeInfo(VerificationTypeInfo info) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("       ").append(info.getType()).append(sep);
-		switch(info.getType()) {
-			case TopVariableInfo:
-			case IntegerVariableInfo:
-			case FloatVariableInfo:
-			case LongVariableInfo:
-			case DoubleVariableInfo:
-			case NullVariableInfo:
-			case UninitializedThisVariableInfo: break;
-			case ObjectVariableInfo:
-				ObjectVariableInfo ovi = (ObjectVariableInfo)info;
-				sb.append("            cpool_index: ").append(ovi.getCPoolIndex());
-				sb.append(", value: ")
-					.append(extract(pool.get(ovi.getCPoolIndex()-1), pool))
-					.append(sep);
-				break;
-			case UninitializedVariableInfo:
-				UninitializedVariableInfo uvi = (UninitializedVariableInfo)info;
-				sb.append("            offset: ").append(uvi.getOffset()).append(sep);
-				break;
-			default:
-				System.out.println("unknown varification-info type: " + info.getType());
-				break;
-		}
-		out.print(sb.toString());
 	}
 
 	private void printTargetInfo(TargetInfo info) {
