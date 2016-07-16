@@ -26,6 +26,7 @@ public class ClassContent extends BaseContent {
 	private NestedClass[] nested;
 	private String sourceFile;
 	private String[] bootstrapMethods;
+	private String thisClass;
 	private String superClass;
 	private String[] interfaces;
 	private boolean isEnclosed;
@@ -38,6 +39,7 @@ public class ClassContent extends BaseContent {
 	 */
 	public ClassContent(ClassFile cf) {
 		ConstantPool pool = cf.getPool();
+		this.thisClass  = extract(pool.get(cf.getThisClass()-1),  pool);
 		this.superClass = extract(pool.get(cf.getSuperClass()-1), pool);
 		if(cf.getInterfaces().length > 0) {
 			int[] interIndex = cf.getInterfaces();
@@ -89,7 +91,6 @@ public class ClassContent extends BaseContent {
 						}
 					}
 				}
-				System.out.println("bsm: "+java.util.Arrays.toString(bootstrapMethods));
 				break;
 			case EnclosingMethod:
 				EnclosingMethod em = (EnclosingMethod)info;
@@ -134,11 +135,68 @@ public class ClassContent extends BaseContent {
 			case SourceFile:
 				SourceFile sf = (SourceFile)info;
 				this.sourceFile = extract(pool.get(sf.getSourceFileIndex()-1), pool);
+				System.out.println(this.sourceFile);
 				break;
 			default:
 				super.investigateAttribute(info, pool);
 				break;
 		}
+	}
+
+	/**
+	 * returns assembled methods which this class has.
+	 * @return assembled methods
+	 */
+	public MethodContent[] getMethods() {
+		return methods;
+	}
+
+	/**
+	 * returns assembled fields which this class has.
+	 * @return assembled fields
+	 */
+	public FieldContent[] getFields() {
+		return fields;
+	}
+
+	/**
+	 * returns assembled nested classes which this class has.
+	 * @return assembled nested classes
+	 */
+	public NestedClass[] getNested() {
+		return nested;
+	}
+
+	/**
+	 * return source file name of this class.
+	 * @return source file name
+	 */
+	public String getSourceFile() {
+		return sourceFile;
+	}
+
+	/**
+	 * returns this class.
+	 * @return 
+	 */
+	public String getThisClass() {
+		return thisClass;
+	}
+
+	/**
+	 * returns super class of this class.
+	 * @return 
+	 */
+	public String getSuperClass() {
+		return superClass;
+	}
+
+	/**
+	 * returns interfaces which this class implements.
+	 * @return 
+	 */
+	public String[] getInterfaces() {
+		return interfaces;
 	}
 
 	/**
