@@ -14,6 +14,7 @@ import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.SuperTypeTarget;
 import sds.classfile.attributes.annotation.TargetInfo;
 import sds.classfile.attributes.annotation.TypeAnnotation;
+import static sds.util.AccessFlags.get;
 import static sds.util.Utf8ValueExtractor.extract;
 
 /**
@@ -26,6 +27,7 @@ public class ClassContent extends BaseContent {
 	private NestedClass[] nested;
 	private String sourceFile;
 	private String[] bootstrapMethods;
+	private String accessFlag;
 	private String thisClass;
 	private String superClass;
 	private String[] interfaces;
@@ -39,6 +41,7 @@ public class ClassContent extends BaseContent {
 	 */
 	public ClassContent(ClassFile cf) {
 		ConstantPool pool = cf.getPool();
+		this.accessFlag = get(cf.getAccessFlag(), "class");
 		this.thisClass  = extract(pool.get(cf.getThisClass()-1),  pool);
 		this.superClass = extract(pool.get(cf.getSuperClass()-1), pool);
 		if(cf.getInterfaces().length > 0) {
@@ -135,7 +138,6 @@ public class ClassContent extends BaseContent {
 			case SourceFile:
 				SourceFile sf = (SourceFile)info;
 				this.sourceFile = extract(pool.get(sf.getSourceFileIndex()-1), pool);
-				System.out.println(this.sourceFile);
 				break;
 			default:
 				super.investigateAttribute(info, pool);
@@ -173,6 +175,14 @@ public class ClassContent extends BaseContent {
 	 */
 	public String getSourceFile() {
 		return sourceFile;
+	}
+
+	/**
+	 * returns access flag of this class.
+	 * @return access flag
+	 */
+	public String getAccessFlag() {
+		return accessFlag;
 	}
 
 	/**
