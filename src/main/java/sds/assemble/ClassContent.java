@@ -72,8 +72,6 @@ public class ClassContent extends BaseContent {
 		}
 		if(ic != null) {
 			this.nested = new NestedClass[ic.getClasses().length];
-		} else {
-			this.nested = new NestedClass[0];
 		}
 	}
 
@@ -150,7 +148,7 @@ public class ClassContent extends BaseContent {
 	 * @return assembled methods
 	 */
 	public MethodContent[] getMethods() {
-		return methods;
+		return methods != null ? methods : new MethodContent[0];
 	}
 
 	/**
@@ -158,7 +156,7 @@ public class ClassContent extends BaseContent {
 	 * @return assembled fields
 	 */
 	public FieldContent[] getFields() {
-		return fields;
+		return fields != null ? fields : new FieldContent[0];
 	}
 
 	/**
@@ -166,7 +164,7 @@ public class ClassContent extends BaseContent {
 	 * @return assembled nested classes
 	 */
 	public NestedClass[] getNested() {
-		return nested;
+		return nested != null ? nested : new NestedClass[0];
 	}
 
 	/**
@@ -206,7 +204,7 @@ public class ClassContent extends BaseContent {
 	 * @return 
 	 */
 	public String[] getInterfaces() {
-		return interfaces;
+		return interfaces != null ? interfaces : new String[0];
 	}
 
 	/**

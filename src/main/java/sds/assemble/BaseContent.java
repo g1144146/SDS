@@ -171,7 +171,8 @@ public abstract class BaseContent {
 		 * @return annotations
 		*/
 		public String[] getAnnotations(boolean isVisible) {
-			return isVisible ? visible : invisible;
+			return isVisible ? (visible   != null ? visible   : new String[0])
+							 : (invisible != null ? invisible : new String[0]);
 		}
 
 		/**
@@ -238,7 +239,8 @@ public abstract class BaseContent {
 		 * @return target info
 		 */
 		public String[] getTargets(boolean isVisible) {
-			return isVisible ? targets : invTargets;
+			return isVisible ? (targets    != null ? targets    : new String[0])
+							 : (invTargets != null ? invTargets : new String[0]);
 		}
 	}
 	// </editor-fold>

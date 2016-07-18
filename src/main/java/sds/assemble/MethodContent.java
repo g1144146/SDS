@@ -309,7 +309,7 @@ public class MethodContent extends MemberContent {
 		 * @return from-indexes
 		 */
 		public int[] getFrom() {
-			return from;
+			return from != null ? from : new int[0];
 		}
 		
 		/**
@@ -317,7 +317,7 @@ public class MethodContent extends MemberContent {
 		 * @return to-indexes
 		 */
 		public int[] getTo() {
-			return to;
+			return to != null ? to : new int[0];
 		}
 		
 		/**
@@ -325,7 +325,7 @@ public class MethodContent extends MemberContent {
 		 * @return target indexes
 		 */
 		public int[] getTarget() {
-			return target;
+			return target != null ? target : new int[0];
 		}
 		
 		/**
@@ -333,7 +333,7 @@ public class MethodContent extends MemberContent {
 		 * @return exception class names
 		 */
 		public String[] getException() {
-			return exception;
+			return exception != null ? exception : new String[0];
 		}
 		
 		/**
