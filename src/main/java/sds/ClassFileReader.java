@@ -50,17 +50,6 @@ public class ClassFileReader {
 			readFields(raf, raf.readShort());
 			readMethods(raf, raf.readShort());
 			cf.attr = readAttributes(raf, raf.readShort());
-			
-			ClassFilePrinter printer = new ClassFilePrinter(cf.pool);
-			printer.printNumber(cf.magicNumber, cf.majorVersion, cf.minorVersion);
-			printer.printConstantPool();
-			printer.printAccessFlag(cf.accessFlag);
-			printer.printThisClass(cf.thisClass);
-			printer.printSuperClass(cf.superClass);
-			printer.printInterface(cf.interfaces);
-			printer.printFields(cf.fields);
-			printer.printMethods(cf.methods);
-			printer.printAttributes(cf.attr);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
