@@ -14,6 +14,7 @@ import static sds.assemble.controlflow.CFNodeType.End;
 import static sds.assemble.controlflow.CFNodeType.Exit;
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
 import static sds.assemble.controlflow.CFNodeType.LoopExit;
+import static sds.assemble.controlflow.CFNodeType.StringSwitch;
 import static sds.assemble.controlflow.CFNodeType.Switch;
 import static sds.assemble.controlflow.CFEdgeType.JumpToCatch;
 import static sds.assemble.controlflow.CFEdgeType.JumpToFinally;
@@ -124,10 +125,10 @@ public class CFGBuilder {
 						break;
 					}
 				}
-			} else if(type == Switch) {
+			} else if(type == Switch || type == StringSwitch) {
 				int[] jumpPoints = n.getSwitchJump();
 				int offsetIndex = 0;
-				for(int i = index; i < nodes.length; i++) {
+				for(int i = 0; i < nodes.length; i++) {
 					if(nodes[i].isInPcRange(jumpPoints[offsetIndex])) {
 						n.addChild(nodes[i]);
 						nodes[i].addParent(n);

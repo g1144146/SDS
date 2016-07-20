@@ -9,6 +9,12 @@ import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.LookupSwitch;
 import sds.classfile.bytecode.TableSwitch;
 
+import static sds.assemble.controlflow.CFNodeType.Entry;
+import static sds.assemble.controlflow.CFNodeType.Exit;
+import static sds.assemble.controlflow.CFNodeType.LoopExit;
+import static sds.assemble.controlflow.CFNodeType.StringSwitch;
+import static sds.assemble.controlflow.CFNodeType.Switch;
+
 /**
  * This class is for node of control flow graph.
  * @author inagaki
@@ -47,18 +53,17 @@ public class CFNode {
 			sb.append(info.getOpcodeType()).append(" ");
 		}
 		this.instStr = sb.toString();
-		
-		
+
 		this.nodeType = CFNodeType.getType(inst.getOpcodes(), end);
-		if(nodeType == CFNodeType.Entry) { // if_xx
+		if(nodeType == Entry) { // if_xx
 			for(OpcodeInfo op : inst.getOpcodes().getAll()) {
 				if(op instanceof BranchOpcode) {
 					this.jumpPoint = ((BranchOpcode)op).getBranch() + op.getPc();
 				}
 			}
-		} else if(nodeType == CFNodeType.Exit || nodeType == CFNodeType.LoopExit) { // goto
+		} else if(nodeType == Exit || nodeType == LoopExit) { // goto
 			this.jumpPoint = ((BranchOpcode)end).getBranch() + end.getPc();
-		} else if(nodeType == CFNodeType.Switch) { // switch
+		} else if(nodeType == Switch) { // switch
 			for(OpcodeInfo op : inst.getOpcodes().getAll()) {
 				if(op instanceof LookupSwitch) {
 					LookupSwitch look = (LookupSwitch)op;
@@ -80,7 +85,25 @@ public class CFNode {
 					break;
 				}
 			}
- 		}
+ 		} else if(nodeType == StringSwitch) {
+			if(end instanceof LookupSwitch) {
+				LookupSwitch look = (LookupSwitch)end;
+				this.switchJump = new int[look.getMatch().length + 1];
+				int[] offsets = look.getOffset();
+				for(int i = 0; i < switchJump.length-1; i++) {
+					switchJump[i] = offsets[i] + look.getPc();
+				}
+				switchJump[switchJump.length - 1] = look.getDefault() + look.getPc();
+			} else if(end instanceof TableSwitch) {
+				TableSwitch table = (TableSwitch)end;
+				this.switchJump = new int[table.getJumpOffsets().length + 1];
+				int[] offsets = table.getJumpOffsets();
+				for(int i = 0; i < switchJump.length-1; i++) {
+					switchJump[i] = offsets[i] + table.getPc();
+				}
+				switchJump[switchJump.length - 1] = table.getDefault() + table.getPc();
+			}
+		}
 
 		// calc hash
 		char[] val1 = String.valueOf(start.getPc()).toCharArray();
