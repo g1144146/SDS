@@ -35,6 +35,9 @@ public class DominatorNodeSearcher {
 	 * @return common dominator node
 	 */
 	public static CFNode searchCommon(CFNode node1, CFNode node2) {
+		if(node2.isRoot()) {
+			return node2;
+		}
 		Set<CFNode> nodeSet = new HashSet<>();
 		nodeSet.add(node1);
 		CFNode n1 = node1;
