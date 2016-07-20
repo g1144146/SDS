@@ -15,6 +15,7 @@ public enum CFNodeType {
 	Entry,
 	Exit,
 	Switch,
+	StringSwitch,
 	LoopEntry,
 	LoopExit,
 	End;
@@ -26,6 +27,10 @@ public enum CFNodeType {
 	 * @return node type
 	 */
 	public static CFNodeType getType(Opcodes opcodes, OpcodeInfo end) {
+		if(hasSomeSwitchOpcode(opcodes)) {
+			return StringSwitch;
+		}
+
 		CFNodeType type;
 		if((type = searchType(end)) != Normal) {
 			return type;
@@ -38,6 +43,16 @@ public enum CFNodeType {
 			index++;
 		}
 		return type;
+	}
+
+	private static boolean hasSomeSwitchOpcode(Opcodes opcodes) {
+		int count = 0;
+		for(OpcodeInfo info : opcodes.getAll()) {
+			if(info instanceof SwitchOpcode) {
+				count++;
+			}
+		}
+		return count > 1;
 	}
 	
 	private static CFNodeType searchType(OpcodeInfo op) {
