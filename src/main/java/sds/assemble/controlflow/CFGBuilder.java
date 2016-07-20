@@ -91,13 +91,14 @@ public class CFGBuilder {
 			// processing for setting parent and child.
 			if(index > 0) {
 				CFNodeType type = nodes[index-1].getType();
-				if(type != Exit && type != LoopExit && type != Switch && type != End) {
+				if(type != Exit && type != LoopExit && type != Switch
+				&& type != End && type != StringSwitch) {
 					n.addParent(nodes[index-1]);
 					nodes[index-1].addChild(n);
 				}
 			} else if(index == nodes.length-1) {
 				CFNodeType type = n.getType();
-				if(type != Exit && type != LoopExit && type != Switch) {
+				if(type != Exit && type != LoopExit && type != Switch && type != StringSwitch) {
 					n.addChild(nodes[index]);
 					nodes[index].addParent(n);
 				}
