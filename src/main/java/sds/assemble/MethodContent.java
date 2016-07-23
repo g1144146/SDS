@@ -127,6 +127,7 @@ public class MethodContent extends MemberContent {
 				this.maxStack    = code.getMaxStack();
 				this.maxLocals   = code.maxLocals();
 				this.opcodes     = code.getCode();
+				// throws exceptions
 				ExceptionTable[] exTable = code.getExceptionTable();
 				String[] exClass = new String[exTable.length];
 				for(int i = 0; i < exTable.length; i++) {
@@ -138,6 +139,7 @@ public class MethodContent extends MemberContent {
 					}
 				}
 				this.exContent = new ExceptionContent(exTable, exClass);
+				// other attributes
 				for(AttributeInfo ai : code.getAttr().getAll()) {
 					investigateAttribute(ai, pool);
 				}

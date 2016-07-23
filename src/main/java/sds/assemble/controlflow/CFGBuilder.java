@@ -47,6 +47,10 @@ public class CFGBuilder {
 	 * @return control flow graph
 	 */
 	public CFNode[] build(LineInstructions[] inst, ExceptionContent ex) {
+		if(inst == null) {
+			return new CFNode[0];
+		}
+
 		/** 1. create nodes **/
 		CFNode[] nodes = new CFNode[inst.length];
 		for(int i = 0; i < nodes.length; i++) {
