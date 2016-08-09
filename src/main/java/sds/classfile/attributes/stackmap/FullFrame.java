@@ -1,7 +1,7 @@
 package sds.classfile.attributes.stackmap;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for full_frame which
@@ -15,20 +15,20 @@ public class FullFrame extends ChopFrame {
 	/**
 	 * constructor.
 	 * @param tag discrimination tag
-	 * @param raf classfile stream
+	 * @param data classfile stream
 	 * @throws IOException 
 	 */
-	public FullFrame(int tag, RandomAccessFile raf) throws IOException {
-		super(StackMapFrameType.FullFrame, tag, raf);
+	public FullFrame(int tag, ClassFileStream data) throws IOException {
+		super(StackMapFrameType.FullFrame, tag, data);
 		try {
 			VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();
-			this.locals = new VerificationTypeInfo[raf.readShort()];
+			this.locals = new VerificationTypeInfo[data.readShort()];
 			for(int i = 0; i < locals.length; i++) {
-				locals[i] = builder.build(raf);
+				locals[i] = builder.build(data);
 			}
-			this.stack = new VerificationTypeInfo[raf.readShort()];
+			this.stack = new VerificationTypeInfo[data.readShort()];
 			for(int i = 0; i < stack.length; i++) {
-				stack[i] = builder.build(raf);
+				stack[i] = builder.build(data);
 			}
 		} catch(VerificationTypeException e) {
 			e.printStackTrace();

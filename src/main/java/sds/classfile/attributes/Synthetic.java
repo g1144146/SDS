@@ -1,7 +1,8 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
 
 /**
  * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.8">Synthetic Attribute</a>.
@@ -18,7 +19,7 @@ public class Synthetic extends AttributeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
 		// do nothing.
 	}
 }

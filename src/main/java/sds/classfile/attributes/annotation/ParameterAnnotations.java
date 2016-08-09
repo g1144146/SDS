@@ -1,7 +1,10 @@
 package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
+
+import static sds.util.AnnotationParser.parseAnnotation;
 
 /**
  * This class is for annotations table.<br>
@@ -12,12 +15,13 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class ParameterAnnotations {
-	private Annotation[] annotations;
+	private String[] annotations;
 
-	ParameterAnnotations(RandomAccessFile raf) throws IOException, ElementValueException {
-		this.annotations = new Annotation[raf.readShort()];
+	ParameterAnnotations(ClassFileStream data, ConstantPool pool)
+	throws IOException, ElementValueException {
+		this.annotations = new String[data.readShort()];
 		for(int i = 0; i < annotations.length; i++) {
-			annotations[i] = new Annotation(raf);
+			annotations[i] = parseAnnotation(new Annotation(data), new StringBuilder(), pool);
 		}
 	}
 
@@ -25,7 +29,7 @@ public class ParameterAnnotations {
 	 * returns runtime parameter annotations.
 	 * @return runtime parameter annotations
 	 */
-	public Annotation[] getAnnotations() {
+	public String[] getAnnotations() {
 		return annotations;
 	}
 }

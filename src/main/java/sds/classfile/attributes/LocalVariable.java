@@ -1,7 +1,10 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
+import static sds.util.DescriptorParser.parse;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This adapter class is for
@@ -32,10 +35,10 @@ public abstract class LocalVariable extends AttributeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.localVariableTable = new LVTable[raf.readShort()];
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		this.localVariableTable = new LVTable[data.readShort()];
 		for(int i = 0; i < localVariableTable.length; i++) {
-			localVariableTable[i] = new LVTable(raf);
+			localVariableTable[i] = new LVTable(data, pool);
 		}
 	}
 
@@ -45,16 +48,19 @@ public abstract class LocalVariable extends AttributeInfo {
 	public class LVTable {
 		private int startPc;
 		private int length;
-		private int nameIndex;
-		private int descriptorIndex;
 		private int index;
+		private String name;
+		private String desc;
 
-		LVTable(RandomAccessFile raf) throws IOException {
-			this.startPc = raf.readShort();
-			this.length = raf.readShort();
-			this.nameIndex = raf.readShort();
-			this.descriptorIndex = raf.readShort();
-			this.index = raf.readShort();
+		LVTable(ClassFileStream data, ConstantPool pool) throws IOException {
+			this.startPc = data.readShort();
+			this.length = data.readShort();
+			int nameIndex = data.readShort();
+			int descIndex = data.readShort();
+			this.index = data.readShort();
+			
+			this.name = extract(pool.get(nameIndex-1), pool);
+			this.desc = (descIndex-1 >= 0) ? parse(extract(pool.get(descIndex-1), pool)) : "";
 		}
 
 		/**
@@ -65,11 +71,6 @@ public abstract class LocalVariable extends AttributeInfo {
 		 * if key is "length", it returns
 		 * range in the code array at which local variable
 		 * is active.<br>
-		 * if key is "name_index", it returns
-		 * constant-pool entry index of local variable name.<br>
-		 * if key is "descriptor", it returns
-		 * constant-pool entry index of local variable's
-		 * descriptor.<br>
 		 * if key is "index", it returns
 		 * index in the local variable array of
 		 * the current frame.<br>
@@ -81,13 +82,27 @@ public abstract class LocalVariable extends AttributeInfo {
 			switch(key) {
 				case "start_pc":   return startPc;
 				case "length":     return length;
-				case "name_index": return nameIndex;
-				case "descriptor": return descriptorIndex;
 				case "index":      return index;
 				default:
 					System.out.println("Invalid key: " + key);
 					return -1;
 			}
+		}
+
+		/**
+		 * returns local variable name.
+		 * @return name
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/**
+		 * returns local variable descriptor.
+		 * @return descriptor
+		 */
+		public String getDesc() {
+			return desc;
 		}
 	}
 }

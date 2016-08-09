@@ -1,7 +1,9 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This class is for
@@ -10,8 +12,8 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class EnclosingMethod extends AttributeInfo {
-	private int classIndex;
-	private int methodIndex;
+	private String _class;
+	private String method;
 	
 	/**
 	 * constructor.
@@ -23,24 +25,26 @@ public class EnclosingMethod extends AttributeInfo {
 	}
 
 	/**
-	 * returns constant-pool entry index of class has this method.
-	 * @return constant-pool entry index of class has this method
+	 * returns class of enclosing method.
+	 * @return class
 	 */
-	public int classIndex() {
-		return classIndex;
+	public String getEncClass() {
+		return _class;
 	}
 
 	/**
-	 * returns constant-pool entry index of this method.
-	 * @return constant-pool entry index of this method
+	 * returns enclosing method.
+	 * @return method
 	 */
-	public int methodIndex() {
-		return methodIndex;
+	public String getEncMethod() {
+		return method;
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.classIndex  = raf.readShort();
-		this.methodIndex = raf.readShort();
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		int classIndex  = data.readShort();
+		this._class = extract(pool.get(classIndex-1), pool);
+		int methodIndex = data.readShort();
+		this.method = methodIndex > 0 ? extract(pool.get(methodIndex-1), pool) : "";
 	}
 }

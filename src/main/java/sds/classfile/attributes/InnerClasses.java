@@ -1,7 +1,10 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
+import static sds.util.AccessFlags.get;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This class is for
@@ -30,10 +33,10 @@ public class InnerClasses extends AttributeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.classes = new Classes[raf.readShort()];
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		this.classes = new Classes[data.readShort()];
 		for(int i = 0; i < classes.length; i++) {
-			classes[i] = new Classes(raf);
+			classes[i] = new Classes(data, pool);
 		}
 	}
 
@@ -41,41 +44,52 @@ public class InnerClasses extends AttributeInfo {
 	 * This class is for inner class.
 	 */
 	public class Classes {
-		private int innerClassInfoIndex;
-		private int outerClassInfoIndex;
-		private int innerNameIndex;
-		private int innerClassAccessFlags;
+		private String innerClass;
+		private String outerClass;
+		private String innerName;
+		private String innerClassAccessFlags;
 
-		Classes(RandomAccessFile raf) throws IOException {
-			this.innerClassInfoIndex = raf.readShort();
-			this.outerClassInfoIndex = raf.readShort();
-			this.innerNameIndex = raf.readShort();
-			this.innerClassAccessFlags = raf.readShort();
+		Classes(ClassFileStream data, ConstantPool pool) throws IOException {
+			int innerClassInfoIndex = data.readShort();
+			int outerClassInfoIndex = data.readShort();
+			int innerNameIndex = data.readShort();
+			int accessFlags = data.readShort();
+			if(checkRange(innerClassInfoIndex-1, pool.size())) {
+				this.innerClass = extract(pool.get(innerClassInfoIndex-1), pool);
+			}
+			if(checkRange(outerClassInfoIndex-1, pool.size())) {
+				this.outerClass = extract(pool.get(outerClassInfoIndex-1), pool);
+			}
+			if(checkRange(innerNameIndex-1, pool.size())) {
+				this.innerName  = extract(pool.get(innerNameIndex-1), pool);
+			}
+			this.innerClassAccessFlags = get(accessFlags, "nested");
+		}
+
+		private boolean checkRange(int index, int size) {
+			return (0 <= index) && (index < size);
 		}
 
 		/**
-		 * returns constant-pool entry index.<br><br>
-		 * if key is "inner", it returns constant-pool entry
-		 * index of inner class.<br>
-		 * if key is "outer", it returns constant-pool entry
-		 * index of class has this inner class.<br>
-		 * if key is "inner_name", it returns constant-pool
-		 * entry index of inner class name.<br>
+		 * returns string accord with specified key.<br><br>
+		 * if key is "inner", it returns inner class.<br>
+		 * if key is "outer", it returns class has this inner class.<br>
+		 * if key is "inner_name", it returns inner class name.<br>
 		 * if key is "access_flag", it returns access flag 
 		 * of inner class.<br>
-		 * by default, it returns -1.
+		 * by default, it returns string of length 0.
 		 * @param key value name
-		 * @return constant-pool entry index
+		 * @return string
 		 */
-		public int getNumber(String key) {
+		public String getNumber(String key) {
 			switch(key) {
-				case "inner":       return innerClassInfoIndex;
-				case "outer":       return outerClassInfoIndex;
-				case "inner_name":  return innerNameIndex;
+				case "inner":       return innerClass;
+				case "outer":       return outerClass;
+				case "inner_name":  return innerName;
 				case "access_flag": return innerClassAccessFlags;
 				default:
 					System.out.println("Invalid key in InnerClasses: " + key);
-					return -1;
+					return "";
 			}
 		}
 	}

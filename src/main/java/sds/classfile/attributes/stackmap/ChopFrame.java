@@ -1,7 +1,7 @@
 package sds.classfile.attributes.stackmap;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for chop_frame which
@@ -11,9 +11,9 @@ import java.io.RandomAccessFile;
 public class ChopFrame extends SameFrame {
 	private int offsetDelta;
 
-	ChopFrame(StackMapFrameType type, int tag, RandomAccessFile raf) throws IOException {
+	ChopFrame(StackMapFrameType type, int tag, ClassFileStream data) throws IOException {
 		super(type, tag);
-		this.offsetDelta = raf.readShort();
+		this.offsetDelta = data.readShort();
 	}
 
 	/**

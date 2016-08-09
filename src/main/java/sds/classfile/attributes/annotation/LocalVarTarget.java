@@ -1,7 +1,7 @@
 package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for localvar_target which
@@ -12,11 +12,11 @@ import java.io.RandomAccessFile;
 public class LocalVarTarget extends AbstractTargetInfo {
 	private LVTTable[] table;
 
-	LocalVarTarget(RandomAccessFile raf) throws IOException {
+	LocalVarTarget(ClassFileStream data) throws IOException {
 		super(TargetInfoType.LocalVarTarget);
-		this.table = new LVTTable[raf.readShort()];
+		this.table = new LVTTable[data.readShort()];
 		for(int i = 0; i < table.length; i++) {
-			table[i] = new LVTTable(raf);
+			table[i] = new LVTTable(data);
 		}
 	}
 
@@ -36,10 +36,10 @@ public class LocalVarTarget extends AbstractTargetInfo {
 		private int length;
 		private int index;
 
-		LVTTable(RandomAccessFile raf) throws IOException {
-			this.startPc = raf.readShort();
-			this.length  = raf.readShort();
-			this.index   = raf.readShort();
+		LVTTable(ClassFileStream data) throws IOException {
+			this.startPc = data.readShort();
+			this.length  = data.readShort();
+			this.index   = data.readShort();
 		}
 
 		/**

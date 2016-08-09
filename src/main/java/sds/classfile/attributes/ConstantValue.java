@@ -1,7 +1,9 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This class is for
@@ -10,7 +12,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class ConstantValue extends AttributeInfo {
-	private int constantValueIndex;
+	private String constantValue;
 
 	/**
 	 * constructor.
@@ -22,15 +24,16 @@ public class ConstantValue extends AttributeInfo {
 	}
 
 	/**
-	 * returns constant-pool entry index of constant value.
-	 * @return constant-pool entry index of constant value
+	 * returns constant value.
+	 * @return constant value
 	 */
-	public int getConstantValueIndex() {
-		return constantValueIndex;
+	public String getConstantValue() {
+		return constantValue;
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.constantValueIndex = raf.readShort();
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		int constantValueIndex = data.readShort();
+		this.constantValue = extract(pool.get(constantValueIndex-1), pool);
 	}
 }

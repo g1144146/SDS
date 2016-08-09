@@ -1,7 +1,7 @@
 package sds.classfile.attributes.stackmap;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for same_frame_extended which
@@ -13,11 +13,11 @@ public class SameFrameExtended extends ChopFrame {
 	 * constructor.
 	 * @param frameType stack-map-frame type
 	 * @param tag discrimination tag
-	 * @param raf classfile stream
+	 * @param data classfile stream
 	 * @throws IOException 
 	 */
-	public SameFrameExtended(StackMapFrameType frameType, int tag, RandomAccessFile raf)
+	public SameFrameExtended(StackMapFrameType frameType, int tag, ClassFileStream data)
 	throws IOException {
-		super(frameType, tag, raf);
+		super(frameType, tag, data);
 	}
 }

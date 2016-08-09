@@ -1,7 +1,7 @@
 package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for annotations table.<br>
@@ -13,15 +13,15 @@ public class TypeAnnotation extends Annotation {
 	private TargetInfo targetInfo;
 	private TypePath targetPath;
 
-	TypeAnnotation(RandomAccessFile raf)
+	TypeAnnotation(ClassFileStream data)
 	throws IOException, TargetTypeException, ElementValueException {
 		TargetInfoBuilder builder = TargetInfoBuilder.getInstance();
-		this.targetInfo = builder.build(raf);
-		this.targetPath = new TypePath(raf);
-		this.typeIndex = raf.readShort();
-		this.elementValuePairs = new ElementValuePair[raf.readShort()];
+		this.targetInfo = builder.build(data);
+		this.targetPath = new TypePath(data);
+		this.typeIndex = data.readShort();
+		this.elementValuePairs = new ElementValuePair[data.readShort()];
 		for(int i = 0; i < elementValuePairs.length; i++) {
-			elementValuePairs[i] = new ElementValuePair(raf);
+			elementValuePairs[i] = new ElementValuePair(data);
 		}
 	}
 

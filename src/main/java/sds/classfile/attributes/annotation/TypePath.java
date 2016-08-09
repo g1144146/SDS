@@ -1,7 +1,7 @@
 package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for 
@@ -14,12 +14,12 @@ public class TypePath {
 	private int[] typePathKind;
 	private int[] typeArgIndex;
 
-	TypePath(RandomAccessFile raf) throws IOException {
-		this.typeArgIndex = new int[raf.readUnsignedByte()];
+	TypePath(ClassFileStream data) throws IOException {
+		this.typeArgIndex = new int[data.readUnsignedByte()];
 		this.typePathKind = new int[typeArgIndex.length];
 		for(int i = 0; i < typeArgIndex.length; i++) {
-			this.typePathKind[i] = raf.readByte();
-			this.typeArgIndex[i] = raf.readByte();
+			this.typePathKind[i] = data.readByte();
+			this.typeArgIndex[i] = data.readByte();
 		}
 	}
 

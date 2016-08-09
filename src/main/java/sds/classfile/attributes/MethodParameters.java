@@ -2,6 +2,10 @@ package sds.classfile.attributes;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
+import static sds.util.AccessFlags.get;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
   * This class is for
@@ -30,10 +34,10 @@ public class MethodParameters extends AttributeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.params = new Parameters[raf.readByte()];
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		this.params = new Parameters[data.readByte()];
 		for(int i = 0; i < params.length; i++) {
-			params[i] = new Parameters(raf);
+			params[i] = new Parameters(data, pool);
 		}
 	}
 
@@ -41,27 +45,29 @@ public class MethodParameters extends AttributeInfo {
 	 * This class is for method parameter.
 	 */
 	public class Parameters {
-		int nameIndex;
-		int accessFlag;
+		private String name;
+		private String accessFlag;
 
-		Parameters(RandomAccessFile raf) throws IOException {
-			this.nameIndex = raf.readShort();
-			this.accessFlag = raf.readShort();
+		Parameters(ClassFileStream data, ConstantPool pool) throws IOException {
+			int nameIndex = data.readShort();
+			int accessFlag = data.readShort();
+			this.accessFlag = get(accessFlag, "local");
+			this.name = extract(pool.get(nameIndex-1), pool);
 		}
 
 		/**
-		 * returns constant-pool entry index of method parameter.
-		 * @return constant-pool entry index of method parameter
+		 * returns method parameter.
+		 * @return method parameter
 		 */
-		public int getNameIndex() {
-			return nameIndex;
+		public String getName() {
+			return name;
 		}
 
 		/**
 		 * returns access flag of method parameter.
 		 * @return access flag
 		 */
-		public int getAccessFlag() {
+		public String getAccessFlag() {
 			return accessFlag;
 		}
 	}

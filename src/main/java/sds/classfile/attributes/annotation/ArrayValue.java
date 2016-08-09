@@ -1,7 +1,7 @@
 package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for array as the value of this element-value.
@@ -10,10 +10,10 @@ import java.io.RandomAccessFile;
 public class ArrayValue {
 	private ElementValue[] values;
 
-	ArrayValue(RandomAccessFile raf) throws IOException, ElementValueException {
-		this.values = new ElementValue[raf.readShort()];
+	ArrayValue(ClassFileStream data) throws IOException, ElementValueException {
+		this.values = new ElementValue[data.readShort()];
 		for(int i = 0; i < values.length; i++) {
-			values[i] = new ElementValue(raf);
+			values[i] = new ElementValue(data);
 		}
 	}
 

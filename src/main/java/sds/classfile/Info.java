@@ -1,7 +1,6 @@
 package sds.classfile;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 /**
  * This interface is for info which classfile has.
@@ -10,8 +9,9 @@ import java.io.RandomAccessFile;
 public interface Info {
 	/**
 	 * reads info from classfile.
-	 * @param raf classfile stream
+	 * @param data classfile stream
+	 * @param pool constant-pool
 	 * @throws IOException 
 	 */
-	abstract void read(RandomAccessFile raf) throws Exception;
+	abstract void read(ClassFileStream data, ConstantPool pool) throws Exception;
 }

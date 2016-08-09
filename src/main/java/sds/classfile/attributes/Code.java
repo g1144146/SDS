@@ -1,18 +1,21 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
-
 import sds.classfile.Attributes;
+import sds.classfile.ClassFileStream;
 import sds.classfile.ConstantPool;
+import sds.classfile.attributes.stackmap.StackMapTable;
 import sds.classfile.bytecode.MnemonicTable;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
 import sds.classfile.bytecode.UndefinedOpcodeException;
 import sds.classfile.constantpool.Utf8Info;
 
+import static sds.util.Utf8ValueExtractor.extract;
+
 /**
- * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.3">Code Attribute</a>.
+ * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.3">
+ * Code Attribute</a>.
  * @author inagaki
  */
 public class Code extends AttributeInfo {
@@ -71,49 +74,46 @@ public class Code extends AttributeInfo {
 		return attr;
 	}
 
-	/**
-	 * reads Code Attribute from classfile.
-	 * @param raf classfile stream
-	 * @param pool constant-pool
-	 * @throws Exception 
-	 */
-	public void read(RandomAccessFile raf, ConstantPool pool) throws Exception {
-		this.maxStack = raf.readShort();
-		this.maxLocals = raf.readShort();
+	@Override
+	public void read(ClassFileStream data, ConstantPool pool) throws Exception {
+		this.maxStack = data.readShort();
+		this.maxLocals = data.readShort();
 		// extract opcode
-		int codeLen = raf.readInt();
-		int p = (int)raf.getFilePointer();
+		int codeLen = data.readInt();
+		int p = (int)data.getFilePointer();
 		this.opcodes = new Opcodes();
+		
 		try {
 			int i;
-			while((i = (int)raf.getFilePointer()) < codeLen + p) {
+			while((i = (int)data.getFilePointer()) < codeLen + p) {
 				int pc = (i - p);
-				OpcodeInfo info = MnemonicTable.get(Byte.toUnsignedInt(raf.readByte()), pc);
-				info.read(raf);
+				OpcodeInfo info = MnemonicTable.get(Byte.toUnsignedInt(data.readByte()), pc);
+				info.read(data, pool);
 				opcodes.add(info.getPc(), info);
 			}
 		} catch(UndefinedOpcodeException e) {
 			e.printStackTrace();
 		}
 		
-		this.exceptionTable = new ExceptionTable[raf.readShort()];
+		this.exceptionTable = new ExceptionTable[data.readShort()];
 		for(int i = 0; i < exceptionTable.length; i++) {
-			exceptionTable[i] = new ExceptionTable(raf);
+			exceptionTable[i] = new ExceptionTable(data, pool);
 		}
 		
-		this.attr = new Attributes(raf.readShort());
+		this.attr = new Attributes(data.readShort());
 		AttributeInfoBuilder builder = AttributeInfoBuilder.getInstance();
 		for(int i = 0; i < attr.size(); i++) {
-			int index = raf.readShort();
+			int index = data.readShort();
 			String attrName = ((Utf8Info)pool.get(index-1)).getValue();
-			AttributeInfo info = builder.build(attrName, index, raf.readInt());
-			info.read(raf);
+			AttributeInfo info = builder.build(attrName, index, data.readInt());
+			if(info.getType() == AttributeType.StackMapTable) {
+				((StackMapTable)info).read(data, pool, opcodes);
+			} else {
+				info.read(data, pool);
+			}
 			attr.add(i, info);
 		}
 	}
-
-	@Override
-	public void read(RandomAccessFile raf) throws IOException {}
 
 	/**
 	 * This class is for exception table of method.
@@ -122,13 +122,18 @@ public class Code extends AttributeInfo {
 		private int startPc;
 		private int endPc;
 		private int handlerPc;
-		private int catchType;
+		private String catchType;
 
-		ExceptionTable(RandomAccessFile raf) throws IOException {
-			this.startPc = raf.readShort();
-			this.endPc = raf.readShort();
-			this.handlerPc = raf.readShort();
-			this.catchType = raf.readShort();
+		ExceptionTable(ClassFileStream data, ConstantPool pool) throws IOException {
+			this.startPc = data.readShort();
+			this.endPc = data.readShort();
+			this.handlerPc = data.readShort();
+			int catchType = data.readShort();
+			if(catchType == 0) {
+				this.catchType = "any";
+			} else {
+				this.catchType = extract(pool.get(catchType), pool);
+			}
 		}
 
 		/**
@@ -141,8 +146,6 @@ public class Code extends AttributeInfo {
 		 * is active.<br>
 		 * if key is "handler_pc", it returns value of start
 		 * of exception handler.<br>
-		 * if key is "catch_type", it returns constant-pool
-		 * entry index exception class.<br>
 		 * by default, it returns -1.
 		 * @param key value name
 		 * @return value
@@ -152,11 +155,18 @@ public class Code extends AttributeInfo {
 				case "start_pc":   return startPc;
 				case "end_pc":     return endPc;
 				case "handler_pc": return handlerPc;
-				case "catch_type": return catchType;
 				default:
 					System.out.println("invalid key: " + key);
 					return -1;
 			}
+		}
+
+		/**
+		 * returns exception class.
+		 * @return exception class
+		 */
+		public String getCatchType() {
+			return catchType;
 		}
 	}
 }

@@ -1,7 +1,8 @@
 package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
 
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeType;
@@ -18,11 +19,11 @@ abstract class RuntimeParameterAnnotations extends AttributeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.parameterAnnotations = new ParameterAnnotations[raf.readByte()];
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		this.parameterAnnotations = new ParameterAnnotations[data.readByte()];
 		try {
 			for(int i = 0; i < parameterAnnotations.length; i++) {
-				parameterAnnotations[i] = new ParameterAnnotations(raf);
+				parameterAnnotations[i] = new ParameterAnnotations(data, pool);
 			}
 		} catch(ElementValueException e) {
 			e.printStackTrace();

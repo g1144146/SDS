@@ -1,7 +1,9 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This class is for
@@ -10,7 +12,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class Exceptions extends AttributeInfo {
-	private int[] exceptionIndexTable;
+	private String[] exceptionTable;
 
 	/**
 	 * constructor.
@@ -22,18 +24,18 @@ public class Exceptions extends AttributeInfo {
 	}
 
 	/**
-	 * returns constant-pool entry indexes of exception classes.
-	 * @return constant-pool entry indexes of exception classes
+	 * returns exception classes.
+	 * @return exception classes
 	 */
-	public int[] getExceptionIndexTable() {
-		return exceptionIndexTable;
+	public String[] getExceptionTable() {
+		return exceptionTable;
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.exceptionIndexTable = new int[raf.readShort()];
-		for(int i = 0; i < exceptionIndexTable.length; i++) {
-			exceptionIndexTable[i] = raf.readShort();
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		this.exceptionTable = new String[data.readShort()];
+		for(int i = 0; i < exceptionTable.length; i++) {
+			exceptionTable[i] = extract(pool.get(data.readShort()-1), pool).replace("/", ".");
 		}
 	}
 }

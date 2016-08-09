@@ -1,7 +1,8 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
 
 /**
  * This class is for
@@ -30,10 +31,10 @@ public class SourceDebugExtension extends AttributeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
 		this.debugExtension = new int[this.getAttrLen()];
 		for(int i = 0; i < this.getAttrLen(); i++) {
-			debugExtension[i] = raf.readUnsignedByte();
+			debugExtension[i] = data.readUnsignedByte();
 		}
 	}
 }

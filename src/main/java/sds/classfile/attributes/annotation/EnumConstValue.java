@@ -1,7 +1,7 @@
 package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for enum constant as the value of this element-value.
@@ -11,9 +11,9 @@ public class EnumConstValue {
 	private int typeNameIndex;
 	private int constNameIndex;
 
-	EnumConstValue(RandomAccessFile raf) throws IOException {
-		this.typeNameIndex = raf.readShort();
-		this.constNameIndex = raf.readShort();
+	EnumConstValue(ClassFileStream data) throws IOException {
+		this.typeNameIndex = data.readShort();
+		this.constNameIndex = data.readShort();
 	}
 
 	/**

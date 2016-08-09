@@ -1,7 +1,9 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This class is for
@@ -22,10 +24,10 @@ public class BootstrapMethods extends AttributeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.bsm = new BSM[raf.readShort()];
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		this.bsm = new BSM[data.readShort()];
 		for(int i = 0; i < bsm.length; i++) {
-			bsm[i] = new BSM(raf);
+			bsm[i] = new BSM(data, pool);
 		}
 	}
 
@@ -41,30 +43,30 @@ public class BootstrapMethods extends AttributeInfo {
 	 * This class is for entry in the bootstrap methods table.
 	 */
 	public class BSM {
-		private int bsmRef;
-		private int[] bootstrapArgs;
+		private String bsmRef;
+		private String[] bootstrapArgs;
 
-		BSM(RandomAccessFile raf) throws IOException {
-			this.bsmRef = raf.readShort();
-			this.bootstrapArgs = new int[raf.readShort()];
+		BSM(ClassFileStream data, ConstantPool pool) throws IOException {
+			this.bsmRef = extract(pool.get(data.readShort()-1), pool);
+			this.bootstrapArgs = new String[data.readShort()];
 			for(int i = 0; i < bootstrapArgs.length; i++) {
-				bootstrapArgs[i] = raf.readShort();
+				bootstrapArgs[i] = extract(pool.get(data.readShort()-1), pool);
 			}
 		}
 
 		/**
-		 * reference index of bootstrap method.
-		 * @return reference index
+		 * returns bootstrap method.
+		 * @return bootstrap method
 		 */
-		public int getBSMRef() {
+		public String getBSMRef() {
 			return bsmRef;
 		}
 
 		/**
-		 * index of bootstrap method arguments.
-		 * @return index of bootstrap method arguments
+		 * retunrs bootstrap method arguments.
+		 * @return bootstrap method arguments
 		 */
-		public int[] getBSMArgs() {
+		public String[] getBSMArgs() {
 			return bootstrapArgs;
 		}
 	}

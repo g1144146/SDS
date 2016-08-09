@@ -1,7 +1,8 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
 
 /**
  * This class is for
@@ -30,10 +31,10 @@ public class LineNumberTable extends AttributeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.lineNumberTable = new LNTable[raf.readShort()];
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		this.lineNumberTable = new LNTable[data.readShort()];
 		for(int i = 0; i < lineNumberTable.length; i++) {
-			lineNumberTable[i] = new LNTable(raf);
+			lineNumberTable[i] = new LNTable(data);
 			if(i == lineNumberTable.length-1) {
 				lineNumberTable[i].endPc = lineNumberTable[i].getStartPc();
 				if(lineNumberTable.length > 1) {
@@ -53,9 +54,9 @@ public class LineNumberTable extends AttributeInfo {
 		private int endPc;
 		private int lineNumber;
 
-		LNTable(RandomAccessFile raf) throws IOException {
-			this.startPc = raf.readShort();
-			this.lineNumber = raf.readShort();
+		LNTable(ClassFileStream data) throws IOException {
+			this.startPc = data.readShort();
+			this.lineNumber = data.readShort();
 		}
 
 		/**

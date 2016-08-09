@@ -1,7 +1,7 @@
 package sds.classfile.attributes.stackmap;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This builder class is for
@@ -25,14 +25,14 @@ public class VerificationTypeInfoBuilder {
 
 	/**
 	 * returns verification type info.
-	 * @param raf classfile stream
+	 * @param data classfile stream
 	 * @return verification type info
 	 * @throws IOException
 	 * @throws VerificationTypeException 
 	 */
-	public VerificationTypeInfo build(RandomAccessFile raf)
+	public VerificationTypeInfo build(ClassFileStream data)
 	throws IOException, VerificationTypeException {
-		int tag = raf.readUnsignedByte();
+		int tag = data.readUnsignedByte();
 		switch(tag) {
 			case 0: return new TopVariableInfo(tag);
 			case 1: return new IntegerVariableInfo(tag);
@@ -41,8 +41,8 @@ public class VerificationTypeInfoBuilder {
 			case 4: return new DoubleVariableInfo(tag);
 			case 5: return new NullVariableInfo(tag);
 			case 6: return new UninitializedThisVariableInfo(tag);
-			case 7: return new ObjectVariableInfo(tag, raf.readShort());
-			case 8: return new UninitializedVariableInfo(tag, raf.readShort());
+			case 7: return new ObjectVariableInfo(tag, data.readShort());
+			case 8: return new UninitializedVariableInfo(tag, data.readShort());
 			default: throw new VerificationTypeException(tag);
 		}
 	}

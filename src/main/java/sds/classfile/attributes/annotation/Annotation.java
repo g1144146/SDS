@@ -2,6 +2,7 @@ package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for annotations table.<br>
@@ -14,11 +15,11 @@ public class Annotation {
 	ElementValuePair[] elementValuePairs;
 	
 	Annotation() {}
-	Annotation(RandomAccessFile raf) throws IOException, ElementValueException {
-		this.typeIndex = raf.readShort();
-		this.elementValuePairs = new ElementValuePair[raf.readShort()];
+	Annotation(ClassFileStream data) throws IOException, ElementValueException {
+		this.typeIndex = data.readShort();
+		this.elementValuePairs = new ElementValuePair[data.readShort()];
 		for(int i = 0; i < elementValuePairs.length; i++) {
-			elementValuePairs[i] = new ElementValuePair(raf);
+			elementValuePairs[i] = new ElementValuePair(data);
 		}
 	}
 

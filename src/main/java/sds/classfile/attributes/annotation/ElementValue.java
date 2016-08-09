@@ -1,7 +1,7 @@
 package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for single element-value in the annotation.
@@ -15,8 +15,8 @@ public class ElementValue {
 	private Annotation annotationValue;
 	private ArrayValue arrayValue;
 
-	ElementValue(RandomAccessFile raf) throws IOException, ElementValueException {
-		this.tag = (char)raf.readByte();
+	ElementValue(ClassFileStream data) throws IOException, ElementValueException {
+		this.tag = (char)data.readByte();
 		switch(tag) {
 			case 'B':
 			case 'C':
@@ -26,11 +26,11 @@ public class ElementValue {
 			case 'J':
 			case 'S':
 			case 'Z':
-			case 's': this.constValueIndex = raf.readShort();         break;
-			case 'e': this.enumConstValue  = new EnumConstValue(raf); break;
-			case 'c': this.classInfoIndex  = raf.readShort();         break;
-			case '@': this.annotationValue = new Annotation(raf);     break;
-			case '[': this.arrayValue      = new ArrayValue(raf);     break;
+			case 's': this.constValueIndex = data.readShort();         break;
+			case 'e': this.enumConstValue  = new EnumConstValue(data); break;
+			case 'c': this.classInfoIndex  = data.readShort();         break;
+			case '@': this.annotationValue = new Annotation(data);     break;
+			case '[': this.arrayValue      = new ArrayValue(data);     break;
 			default:  throw new ElementValueException(tag);
 		}
 	}

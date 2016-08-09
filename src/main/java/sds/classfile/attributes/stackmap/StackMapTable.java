@@ -1,10 +1,16 @@
 package sds.classfile.attributes.stackmap;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
-
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeType;
+import sds.classfile.bytecode.Opcodes;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
+
+import static sds.util.StackMapFrameParser.parseFrame;
 
 /**
  * This class is for
@@ -13,7 +19,7 @@ import sds.classfile.attributes.AttributeType;
  * @author inagaki
  */
 public class StackMapTable extends AttributeInfo {
-	StackMapFrame[] entries;
+	private IntObjectHashMap<UnifiedMap<String, MutableList<String>>> entries;
 
 	/**
 	 * constructor.
@@ -28,18 +34,21 @@ public class StackMapTable extends AttributeInfo {
 	 * returns entries of stack-map-table.
 	 * @return entries
 	 */
-	public StackMapFrame[] getEntries() {
+	public IntObjectHashMap<UnifiedMap<String, MutableList<String>>> getEntries() {
 		return entries;
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.entries = new StackMapFrame[raf.readShort()];
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {}
+
+	public void read(ClassFileStream data, ConstantPool pool, Opcodes opcodes) throws IOException {
+		StackMapFrame[] frames = new StackMapFrame[data.readShort()];
 		try {
 			StackMapFrameBuilder builder = StackMapFrameBuilder.getInstance();
-			for(int i = 0; i < entries.length; i++) {
-				entries[i] = builder.build(raf);
+			for(int i = 0; i < frames.length; i++) {
+				frames[i] = builder.build(data);
 			}
+			entries = parseFrame(frames, pool, opcodes);
 		} catch(StackMapFrameException e) {
 			e.printStackTrace();
 		}

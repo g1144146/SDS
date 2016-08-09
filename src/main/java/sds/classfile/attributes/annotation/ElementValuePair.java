@@ -2,6 +2,7 @@ package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for element-value pair in the annotation.
@@ -11,9 +12,9 @@ public class ElementValuePair {
 	private int elementNameIndex;
 	private ElementValue value;
 
-	ElementValuePair(RandomAccessFile raf) throws IOException, ElementValueException {
-		this.elementNameIndex = raf.readShort();
-		this.value = new ElementValue(raf);
+	ElementValuePair(ClassFileStream data) throws IOException, ElementValueException {
+		this.elementNameIndex = data.readShort();
+		this.value = new ElementValue(data);
 	}
 	
 	/**

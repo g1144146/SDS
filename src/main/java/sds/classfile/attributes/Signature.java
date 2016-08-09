@@ -1,7 +1,9 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This class is for
@@ -10,7 +12,7 @@ import java.io.RandomAccessFile;
  * @author inagaki
  */
 public class Signature extends AttributeInfo {
-	private int signatureIndex;
+	private String signature;
 
 	/**
 	 * constructor.
@@ -22,15 +24,15 @@ public class Signature extends AttributeInfo {
 	}
 
 	/**
-	 * returns constant-pool entry index of signature.
-	 * @return constant-pool entry index of signature
+	 * returns signature.
+	 * @return signature
 	 */
-	public int getSignatureIndex() {
-		return signatureIndex;
+	public String getSignature() {
+		return signature;
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.signatureIndex = raf.readShort();
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		this.signature = extract(pool.get(data.readShort()-1), pool);
 	}
 }

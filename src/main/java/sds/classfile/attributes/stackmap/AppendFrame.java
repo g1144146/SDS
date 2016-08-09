@@ -1,7 +1,7 @@
 package sds.classfile.attributes.stackmap;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for append_frame which
@@ -11,13 +11,13 @@ import java.io.RandomAccessFile;
 public class AppendFrame extends ChopFrame {
 	private VerificationTypeInfo[] locals;
 
-	public AppendFrame(int tag, RandomAccessFile raf) throws IOException {
-		super(StackMapFrameType.AppendFrame, tag, raf);
+	public AppendFrame(int tag, ClassFileStream data) throws IOException {
+		super(StackMapFrameType.AppendFrame, tag, data);
 		this.locals = new VerificationTypeInfo[tag - 251];
 		try {
 			VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();
 			for(int i = 0; i < locals.length; i++) {
-				locals[i] = builder.build(raf);
+				locals[i] = builder.build(data);
 			}
 		} catch(VerificationTypeException e) {
 			e.printStackTrace();

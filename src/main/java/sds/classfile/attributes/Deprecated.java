@@ -1,6 +1,7 @@
 package sds.classfile.attributes;
 
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
 
 /**
  * This class is for
@@ -19,7 +20,7 @@ public class Deprecated extends AttributeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws Exception {
+	public void read(ClassFileStream data, ConstantPool pool) throws Exception {
 		// do nothing.
 	}
 }

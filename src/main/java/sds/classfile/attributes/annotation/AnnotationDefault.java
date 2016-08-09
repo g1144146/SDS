@@ -1,17 +1,19 @@
 package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
-
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeType;
+
+import static sds.util.AnnotationParser.parseElementValue;
 
 /**
  * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.22">AnnotationDefault Attribute</a>.
  * @author inagaki
  */
 public class AnnotationDefault extends AttributeInfo {
-	private ElementValue defaultValue;
+	private String defaultValue;
 
 	/**
 	 * constructor.
@@ -23,9 +25,10 @@ public class AnnotationDefault extends AttributeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
 		try {
-			this.defaultValue = new ElementValue(raf);
+			ElementValue value = new ElementValue(data);
+			this.defaultValue = parseElementValue(value, new StringBuilder(), pool);
 		} catch(ElementValueException e) {
 			e.printStackTrace();
 		}
@@ -35,7 +38,7 @@ public class AnnotationDefault extends AttributeInfo {
 	 * returns default value of the annotation type element.
 	 * @return default value of the annotation type element
 	 */
-	public ElementValue getDefaultValue() {
+	public String getDefaultValue() {
 		return defaultValue;
 	}
 }
