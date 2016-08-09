@@ -1,7 +1,7 @@
 package sds.classfile.constantpool;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This adapter class is for
@@ -42,9 +42,9 @@ public abstract class MemberRefInfo extends ConstantInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.classIndex = raf.readShort();
-		this.nameAndTypeIndex = raf.readShort();
+	public void read(ClassFileStream data) throws IOException {
+		this.classIndex = data.readShort();
+		this.nameAndTypeIndex = data.readShort();
 	}
 
 	@Override

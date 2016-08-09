@@ -1,7 +1,10 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
+
+import static sds.util.OperandExtractor.extractOperand;
 
 /**
  * This class is for opcode has constant-pool entry index.<br>
@@ -51,6 +54,7 @@ import java.io.RandomAccessFile;
  */
 public class CpRefOpcode extends OpcodeInfo {
 	int index;
+	String operand;
 
 	/**
 	 * constrcutor.
@@ -62,12 +66,13 @@ public class CpRefOpcode extends OpcodeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
 		if(this.getOpcodeType() == MnemonicTable.ldc) {
-			this.index = raf.readUnsignedByte();
+			this.index = data.readUnsignedByte();
 		} else {
-			this.index = raf.readShort();
+			this.index = data.readShort();
 		}
+		this.operand = extractOperand(this, pool);
 	}
 
 	/**
@@ -80,6 +85,6 @@ public class CpRefOpcode extends OpcodeInfo {
 
 	@Override
 	public String toString() {
-		return super.toString() + ": #" + index;
+		return super.toString() + ": #" + index + "(" + operand + ")";
 	}
 }

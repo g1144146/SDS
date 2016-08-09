@@ -1,7 +1,7 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for
@@ -18,13 +18,13 @@ public class TableSwitch extends SwitchOpcode {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		super.read(raf);
-		int low = raf.readInt();
-		int high = raf.readInt();
+	public void read(ClassFileStream data) throws IOException {
+		super.read(data);
+		int low = data.readInt();
+		int high = data.readInt();
 		this.jumpOffsets = new int[high - low + 1];
 		for(int i = 0; i < jumpOffsets.length; i++) {
-			jumpOffsets[i] = raf.readInt();
+			jumpOffsets[i] = data.readInt();
 		}
 	}
 

@@ -1,7 +1,7 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for
@@ -22,9 +22,9 @@ public class MultiANewArray extends CpRefOpcode {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		super.read(raf);
-		this.dimensions = raf.readByte();
+	public void read(ClassFileStream data) throws IOException {
+		super.read(data);
+		this.dimensions = data.readByte();
 	}
 
 	/**

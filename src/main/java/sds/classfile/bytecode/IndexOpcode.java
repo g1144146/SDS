@@ -1,7 +1,7 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for opcode has index operand.<br>
@@ -53,8 +53,8 @@ public class IndexOpcode extends OpcodeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.index = raf.readByte();
+	public void read(ClassFileStream data) throws IOException {
+		this.index = data.readByte();
 	}
 
 	/**

@@ -1,7 +1,7 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
  /**
  * This class is for opcode has branch.<br>
@@ -41,8 +41,8 @@ public class BranchOpcode extends OpcodeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.branch = raf.readShort();
+	public void read(ClassFileStream data) throws IOException {
+		this.branch = data.readShort();
 	}
 
 	/**
@@ -56,6 +56,6 @@ public class BranchOpcode extends OpcodeInfo {
 
 	@Override
 	public String toString() {
-		return super.toString() + ": " + branch;
+		return super.toString() + ": " + (branch + getPc());
 	}
 }

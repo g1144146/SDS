@@ -1,7 +1,8 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
 
 /**
  * This class is for
@@ -22,9 +23,9 @@ public class InvokeInterface extends CpRefOpcode {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		super.read(raf);
-		this.count = raf.readUnsignedByte();
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		super.read(data);
+		this.count = data.readUnsignedByte();
 	}
 
 	/**

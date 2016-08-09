@@ -1,7 +1,8 @@
 package sds.classfile.constantpool;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+
 /**
  * This class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.1">
@@ -27,8 +28,8 @@ public class ClassInfo extends ConstantInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.nameIndex = raf.readShort();
+	public void read(ClassFileStream data) throws IOException {
+		this.nameIndex = data.readShort();
 	}
 
 	@Override

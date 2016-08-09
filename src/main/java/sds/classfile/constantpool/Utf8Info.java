@@ -1,7 +1,7 @@
 package sds.classfile.constantpool;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for
@@ -37,10 +37,9 @@ public class Utf8Info extends ConstantInfo {
 	}
 	
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.length = raf.readShort();
-		byte[] b = new byte[length];
-		raf.readFully(b);
+	public void read(ClassFileStream data) throws IOException {
+		this.length = data.readShort();
+		byte[] b = data.readFully(new byte[length]);
 		this.value = new String(b, "UTF-8");
 	}
 

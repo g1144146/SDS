@@ -1,7 +1,7 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for
@@ -27,11 +27,11 @@ public class PushOpcode extends OpcodeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
+	public void read(ClassFileStream data) throws IOException {
 		if(this.getOpcodeType() == MnemonicTable.bipush) {
-			this.value = raf.readByte();
+			this.value = data.readByte();
 		} else if(this.getOpcodeType() == MnemonicTable.sipush) {
-			this.value = raf.readShort();
+			this.value = data.readShort();
 		}
 	}
 

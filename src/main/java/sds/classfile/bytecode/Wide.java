@@ -1,7 +1,7 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for
@@ -22,11 +22,11 @@ public class Wide extends CpRefOpcode {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		if(raf.readByte() == MnemonicTable.iinc.getOpcode()) {
-			super.read(raf);
+	public void read(ClassFileStream data) throws IOException {
+		if(data.readByte() == MnemonicTable.iinc.getOpcode()) {
+			super.read(data);
 		} else {
-			this.constByte = raf.readShort();
+			this.constByte = data.readShort();
 		}
 	}
 

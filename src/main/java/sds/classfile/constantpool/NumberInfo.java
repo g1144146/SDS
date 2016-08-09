@@ -1,7 +1,8 @@
 package sds.classfile.constantpool;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.DataInput;
+import sds.classfile.ClassFileStream;
 
 import static sds.classfile.constantpool.ConstantType.*;
 
@@ -25,12 +26,12 @@ abstract class NumberInfo extends ConstantInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException, NumberTypeException {
+	public void read(ClassFileStream data) throws IOException, NumberTypeException {
 		switch(this.getTag()) {
-			case C_INTEGER: this.number = raf.readInt();    break;
-			case C_FLOAT:   this.number = raf.readFloat();  break;
-			case C_LONG:    this.number = raf.readLong();   break;
-			case C_DOUBLE:  this.number = raf.readDouble(); break;
+			case C_INTEGER: this.number = data.readInt();    break;
+			case C_FLOAT:   this.number = data.readFloat();  break;
+			case C_LONG:    this.number = data.readLong();   break;
+			case C_DOUBLE:  this.number = data.readDouble(); break;
 			default: throw new NumberTypeException("unknown number type: " + this.getTag());
 		}
 	}

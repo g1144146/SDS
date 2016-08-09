@@ -1,7 +1,7 @@
 package sds.classfile.constantpool;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for
@@ -28,8 +28,8 @@ public class MethodTypeInfo extends ConstantInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.descriptorIndex = raf.readShort();
+	public void read(ClassFileStream data) throws IOException {
+		this.descriptorIndex = data.readShort();
 	}
 
 	@Override

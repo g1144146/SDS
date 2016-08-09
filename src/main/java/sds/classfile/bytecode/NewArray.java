@@ -1,7 +1,7 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for
@@ -22,8 +22,8 @@ public class NewArray extends OpcodeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		int type = raf.readUnsignedByte();
+	public void read(ClassFileStream data) throws IOException {
+		int type = data.readUnsignedByte();
 		switch(type) {
 			case 4:  this.atype = "T_BOOLEAN"; break;
 			case 5:  this.atype = "T_CHAR";    break;
@@ -34,7 +34,7 @@ public class NewArray extends OpcodeInfo {
 			case 10: this.atype = "T_INT";     break;
 			case 11: this.atype = "T_LONG";    break;
 			default:
-				System.out.println(">>> unknown type: " + type);
+				System.out.println("[unknown type]: " + type);
 				break;
 		}
 	}

@@ -1,7 +1,8 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
 
 import sds.classfile.Info;
 
@@ -18,8 +19,18 @@ public class OpcodeInfo implements Info {
 		this.pc = pc;
 	}
 
+	/**
+	 * reads info from classfile.<br>
+	 * method for opcode info.
+	 * @param data classfile stream
+	 * @throws IOException 
+	 */
+	public void read(ClassFileStream data) throws IOException {}
+
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {}
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		read(data);
+	}
 
 	/**
 	 * returns opcode type.

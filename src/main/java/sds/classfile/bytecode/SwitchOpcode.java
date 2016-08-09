@@ -1,7 +1,7 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This adapter class is for
@@ -21,12 +21,11 @@ public abstract class SwitchOpcode extends OpcodeInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
+	public void read(ClassFileStream data) throws IOException {
 		for(int i = 1; ((i+this.getPc()) % 4) != 0; i++) {
-			raf.readByte();
+			data.readByte();
 		}
-//		raf.skipBytes((this.pc % 4));
-		this.defaultByte = raf.readInt();
+		this.defaultByte = data.readInt();
 	}
 
 	/**

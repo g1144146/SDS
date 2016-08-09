@@ -1,7 +1,7 @@
 package sds.classfile.constantpool;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for
@@ -37,9 +37,9 @@ public class InvokeDynamicInfo extends ConstantInfo {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.bootstrapMethodAttrIndex = raf.readShort();
-		this.nameAndTypeIndex = raf.readShort();
+	public void read(ClassFileStream data) throws IOException {
+		this.bootstrapMethodAttrIndex = data.readShort();
+		this.nameAndTypeIndex = data.readShort();
 	}
 
 	@Override

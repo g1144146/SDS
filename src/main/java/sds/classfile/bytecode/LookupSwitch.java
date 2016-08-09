@@ -1,7 +1,7 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import sds.classfile.ClassFileStream;
 
 /**
  * This class is for
@@ -19,13 +19,13 @@ public class LookupSwitch extends SwitchOpcode {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		super.read(raf);
-		this.match  = new int[raf.readInt()];
+	public void read(ClassFileStream data) throws IOException {
+		super.read(data);
+		this.match  = new int[data.readInt()];
 		this.offset = new int[match.length];
 		for(int i = 0; i < match.length; i++) {
-			match[i] = raf.readInt();
-			offset[i] = raf.readInt();
+			match[i] = data.readInt();
+			offset[i] = data.readInt();
 		}
 	}
 
