@@ -3,10 +3,6 @@ package sds.assemble;
 import sds.classfile.ConstantPool;
 import sds.classfile.MemberInfo;
 
-import static sds.util.AccessFlags.get;
-import static sds.util.DescriptorParser.parse;
-import static sds.util.Utf8ValueExtractor.extract;
-
 /**
  * This adapter class is for
  * {@link FieldContent <code>FieldContent</code>}
@@ -20,9 +16,9 @@ public abstract class MemberContent extends BaseContent {
 	String desc;
 
 	MemberContent(MemberInfo info, ConstantPool pool) {
-		this.accessFlag = get(info.getAccessFlags(), info.getType());
-		this.desc = parse(extract(pool.get(info.getDescriptorIndex()-1), pool));
-		this.name = extract(pool.get(info.getNameIndex()-1), pool);
+		this.accessFlag = info.getAccessFlags();
+		this.desc = info.getDescriptor();
+		this.name = info.getName();
 	}
 
 	/**

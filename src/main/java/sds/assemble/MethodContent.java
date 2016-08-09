@@ -20,10 +20,6 @@ import sds.classfile.attributes.MethodParameters;
 import sds.classfile.attributes.MethodParameters.Parameters;
 import sds.classfile.attributes.annotation.AnnotationDefault;
 import sds.classfile.attributes.annotation.CatchTarget;
-import sds.classfile.attributes.annotation.ElementValueException;
-import sds.classfile.attributes.annotation.LocalVarTarget;
-import sds.classfile.attributes.annotation.MethodFormalParameterTarget;
-import sds.classfile.attributes.annotation.OffsetTarget;
 import sds.classfile.attributes.annotation.ParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleTypeAnnotations;
@@ -31,17 +27,11 @@ import sds.classfile.attributes.annotation.RuntimeVisibleParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.TargetInfo;
 import sds.classfile.attributes.annotation.ThrowsTarget;
-import sds.classfile.attributes.annotation.TypeAnnotation;
-import sds.classfile.attributes.annotation.TypeParameterBoundTarget;
-import sds.classfile.attributes.annotation.TypeParameterTarget;
 import sds.classfile.attributes.stackmap.StackMapTable;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
 
-import static sds.util.AccessFlags.get;
-import static sds.util.AnnotationParser.parseElementValue;
 import static sds.util.DescriptorParser.parse;
-import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This class is for contents of method.
@@ -58,7 +48,7 @@ public class MethodContent extends MemberContent {
 	private LocalVariableContent valContent;
 	private ParamAnnotationContent paContent;
 	private String defaultAnn;
-	
+
 	/**
 	 * constructor.
 	 * @param info method info
@@ -91,7 +81,7 @@ public class MethodContent extends MemberContent {
 			System.out.println("[local variable]");
 			System.out.println(valContent);
 		}
-		if(exContent !=null && exContent.from.length > 0) {
+		if(exContent != null && exContent.from.length > 0) {
 			System.out.println("[exception]");
 			System.out.println(exContent);
 		}
@@ -101,7 +91,7 @@ public class MethodContent extends MemberContent {
 			}
 		}
 		// set CFG
-		if(! this.getAccessFlag().contains("abstract")) {
+		if(!this.getAccessFlag().contains("abstract")) {
 			CFGBuilder builder = CFGBuilder.getInstance();
 			CFNode[] nodes = builder.build(inst, exContent);
 			for(CFNode n : nodes) {
@@ -110,33 +100,24 @@ public class MethodContent extends MemberContent {
 		}
 		System.out.println("");
 	}
-	
+
 	@Override
 	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
 		switch(info.getType()) {
 			case AnnotationDefault:
-				AnnotationDefault ad = (AnnotationDefault)info;
-				try {
-					this.defaultAnn = parseElementValue(ad.getDefaultValue(), new StringBuilder(), pool);
-				} catch(ElementValueException e) {
-					e.printStackTrace();
-				}
+				AnnotationDefault ad = (AnnotationDefault) info;
+				this.defaultAnn = ad.getDefaultValue();
 				break;
 			case Code:
-				Code code = (Code)info;
-				this.maxStack    = code.getMaxStack();
-				this.maxLocals   = code.maxLocals();
-				this.opcodes     = code.getCode();
+				Code code = (Code) info;
+				this.maxStack = code.getMaxStack();
+				this.maxLocals = code.maxLocals();
+				this.opcodes = code.getCode();
 				// throws exceptions
 				ExceptionTable[] exTable = code.getExceptionTable();
 				String[] exClass = new String[exTable.length];
 				for(int i = 0; i < exTable.length; i++) {
-					ExceptionTable t = exTable[i];
-					if(t.getNumber("catch_type") == 0) {
-						exClass[i] = "any";
-					} else {
-						exClass[i] = extract(pool.get(t.getNumber("catch_type")), pool);
-					}
+					exClass[i] = exTable[i].getCatchType();
 				}
 				this.exContent = new ExceptionContent(exTable, exClass);
 				// other attributes
@@ -145,14 +126,10 @@ public class MethodContent extends MemberContent {
 				}
 				break;
 			case Exceptions:
-				int[] exp = ((Exceptions)info).getExceptionIndexTable();
-				this.exceptions = new String[exp.length];
-				for(int i = 0; i < exp.length; i++) {
-					exceptions[i] = extract(pool.get(exp[i]-1), pool).replace("/", ".");
-				}
+				this.exceptions = ((Exceptions) info).getExceptionTable();
 				break;
 			case LineNumberTable:
-				LineNumberTable.LNTable[] table = ((LineNumberTable)info).getLineNumberTable();
+				LineNumberTable.LNTable[] table = ((LineNumberTable) info).getLineNumberTable();
 				this.inst = new LineInstructions[table.length];
 				for(int i = 0; i < inst.length; i++) {
 					inst[i] = new LineInstructions(table[i]);
@@ -176,8 +153,8 @@ public class MethodContent extends MemberContent {
 								// when end line of method has some instructions,
 								// it adds to end instruction in the line
 								// because the line doesn't have the instruction.
-								if(inst[index-1].getOpcodes().get(op.getPc()) == null) {
-									inst[index-1].addOpcode(op);
+								if(inst[index - 1].getOpcodes().get(op.getPc()) == null) {
+									inst[index - 1].addOpcode(op);
 								}
 								break;
 							}
@@ -186,44 +163,44 @@ public class MethodContent extends MemberContent {
 				}
 				break;
 			case LocalVariableTable:
-				LocalVariableTable lvt = (LocalVariableTable)info;
+				LocalVariableTable lvt = (LocalVariableTable) info;
 				this.valContent = new LocalVariableContent(lvt.getTable(), pool);
 				break;
 			case LocalVariableTypeTable:
-				LocalVariableTypeTable lvtt = (LocalVariableTypeTable)info;
-				valContent.setType(lvtt.getTable(), pool);
+				LocalVariableTypeTable lvtt = (LocalVariableTypeTable) info;
+				valContent.setType(lvtt.getTable());
 				break;
 			case MethodParameters:
-				Parameters[] param = ((MethodParameters)info).getParams();
+				Parameters[] param = ((MethodParameters) info).getParams();
 				this.args = new String[param.length][2];
 				for(int i = 0; i < param.length; i++) {
-					args[i][0] = get(param[i].getAccessFlag(), "local");
-					args[i][1] = extract(pool.get(param[i].getNameIndex()-1), pool);
+					args[i][0] = param[i].getAccessFlag();
+					args[i][1] = param[i].getName();
 				}
 				break;
 			case RuntimeInvisibleParameterAnnotations:
-				RuntimeInvisibleParameterAnnotations ripa = (RuntimeInvisibleParameterAnnotations)info;
+				RuntimeInvisibleParameterAnnotations ripa = (RuntimeInvisibleParameterAnnotations) info;
 				ParameterAnnotations[] invisiblePA = ripa.getParamAnnotations();
 				if(paContent == null) {
-					this.paContent = new ParamAnnotationContent(invisiblePA, pool, false);
+					this.paContent = new ParamAnnotationContent(invisiblePA, false);
 				} else {
-					paContent.setInvisible(invisiblePA, pool);
+					paContent.setInvisible(invisiblePA);
 				}
 //				System.out.println("<<<Runtime Invisible Parameter Annotation>>>: ");
 //				for(String[] a : paContent.invParam)
 //					System.out.println("  " + Arrays.toString(a));
 				break;
 			case RuntimeVisibleParameterAnnotations:
-				RuntimeVisibleParameterAnnotations rvpa = (RuntimeVisibleParameterAnnotations)info;
+				RuntimeVisibleParameterAnnotations rvpa = (RuntimeVisibleParameterAnnotations) info;
 				ParameterAnnotations[] visiblePA = rvpa.getParamAnnotations();
-				this.paContent = new ParamAnnotationContent(visiblePA, pool, true);
+				this.paContent = new ParamAnnotationContent(visiblePA, true);
 //				System.out.println("<<<Runtime Visible Parameter Annotation>>>: ");
 //				for(String[] a : paContent.param)
 //					System.out.println("  " + Arrays.toString(a));
 				break;
 			case RuntimeVisibleTypeAnnotations:
-				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations)info;
-				this.taContent = new MethodTypeAnnotationContent(rvta.getAnnotations(), pool, true);
+				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations) info;
+				this.taContent = new MethodTypeAnnotationContent(rvta.getAnnotations(), true);
 				System.out.println("<<<Runtime Visible Type Annotation>>>: ");
 				for(int i = 0; i < taContent.count; i++) {
 					System.out.print(taContent.visible[i]);
@@ -231,11 +208,11 @@ public class MethodContent extends MemberContent {
 				}
 				break;
 			case RuntimeInvisibleTypeAnnotations:
-				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations)info;
+				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations) info;
 				if(taContent == null) {
-					this.taContent = new MethodTypeAnnotationContent(rita.getAnnotations(), pool, false);
+					this.taContent = new MethodTypeAnnotationContent(rita.getAnnotations(), false);
 				} else {
-					taContent.setInvisible(rita.getAnnotations(), pool);
+					taContent.setInvisible(rita.getAnnotations());
 				}
 				System.out.println("<<<Runtime Invisible Type Annotation>>>: ");
 				for(int i = 0; i < taContent.count; i++) {
@@ -244,7 +221,7 @@ public class MethodContent extends MemberContent {
 				}
 				break;
 			case StackMapTable:
-				StackMapTable smt = (StackMapTable)info;
+				StackMapTable smt = (StackMapTable) info;
 				break;
 			default:
 				super.investigateAttribute(info, pool);
@@ -278,8 +255,8 @@ public class MethodContent extends MemberContent {
 
 	/**
 	 * returns default value of annotation interface's method.<br>
-	 * when the method is not annotation interface's or default value is undefine
-	 * , this method returns null.
+	 * when the method is not annotation interface's or default value is undefine , this method returns null.
+	 *
 	 * @return default value
 	 */
 	public String getDefaultAnn() {
@@ -293,19 +270,19 @@ public class MethodContent extends MemberContent {
 	public class ExceptionContent {
 		private int[] from, to, target;
 		private String[] exception;
-		
+
 		ExceptionContent(ExceptionTable[] table, String[] exception) {
-			this.from   = new int[table.length];
-			this.to     = new int[table.length];
+			this.from = new int[table.length];
+			this.to = new int[table.length];
 			this.target = new int[table.length];
 			for(int i = 0; i < table.length; i++) {
-				from[i]   = table[i].getNumber("start_pc");
-				to[i]     = table[i].getNumber("end_pc");
+				from[i] = table[i].getNumber("start_pc");
+				to[i] = table[i].getNumber("end_pc");
 				target[i] = table[i].getNumber("handler_pc");
 			}
 			this.exception = exception;
 		}
-		
+
 		/**
 		 * returns from-indexes into code array.
 		 * @return from-indexes
@@ -313,7 +290,7 @@ public class MethodContent extends MemberContent {
 		public int[] getFrom() {
 			return from != null ? from : new int[0];
 		}
-		
+
 		/**
 		 * returns to-indexes into code array.
 		 * @return to-indexes
@@ -321,7 +298,7 @@ public class MethodContent extends MemberContent {
 		public int[] getTo() {
 			return to != null ? to : new int[0];
 		}
-		
+
 		/**
 		 * returns target indexes into code array.
 		 * @return target indexes
@@ -329,7 +306,7 @@ public class MethodContent extends MemberContent {
 		public int[] getTarget() {
 			return target != null ? target : new int[0];
 		}
-		
+
 		/**
 		 * returns exception class names.
 		 * @return exception class names
@@ -337,10 +314,10 @@ public class MethodContent extends MemberContent {
 		public String[] getException() {
 			return exception != null ? exception : new String[0];
 		}
-		
+
 		/**
-		 * returns array indexes which specified pc is
-		 * in range between from_index and to_index (or to_index-1).<br>
+		 * returns array indexes which specified pc is in range between from_index and to_index (or
+		 * to_index-1).<br>
 		 * if the array index didn't find, this method returns empty array.
 		 * @param pc index into code array
 		 * @param isAny whether the range has no exception
@@ -354,17 +331,25 @@ public class MethodContent extends MemberContent {
 				if(gotoStart) {
 					if(from[i] <= pc && pc <= to[i]) {
 						if(isAny) {
-							if(exception[i].equals("any"))   indexes[range++] = i;
+							if(exception[i].equals("any")) {
+								indexes[range++] = i;
+							}
 						} else {
-							if(! exception[i].equals("any")) indexes[range++] = i;
+							if(! exception[i].equals("any")) {
+								indexes[range++] = i;
+							}
 						}
 					}
 				} else {
 					if(from[i] <= pc && pc < to[i]) {
 						if(isAny) {
-							if(exception[i].equals("any"))   indexes[range++] = i;
+							if(exception[i].equals("any")) {
+								indexes[range++] = i;
+							}
 						} else {
-							if(! exception[i].equals("any")) indexes[range++] = i;
+							if(!exception[i].equals("any")) {
+								indexes[range++] = i;
+							}
 						}
 					}
 				}
@@ -375,14 +360,14 @@ public class MethodContent extends MemberContent {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
-			for(int i = 0; i < from.length-1; i++) {
+			for(int i = 0; i < from.length - 1; i++) {
 				sb.append(from[i]).append("-").append(to[i])
-					.append(", ").append(target[i]).append(", ")
-					.append(exception[i]).append(System.getProperty("line.separator"));
+						.append(", ").append(target[i]).append(", ")
+						.append(exception[i]).append(System.getProperty("line.separator"));
 			}
-			sb.append(from[from.length-1]).append("-").append(to[from.length-1])
-					.append(", ").append(target[from.length-1]).append(", ")
-					.append(exception[from.length-1]);
+			sb.append(from[from.length - 1]).append("-").append(to[from.length - 1])
+					.append(", ").append(target[from.length - 1]).append(", ")
+					.append(exception[from.length - 1]);
 			return sb.toString();
 		}
 	}
@@ -393,34 +378,35 @@ public class MethodContent extends MemberContent {
 	 * This class is for local variables in method.
 	 */
 	public class LocalVariableContent {
+
 		private int[][] range;
 		private String[][] variable;
 		private int[] index;
 		private boolean hasValType;
-		
+
 		LocalVariableContent(LocalVariableTable.LVTable[] table, ConstantPool pool) {
 			this.range = new int[table.length][2];
 			this.variable = new String[table.length][2];
 			this.index = new int[table.length];
 			this.hasValType = false;
 			int i = 0;
-			for(LocalVariableTable.LVTable t: table) {
+			for(LocalVariableTable.LVTable t : table) {
 				range[i][0] = t.getNumber("start_pc");
 				range[i][1] = t.getNumber("length") + range[i][0];
-				variable[i][0] = extract(pool.get(t.getNumber("name_index")-1), pool);
-				variable[i][1] = parse(extract(pool.get(t.getNumber("descriptor")-1), pool));
+				variable[i][0] = t.getName();
+				variable[i][1] = t.getDesc();
 				index[i] = t.getNumber("index");
 				i++;
 			}
 		}
-		
-		void setType(LocalVariableTypeTable.LVTable[] table, ConstantPool pool) {
+
+		void setType(LocalVariableTypeTable.LVTable[] table) {
 			this.hasValType = true;
 			for(LocalVariableTypeTable.LVTable t : table) {
 				int lvIndex = t.getNumber("index");
 				for(int i = 0; i < index.length; i++) {
 					if(lvIndex == index[i]) {
-						String desc = extract(pool.get(t.getNumber("descriptor")-1), pool);
+						String desc = t.getDesc();
 						String valType = parse(desc);
 						if(valType.contains("<")) {
 							variable[i][1] += valType.substring(valType.indexOf("<"));
@@ -432,41 +418,45 @@ public class MethodContent extends MemberContent {
 				}
 			}
 		}
-		
+
 		/**
 		 * returns valid ranges of variable.<br>
 		 * returned array: int[variable_count][2]<br>
 		 * int[variable_count][0]: start pc<br>
 		 * int[variable_count][1]: end pc
+		 *
 		 * @return ranges
 		 */
 		public int[][] getRanges() {
 			return range;
 		}
-		
+
 		/**
 		 * returns variables.<br>
 		 * returned array: String[variable_count][2]<br>
 		 * String[variable_count][0]: variable name<br>
 		 * String[variable_count][1]: variable descriptor
+		 *
 		 * @return variables
 		 */
 		public String[][] getVariables() {
 			return variable;
 		}
-		
+
 		/**
 		 * returns variable indexes.
+		 *
 		 * @return variable indexes
 		 */
 		public int[] getIndexes() {
 			return index;
 		}
-		
+
 		/**
 		 * return whether the method has
 		 * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.14">
 		 * LocalVariableTypeTable Attribute</a>.
+		 *
 		 * @return if the method has the attribute, this method returns true.<br>
 		 * Otherwise, it returns false.
 		 */
@@ -477,15 +467,15 @@ public class MethodContent extends MemberContent {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
-			for(int i = 0; i < range.length-1; i++) {
+			for(int i = 0; i < range.length - 1; i++) {
 				sb.append(range[i][0]).append("-").append(range[i][1])
-					.append(", ").append(index[i]).append(", ")
-					.append(variable[i][1]).append(" ").append(variable[i][0])
-					.append(System.getProperty("line.separator"));
+						.append(", ").append(index[i]).append(", ")
+						.append(variable[i][1]).append(" ").append(variable[i][0])
+						.append(System.getProperty("line.separator"));
 			}
-			sb.append(range[range.length-1][0]).append("-").append(range[range.length-1][1])
-					.append(", ").append(index[range.length-1]).append(", ")
-					.append(variable[range.length-1][1]).append(" ").append(variable[range.length-1][0]);
+			sb.append(range[range.length - 1][0]).append("-").append(range[range.length - 1][1])
+					.append(", ").append(index[range.length - 1]).append(", ")
+					.append(variable[range.length - 1][1]).append(" ").append(variable[range.length - 1][0]);
 			return sb.toString();
 		}
 	}
@@ -496,42 +486,51 @@ public class MethodContent extends MemberContent {
 	 * This class is for annotations of method parameters.
 	 */
 	public class ParamAnnotationContent extends AnnotationContent {
+
 		private List<String[]> param;
 		private List<String[]> invParam;
 		private int paramCount;
 
-		ParamAnnotationContent(ParameterAnnotations[] pa, ConstantPool pool, boolean isVisible) {
+		ParamAnnotationContent(ParameterAnnotations[] pa, boolean isVisible) {
 			super(isVisible);
 			this.paramCount = pa.length;
-			initAnnotation(pa, pool, isVisible);
+			initAnnotation(pa, isVisible);
 		}
 
-		private void setInvisible(ParameterAnnotations[] annotations, ConstantPool pool) {
+		private void setInvisible(ParameterAnnotations[] annotations) {
 			type = type | INVISIBLE;
-			initAnnotation(annotations, pool, false);
+			initAnnotation(annotations, false);
 		}
 
-		private void initAnnotation(ParameterAnnotations[] pa, ConstantPool pool, boolean isVisible) {
-			if(isVisible) param    = new ArrayList<>();
-			else          invParam = new ArrayList<>();
+		private void initAnnotation(ParameterAnnotations[] pa, boolean isVisible) {
+			if(isVisible) {
+				param = new ArrayList<>();
+			} else {
+				invParam = new ArrayList<>();
+			}
 			for(int i = 0; i < paramCount; i++) {
-				super.initAnnotation(pa[i].getAnnotations(), pool, isVisible);
-				if(isVisible) param.add(visible);
-				else          invParam.add(invisible);
+				super.initAnnotation(pa[i].getAnnotations(), isVisible);
+				if(isVisible) {
+					param.add(visible);
+				} else {
+					invParam.add(invisible);
+				}
 			}
 		}
 
 		/**
 		 * returns parameter annotations.
+		 *
 		 * @param isVisible whether runtime visible annotation
 		 * @return parameter annotations
-		*/
+		 */
 		public List<String[]> getParams(boolean isVisible) {
 			return isVisible ? param : invParam;
 		}
 
 		/**
 		 * returns parameter annotation of specified array index.
+		 *
 		 * @param index array index
 		 * @param isVisible whether runtime visible annotation
 		 * @return parameter annotation
@@ -547,13 +546,12 @@ public class MethodContent extends MemberContent {
 
 	// <editor-fold defaultstate="collapsed" desc="[class] MethodTypeAnnotationContent">
 	/**
-	 * This class is
-	 * {@link TypeAnnotationContent <code>TypeAnnotationContent</code>}
-	 * for method.
+	 * This class is {@link TypeAnnotationContent <code>TypeAnnotationContent</code>} for method.
 	 */
 	public class MethodTypeAnnotationContent extends TypeAnnotationContent {
-		MethodTypeAnnotationContent(TypeAnnotation[] ta, ConstantPool pool, boolean isVisible) {
-			super(ta, pool, isVisible);
+
+		MethodTypeAnnotationContent(String[] ta, boolean isVisible) {
+			super(ta, isVisible);
 		}
 
 		@Override
@@ -561,9 +559,9 @@ public class MethodContent extends MemberContent {
 			String annotation = isVisible ? visible[annIndex] : invisible[annIndex];
 			switch(target.getType()) {
 				case CatchTarget:
-					CatchTarget ct = (CatchTarget)target;
+					CatchTarget ct = (CatchTarget) target;
 					exContent.getException()[ct.getIndex()]
-						= annotation + " " + exContent.getException()[ct.getIndex()];
+							= annotation + " " + exContent.getException()[ct.getIndex()];
 					break;
 				case LocalVarTarget:
 //					LocalVarTarget.LVTTable table = ((LocalVarTarget)target).getTable()[0];
@@ -604,7 +602,7 @@ public class MethodContent extends MemberContent {
 //					sb.append(",").append(ot.getOffset());
 					break;
 				case ThrowsTarget:
-					ThrowsTarget tt = (ThrowsTarget)target;
+					ThrowsTarget tt = (ThrowsTarget) target;
 					exceptions[tt.getIndex()] = annotation + " " + exceptions[tt.getIndex()];
 					break;
 				case TypeParameterTarget:

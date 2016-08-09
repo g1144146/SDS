@@ -6,9 +6,6 @@ import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.ConstantValue;
 import sds.classfile.attributes.Signature;
 
-import static sds.util.DescriptorParser.parse;
-import static sds.util.Utf8ValueExtractor.extract;
-
 /**
  * This class is for contents of field.
  * @author inagaki
@@ -33,11 +30,11 @@ public class FieldContent extends MemberContent {
 		switch(info.getType()) {
 			case ConstantValue:
 				ConstantValue cv = (ConstantValue)info;
-				this.constVal = extract(pool.get(cv.getConstantValueIndex()-1), pool);
+				this.constVal = cv.getConstantValue();
 				break;
 			case Signature:
 				Signature sig = (Signature)info;
-				this.desc = parse(extract(pool.get(sig.getSignatureIndex()-1), pool));
+				this.desc = sig.getSignature();
 				break;
 			default:
 				super.investigateAttribute(info, pool);

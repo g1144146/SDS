@@ -13,7 +13,6 @@ import sds.classfile.attributes.annotation.RuntimeInvisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.SuperTypeTarget;
 import sds.classfile.attributes.annotation.TargetInfo;
-import sds.classfile.attributes.annotation.TypeAnnotation;
 import static sds.util.AccessFlags.get;
 import static sds.util.Utf8ValueExtractor.extract;
 
@@ -85,32 +84,30 @@ public class ClassContent extends BaseContent {
 				this.bootstrapMethods = new String[bsm.getBSM().length];
 				int index = 0;
 				for(BootstrapMethods.BSM b : bsm.getBSM()) {
-					for(int argIndex : b.getBSMArgs()) {
-						String method =extract(pool.get(argIndex-1), pool);
-						if(! method.startsWith("(")) {
-							bootstrapMethods[index++] = method;
+					for(String arg : b.getBSMArgs()) {
+						if(! arg.startsWith("(")) {
+							bootstrapMethods[index++] = arg;
 						}
 					}
 				}
 				break;
 			case EnclosingMethod:
 				EnclosingMethod em = (EnclosingMethod)info;
-				this.enclosingClass  = extract(pool.get(em.classIndex()-1), pool);
-				this.enclosingMethod = em.methodIndex() > 0
-					? extract(pool.get(em.methodIndex()-1), pool) : "";
+				this.enclosingClass  = em.getEncClass();
+				this.enclosingMethod = em.getEncMethod();
 				break;
 			case InnerClasses:
 				InnerClasses ic = (InnerClasses)info;
 				for(InnerClasses.Classes c : ic.getClasses()) {
-					int inner = c.getNumber("inner");
-					int outer = c.getNumber("outer");
-					int name = c.getNumber("inner_name");
-					int accessFlag = c.getNumber("access_flag");
+//					int inner = c.getNumber("inner");
+//					int outer = c.getNumber("outer");
+//					int name = c.getNumber("inner_name");
+//					int accessFlag = c.getNumber("access_flag");
 				}
 				break;
 			case RuntimeVisibleTypeAnnotations:
 				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations)info;
-				this.taContent = new ClassTypeAnnotationContent(rvta.getAnnotations(), pool, true);
+				this.taContent = new ClassTypeAnnotationContent(rvta.getAnnotations(), true);
 				System.out.println("<<<Runtime Visible Type Annotation>>>: ");
 				for(int i = 0; i < taContent.count; i++) {
 					System.out.print(taContent.visible[i]);
@@ -120,9 +117,9 @@ public class ClassContent extends BaseContent {
 			case RuntimeInvisibleTypeAnnotations:
 				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations)info;
 				if(taContent == null) {
-					this.taContent = new ClassTypeAnnotationContent(rita.getAnnotations(), pool, false);
+					this.taContent = new ClassTypeAnnotationContent(rita.getAnnotations(), false);
 				} else {
-					taContent.setInvisible(rita.getAnnotations(), pool);
+					taContent.setInvisible(rita.getAnnotations());
 				}
 				System.out.println("<<<Runtime Invisible Type Annotation>>>: ");
 				for(int i = 0; i < taContent.count; i++) {
@@ -135,7 +132,7 @@ public class ClassContent extends BaseContent {
 				break;
 			case SourceFile:
 				SourceFile sf = (SourceFile)info;
-				this.sourceFile = extract(pool.get(sf.getSourceFileIndex()-1), pool);
+				this.sourceFile = sf.getSourceFile();
 				break;
 			default:
 				super.investigateAttribute(info, pool);
@@ -213,8 +210,8 @@ public class ClassContent extends BaseContent {
 	 * for class.
 	 */
 	public class ClassTypeAnnotationContent extends TypeAnnotationContent {
-		ClassTypeAnnotationContent(TypeAnnotation[] ta, ConstantPool pool, boolean isVisible) {
-			super(ta, pool, isVisible);
+		ClassTypeAnnotationContent(String[] ta, boolean isVisible) {
+			super(ta, isVisible);
 		}
 
 		@Override

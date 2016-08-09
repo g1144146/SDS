@@ -6,18 +6,13 @@ import java.util.Map;
 import sds.classfile.ConstantPool;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.Signature;
-import sds.classfile.attributes.annotation.Annotation;
-import sds.classfile.attributes.annotation.ElementValueException;
 import sds.classfile.attributes.annotation.RuntimeInvisibleAnnotations;
 import sds.classfile.attributes.annotation.RuntimeInvisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleAnnotations;
 import sds.classfile.attributes.annotation.RuntimeVisibleTypeAnnotations;
 import sds.classfile.attributes.annotation.TargetInfo;
-import sds.classfile.attributes.annotation.TypeAnnotation;
 
-import static sds.util.AnnotationParser.parseAnnotation;
 import static sds.util.DescriptorParser.parse;
-import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This adapter class is for
@@ -37,7 +32,7 @@ public abstract class BaseContent {
 			case Deprecated: break;
 			case RuntimeVisibleAnnotations:
 				RuntimeVisibleAnnotations rva = (RuntimeVisibleAnnotations)info;
-				this.annContent = new AnnotationContent(rva.getAnnotations(), pool, true);
+				this.annContent = new AnnotationContent(rva.getAnnotations(), true);
 //				System.out.println("<Runtime Visible Annotation>: ");
 //				for(String a : annContent.visible)
 //					System.out.println("  " + a);
@@ -45,9 +40,9 @@ public abstract class BaseContent {
 			case RuntimeInvisibleAnnotations:
 				RuntimeInvisibleAnnotations ria = (RuntimeInvisibleAnnotations)info;
 				if(annContent == null) {
-					this.annContent = new AnnotationContent(ria.getAnnotations(), pool, false);
+					this.annContent = new AnnotationContent(ria.getAnnotations(), false);
 				} else {
-					annContent.setInvisible(ria.getAnnotations(), pool);
+					annContent.setInvisible(ria.getAnnotations());
 				}
 //				System.out.println("<Runtime Invisible Annotation>: ");
 //				for(String a : annContent.invisible)
@@ -55,7 +50,7 @@ public abstract class BaseContent {
 				break;
 			case RuntimeVisibleTypeAnnotations:
 				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations)info;
-				this.taContent = new TypeAnnotationContent(rvta.getAnnotations(), pool, true);
+				this.taContent = new TypeAnnotationContent(rvta.getAnnotations(), true);
 				System.out.println("<Runtime Visible Type Annotation>: ");
 				for(String a : taContent.visible)
 					System.out.println("  " + a);
@@ -63,9 +58,9 @@ public abstract class BaseContent {
 			case RuntimeInvisibleTypeAnnotations:
 				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations)info;
 				if(taContent == null) {
-					this.taContent = new TypeAnnotationContent(rita.getAnnotations(), pool, false);
+					this.taContent = new TypeAnnotationContent(rita.getAnnotations(), false);
 				} else {
-					taContent.setInvisible(rita.getAnnotations(), pool);
+					taContent.setInvisible(rita.getAnnotations());
 				}
 				System.out.println("<Runtime Invisible Type Annotation>: ");
 				for(String a : taContent.invisible)
@@ -73,7 +68,7 @@ public abstract class BaseContent {
 				break;
 			case Signature:
 				Signature sig = (Signature)info;
-				String desc = extract(pool.get(sig.getSignatureIndex()-1), pool);
+				String desc = sig.getSignature();
 				String parsedDesc = parse(desc, true);
 				String genericsType
 					= parsedDesc.substring(parsedDesc.indexOf("<") + 1, parsedDesc.lastIndexOf(">"));
@@ -133,9 +128,9 @@ public abstract class BaseContent {
 		String[] visible;
 		String[] invisible;
 
-		AnnotationContent(Annotation[] annotations, ConstantPool pool, boolean isVisible) {
+		AnnotationContent(String[] annotations, boolean isVisible) {
 			this(isVisible);
-			initAnnotation(annotations, pool, isVisible);
+			initAnnotation(annotations, isVisible);
 		}
 
 		AnnotationContent(boolean isVisible) {
@@ -143,26 +138,15 @@ public abstract class BaseContent {
 			type = isVisible ? VISIBLE : INVISIBLE;
 		}
 
-		void setInvisible(Annotation[] annotations, ConstantPool pool) {
+		void setInvisible(String[] annotations) {
 			type = type | INVISIBLE;
-			initAnnotation(annotations, pool, false);
+			initAnnotation(annotations, false);
 		}
 
-		void initAnnotation(Annotation[] annotations, ConstantPool pool, boolean isVisible) {
+		void initAnnotation(String[] annotations, boolean isVisible) {
 			this.count = annotations.length;
-			if(isVisible) visible   = new String[count];
-			else          invisible = new String[count];
-			try {
-				for(int i = 0; i < count; i++) {
-					if(isVisible) {
-						this.visible[i] = parseAnnotation(annotations[i], new StringBuilder(), pool);
-					} else {
-						this.invisible[i] = parseAnnotation(annotations[i], new StringBuilder(), pool);
-					}
-				}
-			} catch(ElementValueException e) {
-				e.printStackTrace();
-			}
+			if(isVisible) visible   = annotations;
+			else          invisible = annotations;
 		}
 
 		/**
@@ -209,28 +193,28 @@ public abstract class BaseContent {
 		String[] targets; 
 		String[] invTargets;
 
-		TypeAnnotationContent(TypeAnnotation[] ta, ConstantPool pool, boolean isVisible) {
-			super(ta, pool, isVisible);
+		TypeAnnotationContent(String[] ta, boolean isVisible) {
+			super(ta, isVisible);
 			if(isVisible) {
-				this.targets = new String[count];
-				for(int i = 0; i < count; i++) {
-					initTarget(ta[i].getTargetInfo(), i, isVisible);
-				}
+				this.targets = ta;
+//				for(int i = 0; i < count; i++) {
+//					initTarget(ta[i].getTargetInfo(), i, isVisible);
+//				}
 			} else {
-				setInvisible(ta, pool);
+				setInvisible(ta);
 			}
 		}
 
 		void initTarget(TargetInfo target, int annIndex, boolean isVisible) {}
 
 		@Override
-		void setInvisible(Annotation[] annotations, ConstantPool pool) {
-			super.setInvisible(annotations, pool);
+		void setInvisible(String[] annotations) {
+			super.setInvisible(annotations);
 			this.invTargets = new String[annotations.length];
-			TypeAnnotation[] ta = (TypeAnnotation[])annotations;
-			for(int i = 0; i < ta.length; i++) {
-				initTarget(ta[i].getTargetInfo(), i, false);
-			}
+//			TypeAnnotation[] ta = (TypeAnnotation[])annotations;
+//			for(int i = 0; i < ta.length; i++) {
+//				initTarget(ta[i].getTargetInfo(), i, false);
+//			}
 		}
 
 		/**
