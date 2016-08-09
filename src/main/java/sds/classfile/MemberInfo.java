@@ -1,16 +1,19 @@
 package sds.classfile;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+
+import static sds.util.AccessFlags.get;
+import static sds.util.DescriptorParser.parse;
+import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This adapter class is for info of class has member.
  * @author inagaki
  */
 public class MemberInfo implements Info {
-	private int accessFlags;
-	private int nameIndex;
-	private int descriptorIndex;
+	private String accessFlags;
+	private String name;
+	private String descriptor;
 	private Attributes attr;
 	private String type;
 
@@ -26,24 +29,24 @@ public class MemberInfo implements Info {
 	 * returns access flag of member.
 	 * @return access flag
 	 */
-	public int getAccessFlags() {
+	public String getAccessFlags() {
 		return accessFlags;
 	}
 
 	/**
-	 * returns constant-pool entry index of member name.
-	 * @return constant-pool entry index of member name
+	 * returns member name.
+	 * @return member name
 	 */
-	public int getNameIndex() {
-		return nameIndex;
+	public String getName() {
+		return name;
 	}
 
 	/**
-	 * returns constant-pool entry index of member descriptor.
-	 * @return constant-pool entry index of member descriptor
+	 * returns member descriptor.
+	 * @return member descriptor
 	 */
-	public int getDescriptorIndex() {
-		return descriptorIndex;
+	public String getDescriptor() {
+		return descriptor;
 	}
 
 	/**
@@ -71,9 +74,12 @@ public class MemberInfo implements Info {
 	}
 
 	@Override
-	public void read(RandomAccessFile raf) throws IOException {
-		this.accessFlags = raf.readShort();
-		this.nameIndex = raf.readShort();
-		this.descriptorIndex = raf.readShort();
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		int acc = data.readShort();
+		int nameIndex = data.readShort();
+		int descIndex = data.readShort();
+		this.accessFlags = get(acc, type);
+		this.name = extract(pool.get(nameIndex-1), pool);
+		this.descriptor = parse(extract(pool.get(descIndex-1), pool));
 	}
 }
