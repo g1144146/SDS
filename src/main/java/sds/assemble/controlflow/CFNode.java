@@ -2,7 +2,6 @@ package sds.assemble.controlflow;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import sds.assemble.LineInstructions;
 import sds.classfile.bytecode.BranchOpcode;
 import sds.classfile.bytecode.OpcodeInfo;
@@ -13,6 +12,7 @@ import static sds.assemble.controlflow.CFNodeType.Entry;
 import static sds.assemble.controlflow.CFNodeType.Exit;
 import static sds.assemble.controlflow.CFNodeType.LoopExit;
 import static sds.assemble.controlflow.CFNodeType.StringSwitch;
+import static sds.assemble.controlflow.CFNodeType.SynchronizedExit;
 import static sds.assemble.controlflow.CFNodeType.Switch;
 
 /**
@@ -33,8 +33,9 @@ public class CFNode {
 	// package-private fields.
 	CFNodeType nodeType;
 	boolean inTry      = false;
-	boolean isCatchEntry    = false;
-	boolean isFinallyEntry  = false;
+	boolean isCatch    = false;
+	boolean isFinally  = false;
+	int synchIndent = 0;
 
 	/**
 	 * constructor.
@@ -85,7 +86,7 @@ public class CFNode {
 					break;
 				}
 			}
- 		} else if(nodeType == StringSwitch) {
+ 		} else if(nodeType == StringSwitch) { // switch statement with string
 			if(end instanceof LookupSwitch) {
 				LookupSwitch look = (LookupSwitch)end;
 				this.switchJump = new int[look.getMatch().length + 1];
@@ -102,6 +103,13 @@ public class CFNode {
 					switchJump[i] = offsets[i] + table.getPc();
 				}
 				switchJump[switchJump.length - 1] = table.getDefault() + table.getPc();
+			}
+		} else if(nodeType == SynchronizedExit) { // end of synchronized
+			for(OpcodeInfo info : inst.getOpcodes().getAll()) {
+				if(info instanceof BranchOpcode) {
+					this.jumpPoint = ((BranchOpcode)info).getBranch() + info.getPc();
+					break;
+				}
 			}
 		}
 
@@ -303,15 +311,16 @@ public class CFNode {
 		sb.append("#").append(start.getPc()).append("-").append(end.getPc())
 			.append(" [").append(nodeType).append("]").append("\n");
 		if(inTry)     sb.append("  in try\n");
-		if(isCatchEntry)   sb.append("  catch entry\n");
-		if(isFinallyEntry) sb.append("  finally entry\n");
+		if(isCatch)   sb.append("  in catch\n");
+		if(isFinally) sb.append("  in finally\n");
+		if(synchIndent > 0) sb.append("  in synchronized ").append(synchIndent).append("\n");
 		sb.append("  opcodes: ").append(instStr).append("\n");
 		if(parents.size() == 1) {
-		 	sb.append("  immediate dominator: ").append(parents.iterator().next());
+			sb.append("  immediate dominator: ").append(parents.iterator().next());
 		} else if(parents.size() > 1) {
 			sb.append("  dominator: ")
 				.append(dominator.getStart().getPc()).append("-")
-		 		.append(dominator.getEnd().getPc())
+				.append(dominator.getEnd().getPc())
 				.append("\n  parents: ");
 			for(CFEdge edge : parents) {
 				sb.append(edge.toString()).append(" ");

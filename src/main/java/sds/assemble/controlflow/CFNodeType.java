@@ -5,6 +5,9 @@ import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
 import sds.classfile.bytecode.SwitchOpcode;
 
+import static sds.classfile.bytecode.MnemonicTable.monitorenter;
+import static sds.classfile.bytecode.MnemonicTable.monitorexit;
+
 /**
  * This enum class is for type of
  * {@link CFNode <code>CFNode</code>}.
@@ -16,6 +19,8 @@ public enum CFNodeType {
 	Exit,
 	Switch,
 	StringSwitch,
+	SynchronizedEntry,
+	SynchronizedExit,
 	LoopEntry,
 	LoopExit,
 	End;
@@ -23,7 +28,7 @@ public enum CFNodeType {
 	/**
 	 * returns type of control flow node.
 	 * @param opcodes opcode sequence
-	 * @param end end od opcode
+	 * @param end end of opcode
 	 * @return node type
 	 */
 	public static CFNodeType getType(Opcodes opcodes, OpcodeInfo end) {
@@ -72,6 +77,10 @@ public enum CFNodeType {
 			}
 		} else if(op instanceof SwitchOpcode) {
 			return Switch;
+		} else if(op.getOpcodeType() == monitorenter) {
+			return SynchronizedEntry;
+		} else if(op.getOpcodeType() == monitorexit) {
+			return SynchronizedExit;
 		}
 		return isReturn(op) ? End : Normal;
 	}

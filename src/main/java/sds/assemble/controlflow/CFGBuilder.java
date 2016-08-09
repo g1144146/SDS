@@ -14,12 +14,16 @@ import static sds.assemble.controlflow.CFNodeType.End;
 import static sds.assemble.controlflow.CFNodeType.Exit;
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
 import static sds.assemble.controlflow.CFNodeType.LoopExit;
+import static sds.assemble.controlflow.CFNodeType.SynchronizedEntry;
+import static sds.assemble.controlflow.CFNodeType.SynchronizedExit;
 import static sds.assemble.controlflow.CFNodeType.StringSwitch;
 import static sds.assemble.controlflow.CFNodeType.Switch;
 import static sds.assemble.controlflow.CFEdgeType.JumpToCatch;
 import static sds.assemble.controlflow.CFEdgeType.JumpToFinally;
+import static sds.classfile.bytecode.MnemonicTable.athrow;
 import static sds.classfile.bytecode.MnemonicTable._goto;
 import static sds.classfile.bytecode.MnemonicTable.goto_w;
+
 
 /**
  * This builder class is for control flow graph.<br>
@@ -56,8 +60,8 @@ public class CFGBuilder {
 		for(int i = 0; i < nodes.length; i++) {
 			nodes[i] = new CFNode(inst[i]);
 		}
-		
-		/** 2. set parent and child, and investigate try-catch-finally **/
+
+		/** 2. set parent and child, and investigate try-catch-finally or synchronized statement **/
 		int index = 0;
 		for(CFNode n : nodes) {
 			// processing for try-catch-finally
@@ -65,13 +69,13 @@ public class CFGBuilder {
 						  || (n.getStart().getOpcodeType() == goto_w);
 			int[] tryIndex= ex.getIndexInRange(n.getStart().getPc(), false, isGoto);
 			int[] catchTypeIndex = ex.getIndexInRange(n.getStart().getPc(), true, isGoto);
-			if(tryIndex.length > 0) { // for catch
+			if(tryIndex.length > 0) {
 				n.inTry = true;
-				for(int ti : tryIndex) {
+				for(int ti : tryIndex) { // for catch
 					int catchIndex = ex.getTarget()[ti];
 					for(int i = index; i < nodes.length; i++) {
 						if(nodes[i].isInPcRange(catchIndex)) {
-							nodes[i].isCatchEntry = true;
+							nodes[i].isCatch = true;
 							n.addChild(nodes[i], JumpToCatch);
 							nodes[i].addParent(n, JumpToCatch);
 							break;
@@ -79,15 +83,25 @@ public class CFGBuilder {
 					}
 				}
 			}
-			if(catchTypeIndex.length > 0) { // for finally
+			if(catchTypeIndex.length > 0) {
 				for(int ci : catchTypeIndex) {
 					int finallyIndex = ex.getTarget()[ci];
-					for(int i = index; i < nodes.length; i++) {
+					for(int i = index; i < nodes.length; i++) { // for finally
 						if(nodes[i].isInPcRange(finallyIndex)) {
-							nodes[i].isFinallyEntry = true;
-							n.addChild(nodes[i], JumpToFinally);
-							nodes[i].addParent(n, JumpToFinally);
-							break;
+							if(nodes[i].getType() != SynchronizedExit) {
+								// because ExceptionTable attribute contains synchronized statement,
+								// excluding in case of node type is SynchronizedExit
+								nodes[i].isFinally = true;
+								n.addChild(nodes[i], JumpToFinally);
+								nodes[i].addParent(n, JumpToFinally);
+								if((i + 1) < nodes.length
+								&& nodes[i + 1].getEnd().getOpcodeType() == athrow) {
+									nodes[i + 1].isFinally = true;
+									nodes[i].addChild(nodes[i + 1]);
+									nodes[i + 1].addParent(nodes[i]);
+								}
+								break;
+							}
 						}
 					}
 				}
@@ -112,6 +126,7 @@ public class CFGBuilder {
 
 		/** 3. set jump point node **/
 		index = 0;
+		int synchCount = 0;
 		for(CFNode n : nodes) {
 			CFNodeType type = n.getType();
 			if(type == Exit || type == Entry) {
@@ -143,6 +158,28 @@ public class CFGBuilder {
 						}
 					}
 				}
+			} else if((type == SynchronizedEntry) && (nodes[index].synchIndent == 0)) {
+				// in case of synchIndent is over zero,
+				// the node has already analyzed synchronized statement.
+				synchCount++;
+				int synchIndex = index + 1;
+				while((synchCount > 0) && (synchIndex < nodes.length)) {
+					// count > 0: for nested synchronized statement.
+					nodes[synchIndex].synchIndent += synchCount;
+					if(nodes[synchIndex].getType() == SynchronizedEntry) {
+						synchCount++;
+					} else if(nodes[synchIndex].getType() == SynchronizedExit) {
+						synchCount--;
+						int jumpPoint = nodes[synchIndex].getJumpPoint();
+						for(int j = synchIndex; j < nodes.length; j++) {
+							if(nodes[j].isInPcRange(jumpPoint)) {
+								nodes[synchIndex].addChild(nodes[j]);
+								nodes[j].addParent(nodes[synchIndex]);
+							}
+						}
+					}
+					synchIndex++;
+				}
 			}
 			index++;
 		}
@@ -169,26 +206,4 @@ public class CFGBuilder {
 		}
 		return nodes;
 	}
-//
-//	private Set<CFNode> getChildren(CFNode node) {
-//		Set<CFNode> set = new LinkedHashSet<>();
-//		Deque<CFNode> queue = new ArrayDeque<>();
-//		queue.push(node);
-//		while(! queue.isEmpty()) {
-//			CFNode n = queue.pop();
-//			if(n.getType() == End) {
-//				set.add(n);
-//				break;
-//			}
-//			set.add(n);
-//			for(CFEdge e : n.getChildren()) {
-//				CFNode dest = e.getDest();
-//				if(! set.contains(dest)) {
-//					set.add(dest);
-//					queue.push(dest);
-//				}
-//			}
-//		}
-//		return set;
-//	}
 }
