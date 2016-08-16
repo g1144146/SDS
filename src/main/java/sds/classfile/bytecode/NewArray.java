@@ -25,14 +25,14 @@ public class NewArray extends OpcodeInfo {
 	public void read(ClassFileStream data) throws IOException {
 		int type = data.readUnsignedByte();
 		switch(type) {
-			case 4:  this.atype = "T_BOOLEAN"; break;
-			case 5:  this.atype = "T_CHAR";    break;
-			case 6:  this.atype = "T_FLOAT";   break;
-			case 7:  this.atype = "T_DOUBLE";  break;
-			case 8:  this.atype = "T_BYTE";    break;
-			case 9:  this.atype = "T_SHORT";   break;
-			case 10: this.atype = "T_INT";     break;
-			case 11: this.atype = "T_LONG";    break;
+			case 4:  this.atype = "boolean"; break;
+			case 5:  this.atype = "char";    break;
+			case 6:  this.atype = "float";   break;
+			case 7:  this.atype = "double";  break;
+			case 8:  this.atype = "byte";    break;
+			case 9:  this.atype = "short";   break;
+			case 10: this.atype = "int";     break;
+			case 11: this.atype = "long";    break;
 			default:
 				System.out.println("[unknown type]: " + type);
 				break;
