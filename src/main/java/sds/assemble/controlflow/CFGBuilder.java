@@ -1,10 +1,5 @@
 package sds.assemble.controlflow;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.ArrayDeque;
-import java.util.Deque;
-
 import sds.assemble.MethodContent.ExceptionContent;
 import sds.assemble.LineInstructions;
 
@@ -18,8 +13,10 @@ import static sds.assemble.controlflow.CFNodeType.SynchronizedEntry;
 import static sds.assemble.controlflow.CFNodeType.SynchronizedExit;
 import static sds.assemble.controlflow.CFNodeType.StringSwitch;
 import static sds.assemble.controlflow.CFNodeType.Switch;
+import static sds.assemble.controlflow.CFEdgeType.FalseBranch;
 import static sds.assemble.controlflow.CFEdgeType.JumpToCatch;
 import static sds.assemble.controlflow.CFEdgeType.JumpToFinally;
+import static sds.assemble.controlflow.CFEdgeType.TrueBranch;
 import static sds.classfile.bytecode.MnemonicTable.athrow;
 import static sds.classfile.bytecode.MnemonicTable._goto;
 import static sds.classfile.bytecode.MnemonicTable.goto_w;
@@ -111,14 +108,24 @@ public class CFGBuilder {
 				CFNodeType type = nodes[index-1].getType();
 				if(type != Exit && type != LoopExit && type != Switch
 				&& type != End && type != StringSwitch) {
-					n.addParent(nodes[index-1]);
-					nodes[index-1].addChild(n);
+					if(type == Entry) {
+						n.addParent(nodes[index-1], TrueBranch);
+						nodes[index-1].addChild(n, TrueBranch);
+					} else {
+						n.addParent(nodes[index-1]);
+						nodes[index-1].addChild(n);
+					}
 				}
 			} else if(index == nodes.length-1) {
 				CFNodeType type = n.getType();
 				if(type != Exit && type != LoopExit && type != Switch && type != StringSwitch) {
-					n.addChild(nodes[index]);
-					nodes[index].addParent(n);
+					if(type == Entry) {
+						n.addParent(nodes[index], TrueBranch);
+						nodes[index].addChild(n, TrueBranch);
+					} else {
+						n.addChild(nodes[index]);
+						nodes[index].addParent(n);
+					}
 				}
 			}
 			index++;
@@ -132,8 +139,13 @@ public class CFGBuilder {
 			if(type == Exit || type == Entry) {
 				for(int i = index; i < nodes.length; i++) {
 					if(nodes[i].isInPcRange(n.getJumpPoint())) {
- 						n.addChild(nodes[i]);
-						nodes[i].addParent(n);
+						if(type == Entry) {
+							n.addChild(nodes[i], FalseBranch);
+							nodes[i].addParent(n, FalseBranch);
+						} else {
+							n.addChild(nodes[i]);
+							nodes[i].addParent(n);
+						}
 						break;
 					}
 				}
