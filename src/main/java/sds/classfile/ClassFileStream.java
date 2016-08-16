@@ -32,7 +32,7 @@ public class ClassFileStream implements AutoCloseable {
 	public ClassFileStream(InputStream in) throws IOException {
 		this.stream = new DataInputStream(in);
 		this.isRaf = false;
-	}	
+	}
 
 	/**
 	 * returns current file pointer.
@@ -88,7 +88,7 @@ public class ClassFileStream implements AutoCloseable {
 	 * @return float
 	 * @throws IOException
 	 */
-	public Float readFloat() throws IOException {
+	public float readFloat() throws IOException {
 		filePointer += Float.BYTES;
 		return isRaf ? raf.readFloat() : stream.readFloat();
 	}
