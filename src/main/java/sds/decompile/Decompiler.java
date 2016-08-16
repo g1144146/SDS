@@ -12,4 +12,10 @@ public interface Decompiler {
 	 * @param content decompile target content
 	 */
 	public void decompile(BaseContent content);
+
+	/**
+	 * decompiles specified contents.
+	 * @param contents decompile target contents
+	 */
+	public void decompile(BaseContent[] contents);
 }
