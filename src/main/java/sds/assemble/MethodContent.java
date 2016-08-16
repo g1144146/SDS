@@ -48,6 +48,7 @@ public class MethodContent extends MemberContent {
 	private LocalVariableContent valContent;
 	private ParamAnnotationContent paContent;
 	private String defaultAnn;
+	private CFNode[] nodes;
 
 	/**
 	 * constructor.
@@ -93,7 +94,7 @@ public class MethodContent extends MemberContent {
 		// set CFG
 		if(!this.getAccessFlag().contains("abstract")) {
 			CFGBuilder builder = CFGBuilder.getInstance();
-			CFNode[] nodes = builder.build(inst, exContent);
+			this.nodes = builder.build(inst, exContent);
 			for(CFNode n : nodes) {
 				System.out.println(n.toString());
 			}
@@ -230,6 +231,38 @@ public class MethodContent extends MemberContent {
 	}
 
 	/**
+	 * returns max operand stack size.
+	 * @return operand stack size
+	 */
+	public int getMaxStack() {
+		return maxStack;
+	}
+
+	/**
+	 * returns max local stack size.
+	 * @return local stack size
+	 */
+	public int getMaxLocals() {
+		return maxLocals;
+	}
+
+	/**
+	 * returns methods arguments.
+	 * @return methods arguments
+	 */
+	public String[][] getArgs() {
+		return this.args != null ? args : new String[0][0];
+	}
+
+	/**
+	 * returns exceptions of throws statement.
+	 * @return exceptions
+	 */
+	public String[] getExceptions() {
+		return exceptions != null ? exceptions : new String[0];
+	}
+
+	/**
 	 * returns exception content of this method.
 	 * @return excpetion content
 	 */
@@ -255,12 +288,28 @@ public class MethodContent extends MemberContent {
 
 	/**
 	 * returns default value of annotation interface's method.<br>
-	 * when the method is not annotation interface's or default value is undefine , this method returns null.
-	 *
+	 * when the method is not annotation interface's or default value is undefine,
+	 * this method returns null.
 	 * @return default value
 	 */
 	public String getDefaultAnn() {
 		return defaultAnn;
+	}
+
+	/**
+	 * returns control flow graph of method.
+	 * @return control flow graph
+	 */
+	public CFNode[] getNodes() {
+		return nodes != null ? nodes : new CFNode[0];
+	}
+
+	/**
+	 * returns instruction sequence of a line.
+	 * @return instruction sequence
+	 */
+	public LineInstructions[] getInst() {
+		return inst != null ? inst : new LineInstructions[0];
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="[class] ExceptionContent">
