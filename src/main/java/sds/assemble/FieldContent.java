@@ -21,12 +21,12 @@ public class FieldContent extends MemberContent {
 	public FieldContent(MemberInfo info, ConstantPool pool) {
 		super(info, pool);
 		for(AttributeInfo attr : info.getAttr().getAll()) {
-			investigateAttribute(attr, pool);
+			examineAttribute(attr, pool);
 		}
 	}
 
 	@Override
-	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
+	public void examineAttribute(AttributeInfo info, ConstantPool pool) {
 		switch(info.getType()) {
 			case ConstantValue:
 				ConstantValue cv = (ConstantValue)info;
@@ -37,7 +37,7 @@ public class FieldContent extends MemberContent {
 				this.desc = sig.getSignature();
 				break;
 			default:
-				super.investigateAttribute(info, pool);
+				super.examineAttribute(info, pool);
 				break;
 		}
 	}

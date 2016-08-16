@@ -27,7 +27,12 @@ public abstract class BaseContent {
 	TypeAnnotationContent taContent;
 	boolean hasAnnotation;
 
-	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
+	/**
+	 * examines classfile attribute.
+	 * @param info attribute
+	 * @param pool constant-pool
+	 */
+	public void examineAttribute(AttributeInfo info, ConstantPool pool) {
 		switch(info.getType()) {
 			case Deprecated: break;
 			case RuntimeVisibleAnnotations:

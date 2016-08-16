@@ -75,7 +75,7 @@ public class MethodContent extends MemberContent {
 		}
 		// attriutes
 		for(AttributeInfo attr : info.getAttr().getAll()) {
-			investigateAttribute(attr, pool);
+			examineAttribute(attr, pool);
 		}
 		// print
 		if(valContent != null) {
@@ -103,7 +103,7 @@ public class MethodContent extends MemberContent {
 	}
 
 	@Override
-	public void investigateAttribute(AttributeInfo info, ConstantPool pool) {
+	public void examineAttribute(AttributeInfo info, ConstantPool pool) {
 		switch(info.getType()) {
 			case AnnotationDefault:
 				AnnotationDefault ad = (AnnotationDefault) info;
@@ -123,7 +123,7 @@ public class MethodContent extends MemberContent {
 				this.exContent = new ExceptionContent(exTable, exClass);
 				// other attributes
 				for(AttributeInfo ai : code.getAttr().getAll()) {
-					investigateAttribute(ai, pool);
+					examineAttribute(ai, pool);
 				}
 				break;
 			case Exceptions:
@@ -225,7 +225,7 @@ public class MethodContent extends MemberContent {
 				StackMapTable smt = (StackMapTable) info;
 				break;
 			default:
-				super.investigateAttribute(info, pool);
+				super.examineAttribute(info, pool);
 				break;
 		}
 	}
