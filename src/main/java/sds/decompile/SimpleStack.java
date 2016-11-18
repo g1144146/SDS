@@ -2,6 +2,12 @@ package sds.decompile;
 
 import java.util.NoSuchElementException;
 
+/**
+ * This adapter class is for
+ * {@link LocalStack <code>LocalStack</code>}
+ * and
+ * {@link OperandStack <code>OperandStack</code>}.
+ */
 public abstract class SimpleStack {
 	String[] stack;
 	int current;
