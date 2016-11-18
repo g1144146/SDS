@@ -1,5 +1,9 @@
 package sds.decompile;
 
+/**
+ * This class is for local variable stack.
+ * @author inagaki
+ */
 public class LocalStack extends SimpleStack {
 	public LocalStack(int size) {
 		super(size);
