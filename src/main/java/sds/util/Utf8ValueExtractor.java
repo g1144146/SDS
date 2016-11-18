@@ -90,8 +90,8 @@ public class Utf8ValueExtractor {
 	 * @return value of
 	 * {@link sds.classfile.constantpool.Utf8Info <code>Utf8Info</code>}
 	 */
-	public static String extract(MemberInfo info, ConstantPool pool) {
-		return parse(extract(pool.get(info.getDescriptorIndex()-1), pool))
-			+ " " + extract(pool.get(info.getNameIndex()-1), pool);
-	}
+//	public static String extract(MemberInfo info, ConstantPool pool) {
+//		return parse(extract(pool.get(info.getDescriptorIndex()-1), pool))
+//			+ " " + extract(pool.get(info.getNameIndex()-1), pool);
+//	}
 }
