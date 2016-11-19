@@ -1,5 +1,9 @@
 package sds.decompile;
 
+/**
+ * This class is for operand stack.
+ * @author inagaki
+ */
 public class OperandStack extends SimpleStack {
 	/**
 	 * constructor.
