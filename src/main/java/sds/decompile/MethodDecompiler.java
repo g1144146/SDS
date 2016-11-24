@@ -1,7 +1,9 @@
 package sds.decompile;
 
 import sds.assemble.BaseContent;
+import sds.assemble.LineInstructions;
 import sds.assemble.MethodContent;
+import sds.assemble.controlflow.CFNode;
 import sds.classfile.bytecode.CpRefOpcode;
 import sds.classfile.bytecode.IndexOpcode;
 import sds.classfile.bytecode.MultiANewArray;
@@ -71,7 +73,8 @@ public class MethodDecompiler extends AbstractDecompiler {
 
 	private void examineOpcode(OpcodeInfo opcode) {
 		switch(opcode.getOpcodeType()) {
-			case nop: break;
+			case nop:
+				break;
 			case aconst_null:
 				opStack.push("null");
 				break;
@@ -377,8 +380,12 @@ public class MethodDecompiler extends AbstractDecompiler {
 				String left_2 = opStack.pop();
 				opStack.push("(" + left_2 + " >> " + right_2 + ")");
 				break;
-			case iushr: break;
-			case lushr: break;
+			case iushr:
+			case lushr:
+				String right_3 = opStack.pop();
+				String left_3  = opStack.pop();
+				opStack.push("(" + left_3 + " >>> " + right_3 + ")");
+				break;
 			case iand:
 			case land:
 				String and =  "(" + opStack.pop() + " & " + opStack.pop() + ")";
@@ -456,72 +463,84 @@ public class MethodDecompiler extends AbstractDecompiler {
 				opStack.push(intToShort);
 				break;
 			case lcmp:
-				long longValue2 = Long.parseLong(opStack.pop());
-				long longValue1 = Long.parseLong(opStack.pop());
-				if(longValue1 == longValue2)     opStack.push(0);
-				else if(longValue1 < longValue2) opStack.push(1);
-				else                             opStack.push(-1);
-				break;
 			case fcmpl:
 			case fcmpg:
-				String floatNum_2 = opStack.pop();
-				String floatNum_1 = opStack.pop();
-				if(floatNum_1.equals("NaN") || floatNum_2.equals("NaN")) {
-					if(opcode.getOpcodeType() == fcmpl) {
-						opStack.push(-1);
-					} else {
-						opStack.push(1);
-					}
-				} else {
-					float floatValue2 = Float.parseFloat(floatNum_2);
-					float floatValue1 = Float.parseFloat(floatNum_1);
-					if(floatValue1 == floatValue2)     opStack.push(0);
-					else if(floatValue1 < floatValue2) opStack.push(1);
-					else                               opStack.push(-1);
-				}
-				break;
 			case dcmpl:
 			case dcmpg:
-				String doubleNum_2 = opStack.pop();
-				String doubleNum_1 = opStack.pop();
-				if(doubleNum_1.equals("NaN") || doubleNum_2.equals("NaN")) {
-					if(opcode.getOpcodeType() == dcmpl) {
-						opStack.push(-1);
-					} else {
-						opStack.push(1);
-					}
-				} else {
-					float floatValue2 = Float.parseFloat(doubleNum_2);
-					float floatValue1 = Float.parseFloat(doubleNum_1);
-					if(floatValue1 == floatValue2)     opStack.push(0);
-					else if(floatValue1 < floatValue2) opStack.push(1);
-					else                               opStack.push(-1);
-				}
+				String cmpNum_2 = opStack.pop();
+				String cmpNum_1 = opStack.pop();
+				opStack.push("(" + cmpNum_1 + "OPERATOR" + cmpNum_2 + ")");
 				break;
-			case ifeq: break;
-			case ifne: break;
-			case iflt: break;
-			case ifge: break;
-			case ifgt: break;
-			case ifle: break;
-			case if_icmpeq: break;
-			case if_icmpne: break;
-			case if_icmplt: break;
-			case if_icmpge: break;
-			case if_icmogt: break;
-			case if_icmple: break;
-			case if_acmpeq: break;
-			case if_acmpne: break;
+			case ifeq:
+				String eq = opStack.pop().replace("OPERATOR", " != ");
+				break;
+			case ifne:
+				String ne = opStack.pop().replace("OPERATOR", " == ");
+				break;
+			case iflt:
+				String lt = opStack.pop().replace("OPERATOR", " >= ");
+				break;
+			case ifge:
+				String ge = opStack.pop().replace("OPERATOR", " < ");
+				break;
+			case ifgt:
+				String gt = opStack.pop().replace("OPERATOR", " <= ");
+				break;
+			case ifle:
+				String le = opStack.pop().replace("OPERATOR", " > ");
+				break;
+			case if_icmpeq:
+				String ieq_2 = opStack.pop();
+				String ieq_1 = opStack.pop();
+				String eqExpr = "(" + ieq_1 + " == " + ieq_2 + ")";
+				break;
+			case if_icmpne:
+				String ine_2 = opStack.pop();
+				String ine_1 = opStack.pop();
+				String neExpr = "(" + ine_1 + " != " + ine_2 + ")";
+				break;
+			case if_icmplt:
+				String ilt_2 = opStack.pop();
+				String ilt_1 = opStack.pop();
+				String ltExpr = "(" + ilt_1 + " < " + ilt_2 + ")";
+				break;
+			case if_icmpge:
+				String ige_2 = opStack.pop();
+				String ige_1 = opStack.pop();
+				String geExpr = "(" + ige_1 + " >= " + ige_2 + ")";
+				break;
+			case if_icmpgt:
+				String igt_2 = opStack.pop();
+				String igt_1 = opStack.pop();
+				String gtExpr = "(" + igt_1 + " > " + igt_2 + ")";
+				break;
+			case if_icmple:
+				String ile_2 = opStack.pop();
+				String ile_1 = opStack.pop();
+				String leExpr = "(" + ile_1 + " <= " + ile_2 + ")";
+				break;
+			case if_acmpeq:
+				String aeq_2 = opStack.pop();
+				String aeq_1 = opStack.pop();
+				String aeqExpr = "(" + aeq_1 + " == " + aeq_2 + ")";
+				break;
+			case if_acmpne:
+				String ane_2 = opStack.pop();
+				String ane_1 = opStack.pop();
+				String aneExpr = "(" + ane_1 + " != " + ane_2 + ")";
+				break;
 			case _goto: break;
 			case jsr: break;
 			case ret: break;
 			case tableswitch: break;
 			case lookupswitch: break;
-			case ireturn: break;
-			case lreturn: break;
-			case freturn: break;
-			case dreturn: break;
-			case areturn: break;
+			case ireturn:
+			case lreturn:
+			case freturn:
+			case dreturn:
+			case areturn:
+				String retHasOperand = "return " + opStack.pop();
+				break;
 			case _return: break;
 			case getstatic: break;
 			case putstatic: break;
@@ -575,8 +594,12 @@ public class MethodDecompiler extends AbstractDecompiler {
 				manArray.append("[").append(dimArray[dimArray.length - 1]).append("]");
 				opStack.push(manArray.toString());
 				break;
-			case ifnull: break;
-			case ifnonnull: break;
+			case ifnull: 
+				String ifn = "if(" + opStack.pop() + " == null) {";
+				break;
+			case ifnonnull:
+				String ifnonn = "if(" + opStack.pop() + " != null) {";
+				break;
 			case goto_w: break;
 			case jsr_w: break;
 			case breakpoint: break;
