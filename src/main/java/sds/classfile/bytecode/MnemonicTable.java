@@ -168,7 +168,7 @@ public enum MnemonicTable {
 	if_icmpne(0xa0, 2),
 	if_icmplt(0xa1, 2),
 	if_icmpge(0xa2, 2),
-	if_icmogt(0xa3, 2),
+	if_icmpgt(0xa3, 2),
 	if_icmple(0xa4, 2),
 	if_acmpeq(0xa5, 2),
 	if_acmpne(0xa6, 2),
