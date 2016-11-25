@@ -1,4 +1,7 @@
-
+plugins {
+    id "org.gradle.java"
+    id "com.scuilion.syntastic" version "0.3.8"
+}
 apply(plugin: 'java')
 apply(plugin: 'application')
 
@@ -29,12 +32,12 @@ jar {
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 }
 
-build << {
-    copy {
-        from configurations.runtime
-        into 'build/libs'
-    }
-}
+// build << {
+//     copy {
+//         from configurations.runtime
+//         into 'build/libs'
+//     }
+// }
 
 task initDirs({
     sourceSets*.resources*.each({ it.mkdirs() })
