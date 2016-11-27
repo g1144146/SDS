@@ -67,7 +67,7 @@ public class ClassContent extends BaseContent {
 			if(info instanceof InnerClasses) {
 				ic = (InnerClasses)info;
 			}
-			examineAttribute(info, pool);
+			analyzeAttribute(info, pool);
 		}
 		if(ic != null) {
 			this.nested = new NestedClass[ic.getClasses().length];
@@ -77,7 +77,7 @@ public class ClassContent extends BaseContent {
 	public ClassContent() {}
 
 	@Override
-	public void examineAttribute(AttributeInfo info, ConstantPool pool) {
+	public void analyzeAttribute(AttributeInfo info, ConstantPool pool) {
 		switch(info.getType()) {
 			case BootstrapMethods:
 				BootstrapMethods bsm = (BootstrapMethods)info;
@@ -135,7 +135,7 @@ public class ClassContent extends BaseContent {
 				this.sourceFile = sf.getSourceFile();
 				break;
 			default:
-				super.examineAttribute(info, pool);
+				super.analyzeAttribute(info, pool);
 				break;
 		}
 	}

@@ -28,11 +28,11 @@ public abstract class BaseContent {
 	boolean hasAnnotation;
 
 	/**
-	 * examines classfile attribute.
+	 * analyzes classfile attribute.
 	 * @param info attribute
 	 * @param pool constant-pool
 	 */
-	public void examineAttribute(AttributeInfo info, ConstantPool pool) {
+	public void analyzeAttribute(AttributeInfo info, ConstantPool pool) {
 		switch(info.getType()) {
 			case Deprecated: break;
 			case RuntimeVisibleAnnotations:
