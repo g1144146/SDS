@@ -3,7 +3,6 @@ package sds.classfile.attributes;
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
 import sds.classfile.ConstantPool;
-import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This class is for
