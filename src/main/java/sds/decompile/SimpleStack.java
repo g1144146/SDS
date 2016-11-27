@@ -22,6 +22,14 @@ public abstract class SimpleStack {
 	}
 
 	/**
+	 * returns this stack's current size.
+	 * @return current size
+	 */
+	public int getCurrentStackSize() {
+		return current;
+	}
+
+	/**
 	 * push element to stack.
 	 * @param element
 	 */
