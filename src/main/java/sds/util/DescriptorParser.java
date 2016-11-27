@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * @author inagaki
  */
 public class DescriptorParser {
-	private static final String objPattern  = "L[a-z\\\\.]*[0-9a-zA-Z_\\$\\.]+";
+	private static final String objPattern  = "L[a-z\\.]*[0-9a-zA-Z_\\$\\.]+";
 
 	/**
 	 * returns parsed descriptor.
@@ -109,7 +109,7 @@ public class DescriptorParser {
 			case "Z": return "boolean,";
 			case "V": return "void";
 			default :
-				System.out.println(">>> unknown type \""+head+"\".");
+				System.out.println("[unknown primitive type] \""+head+"\".");
 				return "";
 		}
 	}

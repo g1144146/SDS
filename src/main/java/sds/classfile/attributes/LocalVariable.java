@@ -3,8 +3,8 @@ package sds.classfile.attributes;
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
 import sds.classfile.ConstantPool;
+
 import static sds.util.DescriptorParser.parse;
-import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This adapter class is for

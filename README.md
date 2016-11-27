@@ -22,7 +22,7 @@
     * [Eclipse Collections](https://www.eclipse.org/collections/index.html)
 
 * Project Management
-    * [Gradle 2.x](http://gradle.org/)
+    * [Gradle 3.x](http://gradle.org/)
 
 * Test Environment
     * [JUnit 4.12](http://junit.org/junit4/)

@@ -1,6 +1,8 @@
 package sds.classfile.attributes;
 
 import sds.classfile.Info;
+import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This adapter class is for info of class has attribute.
@@ -21,6 +23,16 @@ public abstract class AttributeInfo implements Info {
 		this.type = type;
 		this.nameIndex = nameIndex;
 		this.attrLen = length;
+	}
+
+	/**
+	 * returns extracted content of the attribute from constant-pool.
+	 * @param info constant info which the attribute has
+	 * @param pool constant-pool
+	 * @return extracted content
+	 */
+	public String extract(ConstantInfo info, ConstantPool pool) {
+		return sds.util.Utf8ValueExtractor.extract(info, pool);
 	}
 
 	/**

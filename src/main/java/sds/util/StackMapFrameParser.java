@@ -9,8 +9,6 @@ import sds.classfile.attributes.stackmap.SameFrameExtended;
 import sds.classfile.attributes.stackmap.SameLocals1StackItemFrame;
 import sds.classfile.attributes.stackmap.SameLocals1StackItemFrameExtended;
 import sds.classfile.attributes.stackmap.StackMapFrame;
-import sds.classfile.attributes.stackmap.TopVariableInfo;
-import sds.classfile.attributes.stackmap.UninitializedThisVariableInfo;
 import sds.classfile.attributes.stackmap.UninitializedVariableInfo;
 import sds.classfile.attributes.stackmap.VerificationTypeInfo;
 import sds.classfile.bytecode.Opcodes;
@@ -36,7 +34,7 @@ public class StackMapFrameParser {
 		int before = 0;
 		for(StackMapFrame frame : frames) {
 			UnifiedMap<String, MutableList<String>> map = new UnifiedMap<>();
-			MutableList stack = getBefore(stackMap, before, "stack");
+//			MutableList stack = getBefore(stackMap, before, "stack");
 			MutableList local = getBefore(stackMap, before, "local");
 			int key = 0;
 			switch(frame.getFrameType()) {

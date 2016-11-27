@@ -83,6 +83,14 @@ public class CpRefOpcode extends OpcodeInfo {
 		return index;
 	}
 
+	/**
+	 * returns operand which this opcode has.
+	 * @return operand.
+	 */
+	public String getOperand() {
+		return operand;
+	}
+
 	@Override
 	public String toString() {
 		return super.toString() + ": #" + index + "(" + operand + ")";

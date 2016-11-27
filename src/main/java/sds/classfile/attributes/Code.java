@@ -11,8 +11,6 @@ import sds.classfile.bytecode.Opcodes;
 import sds.classfile.bytecode.UndefinedOpcodeException;
 import sds.classfile.constantpool.Utf8Info;
 
-import static sds.util.Utf8ValueExtractor.extract;
-
 /**
  * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.3">
  * Code Attribute</a>.

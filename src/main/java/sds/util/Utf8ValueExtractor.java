@@ -63,7 +63,7 @@ public class Utf8ValueExtractor {
 					+ extract(pool.get(rmi.getNameAndTypeIndex()-1), pool);
 			case C_NAME_AND_TYPE:
 				NameAndTypeInfo nati = (NameAndTypeInfo)info;
-				return extract(pool.get(nati.getNameIndex()-1), pool)
+				return extract(pool.get(nati.getNameIndex()-1), pool) + "|"
 					+ parse(extract(pool.get(nati.getDescriptorIndex()-1), pool));
 			case C_METHOD_HANDLE:
 				MethodHandleInfo mhi = (MethodHandleInfo)info;
@@ -90,8 +90,8 @@ public class Utf8ValueExtractor {
 	 * @return value of
 	 * {@link sds.classfile.constantpool.Utf8Info <code>Utf8Info</code>}
 	 */
-	public static String extract(MemberInfo info, ConstantPool pool) {
-		return parse(extract(pool.get(info.getDescriptorIndex()-1), pool))
-			+ " " + extract(pool.get(info.getNameIndex()-1), pool);
-	}
+//	public static String extract(MemberInfo info, ConstantPool pool) {
+//		return parse(extract(pool.get(info.getDescriptorIndex()-1), pool))
+//			+ " " + extract(pool.get(info.getNameIndex()-1), pool);
+//	}
 }

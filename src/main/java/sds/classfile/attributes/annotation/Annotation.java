@@ -1,7 +1,6 @@
 package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import sds.classfile.ClassFileStream;
 
 /**
