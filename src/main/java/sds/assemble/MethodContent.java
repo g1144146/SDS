@@ -60,7 +60,7 @@ public class MethodContent extends MemberContent {
 		System.out.println(this.getName());
 		// set arguments
 		String desc = this.desc;
-		if(desc.indexOf("(") + 1 == desc.indexOf(")")) { // has argument
+		if(desc.indexOf("(") + 1 != desc.indexOf(")")) { // has argument
 			String arg = desc.substring(desc.indexOf("(") + 1, desc.indexOf(")"));
 			if(arg.contains(",")) {
 				String[] argArray = arg.split(",");
