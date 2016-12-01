@@ -1,5 +1,6 @@
 package sds.decompile;
 
+import java.util.Map;
 import sds.assemble.BaseContent;
 import sds.assemble.ClassContent;
 
@@ -26,7 +27,7 @@ public class ClassDecompiler extends AbstractDecompiler {
 		FieldDecompiler fieldDecom = new FieldDecompiler(result);
 		fieldDecom.decompile(cc.getFields());
 
-		MethodDecompiler methodDecom = new MethodDecompiler(fieldDecom.getResult());
+		MethodDecompiler methodDecom = new MethodDecompiler(fieldDecom.getResult(), cc.getThisClass());
 		methodDecom.decompile(cc.getMethods());
 
 		// end
@@ -37,8 +38,23 @@ public class ClassDecompiler extends AbstractDecompiler {
 	void addDeclaration(BaseContent content) {
 		ClassContent cc = (ClassContent)content;
 		StringBuilder classDeclaration = new StringBuilder();
-		classDeclaration.append(cc.getAccessFlag()).append(cc.getThisClass())
-						.append(" extends ").append(cc.getSuperClass());
+		classDeclaration.append(cc.getAccessFlag()).append(cc.getThisClass());
+
+		// generics
+		if(cc.getGenericsMap().size() > 0) {
+			classDeclaration.append("<");
+			StringBuilder generics = new StringBuilder();
+			for(Map.Entry<String, String> e : cc.getGenericsMap().entrySet()) {
+				generics.append(e.getKey()).append(" extends ").append(e.getValue()).append(",");
+			}
+			classDeclaration.append(generics.toString().substring(0, generics.length()-1 ));
+			classDeclaration.append(">");
+		}
+
+		// extends classes
+		classDeclaration.append(" extends ").append(cc.getSuperClass());
+
+		// implements interfaces
 		if(cc.getInterfaces().length > 0) {
 			classDeclaration.append(" implements ");
 			String[] interfaces = cc.getInterfaces();
@@ -47,6 +63,7 @@ public class ClassDecompiler extends AbstractDecompiler {
 			}
 			classDeclaration.append(interfaces[interfaces.length - 1]);
 		}
+
 		classDeclaration.append(" {");
 		result.write(classDeclaration.toString());
 	}
