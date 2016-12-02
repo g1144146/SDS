@@ -54,7 +54,7 @@ public class IndexOpcode extends OpcodeInfo {
 
 	@Override
 	public void read(ClassFileStream data) throws IOException {
-		this.index = data.readByte();
+		this.index = data.readUnsignedByte();
 	}
 
 	/**
