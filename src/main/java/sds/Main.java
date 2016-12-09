@@ -11,8 +11,8 @@ public class Main {
 	 * @param args command line arguments
 	 */
 	public Main(String[] args) {
-		SDS sophomore = new SDS(args);
-		sophomore.run();
+		SDS sds = new SDS(args);
+		sds.run();
 	}
 
 	/**
