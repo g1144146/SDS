@@ -25,8 +25,6 @@ public class FieldContent extends MemberContent {
 		for(AttributeInfo attr : info.getAttr().getAll()) {
 			analyzeAttribute(attr, pool);
 		}
-		System.out.println("desc : " + desc);
-		System.out.println("const: " + constVal);
 	}
 
 	@Override
