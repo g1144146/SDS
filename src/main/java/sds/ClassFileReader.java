@@ -24,27 +24,33 @@ import sds.classfile.constantpool.Utf8Info;
  * @author inagaki
  */
 public class ClassFileReader {
-	private String fileName;
-	private byte[] bytes;
-	private InputStream stream;
+	private ClassFileStream stream;
 	private ClassFile cf;
 
 	/**
-	 * constructor.
-	 * @param file classfile name
+	 * constructor for classfile.
+	 * @param fileName classfile name
 	 */
-	public ClassFileReader(String file) {
-		this.fileName = file;
+	public ClassFileReader(String fileName) {
+		try {
+			RandomAccessFile raf = new RandomAccessFile(fileName, "r");
+			this.stream = new ClassFileStream(raf);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 		cf = new ClassFile();
 	}
 
-	public ClassFileReader(byte[] bytes) {
-		this.bytes = bytes;
-		cf = new ClassFile();
-	}
-
+	/**
+	 * constructor for jar file.
+	 * @param input 
+	 */
 	public ClassFileReader(InputStream input) {
-		this.stream = input;
+		try {
+			this.stream = new ClassFileStream(input);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 		cf = new ClassFile();
 	}
 
@@ -52,17 +58,15 @@ public class ClassFileReader {
 	 * reads classfile.
 	 */
 	public void read() {
-		try(ClassFileStream data = (fileName != null)
-				? new ClassFileStream(new RandomAccessFile(new File(fileName), "r"))
-				: new ClassFileStream(stream)) {
-			readHeaders(data);
-			readConstantPool(data, data.readShort()-1);
-			readAccessFlag(data);
-			readClass(data);
-			readInterfaces(data, data.readShort());
-			readFields(data, data.readShort());
-			readMethods(data, data.readShort());
-			cf.attr = readAttributes(data, data.readShort());
+		try {
+			readHeaders(stream);
+			readConstantPool(stream, stream.readShort()-1);
+			readAccessFlag(stream);
+			readClass(stream);
+			readInterfaces(stream, stream.readShort());
+			readFields(stream, stream.readShort());
+			readMethods(stream, stream.readShort());
+			cf.attr = readAttributes(stream, stream.readShort());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
