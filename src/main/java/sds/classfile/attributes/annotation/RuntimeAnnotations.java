@@ -22,14 +22,10 @@ abstract class RuntimeAnnotations extends AttributeInfo {
 	}
 
 	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException, ElementValueException {
 		this.annotations = new String[data.readShort()];
-		try {
-			for(int i = 0; i < annotations.length; i++) {
-				annotations[i] = parseAnnotation(new Annotation(data), new StringBuilder(), pool);
-			}
-		} catch(ElementValueException e) {
-			e.printStackTrace();
+		for(int i = 0; i < annotations.length; i++) {
+			annotations[i] = parseAnnotation(new Annotation(data), new StringBuilder(), pool);
 		}
 	}
 

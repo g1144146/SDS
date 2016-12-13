@@ -21,16 +21,13 @@ abstract class RuntimeTypeAnnotations extends AttributeInfo {
 	}
 
 	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+	public void read(ClassFileStream data, ConstantPool pool)
+	throws IOException, ElementValueException, TargetTypeException {
 		this.types = new TypeAnnotation[data.readShort()];
 		annotations = new String[types.length];
-		try {
-			for(int i = 0; i < types.length; i++) {
-				types[i] = new TypeAnnotation(data);
-				annotations[i] = parseAnnotation(types[i], new StringBuilder(), pool);
-			}
-		} catch(ElementValueException | TargetTypeException e) {
-			e.printStackTrace();
+		for(int i = 0; i < types.length; i++) {
+			types[i] = new TypeAnnotation(data);
+			annotations[i] = parseAnnotation(types[i], new StringBuilder(), pool);
 		}
 	}
 

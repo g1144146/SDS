@@ -19,14 +19,10 @@ abstract class RuntimeParameterAnnotations extends AttributeInfo {
 	}
 
 	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException, ElementValueException {
 		this.parameterAnnotations = new ParameterAnnotations[data.readByte()];
-		try {
-			for(int i = 0; i < parameterAnnotations.length; i++) {
-				parameterAnnotations[i] = new ParameterAnnotations(data, pool);
-			}
-		} catch(ElementValueException e) {
-			e.printStackTrace();
+		for(int i = 0; i < parameterAnnotations.length; i++) {
+			parameterAnnotations[i] = new ParameterAnnotations(data, pool);
 		}
 	}
 
