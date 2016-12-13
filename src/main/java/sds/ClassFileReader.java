@@ -1,6 +1,5 @@
 package sds;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -43,7 +42,7 @@ public class ClassFileReader {
 
 	/**
 	 * constructor for jar file.
-	 * @param input 
+	 * @param input
 	 */
 	public ClassFileReader(InputStream input) {
 		try {
@@ -59,32 +58,33 @@ public class ClassFileReader {
 	 */
 	public void read() {
 		try {
-			readHeaders(stream);
-			readConstantPool(stream, stream.readShort()-1);
-			readAccessFlag(stream);
-			readClass(stream);
-			readInterfaces(stream, stream.readShort());
-			readFields(stream, stream.readShort());
-			readMethods(stream, stream.readShort());
-			cf.attr = readAttributes(stream, stream.readShort());
+			readHeaders();
+			readConstantPool();
+			readAccessFlag();
+			readClass();
+			readInterfaces();
+			readFields();
+			readMethods();
+			cf.attr = readAttributes();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void readHeaders(ClassFileStream data) throws IOException {
-		cf.magicNumber  = data.readInt(); // 4byte
-		cf.minorVersion = data.readShort(); // 2byte
-		cf.majorVersion = data.readShort(); // 2byte
+	private void readHeaders() throws IOException {
+		cf.magicNumber = stream.readInt(); // 4byte
+		cf.minorVersion = stream.readShort(); // 2byte
+		cf.majorVersion = stream.readShort(); // 2byte
 	}
 
-	private void readConstantPool(ClassFileStream data, int constantPoolCount) throws Exception {
+	private void readConstantPool() throws Exception {
+		int constantPoolCount = stream.readShort() - 1;
 		ConstantPool pool = new ConstantPool(constantPoolCount);
 		ConstantInfoBuilder builder = ConstantInfoBuilder.getInstance();
 		for(int i = 0; i < constantPoolCount; i++) {
-			int tag = data.readByte(); // 1 byte
+			int tag = stream.readByte(); // 1 byte
 			ConstantInfo info = builder.build(tag);
-			info.read(data);
+			info.read(stream);
 			pool.add(i, info);
 			if(tag == ConstantType.C_DOUBLE || tag == ConstantType.C_LONG) {
 				i++;
@@ -94,61 +94,65 @@ public class ClassFileReader {
 		cf.pool = pool;
 	}
 
-	private void readAccessFlag(ClassFileStream data) throws IOException {
-		cf.accessFlag = data.readShort();
+	private void readAccessFlag() throws IOException {
+		cf.accessFlag = stream.readShort();
 	}
 
-	private void readClass(ClassFileStream data) throws IOException {
-		cf.thisClass  = data.readShort();
-		cf.superClass = data.readShort();
+	private void readClass() throws IOException {
+		cf.thisClass = stream.readShort();
+		cf.superClass = stream.readShort();
 	}
 
-	private void readInterfaces(ClassFileStream data, int interfaceCount) throws IOException {
+	private void readInterfaces() throws IOException {
+		int interfaceCount = stream.readShort();
 		int[] interfaces = new int[interfaceCount];
 		for(int i = 0; i < interfaceCount; i++) {
-			interfaces[i] = data.readShort();
+			interfaces[i] = stream.readShort();
 		}
 		cf.interfaces = interfaces;
 	}
 
-	private void readFields(ClassFileStream data, int fieldCount) throws Exception {
+	private void readFields() throws Exception {
+		int fieldCount = stream.readShort();
 		Fields fields = new Fields(fieldCount);
 		Attributes attr;
 		for(int i = 0; i < fieldCount; i++) {
 			FieldInfo info = new FieldInfo();
-			info.read(data, cf.pool);
-			attr = readAttributes(data, data.readShort());
+			info.read(stream, cf.pool);
+			attr = readAttributes();
 			info.setAttr(attr);
 			fields.add(i, info);
 		}
 		cf.fields = fields;
 	}
 
-	private void readMethods(ClassFileStream data, int methodCount) throws Exception {
+	private void readMethods() throws Exception {
+		int methodCount = stream.readShort();
 		Methods methods = new Methods(methodCount);
 		Attributes attr;
 		for(int i = 0; i < methodCount; i++) {
 			MethodInfo info = new MethodInfo();
-			info.read(data, cf.pool);
-			attr = readAttributes(data, data.readShort());
+			info.read(stream, cf.pool);
+			attr = readAttributes();
 			info.setAttr(attr);
 			methods.add(i, info);
 		}
 		cf.methods = methods;
 	}
 
-	private Attributes readAttributes(ClassFileStream data, int attrCount) throws Exception {
+	private Attributes readAttributes() throws Exception {
+		int attrCount = stream.readShort();
 		Attributes attrs = new Attributes(attrCount);
 		AttributeInfoBuilder builder = AttributeInfoBuilder.getInstance();
 		AttributeInfo info;
 		Utf8Info utf8Info;
 		ConstantPool pool = cf.pool;
 		for(int i = 0; i < attrCount; i++) {
-			int nameIndex = data.readShort();
-			utf8Info = (Utf8Info)pool.get(nameIndex-1);
+			int nameIndex = stream.readShort();
+			utf8Info = (Utf8Info) pool.get(nameIndex - 1);
 			String attrName = utf8Info.getValue();
-			info = builder.build(attrName, nameIndex, data.readInt());
-			info.read(data, cf.pool);
+			info = builder.build(attrName, nameIndex, stream.readInt());
+			info.read(stream, cf.pool);
 			attrs.add(i, info);
 		}
 		return attrs;
