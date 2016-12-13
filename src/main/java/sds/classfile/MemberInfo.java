@@ -11,26 +11,15 @@ import static sds.util.Utf8ValueExtractor.extract;
  * @author inagaki
  */
 public class MemberInfo implements Info {
-	private String accessFlags;
-	private String name;
-	private String descriptor;
+	private String[] declaration;
 	private Attributes attr;
-	private String type;
-
-	/**
-	 * constructor.
-	 * @param type type of member.
-	 */
-	MemberInfo(String type) {
-		this.type = type;
-	}
 
 	/**
 	 * returns access flag of member.
 	 * @return access flag
 	 */
 	public String getAccessFlags() {
-		return accessFlags;
+		return declaration[0];
 	}
 
 	/**
@@ -38,7 +27,7 @@ public class MemberInfo implements Info {
 	 * @return member name
 	 */
 	public String getName() {
-		return name;
+		return declaration[1];
 	}
 
 	/**
@@ -46,7 +35,7 @@ public class MemberInfo implements Info {
 	 * @return member descriptor
 	 */
 	public String getDescriptor() {
-		return descriptor;
+		return declaration[2];
 	}
 
 	/**
@@ -58,6 +47,17 @@ public class MemberInfo implements Info {
 	}
 
 	/**
+	 * returns type of member.
+	 * @return type
+	 */
+	public String getType() {
+		if(declaration[2].contains("(")) {
+			return "method";
+		}
+		return "field";
+	}
+
+	/**
 	 * sets attributes of member.
 	 * @param attr attributes
 	 */
@@ -65,21 +65,14 @@ public class MemberInfo implements Info {
 		this.attr = attr;
 	}
 
-	/**
-	 * returns type of member.
-	 * @return type
-	 */
-	public String getType() {
-		return type;
-	}
-
 	@Override
 	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
 		int acc = data.readShort();
 		int nameIndex = data.readShort();
 		int descIndex = data.readShort();
-		this.accessFlags = get(acc, type);
-		this.name = extract(pool.get(nameIndex-1), pool);
-		this.descriptor = parse(extract(pool.get(descIndex-1), pool));
+		this.declaration = new String[3];
+		declaration[1] = extract(pool.get(nameIndex - 1), pool);
+		declaration[2] = parse(extract(pool.get(descIndex - 1), pool));
+		declaration[0] = get(acc, getType());
 	}
 }

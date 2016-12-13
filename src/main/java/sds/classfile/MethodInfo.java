@@ -9,6 +9,6 @@ public class MethodInfo extends MemberInfo {
 	 * constructor.
 	 */
 	public MethodInfo() {
-		super("method");
+		super();
 	}
 }

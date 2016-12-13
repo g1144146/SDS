@@ -9,6 +9,6 @@ public class FieldInfo extends MemberInfo {
 	 * constructor.
 	 */
 	public FieldInfo() {
-		super("field");
+		super();
 	}
 }
