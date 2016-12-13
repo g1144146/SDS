@@ -19,11 +19,9 @@ public abstract class LocalVariable extends AttributeInfo {
 	/**
 	 * constructor.
 	 * @param type attribute type
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	LocalVariable(AttributeType type, int nameIndex, int length) {
-		super(type, nameIndex, length);
+	LocalVariable(AttributeType type) {
+		super(type);
 	}
 
 	/**

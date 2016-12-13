@@ -16,8 +16,8 @@ abstract class RuntimeTypeAnnotations extends AttributeInfo {
 	private TypeAnnotation[] types;
 	private String[] annotations;
 
-	RuntimeTypeAnnotations(AttributeType type, int nameIndex, int length) {
-		super(type, nameIndex, length);
+	RuntimeTypeAnnotations(AttributeType type) {
+		super(type);
 	}
 
 	@Override

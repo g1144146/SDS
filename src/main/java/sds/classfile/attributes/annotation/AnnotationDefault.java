@@ -17,11 +17,9 @@ public class AnnotationDefault extends AttributeInfo {
 
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public AnnotationDefault(int nameIndex, int length) {
-		super(AttributeType.AnnotationDefault, nameIndex, length);
+	public AnnotationDefault() {
+		super(AttributeType.AnnotationDefault);
 	}
 
 	@Override

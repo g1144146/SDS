@@ -17,11 +17,9 @@ public class InnerClasses extends AttributeInfo {
 
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public InnerClasses(int nameIndex, int length) {
-		super(AttributeType.InnerClasses, nameIndex, length);
+	public InnerClasses() {
+		super(AttributeType.InnerClasses);
 	}
 
 	/**

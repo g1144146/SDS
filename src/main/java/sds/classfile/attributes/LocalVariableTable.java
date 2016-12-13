@@ -9,10 +9,8 @@ package sds.classfile.attributes;
 public class LocalVariableTable extends LocalVariable {
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public LocalVariableTable(int nameIndex, int length) {
-		super(AttributeType.LocalVariableTable, nameIndex, length);
+	public LocalVariableTable() {
+		super(AttributeType.LocalVariableTable);
 	}
 }

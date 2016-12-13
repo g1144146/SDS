@@ -15,11 +15,9 @@ public class BootstrapMethods extends AttributeInfo {
 
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name.
-	 * @param length attribute length
 	 */
-	public BootstrapMethods(int nameIndex, int length) {
-		super(AttributeType.BootstrapMethods, nameIndex, length);
+	public BootstrapMethods() {
+		super(AttributeType.BootstrapMethods);
 	}
 
 	@Override

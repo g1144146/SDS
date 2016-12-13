@@ -12,11 +12,9 @@ import sds.classfile.ConstantPool;
 public class Deprecated extends AttributeInfo {
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public Deprecated(int nameIndex, int length) {
-		super(AttributeType.Deprecated, nameIndex, length);
+	public Deprecated() {
+		super(AttributeType.Deprecated);
 	}
 
 	@Override

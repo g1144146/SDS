@@ -17,11 +17,9 @@ public class MethodParameters extends AttributeInfo {
 
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public MethodParameters(int nameIndex, int length) {
-		super(AttributeType.MethodParameters, nameIndex, length);
+	public MethodParameters() {
+		super(AttributeType.MethodParameters);
 	}
 
 	/**

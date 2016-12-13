@@ -14,8 +14,8 @@ import sds.classfile.attributes.AttributeType;
 abstract class RuntimeParameterAnnotations extends AttributeInfo {
 	private ParameterAnnotations[] parameterAnnotations;
 
-	RuntimeParameterAnnotations(AttributeType type, int nameIndex, int length) {
-		super(type, nameIndex, length);
+	RuntimeParameterAnnotations(AttributeType type) {
+		super(type);
 	}
 
 	@Override

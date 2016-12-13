@@ -9,10 +9,8 @@ import sds.classfile.attributes.AttributeType;
 public class RuntimeInvisibleParameterAnnotations extends RuntimeParameterAnnotations {
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public RuntimeInvisibleParameterAnnotations(int nameIndex, int length) {
-		super(AttributeType.RuntimeInvisibleParameterAnnotations, nameIndex, length);
+	public RuntimeInvisibleParameterAnnotations() {
+		super(AttributeType.RuntimeInvisibleParameterAnnotations);
 	}
 }

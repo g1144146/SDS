@@ -11,11 +11,9 @@ import sds.classfile.ConstantPool;
 public class Synthetic extends AttributeInfo {
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public Synthetic(int nameIndex, int length) {
-		super(AttributeType.Synthetic, nameIndex, length);
+	public Synthetic() {
+		super(AttributeType.Synthetic);
 	}
 
 	@Override

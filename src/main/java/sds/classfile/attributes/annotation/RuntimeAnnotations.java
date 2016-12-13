@@ -17,8 +17,8 @@ import static sds.util.AnnotationParser.parseAnnotation;
 abstract class RuntimeAnnotations extends AttributeInfo {
 	private String[] annotations;
 
-	RuntimeAnnotations(AttributeType type, int nameIndex, int length) {
-		super(type, nameIndex, length);
+	RuntimeAnnotations(AttributeType type) {
+		super(type);
 	}
 
 	@Override

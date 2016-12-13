@@ -16,11 +16,9 @@ public class EnclosingMethod extends AttributeInfo {
 	
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public EnclosingMethod(int nameIndex, int length) {
-		super(AttributeType.EnclosingMethod, nameIndex, length);
+	public EnclosingMethod() {
+		super(AttributeType.EnclosingMethod);
 	}
 
 	/**

@@ -23,12 +23,10 @@ public class Code extends AttributeInfo {
 	private Attributes attr;
 
 	/**
-	 *
-	 * @param nameIndex
-	 * @param length
+	 * constructor.
 	 */
-	public Code(int nameIndex, int length) {
-		super(AttributeType.Code, nameIndex, length);
+	public Code() {
+		super(AttributeType.Code);
 	}
 
 	/**
@@ -102,13 +100,13 @@ public class Code extends AttributeInfo {
 	private void readAttributes(ClassFileStream data, ConstantPool pool) throws Exception {
 		this.attr = new Attributes(data.readShort());
 		AttributeInfoBuilder builder = AttributeInfoBuilder.getInstance();
-		int index;
+		int nameIndex;
 		String attrName;
 		AttributeInfo info;
 		for(int i = 0; i < attr.size(); i++) {
-			index = data.readShort();
-			attrName = ((Utf8Info)pool.get(index-1)).getValue();
-			info = builder.build(attrName, index, data.readInt());
+			nameIndex = data.readShort();
+			attrName = ((Utf8Info)pool.get(nameIndex-1)).getValue();
+			info = builder.build(attrName, data.readInt());
 			attr.add(i, readAttributeContent(info, data, pool));
 		}
 	}

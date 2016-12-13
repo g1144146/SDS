@@ -14,12 +14,10 @@ public class LineNumberTable extends AttributeInfo {
 	private LNTable[] lineNumberTable;
 
 	/**
-	 * 
-	 * @param nameIndex
-	 * @param length 
+	 * constrcutor.
 	 */
-	public LineNumberTable(int nameIndex, int length) {
-		super(AttributeType.LineNumberTable, nameIndex, length);
+	public LineNumberTable() {
+		super(AttributeType.LineNumberTable);
 	}
 
 	/**

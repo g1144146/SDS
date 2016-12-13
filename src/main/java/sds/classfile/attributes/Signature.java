@@ -15,11 +15,9 @@ public class Signature extends AttributeInfo {
 
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public Signature(int nameIndex, int length) {
-		super(AttributeType.Signature, nameIndex, length);
+	public Signature() {
+		super(AttributeType.Signature);
 	}
 
 	/**

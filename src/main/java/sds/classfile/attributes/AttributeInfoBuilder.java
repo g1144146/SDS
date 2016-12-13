@@ -31,60 +31,59 @@ public class AttributeInfoBuilder {
 	/**
 	 * returns attribute info.
 	 * @param attrName attribute name
-	 * @param nameIndex constant-pool entry index of attribute name.
 	 * @param length attribute length.
 	 * @return attribute info
 	 * @throws AttributeTypeException 
 	 */
-	public AttributeInfo build(String attrName, int nameIndex, int length)
+	public AttributeInfo build(String attrName, int length)
 	throws AttributeTypeException {
 		switch(attrName) {
 			case "AnnotationDefault":
-				return new AnnotationDefault(nameIndex, length);
+				return new AnnotationDefault();
 			case "BootstrapMethods":
-				return new BootstrapMethods(nameIndex, length);
+				return new BootstrapMethods();
 			case "Code":
-				return new Code(nameIndex, length);
+				return new Code();
 			case "ConstantValue":
-				return new ConstantValue(nameIndex, length);
+				return new ConstantValue();
 			case "Deprecated":
-				return new Deprecated(nameIndex, length);
+				return new Deprecated();
 			case "EnclosingMethod":
-				return new EnclosingMethod(nameIndex, length);
+				return new EnclosingMethod();
 			case "Exceptions":
-				return new Exceptions(nameIndex, length);
+				return new Exceptions();
 			case "InnerClasses":
-				return new InnerClasses(nameIndex, length);
+				return new InnerClasses();
 			case "LineNumberTable":
-				return new LineNumberTable(nameIndex, length);
+				return new LineNumberTable();
 			case "LocalVariableTable":
-				return new LocalVariableTable(nameIndex, length);
+				return new LocalVariableTable();
 			case "LocalVariableTypeTable":
-				return new LocalVariableTypeTable(nameIndex, length);
+				return new LocalVariableTypeTable();
 			case "MethodParameters":
-				return new MethodParameters(nameIndex, length);
+				return new MethodParameters();
 			case "RuntimeInvisibleAnnotations":
-				return new RuntimeInvisibleAnnotations(nameIndex, length);
+				return new RuntimeInvisibleAnnotations();
 			case "RuntimeInvisibleParameterAnnotations":
-				return new RuntimeInvisibleParameterAnnotations(nameIndex, length);
+				return new RuntimeInvisibleParameterAnnotations();
 			case "RuntimeInvisibleTypeAnnotations":
-				return new RuntimeInvisibleTypeAnnotations(nameIndex, length);
+				return new RuntimeInvisibleTypeAnnotations();
 			case "RuntimeVisibleAnnotations":
-				return new RuntimeVisibleAnnotations(nameIndex, length);
+				return new RuntimeVisibleAnnotations();
 			case "RuntimeVisibleParameterAnnotations":
-				return new RuntimeVisibleParameterAnnotations(nameIndex, length);
+				return new RuntimeVisibleParameterAnnotations();
 			case "RuntimeVisibleTypeAnnotations":
-				return new RuntimeVisibleTypeAnnotations(nameIndex, length);
+				return new RuntimeVisibleTypeAnnotations();
 			case "Signature":
-				return new Signature(nameIndex, length);
+				return new Signature();
 			case "SourceDebugExtension":
-				return new SourceDebugExtension(nameIndex, length);
+				return new SourceDebugExtension(length);
 			case "SourceFile":
-				return new SourceFile(nameIndex, length);
+				return new SourceFile();
 			case "Synthetic":
-				return new Synthetic(nameIndex, length);
+				return new Synthetic();
 			case "StackMapTable":
-				return new StackMapTable(nameIndex, length);
+				return new StackMapTable();
 			default:
 				throw new AttributeTypeException(attrName);
 		}

@@ -15,11 +15,9 @@ public class Exceptions extends AttributeInfo {
 
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public Exceptions(int nameIndex, int length) {
-		super(AttributeType.Exceptions, nameIndex, length);
+	public Exceptions() {
+		super(AttributeType.Exceptions);
 	}
 
 	/**

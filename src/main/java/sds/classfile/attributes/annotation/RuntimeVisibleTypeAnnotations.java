@@ -11,10 +11,8 @@ import sds.classfile.attributes.AttributeType;
 public class RuntimeVisibleTypeAnnotations extends RuntimeTypeAnnotations {
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public RuntimeVisibleTypeAnnotations(int nameIndex, int length) {
-		super(AttributeType.RuntimeVisibleTypeAnnotations, nameIndex, length);
+	public RuntimeVisibleTypeAnnotations() {
+		super(AttributeType.RuntimeVisibleTypeAnnotations);
 	}
 }

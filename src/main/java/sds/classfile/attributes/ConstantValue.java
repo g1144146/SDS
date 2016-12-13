@@ -15,11 +15,9 @@ public class ConstantValue extends AttributeInfo {
 
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public ConstantValue(int nameIndex, int length) {
-		super(AttributeType.ConstantValue, nameIndex, length);
+	public ConstantValue() {
+		super(AttributeType.ConstantValue);
 	}
 
 	/**

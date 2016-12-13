@@ -15,11 +15,9 @@ public class SourceFile extends AttributeInfo {
 
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public SourceFile(int nameIndex, int length) {
-		super(AttributeType.SourceFile, nameIndex, length);
+	public SourceFile() {
+		super(AttributeType.SourceFile);
 	}
 
 	/**
