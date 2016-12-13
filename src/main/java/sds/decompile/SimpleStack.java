@@ -59,4 +59,19 @@ public abstract class SimpleStack {
 		stack[current - 1] = null;
 		return element;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		if(current == 0) {
+			for(int i = stack.length - 1; i >= 0; i--) {
+				sb.append("[").append(i).append("]:").append("\n");
+			}
+		} else {
+			for(int i = stack.length - 1; i >= 0; i--) {
+				sb.append("[").append(i).append("]: ").append(stack[i]).append("\n");
+			}
+		}
+		return sb.toString();
+	}
 }
