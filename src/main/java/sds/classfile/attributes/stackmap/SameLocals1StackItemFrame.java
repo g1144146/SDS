@@ -1,7 +1,6 @@
 package sds.classfile.attributes.stackmap;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import sds.classfile.ClassFileStream;
 
 /**
@@ -12,14 +11,10 @@ import sds.classfile.ClassFileStream;
 public class SameLocals1StackItemFrame extends SameFrame {
 	private VerificationTypeInfo stack;
 
-	SameLocals1StackItemFrame(int tag, ClassFileStream data) throws IOException {
+	SameLocals1StackItemFrame(int tag, ClassFileStream data) throws IOException, VerificationTypeException {
 		super(StackMapFrameType.SameLocals1StackItemFrame, tag);
-		try {
-			VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();			
-			this.stack = builder.build(data);
-		} catch(VerificationTypeException e) {
-			e.printStackTrace();
-		}
+		VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();			
+		this.stack = builder.build(data);
 	}
 
 	/**

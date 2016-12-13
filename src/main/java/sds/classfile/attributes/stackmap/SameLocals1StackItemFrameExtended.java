@@ -12,15 +12,12 @@ public class SameLocals1StackItemFrameExtended extends SameFrame {
 	private int offsetDelta;
 	private VerificationTypeInfo stack;
 
-	SameLocals1StackItemFrameExtended(int tag, ClassFileStream data) throws IOException {
+	SameLocals1StackItemFrameExtended(int tag, ClassFileStream data)
+	throws IOException, VerificationTypeException {
 		super(StackMapFrameType.SameLocals1StackItemFrameExtended, tag);
 		this.offsetDelta = data.readShort();
-		try {
-			VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();			
-			this.stack = builder.build(data);
-		} catch(VerificationTypeException e) {
-			e.printStackTrace();
-		}
+		VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();			
+		this.stack = builder.build(data);
 	}
 
 	/**

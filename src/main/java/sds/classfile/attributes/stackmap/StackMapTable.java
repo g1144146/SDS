@@ -41,16 +41,13 @@ public class StackMapTable extends AttributeInfo {
 	@Override
 	public void read(ClassFileStream data, ConstantPool pool) throws IOException {}
 
-	public void read(ClassFileStream data, ConstantPool pool, Opcodes opcodes) throws IOException {
+	public void read(ClassFileStream data, ConstantPool pool, Opcodes opcodes)
+	throws IOException, VerificationTypeException, StackMapFrameException {
 		StackMapFrame[] frames = new StackMapFrame[data.readShort()];
-		try {
-			StackMapFrameBuilder builder = StackMapFrameBuilder.getInstance();
-			for(int i = 0; i < frames.length; i++) {
-				frames[i] = builder.build(data);
-			}
-			entries = parseFrame(frames, pool, opcodes);
-		} catch(StackMapFrameException e) {
-			e.printStackTrace();
+		StackMapFrameBuilder builder = StackMapFrameBuilder.getInstance();
+		for(int i = 0; i < frames.length; i++) {
+			frames[i] = builder.build(data);
 		}
+		entries = parseFrame(frames, pool, opcodes);
 	}
 }

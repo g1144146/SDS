@@ -17,21 +17,18 @@ public class FullFrame extends ChopFrame {
 	 * @param tag discrimination tag
 	 * @param data classfile stream
 	 * @throws IOException 
+	 * @throws sds.classfile.attributes.stackmap.VerificationTypeException 
 	 */
-	public FullFrame(int tag, ClassFileStream data) throws IOException {
+	public FullFrame(int tag, ClassFileStream data) throws IOException, VerificationTypeException {
 		super(StackMapFrameType.FullFrame, tag, data);
-		try {
-			VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();
-			this.locals = new VerificationTypeInfo[data.readShort()];
-			for(int i = 0; i < locals.length; i++) {
-				locals[i] = builder.build(data);
-			}
-			this.stack = new VerificationTypeInfo[data.readShort()];
-			for(int i = 0; i < stack.length; i++) {
-				stack[i] = builder.build(data);
-			}
-		} catch(VerificationTypeException e) {
-			e.printStackTrace();
+		VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();
+		this.locals = new VerificationTypeInfo[data.readShort()];
+		for(int i = 0; i < locals.length; i++) {
+			locals[i] = builder.build(data);
+		}
+		this.stack = new VerificationTypeInfo[data.readShort()];
+		for(int i = 0; i < stack.length; i++) {
+			stack[i] = builder.build(data);
 		}
 	}
 

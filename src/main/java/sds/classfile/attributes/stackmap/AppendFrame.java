@@ -11,16 +11,19 @@ import sds.classfile.ClassFileStream;
 public class AppendFrame extends ChopFrame {
 	private VerificationTypeInfo[] locals;
 
-	public AppendFrame(int tag, ClassFileStream data) throws IOException {
+	/**
+	 * constructor.
+	 * @param tag discrimination tag
+	 * @param data classfile stream
+	 * @throws IOException
+	 * @throws VerificationTypeException 
+	 */
+	public AppendFrame(int tag, ClassFileStream data) throws IOException, VerificationTypeException {
 		super(StackMapFrameType.AppendFrame, tag, data);
 		this.locals = new VerificationTypeInfo[tag - 251];
-		try {
-			VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();
-			for(int i = 0; i < locals.length; i++) {
-				locals[i] = builder.build(data);
-			}
-		} catch(VerificationTypeException e) {
-			e.printStackTrace();
+		VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();
+		for(int i = 0; i < locals.length; i++) {
+			locals[i] = builder.build(data);
 		}
 	}
 
