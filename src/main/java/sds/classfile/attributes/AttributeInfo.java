@@ -9,20 +9,14 @@ import sds.classfile.constantpool.ConstantInfo;
  * @author inagaki
  */
 public abstract class AttributeInfo implements Info {
-	private int nameIndex;
-	private int attrLen;
 	private AttributeType type;
 
 	/**
 	 * constructor.
 	 * @param type attribute type
-	 * @param nameIndex constant-pool entry index of attribute name
-	 * @param length attribute length
 	 */
-	public AttributeInfo(AttributeType type, int nameIndex, int length) {
+	public AttributeInfo(AttributeType type) {
 		this.type = type;
-		this.nameIndex = nameIndex;
-		this.attrLen = length;
 	}
 
 	/**
@@ -39,17 +33,9 @@ public abstract class AttributeInfo implements Info {
 	 * returns constant-pool entry index of attribute name.
 	 * @return constant-pool entry index of attribute name
 	 */
-	public int getNameIndex() {
-		return nameIndex;
-	}
-
-	/**
-	 * returns attribute length.
-	 * @return length
-	 */
-	public int getAttrLen() {
-		return attrLen;
-	}
+//	public int getNameIndex() {
+//		return nameIndex;
+//	}
 
 	/**
 	 * returns attribute type.
