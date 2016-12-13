@@ -12,14 +12,15 @@ import sds.classfile.ConstantPool;
  */
 public class SourceDebugExtension extends AttributeInfo {
 	private int[] debugExtension;
+	private int attrLen;
 
 	/**
 	 * constructor.
-	 * @param nameIndex constant-pool entry index of attribute name
 	 * @param length attribute length
 	 */
-	public SourceDebugExtension(int nameIndex, int length) {
-		super(AttributeType.SourceDebugExtension, nameIndex, length);
+	public SourceDebugExtension(int length) {
+		super(AttributeType.SourceDebugExtension);
+		this.attrLen = length;
 	}
 
 	/**
@@ -32,8 +33,8 @@ public class SourceDebugExtension extends AttributeInfo {
 
 	@Override
 	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.debugExtension = new int[this.getAttrLen()];
-		for(int i = 0; i < this.getAttrLen(); i++) {
+		this.debugExtension = new int[attrLen];
+		for(int i = 0; i < debugExtension.length; i++) {
 			debugExtension[i] = data.readUnsignedByte();
 		}
 	}
