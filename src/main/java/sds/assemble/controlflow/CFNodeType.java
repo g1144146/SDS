@@ -62,27 +62,35 @@ public enum CFNodeType {
 	
 	private static CFNodeType searchType(OpcodeInfo op) {
 		if(op instanceof BranchOpcode) {
-			BranchOpcode branch = (BranchOpcode)op;
-			switch(branch.getOpcodeType()) {
-				case jsr:
-				case jsr_w:
-					// todo
-					break;
-				case _goto:
-				case goto_w:
-					if(branch.getBranch() > 0) return Exit;
-					else                       return LoopExit;
-				default:
-					return Entry;
-			}
-		} else if(op instanceof SwitchOpcode) {
+			searchBranchType(op);
+		}
+		if(op instanceof SwitchOpcode) {
 			return Switch;
-		} else if(op.getOpcodeType() == monitorenter) {
+		}
+		if(op.getOpcodeType() == monitorenter) {
 			return SynchronizedEntry;
-		} else if(op.getOpcodeType() == monitorexit) {
+		}
+		if(op.getOpcodeType() == monitorexit) {
 			return SynchronizedExit;
 		}
 		return isReturn(op) ? End : Normal;
+	}
+
+	private static CFNodeType searchBranchType(OpcodeInfo op) {
+		BranchOpcode branch = (BranchOpcode)op;
+		switch(branch.getOpcodeType()) {
+			case jsr:
+			case jsr_w:
+				// todo
+				break;
+			case _goto:
+			case goto_w:
+				if(branch.getBranch() > 0) {
+					return Exit;
+				}
+				return LoopExit;
+		}
+		return Entry;
 	}
 	
 	private static boolean isReturn(OpcodeInfo op) {
