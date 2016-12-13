@@ -134,11 +134,12 @@ public class ClassFileReader {
 		AttributeInfoBuilder builder = AttributeInfoBuilder.getInstance();
 		AttributeInfo info;
 		Utf8Info utf8Info;
+		String attrName;
 		ConstantPool pool = cf.pool;
 		for(int i = 0; i < attrCount; i++) {
 			int nameIndex = stream.readShort();
-			utf8Info = (Utf8Info) pool.get(nameIndex - 1);
-			String attrName = utf8Info.getValue();
+			utf8Info = (Utf8Info)pool.get(nameIndex - 1);
+			attrName = utf8Info.getValue();
 			info = builder.build(attrName, nameIndex, stream.readInt());
 			info.read(stream, cf.pool);
 			attrs.add(i, info);
