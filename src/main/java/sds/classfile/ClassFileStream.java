@@ -13,7 +13,6 @@ public class ClassFileStream implements AutoCloseable {
 	private DataInputStream stream;
 	private RandomAccessFile raf;
 	private long filePointer;
-	private boolean isRaf;
 
 	/**
 	 * constructor.
@@ -21,7 +20,6 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public ClassFileStream(RandomAccessFile raf) {
 		this.raf = raf;
-		this.isRaf = true;
 	}
 
 	/**
@@ -31,7 +29,6 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public ClassFileStream(InputStream in) throws IOException {
 		this.stream = new DataInputStream(in);
-		this.isRaf = false;
 	}
 
 	/**
@@ -40,7 +37,7 @@ public class ClassFileStream implements AutoCloseable {
 	 * @throws IOException
 	 */
 	public long getFilePointer() throws IOException {
-		return isRaf ? raf.getFilePointer() : filePointer;
+		return (raf != null) ? raf.getFilePointer() : filePointer;
 	}
 
 	/**
@@ -50,7 +47,7 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public byte readByte() throws IOException {
 		filePointer += Byte.BYTES;
-		return isRaf ? raf.readByte() : stream.readByte();
+		return (raf != null) ? raf.readByte() : stream.readByte();
 	}
 
 	/**
@@ -60,7 +57,7 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public int readUnsignedByte() throws IOException {
 		filePointer += Byte.BYTES;
-		return isRaf ? raf.readUnsignedByte() : stream.readUnsignedByte();
+		return (raf != null) ? raf.readUnsignedByte() : stream.readUnsignedByte();
 	}
 
 	/**
@@ -70,7 +67,7 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public char readChar() throws IOException {
 		filePointer += Character.BYTES;
-		return isRaf ? raf.readChar() : stream.readChar();
+		return (raf != null) ? raf.readChar() : stream.readChar();
 	}
 
 	/**
@@ -80,7 +77,7 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public double readDouble() throws IOException {
 		filePointer += Double.BYTES;
-		return isRaf ? raf.readDouble() : stream.readDouble();
+		return (raf != null) ? raf.readDouble() : stream.readDouble();
 	}
 
 	/**
@@ -90,7 +87,7 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public float readFloat() throws IOException {
 		filePointer += Float.BYTES;
-		return isRaf ? raf.readFloat() : stream.readFloat();
+		return (raf != null) ? raf.readFloat() : stream.readFloat();
 	}
 
 	/**
@@ -100,7 +97,7 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public int readInt() throws IOException {
 		filePointer += Integer.BYTES;
-		return isRaf ? raf.readInt(): stream.readInt();
+		return (raf != null) ? raf.readInt(): stream.readInt();
 	}
 
 	/**
@@ -111,7 +108,7 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public long readLong() throws IOException {
 		filePointer += Long.BYTES;
-		return isRaf ? raf.readLong() : stream.readLong();
+		return (raf != null) ? raf.readLong() : stream.readLong();
 	}
 
 	/**
@@ -121,7 +118,7 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public short readShort() throws IOException {
 		filePointer += Short.BYTES;
-		return isRaf ? raf.readShort() : stream.readShort();
+		return (raf != null) ? raf.readShort() : stream.readShort();
 	}
 
 	/**
@@ -131,7 +128,7 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public int readUnsignedShort() throws IOException {
 		filePointer += Short.BYTES;
-		return isRaf ? raf.readUnsignedShort() : stream.readUnsignedShort();
+		return (raf != null) ? raf.readUnsignedShort() : stream.readUnsignedShort();
 	}
 
 	/**
@@ -142,15 +139,11 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public byte[] readFully(byte[] b) throws IOException {
 		filePointer += b.length;
-		if(isRaf) {
-			for(int i = 0; i < b.length; i++) {
-				b[i] = raf.readByte();
-			}
-		} else {
-			for(int i = 0; i < b.length; i++) {
-				b[i] = stream.readByte();
-			}
+		if((raf != null)) {
+			raf.readFully(b);
+			return b;
 		}
+		stream.readFully(b);
 		return b;
 	}
 
@@ -161,21 +154,19 @@ public class ClassFileStream implements AutoCloseable {
 	 */
 	public void skipBytes(int n) throws IOException {
 		filePointer += n;
-		if(isRaf) {
+		if((raf != null)) {
 			raf.skipBytes(n);
-		} else {
-			for(int i = 0; i < n; i++) {
-				stream.readByte();
-			}
+			return;
 		}
+		stream.skipBytes(n);
 	}
 
 	@Override
 	public void close() throws IOException {
-		if(isRaf) {
+		if((raf != null)) {
 			raf.close();
-		} else {
-			stream.close();
+			return;
 		}
+		stream.close();
 	}
 }
