@@ -112,34 +112,42 @@ public class ClassFileReader {
 	}
 
 	private void readFields(ClassFileStream data, int fieldCount) throws Exception {
-		cf.fields = new Fields(fieldCount);
+		Fields fields = new Fields(fieldCount);
+		Attributes attr;
 		for(int i = 0; i < fieldCount; i++) {
 			FieldInfo info = new FieldInfo();
 			info.read(data, cf.pool);
-			Attributes attr = readAttributes(data, data.readShort());
+			attr = readAttributes(data, data.readShort());
 			info.setAttr(attr);
-			cf.fields.add(i, info);
+			fields.add(i, info);
 		}
+		cf.fields = fields;
 	}
 
 	private void readMethods(ClassFileStream data, int methodCount) throws Exception {
-		cf.methods = new Methods(methodCount);
+		Methods methods = new Methods(methodCount);
+		Attributes attr;
 		for(int i = 0; i < methodCount; i++) {
 			MethodInfo info = new MethodInfo();
 			info.read(data, cf.pool);
-			Attributes attr = readAttributes(data, data.readShort());
+			attr = readAttributes(data, data.readShort());
 			info.setAttr(attr);
-			cf.methods.add(i, info);
+			methods.add(i, info);
 		}
+		cf.methods = methods;
 	}
 
 	private Attributes readAttributes(ClassFileStream data, int attrCount) throws Exception {
 		Attributes attrs = new Attributes(attrCount);
 		AttributeInfoBuilder builder = AttributeInfoBuilder.getInstance();
+		AttributeInfo info;
+		Utf8Info utf8Info;
+		ConstantPool pool = cf.pool;
 		for(int i = 0; i < attrCount; i++) {
 			int nameIndex = data.readShort();
-			String attrName = ((Utf8Info)cf.pool.get(nameIndex-1)).getValue();
-			AttributeInfo info = builder.build(attrName, nameIndex, data.readInt());
+			utf8Info = (Utf8Info)pool.get(nameIndex-1);
+			String attrName = utf8Info.getValue();
+			info = builder.build(attrName, nameIndex, data.readInt());
 			info.read(data, cf.pool);
 			attrs.add(i, info);
 		}
