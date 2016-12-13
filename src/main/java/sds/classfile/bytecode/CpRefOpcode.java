@@ -69,9 +69,10 @@ public class CpRefOpcode extends OpcodeInfo {
 	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
 		if(this.getOpcodeType() == MnemonicTable.ldc) {
 			this.index = data.readUnsignedByte();
-		} else {
-			this.index = data.readShort();
+			this.operand = extractOperand(this, pool);
+			return;
 		}
+		this.index = data.readShort();
 		this.operand = extractOperand(this, pool);
 	}
 

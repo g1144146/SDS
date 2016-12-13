@@ -30,7 +30,9 @@ public class PushOpcode extends OpcodeInfo {
 	public void read(ClassFileStream data) throws IOException {
 		if(this.getOpcodeType() == MnemonicTable.bipush) {
 			this.value = data.readByte();
-		} else if(this.getOpcodeType() == MnemonicTable.sipush) {
+			return;
+		}
+		if(this.getOpcodeType() == MnemonicTable.sipush) {
 			this.value = data.readShort();
 		}
 	}

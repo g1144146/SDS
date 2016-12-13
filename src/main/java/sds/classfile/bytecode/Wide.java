@@ -25,9 +25,9 @@ public class Wide extends CpRefOpcode {
 	public void read(ClassFileStream data) throws IOException {
 		if(data.readByte() == MnemonicTable.iinc.getOpcode()) {
 			super.read(data);
-		} else {
-			this.constByte = data.readShort();
+			return;
 		}
+		this.constByte = data.readShort();
 	}
 
 	/**
