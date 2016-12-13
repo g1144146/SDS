@@ -1,7 +1,6 @@
 package sds;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
@@ -16,7 +15,7 @@ import org.eclipse.collections.impl.list.mutable.FastList;
  * @author inagaki
  */
 public class SDS {
-	private FastList<String> argList;
+	private FastList<String> classFiles;
 	private JarFile jar;
 
 	/**
@@ -24,19 +23,9 @@ public class SDS {
 	 * @param args command line arguments
 	 */
 	public SDS(String[] args) {
-		this.argList = new FastList<>();
+		this.classFiles = new FastList<>();
 		for(String arg : args) {
-			if(arg.endsWith(".class")) {
-				argList.add(arg);
-			} else if(arg.endsWith(".jar")) {
-				try {
-					this.jar = new JarFile(new File(arg));
-				} catch(IOException e) {
-					e.printStackTrace();
-				}
-			} else {
-				System.out.println(arg + " is not classfile or jar.");
-			}
+			parseArg(arg);
 		}
 	}
 
@@ -44,9 +33,33 @@ public class SDS {
 	 * starts SDS.
 	 */
 	public void run() {
-		boolean output = true;
 		// classfile
-		for(String arg : argList) {
+		if(classFiles.size() > 0) {
+			analyzeClassFile();
+		}
+		// jar
+		if(jar != null) {
+			analyzeJarFile();
+		}
+	}
+
+	private void parseArg(String arg) {
+		if(arg.endsWith(".class")) {
+			classFiles.add(arg);
+		} else if(arg.endsWith(".jar")) {
+			try {
+				this.jar = new JarFile(new File(arg));
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.out.println(arg + " is not classfile or jar.");
+		}
+	}
+
+	private void analyzeClassFile() {
+		boolean output = true;
+		for(String arg : classFiles) {
 			ClassFileReader reader = new ClassFileReader(arg);
 			reader.read();
 			ClassFile cf = reader.getClassFile();
@@ -55,14 +68,15 @@ public class SDS {
 			DecompileProcessor dp = new DecompileProcessor();
 			dp.process(cc);
 		}
-		
-		// jar
-		if(jar == null)
-			return;
+	}
+
+	private void analyzeJarFile() {
+		boolean output = true;
 		try {
 			for(Enumeration<JarEntry> e = jar.entries(); e.hasMoreElements();) {
 				JarEntry entry = e.nextElement();
-				if(! entry.toString().endsWith(".class")) {
+				String fileName = entry.toString();
+				if(! fileName.endsWith(".class")) {
 					continue;
 				}
 				ClassFileReader reader = new ClassFileReader(jar.getInputStream(entry));
