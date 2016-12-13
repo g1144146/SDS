@@ -142,13 +142,17 @@ public class AccessFlags {
 	public static String get(int accessFlag, String type) {
 		if(type.equals("class") && ((accessFlag | CLASS_FLAG) == CLASS_FLAG)) {
 			return getClassAccessFlag(accessFlag);
-		} else if(type.equals("field")  && (accessFlag | FIELD_FLAG  ) == FIELD_FLAG) {
+		}
+		if(type.equals("field")  && (accessFlag | FIELD_FLAG  ) == FIELD_FLAG) {
 			return getFieldAccessFlag(accessFlag);
-		} else if(type.equals("method") && (accessFlag | METHOD_FLAG ) == METHOD_FLAG) {
+		}
+		if(type.equals("method") && (accessFlag | METHOD_FLAG ) == METHOD_FLAG) {
 			return getMethodAccessFlag(accessFlag);
-		} else if(type.equals("nested") && (accessFlag | NESTED_CLASS) == NESTED_CLASS) {
+		}
+		if(type.equals("nested") && (accessFlag | NESTED_CLASS) == NESTED_CLASS) {
 			return getClassAccessFlag(accessFlag);
-		} else if(type.equals("local") && (accessFlag | LOCAL_VAL) == LOCAL_VAL) {
+		}
+		if(type.equals("local") && (accessFlag | LOCAL_VAL) == LOCAL_VAL) {
 			return getLocalValAccessFlag(accessFlag);
 		}
 		System.out.println("unknown access flag : " + accessFlag);
