@@ -8,7 +8,6 @@ import sds.classfile.attributes.stackmap.StackMapTable;
 import sds.classfile.bytecode.MnemonicTable;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
-import sds.classfile.bytecode.UndefinedOpcodeException;
 import sds.classfile.constantpool.Utf8Info;
 
 /**
@@ -76,41 +75,52 @@ public class Code extends AttributeInfo {
 	public void read(ClassFileStream data, ConstantPool pool) throws Exception {
 		this.maxStack = data.readShort();
 		this.maxLocals = data.readShort();
-		// extract opcode
-		int codeLen = data.readInt();
-		int p = (int)data.getFilePointer();
-		this.opcodes = new Opcodes();
-		
-		try {
-			int i;
-			while((i = (int)data.getFilePointer()) < codeLen + p) {
-				int pc = (i - p);
-				OpcodeInfo info = MnemonicTable.get(Byte.toUnsignedInt(data.readByte()), pc);
-				info.read(data, pool);
-				opcodes.add(info.getPc(), info);
-			}
-		} catch(UndefinedOpcodeException e) {
-			e.printStackTrace();
-		}
-		
+
+		readOpcode(data, pool);
 		this.exceptionTable = new ExceptionTable[data.readShort()];
 		for(int i = 0; i < exceptionTable.length; i++) {
 			exceptionTable[i] = new ExceptionTable(data, pool);
 		}
-		
+		readAttributes(data, pool);
+	}
+
+	private void readOpcode(ClassFileStream data, ConstantPool pool) throws Exception {
+		this.opcodes = new Opcodes();
+		int codeLen = data.readInt();
+		int filePointer = (int)data.getFilePointer();
+		int index;
+		int pc;
+		OpcodeInfo info;
+		while((index = (int)data.getFilePointer()) < codeLen + filePointer) {
+			pc = (index - filePointer);
+			info = MnemonicTable.get(Byte.toUnsignedInt(data.readByte()), pc);
+			info.read(data, pool);
+			opcodes.add(info.getPc(), info);
+		}
+	}
+
+	private void readAttributes(ClassFileStream data, ConstantPool pool) throws Exception {
 		this.attr = new Attributes(data.readShort());
 		AttributeInfoBuilder builder = AttributeInfoBuilder.getInstance();
+		int index;
+		String attrName;
+		AttributeInfo info;
 		for(int i = 0; i < attr.size(); i++) {
-			int index = data.readShort();
-			String attrName = ((Utf8Info)pool.get(index-1)).getValue();
-			AttributeInfo info = builder.build(attrName, index, data.readInt());
-			if(info.getType() == AttributeType.StackMapTable) {
-				((StackMapTable)info).read(data, pool, opcodes);
-			} else {
-				info.read(data, pool);
-			}
-			attr.add(i, info);
+			index = data.readShort();
+			attrName = ((Utf8Info)pool.get(index-1)).getValue();
+			info = builder.build(attrName, index, data.readInt());
+			attr.add(i, readAttributeContent(info, data, pool));
 		}
+	}
+
+	private AttributeInfo readAttributeContent(AttributeInfo info, ClassFileStream data, ConstantPool pool)
+	throws Exception {
+		if(info.getType() == AttributeType.StackMapTable) {
+			((StackMapTable)info).read(data, pool, opcodes);
+			return info;
+		}
+		info.read(data, pool);
+		return info;
 	}
 
 	/**
