@@ -35,14 +35,24 @@ public class LineNumberTable extends AttributeInfo {
 		this.lineNumberTable = new LNTable[data.readShort()];
 		for(int i = 0; i < lineNumberTable.length; i++) {
 			lineNumberTable[i] = new LNTable(data);
-			if(i == lineNumberTable.length-1) {
-				lineNumberTable[i].endPc = lineNumberTable[i].getStartPc();
-				if(lineNumberTable.length > 1) {
-					lineNumberTable[i-1].endPc = lineNumberTable[i].getStartPc();
-				}
-			} else if(i > 0) {
-				lineNumberTable[i-1].endPc = lineNumberTable[i].startPc;
-			}
+			setEndPc(i);
+		}
+	}
+
+	private void setEndPc(int index) {
+		if(index == lineNumberTable.length-1) {
+			lineNumberTable[index].endPc = lineNumberTable[index].getStartPc();
+			setEndPc2(index);
+			return;
+		}
+		if(index > 0) {
+			lineNumberTable[index-1].endPc = lineNumberTable[index].startPc;
+		}
+	}
+
+	private void setEndPc2(int index) {
+		if(lineNumberTable.length > 1) {
+			lineNumberTable[index-1].endPc = lineNumberTable[index].getStartPc();
 		}
 	}
 
