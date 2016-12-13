@@ -140,7 +140,7 @@ public class ClassFileReader {
 			int nameIndex = stream.readShort();
 			utf8Info = (Utf8Info)pool.get(nameIndex - 1);
 			attrName = utf8Info.getValue();
-			info = builder.build(attrName, nameIndex, stream.readInt());
+			info = builder.build(attrName, stream.readInt());
 			info.read(stream, cf.pool);
 			attrs.add(i, info);
 		}
