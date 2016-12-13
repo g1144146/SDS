@@ -348,7 +348,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						int _const = inc.getConst();
 						if(_const == 1) {
 							line.append("++");
-						} else if(_cosnt == -1) {
+						} else if(_const == -1) {
 							line.append("--");
 						} else if(_const > 1) {
 							line.append(" += ").append(_const);
