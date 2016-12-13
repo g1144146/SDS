@@ -58,10 +58,13 @@ public class ClassFileReader {
 	 */
 	public void read() {
 		try {
-			readHeaders();
+			cf.magicNumber = stream.readInt(); // 4byte
+			cf.minorVersion = stream.readShort(); // 2byte
+			cf.majorVersion = stream.readShort(); // 2byte
 			readConstantPool();
-			readAccessFlag();
-			readClass();
+			cf.accessFlag = stream.readShort();
+			cf.thisClass = stream.readShort();
+			cf.superClass = stream.readShort();
 			readInterfaces();
 			readFields();
 			readMethods();
@@ -69,12 +72,6 @@ public class ClassFileReader {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	private void readHeaders() throws IOException {
-		cf.magicNumber = stream.readInt(); // 4byte
-		cf.minorVersion = stream.readShort(); // 2byte
-		cf.majorVersion = stream.readShort(); // 2byte
 	}
 
 	private void readConstantPool() throws Exception {
@@ -92,15 +89,6 @@ public class ClassFileReader {
 			}
 		}
 		cf.pool = pool;
-	}
-
-	private void readAccessFlag() throws IOException {
-		cf.accessFlag = stream.readShort();
-	}
-
-	private void readClass() throws IOException {
-		cf.thisClass = stream.readShort();
-		cf.superClass = stream.readShort();
 	}
 
 	private void readInterfaces() throws IOException {
