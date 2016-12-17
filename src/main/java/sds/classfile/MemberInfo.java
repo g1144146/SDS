@@ -75,4 +75,9 @@ public class MemberInfo implements Info {
 		declaration[2] = parse(extract(pool.get(descIndex - 1), pool));
 		declaration[0] = get(acc, getType());
 	}
+
+	@Override
+	public String toString() {
+		return declaration[0] + declaration[1] + declaration[2];
+	}
 }
