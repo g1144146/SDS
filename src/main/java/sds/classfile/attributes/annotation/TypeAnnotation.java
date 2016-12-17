@@ -15,8 +15,8 @@ public class TypeAnnotation extends Annotation {
 
 	TypeAnnotation(ClassFileStream data)
 	throws IOException, TargetTypeException, ElementValueException {
-		TargetInfoBuilder builder = TargetInfoBuilder.getInstance();
-		this.targetInfo = builder.build(data);
+		TargetInfoFactory factory = new TargetInfoFactory();
+		this.targetInfo = factory.create(data);
 		this.targetPath = new TypePath(data);
 		this.typeIndex = data.readShort();
 		this.elementValuePairs = new ElementValuePair[data.readShort()];

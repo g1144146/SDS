@@ -13,8 +13,8 @@ public class SameLocals1StackItemFrame extends SameFrame {
 
 	SameLocals1StackItemFrame(int tag, ClassFileStream data) throws IOException, VerificationTypeException {
 		super(StackMapFrameType.SameLocals1StackItemFrame, tag);
-		VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();			
-		this.stack = builder.build(data);
+		VerificationTypeInfoFactory factory = new VerificationTypeInfoFactory();
+		this.stack = factory.create(data);
 	}
 
 	/**

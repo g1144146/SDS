@@ -16,8 +16,8 @@ public class SameLocals1StackItemFrameExtended extends SameFrame {
 	throws IOException, VerificationTypeException {
 		super(StackMapFrameType.SameLocals1StackItemFrameExtended, tag);
 		this.offsetDelta = data.readShort();
-		VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();			
-		this.stack = builder.build(data);
+		VerificationTypeInfoFactory factory = new VerificationTypeInfoFactory();
+		this.stack = factory.create(data);
 	}
 
 	/**

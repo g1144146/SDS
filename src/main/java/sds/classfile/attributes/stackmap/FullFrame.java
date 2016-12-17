@@ -21,14 +21,14 @@ public class FullFrame extends ChopFrame {
 	 */
 	public FullFrame(int tag, ClassFileStream data) throws IOException, VerificationTypeException {
 		super(StackMapFrameType.FullFrame, tag, data);
-		VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();
+		VerificationTypeInfoFactory factory = new VerificationTypeInfoFactory();
 		this.locals = new VerificationTypeInfo[data.readShort()];
 		for(int i = 0; i < locals.length; i++) {
-			locals[i] = builder.build(data);
+			locals[i] = factory.create(data);
 		}
 		this.stack = new VerificationTypeInfo[data.readShort()];
 		for(int i = 0; i < stack.length; i++) {
-			stack[i] = builder.build(data);
+			stack[i] = factory.create(data);
 		}
 	}
 

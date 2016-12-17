@@ -21,9 +21,9 @@ public class AppendFrame extends ChopFrame {
 	public AppendFrame(int tag, ClassFileStream data) throws IOException, VerificationTypeException {
 		super(StackMapFrameType.AppendFrame, tag, data);
 		this.locals = new VerificationTypeInfo[tag - 251];
-		VerificationTypeInfoBuilder builder = VerificationTypeInfoBuilder.getInstance();
+		VerificationTypeInfoFactory factory = new VerificationTypeInfoFactory();
 		for(int i = 0; i < locals.length; i++) {
-			locals[i] = builder.build(data);
+			locals[i] = factory.create(data);
 		}
 	}
 
