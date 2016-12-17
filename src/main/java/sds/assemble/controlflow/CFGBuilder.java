@@ -16,123 +16,141 @@ import static sds.assemble.controlflow.CFNodeType.Switch;
 import static sds.assemble.controlflow.CFEdgeType.FalseBranch;
 import static sds.assemble.controlflow.CFEdgeType.JumpToCatch;
 import static sds.assemble.controlflow.CFEdgeType.JumpToFinally;
+import static sds.assemble.controlflow.CFEdgeType.Normal;
 import static sds.assemble.controlflow.CFEdgeType.TrueBranch;
 import static sds.classfile.bytecode.MnemonicTable.athrow;
 import static sds.classfile.bytecode.MnemonicTable._goto;
 import static sds.classfile.bytecode.MnemonicTable.goto_w;
 
-
 /**
  * This builder class is for control flow graph.<br>
- * This class is designed singleton.
  * @author inagaki
  */
 public class CFGBuilder {
-	private static CFGBuilder builder = null;
+	private CFNode[] nodes;
+	private ExceptionContent ex;
 
 	/**
-	 * returns own instance.
-	 * @return instance
+	 * constructor.
+	 * @param inst method's instructions
+	 * @param ex content of method's try-catch-finally
 	 */
-	public static CFGBuilder getInstance() {
-		if(builder == null) {
-			builder = new CFGBuilder();
+	public CFGBuilder(LineInstructions[] inst, ExceptionContent ex) {
+		this.ex = ex;
+		if(inst == null) {
+			this.nodes = new CFNode[0];
+			return;
 		}
-		return builder;
+		this.nodes = new CFNode[inst.length];
+		for(int i = 0; i < nodes.length; i++) {
+			nodes[i] = new CFNode(inst[i]);
+		}
 	}
 
 	/**
 	 * returns control flow graph.
-	 * @param inst method's instructions
-	 * @param ex content of method's try-catch-finally
 	 * @return control flow graph
 	 */
-	public CFNode[] build(LineInstructions[] inst, ExceptionContent ex) {
-		if(inst == null) {
-			return new CFNode[0];
+	public CFNode[] build() {
+		if(nodes.length == 0) {
+			return nodes;
 		}
 
-		/** 1. create nodes **/
-		CFNode[] nodes = new CFNode[inst.length];
-		for(int i = 0; i < nodes.length; i++) {
-			nodes[i] = new CFNode(inst[i]);
-		}
+		/** 1. set parent and child, and investigate try-catch-finally or synchronized statement **/
+		setParentAndChildNode();
 
-		/** 2. set parent and child, and investigate try-catch-finally or synchronized statement **/
+		/** 2. set jump point node **/
+		setJumpPointNode();
+
+		/** 3. decide dominator **/
+		decideDominatorNode();
+		return nodes;
+	}
+
+	private void setParentAndChildNode() {
 		int index = 0;
 		for(CFNode n : nodes) {
 			// processing for try-catch-finally
 			boolean isGoto = (n.getStart().getOpcodeType() == _goto)
 						  || (n.getStart().getOpcodeType() == goto_w);
-			int[] tryIndex= ex.getIndexInRange(n.getStart().getPc(), false, isGoto);
-			int[] catchTypeIndex = ex.getIndexInRange(n.getStart().getPc(), true, isGoto);
-			if(tryIndex.length > 0) {
-				n.inTry = true;
-				for(int ti : tryIndex) { // for catch
-					int catchIndex = ex.getTarget()[ti];
-					for(int i = index; i < nodes.length; i++) {
-						if(nodes[i].isInPcRange(catchIndex)) {
-							nodes[i].isCatch = true;
-							n.addChild(nodes[i], JumpToCatch);
-							nodes[i].addParent(n, JumpToCatch);
-							break;
-						}
-					}
-				}
-			}
-			if(catchTypeIndex.length > 0) {
-				for(int ci : catchTypeIndex) {
-					int finallyIndex = ex.getTarget()[ci];
-					for(int i = index; i < nodes.length; i++) { // for finally
-						if(nodes[i].isInPcRange(finallyIndex)) {
-							if(nodes[i].getType() != SynchronizedExit) {
-								// because ExceptionTable attribute contains synchronized statement,
-								// excluding in case of node type is SynchronizedExit
-								nodes[i].isFinally = true;
-								n.addChild(nodes[i], JumpToFinally);
-								nodes[i].addParent(n, JumpToFinally);
-								if((i + 1) < nodes.length
-								&& nodes[i + 1].getEnd().getOpcodeType() == athrow) {
-									nodes[i + 1].isFinally = true;
-									nodes[i].addChild(nodes[i + 1]);
-									nodes[i + 1].addParent(nodes[i]);
-								}
-								break;
-							}
-						}
-					}
-				}
-			}
+			setParentAndChildNodeForTry(isGoto, index);
+			setParentAndChildNodeForCatch(isGoto, index);
 			// processing for setting parent and child.
 			if(index > 0) {
-				CFNodeType type = nodes[index-1].getType();
-				if(type != Exit && type != LoopExit && type != Switch
-				&& type != End && type != StringSwitch) {
-					if(type == Entry) {
-						n.addParent(nodes[index-1], TrueBranch);
-						nodes[index-1].addChild(n, TrueBranch);
+				if(! checkType(nodes[index-1], Exit, LoopExit, End, Switch, StringSwitch)) {
+					if(nodes[index-1].getType() == Entry) {
+						addParentAndChild(index, index - 1, TrueBranch);
 					} else {
-						n.addParent(nodes[index-1]);
-						nodes[index-1].addChild(n);
+						addParentAndChild(index, index - 1, Normal);
 					}
 				}
 			} else if(index == nodes.length-1) {
-				CFNodeType type = n.getType();
-				if(type != Exit && type != LoopExit && type != Switch && type != StringSwitch) {
-					if(type == Entry) {
-						n.addParent(nodes[index], TrueBranch);
-						nodes[index].addChild(n, TrueBranch);
+				if(! checkType(n, Exit, LoopExit, Switch, StringSwitch)) {
+					if(n.getType() == Entry) {
+						addParentAndChild(index, index, TrueBranch);
 					} else {
-						n.addChild(nodes[index]);
-						nodes[index].addParent(n);
+						addParentAndChild(index, index, Normal);
 					}
 				}
 			}
 			index++;
 		}
+	}
 
-		/** 3. set jump point node **/
-		index = 0;
+	private boolean checkType(CFNode node, CFNodeType... types) {
+		CFNodeType nodeType = node.getType();
+		for(CFNodeType type : types) {
+			if(nodeType == type) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void setParentAndChildNodeForTry(boolean isGoto, int index) {
+		int[] tryIndex = ex.getIndexInRange(nodes[index].getStart().getPc(), false, isGoto);
+		if(tryIndex.length > 0) {
+			nodes[index].inTry = true;
+			for(int ti : tryIndex) { // for catch
+				int catchIndex = ex.getTarget()[ti];
+				for(int i = index; i < nodes.length; i++) {
+					if(nodes[i].isInPcRange(catchIndex)) {
+						nodes[i].isCatch = true;
+						addParentAndChild(i, index, JumpToCatch);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	private void setParentAndChildNodeForCatch(boolean isGoto, int index) {
+		int[] catchTypeIndex = ex.getIndexInRange(nodes[index].getStart().getPc(), true, isGoto);
+		if(catchTypeIndex.length > 0) {
+			for(int ci : catchTypeIndex) {
+				int finallyIndex = ex.getTarget()[ci];
+				for(int i = index; i < nodes.length; i++) { // for finally
+					if(nodes[i].isInPcRange(finallyIndex)) {
+						if(nodes[i].getType() != SynchronizedExit) {
+							// because ExceptionTable attribute contains synchronized statement,
+							// excluding in case of node type is SynchronizedExit
+							nodes[i].isFinally = true;
+							addParentAndChild(i, index, JumpToFinally);
+							if((i + 1) < nodes.length
+							&& nodes[i + 1].getEnd().getOpcodeType() == athrow) {
+								nodes[i + 1].isFinally = true;
+								addParentAndChild(i + 1, i, Normal);
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void setJumpPointNode() {
+		int index = 0;
 		int synchCount = 0;
 		for(CFNode n : nodes) {
 			CFNodeType type = n.getType();
@@ -140,11 +158,9 @@ public class CFGBuilder {
 				for(int i = index; i < nodes.length; i++) {
 					if(nodes[i].isInPcRange(n.getJumpPoint())) {
 						if(type == Entry) {
-							n.addChild(nodes[i], FalseBranch);
-							nodes[i].addParent(n, FalseBranch);
+							addParentAndChild(i, index, FalseBranch);
 						} else {
-							n.addChild(nodes[i]);
-							nodes[i].addParent(n);
+							addParentAndChild(i, index, Normal);
 						}
 						break;
 					}
@@ -162,8 +178,7 @@ public class CFGBuilder {
 				int offsetIndex = 0;
 				for(int i = 0; i < nodes.length; i++) {
 					if(nodes[i].isInPcRange(jumpPoints[offsetIndex])) {
-						n.addChild(nodes[i]);
-						nodes[i].addParent(n);
+						addParentAndChild(i, index, Normal);
 						offsetIndex++;
 						if(offsetIndex == jumpPoints.length) {
 							break;
@@ -185,8 +200,7 @@ public class CFGBuilder {
 						int jumpPoint = nodes[synchIndex].getJumpPoint();
 						for(int j = synchIndex; j < nodes.length; j++) {
 							if(nodes[j].isInPcRange(jumpPoint)) {
-								nodes[synchIndex].addChild(nodes[j]);
-								nodes[j].addParent(nodes[synchIndex]);
+								addParentAndChild(j, synchIndex, Normal);
 							}
 						}
 					}
@@ -195,8 +209,14 @@ public class CFGBuilder {
 			}
 			index++;
 		}
+	}
 
-		/** 4. decide dominator **/
+	private void addParentAndChild(int x, int y, CFEdgeType type) {
+		nodes[x].addParent(nodes[y], type);
+		nodes[y].addChild( nodes[x], type);
+	}
+
+	private void decideDominatorNode() {
 		for(int i = nodes.length - 1; i > 0; i--) {
 			if(nodes[i].getParents().size() == 1) { // immediate dominator
 				CFNode n = nodes[i].getParents().iterator().next().getDest();
@@ -216,6 +236,5 @@ public class CFGBuilder {
 				nodes[i].setDominator(candidate);
 			}
 		}
-		return nodes;
 	}
 }

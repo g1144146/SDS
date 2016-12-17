@@ -93,8 +93,8 @@ public class MethodContent extends MemberContent {
 		}
 		// set CFG
 		if(!this.getAccessFlag().contains("abstract")) {
-			CFGBuilder builder = CFGBuilder.getInstance();
-			this.nodes = builder.build(inst, exContent);
+			CFGBuilder builder = new CFGBuilder(inst, exContent);
+			this.nodes = builder.build();
 			for(CFNode n : nodes) {
 				System.out.println(n.toString());
 			}
