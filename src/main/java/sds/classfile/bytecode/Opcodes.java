@@ -52,7 +52,7 @@ public class Opcodes {
 				return opcodes[i];
 			}
 		}
-		throw new IllegalArgumentException("not found opcode of the specified pc ("+ pc + ").");
+		return null;
 	}
 
 	/**
