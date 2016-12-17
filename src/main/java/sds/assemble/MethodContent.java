@@ -74,8 +74,8 @@ public class MethodContent extends MemberContent {
 			}
 		}
 		// attriutes
-		for(AttributeInfo attr : info.getAttr().getAll()) {
-			analyzeAttribute(attr, pool);
+		for(AttributeInfo a : info.getAttr()) {
+			analyzeAttribute(a, pool);
 		}
 		// print
 		if(valContent != null) {
@@ -122,8 +122,8 @@ public class MethodContent extends MemberContent {
 				}
 				this.exContent = new ExceptionContent(exTable, exClass);
 				// other attributes
-				for(AttributeInfo ai : code.getAttr().getAll()) {
-					analyzeAttribute(ai, pool);
+				for(AttributeInfo a : code.getAttr()) {
+					analyzeAttribute(a, pool);
 				}
 				break;
 			case Exceptions:

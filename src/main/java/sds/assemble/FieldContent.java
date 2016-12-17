@@ -22,8 +22,8 @@ public class FieldContent extends MemberContent {
 	 */
 	public FieldContent(MemberInfo info, ConstantPool pool) {
 		super(info, pool);
-		for(AttributeInfo attr : info.getAttr().getAll()) {
-			analyzeAttribute(attr, pool);
+		for(AttributeInfo a : info.getAttr()) {
+			analyzeAttribute(a, pool);
 		}
 	}
 

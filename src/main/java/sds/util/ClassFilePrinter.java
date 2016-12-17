@@ -161,23 +161,20 @@ public class ClassFilePrinter {
 			out.println("has no fields." + sep);
 			return;
 		}
-
-		for(int i = 0; i < fields.size(); i++) {
-			MemberInfo field = fields.get(i);
-			out.println(i + 1 + ". " + field.getAccessFlags()
-					+ field.getDescriptor() + " " + field.getName());
-			Attributes attr = field.getAttr();
-			for(int j = 0; j < attr.size(); j++) {
-				AttributeInfo info = attr.get(j);
-				if(info.getType() != AttributeType.Signature) {
-					printAttributeInfo(attr.get(j));
-				} else {
-					out.println("  " + info.getType().toString());
-					Signature sig = (Signature)info;
-					out.println("     " + parse(sig.getSignature()));
+		int i = 0;
+		for(MemberInfo f : fields) {
+			out.println(i + 1 + ". " + f.getAccessFlags() + f.getDescriptor() + " " + f.getName());
+			for(AttributeInfo a : f.getAttr()) {
+				if(a.getType() != AttributeType.Signature) {
+					printAttributeInfo(a);
+					continue;
 				}
+				out.println("  " + a.getType().toString());
+				Signature sig = (Signature)a;
+				out.println("     " + parse(sig.getSignature()));
 			}
 			out.print(sep);
+			i++;
 		}
 	}
 
@@ -192,15 +189,14 @@ public class ClassFilePrinter {
 			out.print("has no methods." + sep);
 			return;
 		}
-		for(int i = 0; i < methods.size(); i++) {
-			MemberInfo method = methods.get(i);
-			out.println(i + 1 + ". " + method.getAccessFlags()
-					+ method.getDescriptor() + " " + method.getName());
-			Attributes attr = method.getAttr();
-			for(int j = 0; j < attr.size(); j++) {
-				printAttributeInfo(attr.get(j));
+		int i = 0;
+		for(MemberInfo m : methods) {
+			out.println(i + 1 + ". " + m.getAccessFlags() + m.getDescriptor() + " " + m.getName());
+			for(AttributeInfo a : m.getAttr()) {
+				printAttributeInfo(a);
 			}
 			out.print(sep);
+			i++;
 		}
 	}
 
@@ -215,8 +211,8 @@ public class ClassFilePrinter {
 			out.print("has no attributes." + sep);
 			return;
 		}
-		for(int i = 0; i < attr.size(); i++) {
-			printAttributeInfo(attr.get(i));
+		for(AttributeInfo a : attr) {
+			printAttributeInfo(a);
 		}
 		out.println(sep);
 	}
@@ -261,8 +257,8 @@ public class ClassFilePrinter {
 					out.println(", catch_type: " + t.getCatchType());
 					codeIndex++;
 				}
-				for(AttributeInfo ai : code.getAttr().getAll()) {
-					printAttributeInfo(ai);
+				for(AttributeInfo a : code.getAttr()) {
+					printAttributeInfo(a);
 				}
 				break;
 			case ConstantValue:

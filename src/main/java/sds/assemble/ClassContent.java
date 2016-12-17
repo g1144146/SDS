@@ -4,6 +4,7 @@ import sds.ClassFile;
 import sds.classfile.ConstantPool;
 import sds.classfile.Fields;
 import sds.classfile.Methods;
+import sds.classfile.MemberInfo;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.BootstrapMethods;
 import sds.classfile.attributes.EnclosingMethod;
@@ -50,20 +51,22 @@ public class ClassContent extends BaseContent {
 				interfaces[i] = extract(pool.get(interIndex[i]-1), pool);
 			}
 		}
+		int arrayIndex = 0;
 		Methods method = cf.getMethods();
 		this.methods = new MethodContent[method.size()];
-		for(int i = 0; i < methods.length; i++) {
-			methods[i] = new MethodContent(method.get(i), pool);
+		for(MemberInfo m : method) {
+			methods[arrayIndex++] = new MethodContent(m, pool);
 		}
 
+		arrayIndex = 0;
 		Fields field = cf.getFields();
 		this.fields = new FieldContent[field.size()];
-		for(int i = 0; i < fields.length; i++) {
-			fields[i] = new FieldContent(field.get(i), pool);
+		for(MemberInfo f : field) {
+			fields[arrayIndex++] = new FieldContent(f, pool);
 		}
 
 		InnerClasses ic = null;
-		for(AttributeInfo info : cf.getAttr().getAll()) {
+		for(AttributeInfo info : cf.getAttr()) {
 			if(info instanceof InnerClasses) {
 				ic = (InnerClasses)info;
 			}
