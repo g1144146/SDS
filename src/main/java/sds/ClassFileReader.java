@@ -12,9 +12,9 @@ import sds.classfile.FieldInfo;
 import sds.classfile.Methods;
 import sds.classfile.MethodInfo;
 import sds.classfile.attributes.AttributeInfo;
-import sds.classfile.attributes.AttributeInfoBuilder;
+import sds.classfile.attributes.AttributeInfoFactory;
 import sds.classfile.constantpool.ConstantInfo;
-import sds.classfile.constantpool.ConstantInfoBuilder;
+import sds.classfile.constantpool.ConstantInfoFactory;
 import sds.classfile.constantpool.ConstantType;
 import sds.classfile.constantpool.Utf8Info;
 
@@ -77,10 +77,10 @@ public class ClassFileReader {
 	private void readConstantPool() throws Exception {
 		int constantPoolCount = stream.readShort() - 1;
 		ConstantPool pool = new ConstantPool(constantPoolCount);
-		ConstantInfoBuilder builder = ConstantInfoBuilder.getInstance();
+		ConstantInfoFactory factory = new ConstantInfoFactory();
 		for(int i = 0; i < constantPoolCount; i++) {
 			int tag = stream.readByte(); // 1 byte
-			ConstantInfo info = builder.build(tag);
+			ConstantInfo info = factory.create(tag);
 			info.read(stream);
 			pool.add(i, info);
 			if(tag == ConstantType.C_DOUBLE || tag == ConstantType.C_LONG) {
@@ -131,7 +131,7 @@ public class ClassFileReader {
 	private Attributes readAttributes() throws Exception {
 		int attrCount = stream.readShort();
 		Attributes attrs = new Attributes(attrCount);
-		AttributeInfoBuilder builder = AttributeInfoBuilder.getInstance();
+		AttributeInfoFactory factory = new AttributeInfoFactory();
 		AttributeInfo info;
 		Utf8Info utf8Info;
 		String attrName;
@@ -140,7 +140,7 @@ public class ClassFileReader {
 			int nameIndex = stream.readShort();
 			utf8Info = (Utf8Info)pool.get(nameIndex - 1);
 			attrName = utf8Info.getValue();
-			info = builder.build(attrName, stream.readInt());
+			info = factory.create(attrName, stream.readInt());
 			info.read(stream, cf.pool);
 			attrs.add(i, info);
 		}

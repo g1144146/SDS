@@ -4,25 +4,11 @@ import java.io.IOException;
 import sds.classfile.ClassFileStream;
 
 /**
- * This builder class is for
- * {@link VerificationTypeInfo <code>VerificationTypeInfo</code>}.<br>
- * This class is designed singleton.
+ * This factory class is for
+ * {@link VerificationTypeInfo <code>VerificationTypeInfo</code>}.
  * @author inagaki
  */
-public class VerificationTypeInfoBuilder {
-	private static VerificationTypeInfoBuilder builder = null;
-
-	/**
-	 * returns own instance.
-	 * @return instance
-	 */
-	public static VerificationTypeInfoBuilder getInstance() {
-		if(builder == null) {
-			builder = new VerificationTypeInfoBuilder();
-		}
-		return builder;
-	}
-
+public class VerificationTypeInfoFactory {
 	/**
 	 * returns verification type info.
 	 * @param data classfile stream
@@ -30,7 +16,7 @@ public class VerificationTypeInfoBuilder {
 	 * @throws IOException
 	 * @throws VerificationTypeException 
 	 */
-	public VerificationTypeInfo build(ClassFileStream data)
+	public VerificationTypeInfo create(ClassFileStream data)
 	throws IOException, VerificationTypeException {
 		int tag = data.readUnsignedByte();
 		switch(tag) {

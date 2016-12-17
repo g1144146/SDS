@@ -99,14 +99,14 @@ public class Code extends AttributeInfo {
 
 	private void readAttributes(ClassFileStream data, ConstantPool pool) throws Exception {
 		this.attr = new Attributes(data.readShort());
-		AttributeInfoBuilder builder = AttributeInfoBuilder.getInstance();
+		AttributeInfoFactory factory = new AttributeInfoFactory();
 		int nameIndex;
 		String attrName;
 		AttributeInfo info;
 		for(int i = 0; i < attr.size(); i++) {
 			nameIndex = data.readShort();
 			attrName = ((Utf8Info)pool.get(nameIndex-1)).getValue();
-			info = builder.build(attrName, data.readInt());
+			info = factory.create(attrName, data.readInt());
 			attr.add(i, readAttributeContent(info, data, pool));
 		}
 	}

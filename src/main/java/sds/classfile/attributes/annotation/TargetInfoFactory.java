@@ -4,27 +4,10 @@ import java.io.IOException;
 import sds.classfile.ClassFileStream;
 
 /**
- * This builder class is for {@link TargetInfo <code>TargetInfo</code>}.<br>
- * This class is designed singleton.
+ * This factory class is for {@link TargetInfo <code>TargetInfo</code>}.
  * @author inagaki
  */
-public class TargetInfoBuilder {
-	/**
-	 * instance of builder class.
-	 */
-	private static TargetInfoBuilder builder = null;
-
-	/**
-	 * returns own instance.
-	 * @return instance
-	 */
-	public static TargetInfoBuilder getInstance() {
-		if(builder == null) {
-			builder = new TargetInfoBuilder();
-		}
-		return builder;
-	}
-
+public class TargetInfoFactory {
 	/**
 	 * returns target info.
 	 * @param data classfile stream
@@ -32,7 +15,7 @@ public class TargetInfoBuilder {
 	 * @throws IOException
 	 * @throws TargetTypeException 
 	 */
-	public TargetInfo build(ClassFileStream data) throws IOException, TargetTypeException {
+	public TargetInfo create(ClassFileStream data) throws IOException, TargetTypeException {
 		int targetType = data.readUnsignedByte();
 		switch(targetType) {
 			case 0x00:

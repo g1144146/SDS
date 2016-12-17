@@ -3,30 +3,17 @@ package sds.classfile.constantpool;
 import static sds.classfile.constantpool.ConstantType.*;
 
 /**
- * This builder class is for {@link ConstantInfo <code>ConstantInfo</code>}.<br>
- * This class is designed singleton.
+ * This factory class is for {@link ConstantInfo <code>ConstantInfo</code>}.
  * @author inagaki
  */
-public class ConstantInfoBuilder {
-	private static ConstantInfoBuilder builder = new ConstantInfoBuilder();
-
-	private ConstantInfoBuilder() {}
-
-	/**
-	 * return own instance.
-	 * @return instance
-	 */
-	public static ConstantInfoBuilder getInstance() {
-		return builder;
-	}
-
+public class ConstantInfoFactory {
 	/**
 	 * returns constant info.
 	 * @param tag constant info tag.
 	 * @return constant info
 	 * @throws ConstantTypeException 
 	 */
-	public ConstantInfo build(int tag) throws ConstantTypeException {
+	public ConstantInfo create(int tag) throws ConstantTypeException {
 		switch(tag) {
 			case C_CLASS:               return new ClassInfo();
 			case C_FIELDREF:            return new FieldrefInfo();

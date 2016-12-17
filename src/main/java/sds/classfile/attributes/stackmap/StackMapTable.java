@@ -42,9 +42,9 @@ public class StackMapTable extends AttributeInfo {
 	public void read(ClassFileStream data, ConstantPool pool, Opcodes opcodes)
 	throws IOException, VerificationTypeException, StackMapFrameException {
 		StackMapFrame[] frames = new StackMapFrame[data.readShort()];
-		StackMapFrameBuilder builder = StackMapFrameBuilder.getInstance();
+		StackMapFrameFactory factory = new StackMapFrameFactory();
 		for(int i = 0; i < frames.length; i++) {
-			frames[i] = builder.build(data);
+			frames[i] = factory.create(data);
 		}
 		entries = parseFrame(frames, pool, opcodes);
 	}

@@ -4,24 +4,10 @@ import java.io.IOException;
 import sds.classfile.ClassFileStream;
 
 /**
- * This builder class is for {@link StackMapFrame <code>StackMapFrame</code>}.<br>
- * This class is designed singleton.
+ * This factory class is for {@link StackMapFrame <code>StackMapFrame</code>}.
  * @author inagaki
  */
-public class StackMapFrameBuilder {
-	private static StackMapFrameBuilder builder = null;
-
-	/**
-	 * returns own instance.
-	 * @return instance
-	 */
-	public static StackMapFrameBuilder getInstance() {
-		if(builder == null) {
-			builder = new StackMapFrameBuilder();
-		}
-		return builder;
- 	}
-
+public class StackMapFrameFactory {
 	/**
 	 * returns stack-map-frame.
 	 * @param data classfile stream
@@ -30,7 +16,7 @@ public class StackMapFrameBuilder {
 	 * @throws StackMapFrameException 
 	 * @throws sds.classfile.attributes.stackmap.VerificationTypeException 
 	 */
-	public StackMapFrame build(ClassFileStream data)
+	public StackMapFrame create(ClassFileStream data)
 	throws IOException, StackMapFrameException, VerificationTypeException {
 		int tag = data.readUnsignedByte();
 		if(0 <= tag && tag <= 63) {
