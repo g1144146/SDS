@@ -1,9 +1,6 @@
 package sds.classfile.bytecode;
 
 import java.util.Arrays;
-import java.util.Comparator;
-
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 /**
  * This class is for
@@ -12,13 +9,14 @@ import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
  * @author inagaki
  */
 public class Opcodes {
-	private IntObjectHashMap<OpcodeInfo> opcodeMap;
+	private OpcodeInfo[] opcodes;
+	private int size;
 
 	/**
 	 * constructor.
 	 */
 	public Opcodes() {
-		this.opcodeMap = new IntObjectHashMap<>();
+		this.opcodes = new OpcodeInfo[10];
 	}
 
 	/**
@@ -26,16 +24,21 @@ public class Opcodes {
 	 * @return size
 	 */
 	public int size() {
-		return opcodeMap.size();
+		return size;
 	}
 
 	/**
 	 * adds opcode to map.
-	 * @param key index into the code array
 	 * @param element opcode
 	 */
-	public void add(int key, OpcodeInfo element) {
-		opcodeMap.put(key, element);
+	public void add(OpcodeInfo element) {
+		if(size >= opcodes.length) {
+			OpcodeInfo[] newInfo = new OpcodeInfo[opcodes.length + 5];
+			System.arraycopy(opcodes, 0, newInfo, 0, opcodes.length);
+			opcodes = newInfo;
+		}
+		opcodes[size] = element;
+		size++;
 	}
 
 	/**
@@ -44,7 +47,12 @@ public class Opcodes {
 	 * @return opcode
 	 */
 	public OpcodeInfo get(int pc) {
-		return opcodeMap.get(pc);
+		for(int i = 0; i < size; i++) {
+			if(pc == opcodes[i].getPc()) {
+				return opcodes[i];
+			}
+		}
+		throw new IllegalArgumentException("not found opcode of the specified pc ("+ pc + ").");
 	}
 
 	/**
@@ -52,10 +60,7 @@ public class Opcodes {
 	 * @return opcodes.
 	 */
 	public OpcodeInfo[] getAll() {
-		OpcodeInfo[] values = opcodeMap.values().toArray(new OpcodeInfo[0]);
-		Comparator<OpcodeInfo> c = this::compare;
-		Arrays.sort(values, c);
-		return values;
+		return Arrays.copyOfRange(opcodes, 0, size);
 	}
 
 	/**
@@ -63,20 +68,10 @@ public class Opcodes {
 	 * @return values
 	 */
 	public int[] getKeys() {
-		int keys[] = opcodeMap.keySet().toArray();
-		Arrays.sort(keys);
-		return keys;
-	}
-
-	/**
-	 * returns opcode map.
-	 * @return opcode map
-	 */
-	public IntObjectHashMap<OpcodeInfo> getMap() {
-		return opcodeMap;
-	}
-
-	private int compare(OpcodeInfo o1, OpcodeInfo o2) {
-		return o1.getPc() - o2.getPc();
+		int[] pc = new int[size];
+		for(int i = 0; i < size; i++) {
+			pc[i] = opcodes[i].getPc();
+		}
+		return pc;
 	}
 }

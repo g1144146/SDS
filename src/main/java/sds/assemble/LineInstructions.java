@@ -26,7 +26,7 @@ public class LineInstructions {
 	 * @param opcode opcode 
 	 */
 	public void addOpcode(OpcodeInfo opcode) {
-		opcodes.add(opcode.getPc(), opcode);
+		opcodes.add(opcode);
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class LineInstructions {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		for(OpcodeInfo op : opcodes.getMap().values()) {
+		for(OpcodeInfo op : opcodes.getAll()) {
 			sb.append(op.getPc()).append(":").append(op).append("\n");
 		}
 		return sb.toString();

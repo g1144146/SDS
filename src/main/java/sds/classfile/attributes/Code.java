@@ -93,7 +93,7 @@ public class Code extends AttributeInfo {
 			pc = (index - filePointer);
 			info = MnemonicTable.get(Byte.toUnsignedInt(data.readByte()), pc);
 			info.read(data, pool);
-			opcodes.add(info.getPc(), info);
+			opcodes.add(info);
 		}
 	}
 
