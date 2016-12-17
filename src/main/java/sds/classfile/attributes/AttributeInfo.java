@@ -30,18 +30,15 @@ public abstract class AttributeInfo implements Info {
 	}
 
 	/**
-	 * returns constant-pool entry index of attribute name.
-	 * @return constant-pool entry index of attribute name
-	 */
-//	public int getNameIndex() {
-//		return nameIndex;
-//	}
-
-	/**
 	 * returns attribute type.
 	 * @return type
 	 */
 	public AttributeType getType() {
 		return type;
+	}
+
+	@Override
+	public String toString() {
+		return type.toString();
 	}
 }
