@@ -63,10 +63,10 @@ public class ClassFileReaderTest {
 				,"CONSTANT_UTF8","CONSTANT_UTF8","CONSTANT_UTF8","CONSTANT_UTF8"
 				,"CONSTANT_UTF8","CONSTANT_UTF8"};
 		int index = 0;
-		for(ConstantInfo info : cf.pool) {
-			assert info.toString().startsWith(constantPool[index++]);
-		}
 		ConstantPool pool = cf.pool;
+		for(int i = 0; i < pool.size(); i++) {
+			assert pool.get(i).toString().startsWith(constantPool[index++]);
+		}
 		assertThat(extract(pool.get(cf.superClass-1), pool), is("java.lang.Object"));
 		assertThat(extract(pool.get(cf.thisClass-1), pool), is("Hello"));
 		String source = ((SourceFile)cf.attr.iterator().next()).getSourceFile();

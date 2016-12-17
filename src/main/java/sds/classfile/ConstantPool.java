@@ -1,14 +1,12 @@
 package sds.classfile;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This class is for constant-pool of classfile.
  * @author inagaki
  */
-public class ConstantPool extends AbstractArrayInfo<ConstantInfo> implements Iterable<ConstantInfo> {
+public class ConstantPool extends AbstractArrayInfo<ConstantInfo> {
 	/**
 	 * constructor.
 	 * @param size constant-pool size
@@ -24,11 +22,6 @@ public class ConstantPool extends AbstractArrayInfo<ConstantInfo> implements Ite
 	 */
 	public ConstantInfo get(int index) {
 		return (ConstantInfo)elements[index];
-	}
-
-	@Override
-	public Iterator<ConstantInfo> iterator() {
-		return Arrays.asList((ConstantInfo[])elements).iterator();
 	}
 
 	@Override
