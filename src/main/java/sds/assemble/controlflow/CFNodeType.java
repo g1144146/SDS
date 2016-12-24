@@ -62,7 +62,7 @@ public enum CFNodeType {
 	
 	private static CFNodeType searchType(OpcodeInfo op) {
 		if(op instanceof BranchOpcode) {
-			searchBranchType(op);
+			return searchBranchType(op);
 		}
 		if(op instanceof SwitchOpcode) {
 			return Switch;
