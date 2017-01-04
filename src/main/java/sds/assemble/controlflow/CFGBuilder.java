@@ -2,6 +2,7 @@ package sds.assemble.controlflow;
 
 import sds.assemble.MethodContent.ExceptionContent;
 import sds.assemble.LineInstructions;
+import sds.classfile.bytecode.MnemonicTable;
 
 import static sds.assemble.controlflow.DominatorNodeSearcher.searchCommon;
 import static sds.assemble.controlflow.CFNodeType.Entry;
@@ -55,7 +56,6 @@ public class CFGBuilder {
 		if(nodes.length == 0) {
 			return nodes;
 		}
-
 		/** 1. set parent and child, and investigate try-catch-finally or synchronized statement **/
 		setParentAndChildNode();
 
@@ -136,8 +136,8 @@ public class CFGBuilder {
 							// excluding in case of node type is SynchronizedExit
 							nodes[i].isFinally = true;
 							addParentAndChild(i, index, JumpToFinally);
-							if((i + 1) < nodes.length
-							&& nodes[i + 1].getEnd().getOpcodeType() == athrow) {
+							MnemonicTable type = nodes[i + 1].getEnd().getOpcodeType();
+							if((i + 1) < nodes.length && type == athrow) {
 								nodes[i + 1].isFinally = true;
 								addParentAndChild(i + 1, i, Normal);
 							}
