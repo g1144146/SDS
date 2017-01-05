@@ -37,8 +37,8 @@ public class MethodDecompiler extends AbstractDecompiler {
 	@Override
 	public void decompile(BaseContent content) {
 		MethodContent method = (MethodContent)content;
-		this.opStack = new OperandStack(method.getMaxStack());
-		this.local = new LocalStack(method.getMaxLocals());
+		this.opStack = new OperandStack();
+		this.local = new LocalStack();
 		addAnnotation(method.getAnnotation());
 		addDeclaration(method);
 		result.changeIndent(DecompiledResult.INCREMENT);
@@ -81,7 +81,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 		}
 		result.write(methodDeclaration.toString());
 		// method body
-		// buildMethodBody(method.getInst(), method.getNodes());
+		result.changeIndent(DecompiledResult.INCREMENT);
+		buildMethodBody(method.getInst(), method.getNodes());
+		result.changeIndent(DecompiledResult.DECREMENT);
 	}
 
 	private void buildMethodBody(LineInstructions[] insts, CFNode[] nodes) {
@@ -90,6 +92,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 			LineInstructions inst = insts[i];
 			StringBuilder line = new StringBuilder();
 			for(OpcodeInfo opcode : inst.getOpcodes().getAll()) {
+				System.out.println(opcode + ", current: " + opStack.getCurrentStackSize());
+				System.out.println("local: " + local);
+				System.out.println("stack: " + opStack);
 				switch(opcode.getOpcodeType()) {
 					case nop: break;
 					case aconst_null: opStack.push("null"); break;
@@ -162,33 +167,36 @@ public class MethodDecompiler extends AbstractDecompiler {
 						opStack.push(refedArray + "[" + arrayIndex + "]");
 						break;
 					case istore:
-					case lstore:
 					case fstore:
-					case dstore:
 					case astore:
 						IndexOpcode inOp = (IndexOpcode)opcode;
 						line.append(local.load(inOp.getIndex())).append(" = ").append(opStack.pop());
+						break;
+					case lstore:
+					case dstore:
+						IndexOpcode inOpDL = (IndexOpcode)opcode;
+						line.append(local.load(inOpDL.getIndex(), true)).append(" = ").append(opStack.pop());
 						break;
 					case istore_0: line.append(local.load(0)).append(" = ").append(opStack.pop()); break;
 					case istore_1: line.append(local.load(1)).append(" = ").append(opStack.pop()); break;
 					case istore_2: line.append(local.load(2)).append(" = ").append(opStack.pop()); break;
 					case istore_3: line.append(local.load(3)).append(" = ").append(opStack.pop()); break;
-					case lstore_0: line.append(local.load(0)).append(" = ").append(opStack.pop()); break;
-					case lstore_1: line.append(local.load(1)).append(" = ").append(opStack.pop()); break;
-					case lstore_2: line.append(local.load(2)).append(" = ").append(opStack.pop()); break;
-					case lstore_3: line.append(local.load(3)).append(" = ").append(opStack.pop()); break;
 					case fstore_0: line.append(local.load(0)).append(" = ").append(opStack.pop()); break;
 					case fstore_1: line.append(local.load(1)).append(" = ").append(opStack.pop()); break;
 					case fstore_2: line.append(local.load(2)).append(" = ").append(opStack.pop()); break;
 					case fstore_3: line.append(local.load(3)).append(" = ").append(opStack.pop()); break;
-					case dstore_0: line.append(local.load(0)).append(" = ").append(opStack.pop()); break;
-					case dstore_1: line.append(local.load(1)).append(" = ").append(opStack.pop()); break;
-					case dstore_2: line.append(local.load(2)).append(" = ").append(opStack.pop()); break;
-					case dstore_3: line.append(local.load(3)).append(" = ").append(opStack.pop()); break;
 					case astore_0: line.append(local.load(0)).append(" = ").append(opStack.pop()); break;
 					case astore_1: line.append(local.load(1)).append(" = ").append(opStack.pop()); break;
 					case astore_2: line.append(local.load(2)).append(" = ").append(opStack.pop()); break;
 					case astore_3: line.append(local.load(3)).append(" = ").append(opStack.pop()); break;
+					case lstore_0: line.append(local.load(0, true)).append(" = ").append(opStack.pop()); break;
+					case lstore_1: line.append(local.load(1, true)).append(" = ").append(opStack.pop()); break;
+					case lstore_2: line.append(local.load(2, true)).append(" = ").append(opStack.pop()); break;
+					case lstore_3: line.append(local.load(3, true)).append(" = ").append(opStack.pop()); break;
+					case dstore_0: line.append(local.load(0, true)).append(" = ").append(opStack.pop()); break;
+					case dstore_1: line.append(local.load(1, true)).append(" = ").append(opStack.pop()); break;
+					case dstore_2: line.append(local.load(2, true)).append(" = ").append(opStack.pop()); break;
+					case dstore_3: line.append(local.load(3, true)).append(" = ").append(opStack.pop()); break;
 					case iastore:
 					case lastore:
 					case fastore:
@@ -477,14 +485,22 @@ public class MethodDecompiler extends AbstractDecompiler {
 						line.append("return ").append(opStack.pop());
 						break;
 					case _return:
-						line.append("return");
+						if(i != nodes.length - 1) {
+							// in case of this return instruction is not end of opcode,
+							// specifies "return;".
+							line.append("return");
+						}
 						break;
 					case getstatic:
 						CpRefOpcode getSta = (CpRefOpcode)opcode;
-						String staticField = getSta.getOperand().split("\\|")[0];
-						opStack.push(staticField);
+						String getStaticField = getSta.getOperand().split("\\|")[0];
+						opStack.push(getStaticField);
 						break;
-					case putstatic: break;
+					case putstatic:
+						CpRefOpcode putSta = (CpRefOpcode)opcode;
+						String putStaticField = putSta.getOperand().split("\\|")[0];
+						line.append(putStaticField).append(" = ").append(opStack.pop());
+						break;
 					case getfield: break;
 					case putfield: break;
 					case invokevirtual:
@@ -579,6 +595,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case impdep2: break;
 					default: break;
 				}
+				System.out.println(opcode + ", current: " + opStack.getCurrentStackSize());
+				System.out.println("local: " + local);
+				System.out.println("stack: " + opStack + "\n");
 			}
 			// When the node is not start or end of a statement, (ex. "if(...) {", "}")
 			// add semicolon and write in the line context.

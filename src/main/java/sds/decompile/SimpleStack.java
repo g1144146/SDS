@@ -1,6 +1,6 @@
 package sds.decompile;
 
-import java.util.NoSuchElementException;
+import java.util.Stack;
 
 /**
  * This adapter class is for
@@ -9,15 +9,14 @@ import java.util.NoSuchElementException;
  * {@link OperandStack <code>OperandStack</code>}.
  */
 public abstract class SimpleStack {
-	String[] stack;
 	int current;
+	Stack<String> stack;
 
 	/**
 	 * constructor.
-	 * @param size max size of stack
 	 */
-	public SimpleStack(int size) {
-		this.stack = new String[size];
+	public SimpleStack() {
+		this.stack = new Stack<>();
 		this.current = 0;
 	}
 
@@ -37,10 +36,7 @@ public abstract class SimpleStack {
 		if(element == null) {
 			throw new IllegalArgumentException("argument is null.");
 		}
-		if(current >= stack.length) {
-			throw new ArrayIndexOutOfBoundsException("stack size is over specified size (" + stack.length + ") .");
-		}
-		stack[current] = element;
+		stack.push(element);
 		current++;
 	}
 
@@ -49,29 +45,18 @@ public abstract class SimpleStack {
 	 * @return top element
 	 */
 	public String pop() {
-		if(current > 0) {
-			current--;
+		if(stack.empty()) {
+			throw new IllegalStateException("stack is empty.");
 		}
-		String element = stack[current];
-		if(element == null) {
-			throw new NoSuchElementException("stack is empty.");
-		}
-		stack[current - 1] = null;
+		String element = stack.pop();
+		current--;
 		return element;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		if(current == 0) {
-			for(int i = stack.length - 1; i >= 0; i--) {
-				sb.append("[").append(i).append("]:").append("\n");
-			}
-		} else {
-			for(int i = stack.length - 1; i >= 0; i--) {
-				sb.append("[").append(i).append("]: ").append(stack[i]).append("\n");
-			}
-		}
+		sb.append(stack);
 		return sb.toString();
 	}
 }

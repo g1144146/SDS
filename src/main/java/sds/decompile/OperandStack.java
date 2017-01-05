@@ -7,10 +7,9 @@ package sds.decompile;
 public class OperandStack extends SimpleStack {
 	/**
 	 * constructor.
-	 * @param size max size of stack
 	 */
-	public OperandStack(int size) {
-		super(size);
+	public OperandStack() {
+		super();
 	}
 
 	/**

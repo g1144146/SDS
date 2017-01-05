@@ -5,8 +5,8 @@ package sds.decompile;
  * @author inagaki
  */
 public class LocalStack extends SimpleStack {
-	public LocalStack(int size) {
-		super(size);
+	public LocalStack() {
+		super();
 	}
 
 	/**
@@ -15,9 +15,23 @@ public class LocalStack extends SimpleStack {
 	 * @return argument
 	 */
 	public String load(int index) {
-		if(index >= stack.length) {
-			throw new ArrayIndexOutOfBoundsException("stack size is over specified size (" + stack.length + ") .");
+		return load(index, false);
+	}
+
+	/**
+	 * returns argument of specified index.
+	 * @param index array index
+	 * @param isLongOrDouble  whether type of the specified local variable is long or double.
+	 * @return argument
+	 */
+	public String load(int index, boolean isLongOrDouble) {
+		if(index >= stack.size()) {
+			int argNumber = stack.size();
+			stack.push("arg" + argNumber);
+			if(isLongOrDouble) {
+				stack.push("arg" + argNumber);
+			}
 		}
-		return stack[index];
+		return stack.get(index);
 	}
 }
