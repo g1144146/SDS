@@ -17,7 +17,6 @@ dependencies {
     testCompile('junit:junit:4.+')
     testCompile('org.hamcrest:hamcrest-library:1.+')
     testCompile('com.googlecode.jmockit:jmockit:1.+')
-    compile('org.eclipse.collections:eclipse-collections:7.+')
 }
 
 javadoc {

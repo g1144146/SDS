@@ -1,5 +1,11 @@
 package sds.util;
 
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.HashMap;
+import java.util.Map;
 import sds.classfile.ConstantPool;
 import sds.classfile.attributes.stackmap.AppendFrame;
 import sds.classfile.attributes.stackmap.ChopFrame;
@@ -13,11 +19,6 @@ import sds.classfile.attributes.stackmap.UninitializedVariableInfo;
 import sds.classfile.attributes.stackmap.VerificationTypeInfo;
 import sds.classfile.bytecode.Opcodes;
 
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.list.mutable.MutableListFactoryImpl;
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
-
 import static sds.util.DescriptorParser.parse;
 import static sds.util.OperandExtractor.extractOperand;
 import static sds.util.Utf8ValueExtractor.extract;
@@ -27,31 +28,43 @@ import static sds.util.Utf8ValueExtractor.extract;
  * @author inagaki
  */
 public class StackMapFrameParser {
-	public static IntObjectHashMap<UnifiedMap<String, MutableList<String>>> parseFrame(
-	StackMapFrame[] frames, ConstantPool pool, Opcodes opcodes) {
-		IntObjectHashMap<UnifiedMap<String, MutableList<String>>> stackMap = new IntObjectHashMap<>(opcodes.size());
-		MutableListFactoryImpl factory = new MutableListFactoryImpl();
+
+	private static List<String> getBefore(Map<Integer, Map<String, List<String>>> stackMap,
+	int before, String type) {
+		if(stackMap.get(before) != null) {
+			if(stackMap.get(before).get(type) != null) {
+				return stackMap.get(before).get(type);
+			}
+		}
+		return new ArrayList<>();
+	}
+
+	public static Map<Integer, Map<String, List<String>>> parseFrame(StackMapFrame[] frames,
+	ConstantPool pool, Opcodes opcodes) {
+		Map<Integer, Map<String, List<String>>> stackMap = new LinkedHashMap<>();
 		int before = 0;
 		for(StackMapFrame frame : frames) {
-			UnifiedMap<String, MutableList<String>> map = new UnifiedMap<>();
-//			MutableList stack = getBefore(stackMap, before, "stack");
-			MutableList local = getBefore(stackMap, before, "local");
+			Map<String, List<String>> map = new HashMap<>();
+			List<String> local = getBefore(stackMap, before, "local");
+			List<String> list = new ArrayList<>();
 			int key = 0;
 			switch(frame.getFrameType()) {
 				case SameFrame:
-					map.put("stack", factory.empty());
+					map.put("stack", list);
 					map.put("local", local);
 					key = frame.getTag();
 					break;
 				case SameLocals1StackItemFrame:
 					SameLocals1StackItemFrame sl = (SameLocals1StackItemFrame)frame;
-					map.put("stack", factory.of(parseVerification(sl.getStack(), pool, opcodes)));
+					list.add(parseVerification(sl.getStack(), pool, opcodes));
+					map.put("stack", list);
 					map.put("local", local);
 					key = frame.getTag() - 64;
 					break;
 				case SameLocals1StackItemFrameExtended:
 					SameLocals1StackItemFrameExtended sle = (SameLocals1StackItemFrameExtended)frame;
-					map.put("stack", factory.of(parseVerification(sle.getStack(), pool, opcodes)));
+					list.add(parseVerification(sle.getStack(), pool, opcodes));
+					map.put("stack", list);
 					map.put("local", local);
 					key = sle.getOffset();
 					break;
@@ -59,16 +72,17 @@ public class StackMapFrameParser {
 					ChopFrame cf = (ChopFrame)frame;
 					int deleteArg = 251 - cf.getTag();
 					int argCount = local.size();
-					for(int i = argCount-1; i > (argCount-1) - deleteArg; i--) {
+					System.out.println(local);
+					for(int i = argCount-1; i > ((argCount-1) - deleteArg); i--) {
 						local.remove(i);
 					}
-					map.put("stack", factory.empty());
+					map.put("stack", list);
 					map.put("local", local);
 					key = cf.getOffset();
 					break;
 				case SameFrameExtended:
 					SameFrameExtended sf = (SameFrameExtended)frame;
-					map.put("stack", factory.empty());
+					map.put("stack", list);
 					map.put("local", local);
 					key = sf.getOffset();
 					break;
@@ -78,7 +92,7 @@ public class StackMapFrameParser {
 					for(int i = 0; i < afInfo.length; i++) {
 						local.add(parseVerification(afInfo[i], pool, opcodes));
 					}
-					map.put("stack", factory.empty());
+					map.put("stack", list);
 					map.put("local", local);
 					key = af.getOffset();
 					break;
@@ -94,8 +108,10 @@ public class StackMapFrameParser {
 					for(int i = 0; i < ffLocals.length; i++) {
 						ffLocals[i] = parseVerification(ffLocalsInfo[i], pool, opcodes);
 					}
-					map.put("stack", factory.of(ffStack));
-					map.put("local", factory.of(ffLocals));
+					List<String> ffStackList = new ArrayList<>(Arrays.asList(ffStack));
+					List<String> ffLocalsList = new ArrayList<>(Arrays.asList(ffLocals));
+					map.put("stack", ffStackList);
+					map.put("local", ffLocalsList);
 					key = ff.getOffset();
 					break;
 				default:
@@ -125,14 +141,5 @@ public class StackMapFrameParser {
 				return extractOperand(opcodes.get(uv.getOffset()), pool);
 		}
 		return "";
-	}
-
-	private static MutableList<String> getBefore(
-	IntObjectHashMap<UnifiedMap<String, MutableList<String>>> stackMap, int before, String type) {
-		MutableListFactoryImpl factory = new MutableListFactoryImpl();
-		return (stackMap.get(before) != null) ?
-					(stackMap.get(before).get(type) != null) ?
-						  stackMap.get(before).get(type) : factory.empty()
-					: factory.empty();
 	}
 }

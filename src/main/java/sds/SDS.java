@@ -3,19 +3,20 @@ package sds;
 import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import sds.assemble.ClassContent;
 import sds.decompile.DecompileProcessor;
 import sds.util.ClassFilePrinter;
-import org.eclipse.collections.impl.list.mutable.FastList;
 
 /**
  * This class is for driving SDS.
  * @author inagaki
  */
 public class SDS {
-	private FastList<String> classFiles;
+	private List<String> classFiles;
 	private JarFile jar;
 
 	/**
@@ -23,7 +24,7 @@ public class SDS {
 	 * @param args command line arguments
 	 */
 	public SDS(String[] args) {
-		this.classFiles = new FastList<>();
+		this.classFiles = new ArrayList<>();
 		for(String arg : args) {
 			parseArg(arg);
 		}

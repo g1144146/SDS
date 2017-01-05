@@ -19,7 +19,6 @@
 
 * Runtime / Development Environment
     * [Java SE 8](http://www.oracle.com/technetwork/java/javase/overview/index.html)
-    * [Eclipse Collections](https://www.eclipse.org/collections/index.html)
 
 * Project Management
     * [Gradle 3.x](http://gradle.org/)

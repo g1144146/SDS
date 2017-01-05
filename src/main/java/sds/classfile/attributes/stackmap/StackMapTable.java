@@ -1,14 +1,13 @@
 package sds.classfile.attributes.stackmap;
 
 import java.io.IOException;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import java.util.List;
+import java.util.Map;
 import sds.classfile.ClassFileStream;
 import sds.classfile.ConstantPool;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeType;
 import sds.classfile.bytecode.Opcodes;
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 import static sds.util.StackMapFrameParser.parseFrame;
 
@@ -19,7 +18,7 @@ import static sds.util.StackMapFrameParser.parseFrame;
  * @author inagaki
  */
 public class StackMapTable extends AttributeInfo {
-	private IntObjectHashMap<UnifiedMap<String, MutableList<String>>> entries;
+	private Map<Integer, Map<String, List<String>>> entries;
 
 	/**
 	 * constructor.
@@ -32,7 +31,7 @@ public class StackMapTable extends AttributeInfo {
 	 * returns entries of stack-map-table.
 	 * @return entries
 	 */
-	public IntObjectHashMap<UnifiedMap<String, MutableList<String>>> getEntries() {
+	public Map<Integer, Map<String, List<String>>> getEntries() {
 		return entries;
 	}
 

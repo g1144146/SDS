@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
-import org.eclipse.collections.impl.list.mutable.FastList;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.WRITE;
@@ -16,7 +17,7 @@ import static java.nio.file.StandardOpenOption.WRITE;
  */
 public class DecompiledResult {
 	private String name;
-	private FastList<String> source;
+	private List<String> source;
 	private int indentLevel;
 	/**
 	 * for changing indent level.<br>
@@ -35,7 +36,7 @@ public class DecompiledResult {
 	 */
 	public DecompiledResult(String name) {
 		this.name = name;
-		this.source = new FastList<>();
+		this.source = new ArrayList<>();
 		this.indentLevel = 0;
 	}
 

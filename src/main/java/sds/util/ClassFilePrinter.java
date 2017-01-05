@@ -2,9 +2,8 @@ package sds.util;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import java.util.List;
+import java.util.Map;
 
 import sds.classfile.Attributes;
 import sds.classfile.ConstantPool;
@@ -413,10 +412,9 @@ public class ClassFilePrinter {
 				break;
 			case StackMapTable:
 				StackMapTable smt = (StackMapTable)info;
-				int stackIndex = 1;
-				IntObjectHashMap<UnifiedMap<String, MutableList<String>>> stackMap = smt.getEntries();
-				for(int i : stackMap.keySet().toArray()) {
-					UnifiedMap<String, MutableList<String>> map = stackMap.get(i);
+				Map<Integer, Map<String, List<String>>> stackMap = smt.getEntries();
+				for(Integer i : stackMap.keySet()) {
+					Map<String, List<String>> map = stackMap.get(i.intValue());
 					out.println("     " + i + ": " + map);
 				}
 				break;
