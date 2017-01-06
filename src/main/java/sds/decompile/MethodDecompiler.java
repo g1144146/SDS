@@ -501,8 +501,22 @@ public class MethodDecompiler extends AbstractDecompiler {
 						String putStaticField = putSta.getOperand().split("\\|")[0];
 						line.append(putStaticField).append(" = ").append(opStack.pop());
 						break;
-					case getfield: break;
-					case putfield: break;
+					case getfield:
+						CpRefOpcode getField = (CpRefOpcode)opcode;
+						String get = getField.getOperand().split("\\|")[0];
+						String getDeclaration = opStack.pop() + ".";
+						String[] getNames = get.split("\\.");
+						opStack.push(getDeclaration + getNames[getNames.length - 1]);
+						break;
+					case putfield:
+						CpRefOpcode putField = (CpRefOpcode)opcode;
+						String put = putField.getOperand().split("\\|")[0];
+						String[] putNames = put.split("\\.");
+						String value = opStack.pop();
+						String putCaller = opStack.pop();
+						line.append(putCaller).append(".").append(putNames[putNames.length - 1])
+							.append(" = ").append(value);
+						break;
 					case invokevirtual:
 						CpRefOpcode virOpcode = (CpRefOpcode)opcode;
 						// 0: xxx.yyy.zzz.method
@@ -522,7 +536,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 							for(int j = virArgs.length - 1; j > 0; j--) {
 								virtual.append(virArgs[j]).append(",");
 							}
-							// callee.method(args1,args2,...)
+							// caller.method(args1,args2,...)
 							virtual.append(virArgs[0]).append(")");
 							opStack.push(virtual.toString());
 						}
