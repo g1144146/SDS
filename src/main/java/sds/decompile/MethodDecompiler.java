@@ -49,37 +49,62 @@ public class MethodDecompiler extends AbstractDecompiler {
 	void addDeclaration(BaseContent content) {
 		MethodContent method = (MethodContent)content;
 		StringBuilder methodDeclaration = new StringBuilder();
+		// access flag
 		methodDeclaration.append(method.getAccessFlag());
-		String desc = method.getDescriptor();
-		String returnType = desc.substring(desc.indexOf(")") + 1, desc.length());
-		methodDeclaration.append(returnType).append(" ")
+
+		// in case of method is not static initializer
+		if(! method.getName().equals("<clinit>")) {
+			// return type
+			String desc = method.getDescriptor();
+			String returnType = desc.substring(desc.indexOf(")") + 1, desc.length());
+			methodDeclaration.append(returnType).append(" ")
 						.append(method.getName().replace("<init>", caller)).append("(");
-		// args
-		String[][] args = method.getArgs();
-		if(args.length > 0) {
-			for(int i = 0; i < args.length - 1 ; i++) {
-				methodDeclaration.append(args[i][0]).append(" ").append(args[i][1]).append(", ");
+			// args
+			if(! method.getAccessFlag().contains("static")) {
+				// in case of method is not static, the method has own as argument.
+				local.push("this");
 			}
-			methodDeclaration.append(args[args.length - 1][0]).append(" ")
-							 .append(args[args.length - 1][1]);
+			String[][] args = method.getArgs();
+			if(args.length > 0) {
+				for(int i = 0; i < args.length - 1 ; i++) {
+					methodDeclaration.append(args[i][0]).append(" ").append(args[i][1]).append(", ");
+					if(args[i][0].matches("double|long")) {
+						local.push("methodArg" + i);
+						local.push("methodArg" + i);
+					} else {
+						local.push("methodArg" + i);
+					}
+				}
+				methodDeclaration.append(args[args.length - 1][0]).append(" ")
+								.append(args[args.length - 1][1]);
+				if(args[args.length - 1][0].matches("double|long")) {
+					local.push("methodArg" + (args.length - 1));
+					local.push("methodArg" + (args.length - 1));
+				} else {
+					local.push("methodArg" + (args.length - 1));
+				}
+			}
+			methodDeclaration.append(") ");
 		}
-		methodDeclaration.append(")");
-		// has throws statement
+		// throws statement
 		if(method.getExceptions().length > 0) {
-			methodDeclaration.append(" throws ");
+			methodDeclaration.append("throws ");
 			String[] exceptions = method.getExceptions();
 			for(int i = 0; i < exceptions.length - 1; i++) {
 				methodDeclaration.append(exceptions[i]).append(", ");
 			}
-			methodDeclaration.append(exceptions[exceptions.length - 1]);
+			methodDeclaration.append(exceptions[exceptions.length - 1]).append(" ");
 		}
 		// abstract or other method
 		if(method.getAccessFlag().contains("abstract")) {
 			methodDeclaration.append(";");
 		} else {
-			methodDeclaration.append(" {");
+			methodDeclaration.append("{");
 		}
+		// method declaration
+		// ex). public void method(int i, int k) throws Exception {...
 		result.write(methodDeclaration.toString());
+
 		// method body
 		result.changeIndent(DecompiledResult.INCREMENT);
 		buildMethodBody(method.getInst(), method.getNodes());
@@ -145,12 +170,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case dload_1: opStack.push(local.load(1)); break;
 					case dload_2: opStack.push(local.load(2)); break;
 					case dload_3: opStack.push(local.load(3)); break;
-					case aload_0:
-						if(local.getCurrentStackSize() == 0) {
-							local.push("this");
-						}
-						opStack.push(local.load(0));
-						break;
+					case aload_0: opStack.push(local.load(0)); break;
 					case aload_1: opStack.push(local.load(1)); break;
 					case aload_2: opStack.push(local.load(2)); break;
 					case aload_3: opStack.push(local.load(3)); break;
@@ -212,7 +232,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 							.append(" = ").append(storingValue);
 						break;
 					case pop:
-						opStack.pop();
+						line.append(opStack.pop());
 						break;
 					case pop2:
 						opStack.pop();
@@ -541,7 +561,33 @@ public class MethodDecompiler extends AbstractDecompiler {
 							opStack.push(virtual.toString());
 						}
 						break;
-					case invokespecial: break;
+					case invokespecial:
+						CpRefOpcode specialOpcode = (CpRefOpcode)opcode;
+						String[] specialOperand = specialOpcode.getOperand().split("\\|");
+						String spMethod = specialOperand[0].replace(".<init>", "");
+						String spDescriptor = specialOperand[1];
+						StringBuilder special = new StringBuilder("new ").append(spMethod).append("(");
+						if((spDescriptor.indexOf("(") + 1) < spDescriptor.indexOf(")")) {
+							String[] specialArgs = new String[spDescriptor.split(",").length + 1];
+							for(int j = 0; j < specialArgs.length; j++) {
+								specialArgs[j] = opStack.pop();
+							}
+							// specialArgs[thisArrayLength - 1]: unnecessary value.
+							// the value is pushed for "new" opcode
+							for(int j = specialArgs.length - 2; j > 0; j--) {
+								special.append(specialArgs[j]).append(",");
+							}
+							special.append(specialArgs[0]);
+						}
+						special.append(")");
+//						if(! specialOperand[1].endsWith(")void")) {
+							// in case of return type of the method is not void,
+							// push result to stack.
+//							opStack.push(special.toString());
+//							break;
+//						}
+						opStack.push(special.toString());
+						break;
 					case invokestatic: break;
 					case invokeinterface: break;
 					case inovokedynamic: break;
