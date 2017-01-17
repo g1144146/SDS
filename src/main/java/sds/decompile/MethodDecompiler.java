@@ -117,9 +117,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 			LineInstructions inst = insts[i];
 			StringBuilder line = new StringBuilder();
 			for(OpcodeInfo opcode : inst.getOpcodes().getAll()) {
-				System.out.println(opcode + ", current: " + opStack.getCurrentStackSize());
-				System.out.println("local: " + local);
-				System.out.println("stack: " + opStack);
+//				System.out.println(opcode + ", current: " + opStack.getCurrentStackSize());
+//				System.out.println("local: " + local);
+//				System.out.println("stack: " + opStack);
 				switch(opcode.getOpcodeType()) {
 					case nop: break;
 					case aconst_null: opStack.push("null"); break;
@@ -655,9 +655,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case impdep2: break;
 					default: break;
 				}
-				System.out.println(opcode + ", current: " + opStack.getCurrentStackSize());
-				System.out.println("local: " + local);
-				System.out.println("stack: " + opStack + "\n");
+//				System.out.println(opcode + ", current: " + opStack.getCurrentStackSize());
+//				System.out.println("local: " + local);
+//				System.out.println("stack: " + opStack + "\n");
 			}
 			// When the node is not start or end of a statement, (ex. "if(...) {", "}")
 			// add semicolon and write in the line context.
