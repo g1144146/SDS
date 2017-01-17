@@ -67,10 +67,10 @@ public class MethodContent extends MemberContent {
 				this.args = new String[argArray.length][2];
 				for(int i = 0; i < argArray.length; i++) {
 					this.args[i][0] = argArray[i];
-					this.args[i][1] = "arg" + String.valueOf(i);
+					this.args[i][1] = "methodArg" + String.valueOf(i);
 				}
 			} else {
-				this.args = new String[][]{{arg, "arg0"}};
+				this.args = new String[][]{{arg, "methodArg0"}};
 			}
 		}
 		// attriutes
