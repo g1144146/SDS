@@ -41,6 +41,18 @@ public abstract class SimpleStack {
 	}
 
 	/**
+	 * push element to stack in specified index.
+	 * @param index
+	 * @param element 
+	 */
+	public void push(int index, String element) {
+		if(element == null) {
+			throw new IllegalArgumentException("argument is null.");
+		}
+		stack.add(index, element);
+	}
+
+	/**
 	 * returns top element of stack.
 	 * @return top element
 	 */
