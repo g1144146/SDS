@@ -116,7 +116,8 @@ public class MethodDecompiler extends AbstractDecompiler {
 			CFNode node = nodes[i];
 			LineInstructions inst = insts[i];
 			StringBuilder line = new StringBuilder();
-			for(OpcodeInfo opcode : inst.getOpcodes().getAll()) {
+			OpcodeInfo[] opcodes = inst.getOpcodes().getAll();
+			for(OpcodeInfo opcode : opcodes) {
 //				System.out.println(opcode + ", current: " + opStack.getCurrentStackSize());
 //				System.out.println("local: " + local);
 //				System.out.println("stack: " + opStack);
@@ -588,7 +589,34 @@ public class MethodDecompiler extends AbstractDecompiler {
 //						}
 						opStack.push(special.toString());
 						break;
-					case invokestatic: break;
+					case invokestatic:
+						CpRefOpcode staticOpcode =(CpRefOpcode)opcode;
+						String[] staticOperand = staticOpcode.getOperand().split("\\|");
+						String staticDesc = staticOperand[1];
+						StringBuilder st = new StringBuilder();
+						st.append(staticOperand[0]).append("(");
+						if(! staticDesc.endsWith(")void")) {
+							if((staticDesc.indexOf("(") + 1) < staticDesc.indexOf(")")) {
+								String[] staticArgs = new String[staticDesc.split(",").length];
+								for(int j = 0; j < staticArgs.length; j++) {
+									staticArgs[j] = opStack.pop();
+								}
+								for(int j = staticArgs.length - 1; j > 0; j--) {
+									st.append(staticArgs[j]).append(",");
+								}
+								st.append(staticArgs[0]);
+							}
+						}
+						st.append(")");
+						for(int j = opcodes.length - 1; j >= 0; j--) {
+							if(opcodes[j].getPc() == opcode.getPc()) {
+								if(j == opcodes.length - 1) {
+									line.append(st.toString()); break;
+								}
+								opStack.push(st.toString()); break;
+							}
+						}
+						break;
 					case invokeinterface: break;
 					case inovokedynamic: break;
 					case _new:
