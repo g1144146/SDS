@@ -36,7 +36,11 @@ public abstract class SimpleStack {
 		if(element == null) {
 			throw new IllegalArgumentException("argument is null.");
 		}
-		stack.push(element);
+		if(element.length() == 0) {
+			stack.push("\"\"");
+		} else {
+			stack.push(element);
+		}
 		current++;
 	}
 
@@ -49,7 +53,11 @@ public abstract class SimpleStack {
 		if(element == null) {
 			throw new IllegalArgumentException("argument is null.");
 		}
-		stack.add(index, element);
+		if(element.length() == 0) {
+			stack.add(index, "\"\"");
+		} else {
+			stack.add(index, element);
+		}
 	}
 
 	/**
