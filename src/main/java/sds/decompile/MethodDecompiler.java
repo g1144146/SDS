@@ -304,38 +304,23 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case iadd:
 					case ladd:
 					case fadd:
-					case dadd:
-						String sum =  "(" + opStack.pop() + " + " + opStack.pop() + ")";
-						opStack.push(sum);
-						break;
+					case dadd: calculate(" + "); break;
 					case isub:
 					case lsub:
 					case fsub:
-					case dsub:
-						String sub =  "(" + opStack.pop() + " - " + opStack.pop() + ")";
-						opStack.push(sub);
-						break;
+					case dsub: calculate(" - "); break;
 					case imul:
 					case lmul:
 					case fmul:
-					case dmul:
-						String product =  "(" + opStack.pop() + " * " + opStack.pop() + ")";
-						opStack.push(product);
-						break;
+					case dmul: calculate(" * "); break;
 					case idiv:
 					case ldiv:
 					case fdiv:
-					case ddiv:
-						String quotient =  "(" + opStack.pop() + " / " + opStack.pop() + ")";
-						opStack.push(quotient);
-						break;
+					case ddiv: calculate(" / "); break;
 					case irem:
 					case lrem:
 					case frem:
-					case drem:
-						String remainder =  "(" + opStack.pop() + " % " + opStack.pop() + ")";
-						opStack.push(remainder);
-						break;
+					case drem: calculate(" % "); break;
 					case ineg:
 					case lneg:
 					case fneg:
@@ -362,20 +347,11 @@ public class MethodDecompiler extends AbstractDecompiler {
 						opStack.push("(" + left_3 + " >>> " + right_3 + ")");
 						break;
 					case iand:
-					case land:
-						String and =  "(" + opStack.pop() + " & " + opStack.pop() + ")";
-						opStack.push(and);
-						break;
+					case land: calculate(" & "); break;
 					case ior:
-					case lor:
-						String or =  "(" + opStack.pop() + " | " + opStack.pop() + ")";
-						opStack.push(or);
-						break;
+					case lor:  calculate(" | "); break;
 					case ixor:
-					case lxor:
-						String xor =  "(" + opStack.pop() + " ^ " + opStack.pop() + ")";
-						opStack.push(xor);
-						break;
+					case lxor: calculate(" ^ "); break;
 					case iinc:
 						Iinc inc = (Iinc)opcode;
 						line.append(local.load(inc.getIndex()));
@@ -657,6 +633,11 @@ public class MethodDecompiler extends AbstractDecompiler {
 				result.write(line.toString());
 			}
 		}
+	}
+
+	private void calculate(String operator) {
+		String expr = "(" + opStack.pop() + operator + opStack.pop() + ")";
+		opStack.push(expr);
 	}
 
 	private void castPrimitive(String type) {
