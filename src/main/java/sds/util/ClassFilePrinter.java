@@ -1,7 +1,6 @@
 package sds.util;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 
@@ -56,11 +55,10 @@ import static sds.util.DescriptorParser.parse;
 import static sds.util.Utf8ValueExtractor.extract;
 
 /**
- * This class is for debugging.
+ * This class is for debugging classfile.
  * @author inagaki
  */
-public class ClassFilePrinter {
-	private PrintStream out = System.out;
+public class ClassFilePrinter extends Printer {
 	private ConstantPool pool;
 	private String sep = System.getProperty("line.separator");
 	private Opcodes opcodes;
@@ -83,16 +81,16 @@ public class ClassFilePrinter {
 	 * @param minorVersion minor version
 	 */
 	public void printNumber(int magicNum, int majorVersion, int minorVersion) {
-		out.println("*** Magic Number  *** " + sep + Integer.toHexString(magicNum) + sep);
-		out.println("*** Major Version *** " + sep + majorVersion + sep);
-		out.println("*** Minor Version *** " + sep + minorVersion + sep);
+		println("*** Magic Number  *** " + sep + Integer.toHexString(magicNum) + sep);
+		println("*** Major Version *** " + sep + majorVersion + sep);
+		println("*** Minor Version *** " + sep + minorVersion + sep);
 	}
 
 	/**
 	 * prints constant-pool.
 	 */
 	public void printConstantPool() {
-		out.println(pool);
+		println(pool);
 	}
 
 	/**
@@ -100,9 +98,9 @@ public class ClassFilePrinter {
 	 * @param accessFlag
 	 */
 	public void printAccessFlag(int accessFlag) {
-		out.println("*** Access Flag *** ");
-		out.println(AccessFlags.get(accessFlag, "class"));
-		out.print(sep);
+		println("*** Access Flag *** ");
+		println(AccessFlags.get(accessFlag, "class"));
+		print(sep);
 	}
 
 	/**
@@ -110,13 +108,13 @@ public class ClassFilePrinter {
 	 * @param thisClass
 	 */
 	public void printThisClass(int thisClass) {
-		out.println("*** This Class *** ");
+		println("*** This Class *** ");
 		if(!checkRange(thisClass)) {
-			out.print(sep);
+			print(sep);
 			return;
 		}
-		out.println(extract(pool.get(thisClass - 1), pool));
-		out.print(sep);
+		println(extract(pool.get(thisClass - 1), pool));
+		print(sep);
 	}
 
 	/**
@@ -124,13 +122,13 @@ public class ClassFilePrinter {
 	 * @param superClass
 	 */
 	public void printSuperClass(int superClass) {
-		out.println("*** Super Class *** ");
+		println("*** Super Class *** ");
 		if(!checkRange(superClass)) {
-			out.print("has no super class." + sep);
+			print("has no super class." + sep);
 			return;
 		}
-		out.println(extract(pool.get(superClass - 1), pool));
-		out.print(sep);
+		println(extract(pool.get(superClass - 1), pool));
+		print(sep);
 	}
 
 	/**
@@ -138,15 +136,15 @@ public class ClassFilePrinter {
 	 * @param interfaces
 	 */
 	public void printInterface(int[] interfaces) {
-		out.println("*** Interfaces *** ");
+		println("*** Interfaces *** ");
 		if(interfaces.length == 0) {
-			out.println("has no interfaces." + sep);
+			println("has no interfaces." + sep);
 			return;
 		}
 		for(int i : interfaces) {
-			out.println(extract(pool.get(i - 1), pool));
+			println(extract(pool.get(i - 1), pool));
 		}
-		out.print(sep);
+		print(sep);
 	}
 
 	/**
@@ -155,24 +153,24 @@ public class ClassFilePrinter {
 	 * @throws IOException
 	 */
 	public void printFields(Fields fields) throws Exception {
-		out.println("*** Fields *** ");
+		println("*** Fields *** ");
 		if(fields.size() == 0) {
-			out.println("has no fields." + sep);
+			println("has no fields." + sep);
 			return;
 		}
 		int i = 0;
 		for(MemberInfo f : fields) {
-			out.println(i + 1 + ". " + f.getAccessFlags() + f.getDescriptor() + " " + f.getName());
+			println(i + 1 + ". " + f.getAccessFlags() + f.getDescriptor() + " " + f.getName());
 			for(AttributeInfo a : f.getAttr()) {
 				if(a.getType() != AttributeType.Signature) {
 					printAttributeInfo(a);
 					continue;
 				}
-				out.println("  " + a.getType().toString());
+				println("  " + a.getType().toString());
 				Signature sig = (Signature)a;
-				out.println("     " + parse(sig.getSignature()));
+				println("     " + parse(sig.getSignature()));
 			}
-			out.print(sep);
+			print(sep);
 			i++;
 		}
 	}
@@ -183,18 +181,18 @@ public class ClassFilePrinter {
 	 * @throws IOException
 	 */
 	public void printMethods(Methods methods) throws Exception {
-		out.println("*** Methods *** ");
+		println("*** Methods *** ");
 		if(methods.size() == 0) {
-			out.print("has no methods." + sep);
+			print("has no methods." + sep);
 			return;
 		}
 		int i = 0;
 		for(MemberInfo m : methods) {
-			out.println(i + 1 + ". " + m.getAccessFlags() + m.getDescriptor() + " " + m.getName());
+			println(i + 1 + ". " + m.getAccessFlags() + m.getDescriptor() + " " + m.getName());
 			for(AttributeInfo a : m.getAttr()) {
 				printAttributeInfo(a);
 			}
-			out.print(sep);
+			print(sep);
 			i++;
 		}
 	}
@@ -205,15 +203,15 @@ public class ClassFilePrinter {
 	 * @throws IOException
 	 */
 	public void printAttributes(Attributes attr) throws Exception {
-		out.println("*** Attributes *** ");
+		println("*** Attributes *** ");
 		if(attr.size() == 0) {
-			out.print("has no attributes." + sep);
+			print("has no attributes." + sep);
 			return;
 		}
 		for(AttributeInfo a : attr) {
 			printAttributeInfo(a);
 		}
-		out.println(sep);
+		println(sep);
 	}
 
 	/**
@@ -222,38 +220,38 @@ public class ClassFilePrinter {
 	 * @throws Exception
 	 */
 	public void printAttributeInfo(AttributeInfo info) throws Exception {
-		out.println("  " + info.getType().toString());
+		println("  " + info.getType().toString());
 		switch(info.getType()) {
 			case AnnotationDefault:
 				AnnotationDefault ad = (AnnotationDefault)info;
-				out.println("     " + ad.getDefaultValue());
+				println("     " + ad.getDefaultValue());
 				break;
 			case BootstrapMethods:
 				BootstrapMethods bsm = (BootstrapMethods)info;
 				for(BootstrapMethods.BSM b : bsm.getBSM()) {
-					out.println("     bsm ref: " + b.getBSMRef());
+					println("     bsm ref: " + b.getBSMRef());
 					for(String arg : b.getBSMArgs()) {
-						out.println("     bsm args: " + arg);
+						println("     bsm args: " + arg);
 					}
 				}
 				break;
 			case Code:
 				Code code = (Code)info;
-				out.print("     max_stack: " + code.getMaxStack());
-				out.println(", max_locals: " + code.maxLocals());
+				print("     max_stack: " + code.getMaxStack());
+				println(", max_locals: " + code.maxLocals());
 				this.opcodes = code.getCode();
 				for(OpcodeInfo op : opcodes.getAll()) {
-					out.println("     " + op.getPc() + " - " + op);
+					println("     " + op.getPc() + " - " + op);
 				}
 				if(code.getExceptionTable().length > 0) {
-					out.println("  ExceptionTable");
+					println("  ExceptionTable");
 				}
 				int codeIndex = 1;
 				for(Code.ExceptionTable t : code.getExceptionTable()) {
-					out.print("     " + codeIndex + ". pc: " + t.getNumber("start_pc")
+					print("     " + codeIndex + ". pc: " + t.getNumber("start_pc")
 							+ "-" + t.getNumber("end_pc"));
-					out.print(", handler: " + t.getNumber("handler_pc"));
-					out.println(", catch_type: " + t.getCatchType());
+					print(", handler: " + t.getNumber("handler_pc"));
+					println(", catch_type: " + t.getCatchType());
 					codeIndex++;
 				}
 				for(AttributeInfo a : code.getAttr()) {
@@ -262,21 +260,21 @@ public class ClassFilePrinter {
 				break;
 			case ConstantValue:
 				ConstantValue cv = (ConstantValue)info;
-				out.println("     " + cv.getConstantValue());
+				println("     " + cv.getConstantValue());
 				break;
 			case Deprecated:
 				// do nothing.
 				break;
 			case EnclosingMethod:
 				EnclosingMethod em = (EnclosingMethod)info;
-				out.println("     " + em.getEncClass());
-				out.println("     " + em.getEncMethod());
+				println("     " + em.getEncClass());
+				println("     " + em.getEncMethod());
 				break;
 			case Exceptions:
 				Exceptions ex = (Exceptions)info;
 				int excepIndex = 1;
 				for(String exception : ex.getExceptionTable()) {
-					out.println("     " + excepIndex + ". " + exception);
+					println("     " + excepIndex + ". " + exception);
 					excepIndex++;
 				}
 				break;
@@ -286,7 +284,7 @@ public class ClassFilePrinter {
 				for(InnerClasses.Classes c : ic.getClasses()) {
 					String inner = c.getNumber("inner");
 					String accessFlag = c.getNumber("access_flag");
-					out.println("     " + classIndex + ". " + accessFlag + inner);
+					println("     " + classIndex + ". " + accessFlag + inner);
 					classIndex++;
 				}
 				break;
@@ -294,7 +292,7 @@ public class ClassFilePrinter {
 				LineNumberTable lnt = (LineNumberTable)info;
 				int lineIndex = 1;
 				for(LineNumberTable.LNTable t : lnt.getLineNumberTable()) {
-					out.println("     " + lineIndex + ". start_pc: " + t.getStartPc()
+					println("     " + lineIndex + ". start_pc: " + t.getStartPc()
 							+ ", line_number: " + t.getLineNumber());
 					lineIndex++;
 				}
@@ -303,11 +301,11 @@ public class ClassFilePrinter {
 				LocalVariableTable lvt = (LocalVariableTable)info;
 				int localIndex = 1;
 				for(LocalVariable.LVTable t : lvt.getTable()) {
-					out.print("     " + localIndex + ". pc: " + t.getNumber("start_pc")
+					print("     " + localIndex + ". pc: " + t.getNumber("start_pc")
 							+ "-" + (t.getNumber("start_pc") + t.getNumber("length") - 1));
-					out.print(", name: " + t.getName());
-					out.print(", index : " + t.getNumber("index"));
-					out.println(", desc: " + t.getDesc());
+					print(", name: " + t.getName());
+					print(", index : " + t.getNumber("index"));
+					println(", desc: " + t.getDesc());
 					localIndex++;
 				}
 				break;
@@ -315,10 +313,10 @@ public class ClassFilePrinter {
 				LocalVariableTypeTable lvtt = (LocalVariableTypeTable)info;
 				int varIndex = 1;
 				for(LocalVariable.LVTable t : lvtt.getTable()) {
-					out.print("     " + varIndex + ". pc: " + t.getNumber("start_pc")
+					print("     " + varIndex + ". pc: " + t.getNumber("start_pc")
 							+ "-" + (t.getNumber("start_pc") + t.getNumber("length") - 1));
-					out.println(", name: " + t.getName() + ", index: " + t.getNumber("index"));
-					out.println("     desc: " + t.getDesc());
+					println(", name: " + t.getName() + ", index: " + t.getNumber("index"));
+					println("     desc: " + t.getDesc());
 					varIndex++;
 				}
 				break;
@@ -326,7 +324,7 @@ public class ClassFilePrinter {
 				MethodParameters mp = (MethodParameters)info;
 				int methodIndex = 1;
 				for(MethodParameters.Parameters p : mp.getParams()) {
-					out.println("   " + methodIndex + ". " + p.getAccessFlag() + p.getName());
+					println("   " + methodIndex + ". " + p.getAccessFlag() + p.getName());
 					methodIndex++;
 				}
 				break;
@@ -334,7 +332,7 @@ public class ClassFilePrinter {
 				RuntimeInvisibleAnnotations ria = (RuntimeInvisibleAnnotations) info;
 				int riaIndex = 1;
 				for(String a : ria.getAnnotations()) {
-					out.println("     " + riaIndex + "." + a);
+					println("     " + riaIndex + "." + a);
 					riaIndex++;
 				}
 				break;
@@ -342,9 +340,9 @@ public class ClassFilePrinter {
 				RuntimeInvisibleParameterAnnotations ripa = (RuntimeInvisibleParameterAnnotations)info;
 				int ripaIndex = 1;
 				for(ParameterAnnotations pa : ripa.getParamAnnotations()) {
-					out.println("     " + ripaIndex + ".");
+					println("     " + ripaIndex + ".");
 					for(String a : pa.getAnnotations()) {
-						out.println("       " + a);
+						println("       " + a);
 					}
 					ripaIndex++;
 				}
@@ -353,7 +351,7 @@ public class ClassFilePrinter {
 				RuntimeInvisibleTypeAnnotations rita = (RuntimeInvisibleTypeAnnotations)info;
 				int ritaIndex = 1;
 				for(TypeAnnotation ta : rita.getTypes()) {
-					out.println("     " + ritaIndex + "." + parseAnnotation(ta, new StringBuilder(), pool));
+					println("     " + ritaIndex + "." + parseAnnotation(ta, new StringBuilder(), pool));
 					printTargetInfo(ta.getTargetInfo());
 					printTypePath(ta.getTargetPath());
 					ritaIndex++;
@@ -363,7 +361,7 @@ public class ClassFilePrinter {
 				RuntimeVisibleAnnotations rva = (RuntimeVisibleAnnotations)info;
 				int rvaIndex = 1;
 				for(String a : rva.getAnnotations()) {
-					out.println("     " + rvaIndex + "." + a);
+					println("     " + rvaIndex + "." + a);
 					rvaIndex++;
 				}
 				break;
@@ -371,9 +369,9 @@ public class ClassFilePrinter {
 				RuntimeVisibleParameterAnnotations rvpa = (RuntimeVisibleParameterAnnotations)info;
 				int rvpaIndex = 1;
 				for(ParameterAnnotations pa : rvpa.getParamAnnotations()) {
-					out.println("     " + rvpaIndex + ".");
+					println("     " + rvpaIndex + ".");
 					for(String a : pa.getAnnotations()) {
-						out.println("       " + a);
+						println("       " + a);
 					}
 					rvpaIndex++;
 				}
@@ -382,7 +380,7 @@ public class ClassFilePrinter {
 				RuntimeVisibleTypeAnnotations rvta = (RuntimeVisibleTypeAnnotations)info;
 				int rvtaIndex = 1;
 				for(TypeAnnotation pa : rvta.getTypes()) {
-					out.println("     " + rvtaIndex + "." + parseAnnotation(pa, new StringBuilder(), pool));
+					println("     " + rvtaIndex + "." + parseAnnotation(pa, new StringBuilder(), pool));
 					printTargetInfo(pa.getTargetInfo());
 					printTypePath(pa.getTargetPath());
 					rvtaIndex++;
@@ -393,19 +391,19 @@ public class ClassFilePrinter {
 				String desc = sig.getSignature();
 				String genericsType = parse(desc.substring(0, desc.lastIndexOf(">") + 1), true);
 				String returnType = parse(desc.substring(desc.lastIndexOf(">") + 1));
-				out.println("     " + genericsType + returnType);
+				println("     " + genericsType + returnType);
 				break;
 			case SourceDebugExtension:
 				SourceDebugExtension sde = (SourceDebugExtension)info;
 				int sdeIndex = 1;
 				for(int i : sde.getDebugExtension()) {
-					out.println("     " + sdeIndex + ". " + extract(pool.get(i - 1), pool));
+					println("     " + sdeIndex + ". " + extract(pool.get(i - 1), pool));
 					sdeIndex++;
 				}
 				break;
 			case SourceFile:
 				SourceFile sf = (SourceFile)info;
-				out.println("     " + sf.getSourceFile());
+				println("     " + sf.getSourceFile());
 				break;
 			case Synthetic:
 				// do nothing.
@@ -415,92 +413,92 @@ public class ClassFilePrinter {
 				Map<Integer, Map<String, List<String>>> stackMap = smt.getEntries();
 				for(Integer i : stackMap.keySet()) {
 					Map<String, List<String>> map = stackMap.get(i.intValue());
-					out.println("     " + i + ": " + map);
+					println("     " + i + ": " + map);
 				}
 				break;
 			default:
-				System.out.println("unknown attribute type: " + info.getType().name());
+				println("unknown attribute type: " + info.getType().name());
 				break;
 		}
 	}
 
 	private void printTargetInfo(TargetInfo info) {
-		out.println("       " + info.getType());
+		println("       " + info.getType());
 		switch(info.getType()) {
 			case TypeParameterTarget:
 				TypeParameterTarget tpt = (TypeParameterTarget)info;
-				out.println("       index: " + tpt.getIndex());
+				println("       index: " + tpt.getIndex());
 				break;
 			case SuperTypeTarget:
 				SuperTypeTarget stt = (SuperTypeTarget)info;
-				out.println("       index: " + stt.getIndex());
+				println("       index: " + stt.getIndex());
 				break;
 			case TypeParameterBoundTarget:
 				TypeParameterBoundTarget tpbt = (TypeParameterBoundTarget)info;
-				out.print("       bound_index: " + tpbt.getBoundIndex());
-				out.println(", type_parameter_index: " + tpbt.getTPI());
+				print("       bound_index: " + tpbt.getBoundIndex());
+				println(", type_parameter_index: " + tpbt.getTPI());
 				break;
 			case EmptyTarget:
 				EmptyTarget et = (EmptyTarget)info;
 				break;
 			case MethodFormalParameterTarget:
 				MethodFormalParameterTarget mfpt = (MethodFormalParameterTarget)info;
-				out.println("       index: " + mfpt.getIndex());
+				println("       index: " + mfpt.getIndex());
 				break;
 			case ThrowsTarget:
 				ThrowsTarget tt = (ThrowsTarget)info;
-				out.println("       index: " + tt.getIndex());
+				println("       index: " + tt.getIndex());
 				break;
 			case LocalVarTarget:
 				LocalVarTarget lvt = (LocalVarTarget)info;
 				for(LocalVarTarget.LVTTable t : lvt.getTable()) {
-					out.print("       index: " + t.getIndex());
-					out.println(", pc: " + t.getStartPc() + "-" + (t.getStartPc() + t.getLen() - 1));
+					print("       index: " + t.getIndex());
+					println(", pc: " + t.getStartPc() + "-" + (t.getStartPc() + t.getLen() - 1));
 				}
 				break;
 			case CatchTarget:
 				CatchTarget ct = (CatchTarget)info;
-				out.println("       index: " + ct.getIndex());
+				println("       index: " + ct.getIndex());
 				break;
 			case OffsetTarget:
 				OffsetTarget ot = (OffsetTarget)info;
-				out.println("       offset: " + ot.getOffset());
+				println("       offset: " + ot.getOffset());
 				break;
 			case TypeArgumentTarget:
 				TypeArgumentTarget tat = (TypeArgumentTarget)info;
-				out.print("          index: " + tat.getIndex());
-				out.println(", offset: " + tat.getOffset());
+				print("          index: " + tat.getIndex());
+				println(", offset: " + tat.getOffset());
 				break;
 			default:
-				System.out.println("unknown target-info type: " + info.getType());
+				println("unknown target-info type: " + info.getType());
 				break;
 		}
 	}
 
 	private void printTypePath(TypePath path) {
 		for(int i = 0; i < path.getArgIndex().length; i++) {
-			out.print("       type_path_type: ");
+			print("       type_path_type: ");
 			int pk = path.getPathKind()[i];
 			int ai = path.getArgIndex()[i];
 			switch(pk) {
 				case 0:
-					out.println("Annotation is deeper in an array type.");
+					println("Annotation is deeper in an array type.");
 					break;
 				case 1:
-					out.println("Annotation is deeper in a nested type.");
+					println("Annotation is deeper in a nested type.");
 					break;
 				case 2:
-					out.println("Annotation is on the bound of a "
+					println("Annotation is on the bound of a "
 							+ "wildcard type argument of a parameterized type.");
 					break;
 				case 3:
-					out.println("Annotation is on a type argument of a parameterized type.");
+					println("Annotation is on a type argument of a parameterized type.");
 					break;
 				default:
-					out.println("unknown type_path_kind: " + pk);
+					println("unknown type_path_kind: " + pk);
 					break;
 			}
-			out.println("       type_arg_index: " + ai);
+			println("       type_arg_index: " + ai);
 		}
 	}
 
