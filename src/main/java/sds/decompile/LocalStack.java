@@ -27,9 +27,9 @@ public class LocalStack extends SimpleStack {
 	public String load(int index, boolean isLongOrDouble) {
 		if(index >= stack.size()) {
 			int argNumber = stack.size();
-			stack.push("arg" + argNumber);
+			stack.push("val_" + argNumber);
 			if(isLongOrDouble) {
-				stack.push("arg" + argNumber);
+				stack.push("val_" + argNumber);
 			}
 		}
 		return stack.get(index);
