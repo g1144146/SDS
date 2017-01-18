@@ -329,29 +329,17 @@ public class MethodDecompiler extends AbstractDecompiler {
 						opStack.push(minus);
 						break;
 					case ishl:
-					case lshl:
-						String right_1 = opStack.pop();
-						String left_1 = opStack.pop();
-						opStack.push("(" + left_1 + " << " + right_1 + ")");
-						break;
+					case lshl:  calculate(" << ");  break;
 					case ishr:
-					case lshr:
-						String right_2 = opStack.pop();
-						String left_2 = opStack.pop();
-						opStack.push("(" + left_2 + " >> " + right_2 + ")");
-						break;
+					case lshr:  calculate(" >> ");  break;
 					case iushr:
-					case lushr:
-						String right_3 = opStack.pop();
-						String left_3  = opStack.pop();
-						opStack.push("(" + left_3 + " >>> " + right_3 + ")");
-						break;
+					case lushr: calculate(" >>> "); break;
 					case iand:
-					case land: calculate(" & "); break;
+					case land:  calculate(" & ");   break;
 					case ior:
-					case lor:  calculate(" | "); break;
+					case lor:   calculate(" | ");   break;
 					case ixor:
-					case lxor: calculate(" ^ "); break;
+					case lxor:  calculate(" ^ ");   break;
 					case iinc:
 						Iinc inc = (Iinc)opcode;
 						line.append(local.load(inc.getIndex()));
@@ -636,7 +624,14 @@ public class MethodDecompiler extends AbstractDecompiler {
 	}
 
 	private void calculate(String operator) {
-		String expr = "(" + opStack.pop() + operator + opStack.pop() + ")";
+		String value_1 = opStack.pop(); // value_1
+		String value_2  = opStack.pop(); // value_2
+		String expr;
+		if(operator.contains("<") || operator.contains(">")) {
+			expr = "(" + value_2 + operator + value_1 + ")";
+		} else {
+			expr = "(" + value_1 + operator + value_2 + ")";
+		}
 		opStack.push(expr);
 	}
 
