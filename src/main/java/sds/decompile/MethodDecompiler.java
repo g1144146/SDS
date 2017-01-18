@@ -14,6 +14,7 @@ import sds.classfile.bytecode.PushOpcode;
 
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
 import static sds.classfile.bytecode.MnemonicTable.*;
+import static sds.util.Printer.println;
 
 /**
  * This class is for decompiling contents of method.
@@ -54,34 +55,37 @@ public class MethodDecompiler extends AbstractDecompiler {
 
 		// in case of method is not static initializer
 		if(! method.getName().equals("<clinit>")) {
-			// return type
-			String desc = method.getDescriptor();
-			String returnType = desc.substring(desc.indexOf(")") + 1, desc.length());
-			methodDeclaration.append(returnType).append(" ")
-						.append(method.getName().replace("<init>", caller)).append("(");
+			if(method.getName().contains("<init>")) {
+				// in case of Constructor, it is unnecessary return type declaration.
+				methodDeclaration.append(method.getName().replace("<init>", caller)).append("(");
+			} else {
+				String desc = method.getDescriptor();
+				String returnType = desc.substring(desc.indexOf(")") + 1, desc.length());
+				methodDeclaration.append(returnType).append(" ").append(method.getName()).append("(");
+			}
 			// args
 			if(! method.getAccessFlag().contains("static")) {
 				// in case of method is not static, the method has own as argument.
 				local.push("this");
 			}
 			String[][] args = method.getArgs();
-			if(args.length > 0) {
-				for(int i = 0; i < args.length - 1 ; i++) {
+			int length = args.length;
+			if(length > 0) {
+				for(int i = 0; i < length - 1 ; i++) {
 					methodDeclaration.append(args[i][0]).append(" ").append(args[i][1]).append(", ");
 					if(args[i][0].matches("double|long")) {
-						local.push("methodArg" + i);
-						local.push("methodArg" + i);
+						local.push("arg_" + i);
+						local.push("arg_" + i);
 					} else {
-						local.push("methodArg" + i);
+						local.push("arg_" + i);
 					}
 				}
-				methodDeclaration.append(args[args.length - 1][0]).append(" ")
-								.append(args[args.length - 1][1]);
+				methodDeclaration.append(args[length - 1][0]).append(" ").append(args[length - 1][1]);
 				if(args[args.length - 1][0].matches("double|long")) {
-					local.push("methodArg" + (args.length - 1));
-					local.push("methodArg" + (args.length - 1));
+					local.push("arg_" + (length - 1));
+					local.push("arg_" + (length - 1));
 				} else {
-					local.push("methodArg" + (args.length - 1));
+					local.push("arg_" + (length - 1));
 				}
 			}
 			methodDeclaration.append(") ");
@@ -104,6 +108,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 		// method declaration
 		// ex). public void method(int i, int k) throws Exception {...
 		result.write(methodDeclaration.toString());
+		println(">>> " + methodDeclaration.toString());
 
 		// method body
 		result.changeIndent(DecompiledResult.INCREMENT);
@@ -118,9 +123,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 			StringBuilder line = new StringBuilder();
 			OpcodeInfo[] opcodes = inst.getOpcodes().getAll();
 			for(OpcodeInfo opcode : opcodes) {
-//				System.out.println(opcode + ", current: " + opStack.getCurrentStackSize());
-//				System.out.println("local: " + local);
-//				System.out.println("stack: " + opStack);
+				println(opcode + ", current: " + opStack.getCurrentStackSize());
+				println("local: " + local);
+				println("stack: " + opStack);
 				switch(opcode.getOpcodeType()) {
 					case nop: break;
 					case aconst_null: opStack.push("null"); break;
@@ -543,78 +548,36 @@ public class MethodDecompiler extends AbstractDecompiler {
 						// 0: xxx.yyy.zzz.method
 						// 1: (args_1,args_2,...)returnType
 						String[] virOperand = virOpcode.getOperand().split("\\|");
-						if(! virOperand[1].endsWith(")void")) {
-							String[] virArgs = new String[virOperand[1].split(",").length + 1];
-							for(int j = 0; j < virArgs.length; j++) {
-								virArgs[j] = opStack.pop();
-							}
-							// xxx.yyy.zzz.method
-							String[] virMethod = virOperand[0].split("\\.");
-							StringBuilder virtual = new StringBuilder();
-							// caller.method(
-							virtual.append(opStack.pop()).append(".")
-									.append(virMethod[virMethod.length - 1]).append("(");
-							for(int j = virArgs.length - 1; j > 0; j--) {
-								virtual.append(virArgs[j]).append(",");
-							}
-							// caller.method(args1,args2,...)
-							virtual.append(virArgs[0]).append(")");
-							opStack.push(virtual.toString());
+						String virDesc = virOperand[1];
+						StringBuilder virtual = new StringBuilder();
+						String virArgs = getMethodArgs(virDesc, false);
+						// xxx.yyy.zzz.method
+						String[] virMethod = virOperand[0].split("\\.");
+						// caller.method
+						virtual.append(opStack.pop()).append(".").append(virMethod[virMethod.length - 1])
+						// caller.method(args1,args2,...)
+								.append("(").append(virArgs).append(")");
+						if(! pushOntoStack(opcodes, opcode, virtual.toString())) {
+							line.append(virtual.toString());
 						}
 						break;
 					case invokespecial:
 						CpRefOpcode specialOpcode = (CpRefOpcode)opcode;
 						String[] specialOperand = specialOpcode.getOperand().split("\\|");
 						String spMethod = specialOperand[0].replace(".<init>", "");
-						String spDescriptor = specialOperand[1];
-						StringBuilder special = new StringBuilder("new ").append(spMethod).append("(");
-						if((spDescriptor.indexOf("(") + 1) < spDescriptor.indexOf(")")) {
-							String[] specialArgs = new String[spDescriptor.split(",").length + 1];
-							for(int j = 0; j < specialArgs.length; j++) {
-								specialArgs[j] = opStack.pop();
-							}
-							// specialArgs[thisArrayLength - 1]: unnecessary value.
-							// the value is pushed for "new" opcode
-							for(int j = specialArgs.length - 2; j > 0; j--) {
-								special.append(specialArgs[j]).append(",");
-							}
-							special.append(specialArgs[0]);
+						String spDesc = specialOperand[1];
+						String special = "new " + spMethod + "(" + getMethodArgs(spDesc, true) + ")";
+						if(! pushOntoStack(opcodes, opcode, special)) {
+							line.append(special);
 						}
-						special.append(")");
-//						if(! specialOperand[1].endsWith(")void")) {
-							// in case of return type of the method is not void,
-							// push result to stack.
-//							opStack.push(special.toString());
-//							break;
-//						}
-						opStack.push(special.toString());
 						break;
 					case invokestatic:
 						CpRefOpcode staticOpcode =(CpRefOpcode)opcode;
 						String[] staticOperand = staticOpcode.getOperand().split("\\|");
 						String staticDesc = staticOperand[1];
-						StringBuilder st = new StringBuilder();
-						st.append(staticOperand[0]).append("(");
-						if(! staticDesc.endsWith(")void")) {
-							if((staticDesc.indexOf("(") + 1) < staticDesc.indexOf(")")) {
-								String[] staticArgs = new String[staticDesc.split(",").length];
-								for(int j = 0; j < staticArgs.length; j++) {
-									staticArgs[j] = opStack.pop();
-								}
-								for(int j = staticArgs.length - 1; j > 0; j--) {
-									st.append(staticArgs[j]).append(",");
-								}
-								st.append(staticArgs[0]);
-							}
-						}
-						st.append(")");
-						for(int j = opcodes.length - 1; j >= 0; j--) {
-							if(opcodes[j].getPc() == opcode.getPc()) {
-								if(j == opcodes.length - 1) {
-									line.append(st.toString()); break;
-								}
-								opStack.push(st.toString()); break;
-							}
+						String st = staticOperand[0] + "(" + getMethodArgs(staticDesc, false) + ")";
+						if(! pushOntoStack(opcodes, opcode, st)) {
+							line.append(st);
 						}
 						break;
 					case invokeinterface: break;
@@ -683,9 +646,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case impdep2: break;
 					default: break;
 				}
-//				System.out.println(opcode + ", current: " + opStack.getCurrentStackSize());
-//				System.out.println("local: " + local);
-//				System.out.println("stack: " + opStack + "\n");
+				println(opcode + ", current: " + opStack.getCurrentStackSize());
+				println("local: " + local);
+				println("stack: " + opStack + "\n");
 			}
 			// When the node is not start or end of a statement, (ex. "if(...) {", "}")
 			// add semicolon and write in the line context.
@@ -699,5 +662,73 @@ public class MethodDecompiler extends AbstractDecompiler {
 	private void castPrimitive(String type) {
 		String casted = "((" + type + ")" + opStack.pop() + ")";
 		opStack.push(casted);
+	}
+
+	private String getMethodArgs(String descriptor, boolean isSpecial) {
+		StringBuilder sb = new StringBuilder("");
+		if((descriptor.indexOf("(") + 1) < descriptor.indexOf(")")) {
+			String[] args;
+			if(descriptor.contains(",")){
+				args = new String[descriptor.split(",").length];
+			} else {
+				args = new String[1];
+			}
+			// get arguments from stack
+			for(int j = 0; j < args.length; j++) {
+				args[j] = opStack.pop();
+			}
+			println(args);
+			// build arguments
+			// argN-1, argN-2, ..., arg1
+			if(isSpecial) {
+				// in case of invokespecial,
+				// top element of operand stack is unnecessary to invoke method
+				// because the element is pushed by new opcode.
+				for(int j = args.length - 1; j > 0; j--) {
+					sb.append(args[j]).append(", ");
+				}
+			} else {
+				for(int j = args.length - 1; j > 0; j--) {
+					sb.append(args[j]).append(", ");
+				}
+			}
+			// argN-1, argN-2, ..., arg1, arg0
+			sb.append(args[0]);
+		}
+		println("@@@ " + sb.toString());
+		return sb.toString();
+	}
+
+	/**
+	 * this method is for invoke method instruction<br>
+	 * 
+	 * push element onto operand stack
+	 * when specified opcode is end in current node has all opcodes.<br>
+	 * 
+	 * in case of the opcode is end,
+	 * it is necessary to push element onto openrand stack
+	 * because there is some processing in the next.<br>
+	 * 
+	 * on the other hand, in case of that is not end,
+	 * it is necessary to write processing of invoking method to decompiled source code
+	 * because no opcode is in the next.
+	 * 
+	 * @param opcodes node has all opcodes
+	 * @param opcode one of the node has opcodes.
+	 * @param element element for pushing onto operand stack
+	 * @return whether pushes element onto operand stack.
+	 */
+	private boolean pushOntoStack(OpcodeInfo[] opcodes, OpcodeInfo opcode, String element) {
+		for(int j = opcodes.length - 1; j >= 0; j--) {
+			if(opcodes[j].getPc() == opcode.getPc()) {
+				if(j == opcodes.length - 1) {
+					// end opcode
+					return false;
+				}
+				opStack.push(element);
+				return true;
+			}
+		}
+		throw new IllegalArgumentException("the specified opcode is not in the opcodes.");
 	}
 }
