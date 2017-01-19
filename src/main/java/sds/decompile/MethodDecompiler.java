@@ -514,7 +514,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						String[] virOperand = virOpcode.getOperand().split("\\|");
 						String virDesc = virOperand[1];
 						StringBuilder virtual = new StringBuilder();
-						String virArgs = getMethodArgs(virDesc, false);
+						String virArgs = getMethodArgs(virDesc);
 						// xxx.yyy.zzz.method
 						String[] virMethod = virOperand[0].split("\\.");
 						// caller.method
@@ -530,7 +530,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						String[] specialOperand = specialOpcode.getOperand().split("\\|");
 						String spMethod = specialOperand[0].replace(".<init>", "");
 						String spDesc = specialOperand[1];
-						String special = "new " + spMethod + "(" + getMethodArgs(spDesc, true) + ")";
+						String special = "new " + spMethod + "(" + getMethodArgs(spDesc) + ")";
 						if(! pushOntoStack(opcodes, opcode, special)) {
 							line.append(special);
 						}
@@ -539,7 +539,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						CpRefOpcode staticOpcode =(CpRefOpcode)opcode;
 						String[] staticOperand = staticOpcode.getOperand().split("\\|");
 						String staticDesc = staticOperand[1];
-						String st = staticOperand[0] + "(" + getMethodArgs(staticDesc, false) + ")";
+						String st = staticOperand[0] + "(" + getMethodArgs(staticDesc) + ")";
 						if(! pushOntoStack(opcodes, opcode, st)) {
 							line.append(st);
 						}
@@ -640,7 +640,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 		opStack.push(casted);
 	}
 
-	private String getMethodArgs(String descriptor, boolean isSpecial) {
+	private String getMethodArgs(String descriptor) {
 		StringBuilder sb = new StringBuilder("");
 		if((descriptor.indexOf("(") + 1) < descriptor.indexOf(")")) {
 			String[] args;
@@ -656,17 +656,8 @@ public class MethodDecompiler extends AbstractDecompiler {
 			println(args);
 			// build arguments
 			// argN-1, argN-2, ..., arg1
-			if(isSpecial) {
-				// in case of invokespecial,
-				// top element of operand stack is unnecessary to invoke method
-				// because the element is pushed by new opcode.
-				for(int j = args.length - 1; j > 0; j--) {
-					sb.append(args[j]).append(", ");
-				}
-			} else {
-				for(int j = args.length - 1; j > 0; j--) {
-					sb.append(args[j]).append(", ");
-				}
+			for(int j = args.length - 1; j > 0; j--) {
+				sb.append(args[j]).append(", ");
 			}
 			// argN-1, argN-2, ..., arg1, arg0
 			sb.append(args[0]);
