@@ -48,8 +48,7 @@ public class OperandExtractor {
 			operand.append(extract(pool.get(id.getIndexByte()-1), pool));
 		} else if(op instanceof InvokeInterface) {
 			InvokeInterface ii = (InvokeInterface)op;
-			operand.append(ii.getCount())
-				.append(",").append(extract(pool.get(ii.getIndexByte()-1), pool));
+			operand.append(extract(pool.get(ii.getIndexByte()-1), pool));
 		} else if(op instanceof LookupSwitch) {
 			LookupSwitch ls = (LookupSwitch)op;
 			int[] match = ls.getMatch();
