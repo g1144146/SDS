@@ -24,8 +24,9 @@ public class InvokeInterface extends CpRefOpcode {
 
 	@Override
 	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		super.read(data);
+		super.read(data, pool);
 		this.count = data.readUnsignedByte();
+		data.skipBytes(1);
 	}
 
 	/**
