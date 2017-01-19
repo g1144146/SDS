@@ -4,7 +4,7 @@
 # Overview
 
 * for decompiling
-    * branch "master"
+    * branch "master" (unfinished)
 * for disassembling
     * branch "disassemble"
 
