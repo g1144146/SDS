@@ -7,6 +7,7 @@ import sds.assemble.controlflow.CFNode;
 import sds.classfile.bytecode.CpRefOpcode;
 import sds.classfile.bytecode.Iinc;
 import sds.classfile.bytecode.IndexOpcode;
+import sds.classfile.bytecode.InvokeInterface;
 import sds.classfile.bytecode.MultiANewArray;
 import sds.classfile.bytecode.NewArray;
 import sds.classfile.bytecode.OpcodeInfo;
@@ -108,7 +109,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 		// method declaration
 		// ex). public void method(int i, int k) throws Exception {...
 		result.write(methodDeclaration.toString());
-		println(">>> " + methodDeclaration.toString());
+//		println(">>> " + methodDeclaration.toString());
 
 		// method body
 		result.changeIndent(DecompiledResult.INCREMENT);
@@ -123,9 +124,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 			StringBuilder line = new StringBuilder();
 			OpcodeInfo[] opcodes = inst.getOpcodes().getAll();
 			for(OpcodeInfo opcode : opcodes) {
-				println(opcode + ", current: " + opStack.getCurrentStackSize());
-				println("local: " + local);
-				println("stack: " + opStack);
+//				println(opcode + ", current: " + opStack.getCurrentStackSize());
+//				println("local: " + local);
+//				println("stack: " + opStack);
 				switch(opcode.getOpcodeType()) {
 					case nop: break;
 					case aconst_null: opStack.push("null"); break;
@@ -530,9 +531,21 @@ public class MethodDecompiler extends AbstractDecompiler {
 						String[] specialOperand = specialOpcode.getOperand().split("\\|");
 						String spMethod = specialOperand[0].replace(".<init>", "");
 						String spDesc = specialOperand[1];
+						// stack: [obj, obj, arg_1, ..., arg_N]
+						// stack: [obj, obj] (after calling getMethodArgs())
 						String special = "new " + spMethod + "(" + getMethodArgs(spDesc) + ")";
+						// stack: [obj]
+						opStack.pop();
 						if(! pushOntoStack(opcodes, opcode, special)) {
 							line.append(special);
+						} else {
+							// stack: [obj, invoked_method]
+							// stack: [obj]
+							String element = opStack.pop();
+							// stack: []
+							opStack.pop();
+							// stack: [invoked_method]
+							opStack.push(element);
 						}
 						break;
 					case invokestatic:
@@ -544,7 +557,19 @@ public class MethodDecompiler extends AbstractDecompiler {
 							line.append(st);
 						}
 						break;
-					case invokeinterface: break;
+					case invokeinterface:
+						InvokeInterface interfaceOpcode = (InvokeInterface)opcode;
+						String[] interOperand = interfaceOpcode.getOperand().split("\\|");
+						String interDesc = interOperand[1];
+						String[] interMethod = interOperand[0].split("\\.");
+						String interArgs = getMethodArgs(interDesc);
+						StringBuilder inter = new StringBuilder();
+						inter.append(opStack.pop()).append(".").append(interMethod[interMethod.length - 1])
+							.append("(").append(interArgs).append(")");
+						if(! pushOntoStack(opcodes, opcode, inter.toString())) {
+							line.append(inter.toString());
+						}
+						break;
 					case inovokedynamic: break;
 					case _new:
 						String newClass = ((CpRefOpcode)opcode).getOperand();
@@ -610,9 +635,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case impdep2: break;
 					default: break;
 				}
-				println(opcode + ", current: " + opStack.getCurrentStackSize());
-				println("local: " + local);
-				println("stack: " + opStack + "\n");
+//				println(opcode + ", current: " + opStack.getCurrentStackSize());
+//				println("local: " + local);
+//				println("stack: " + opStack + "\n");
 			}
 			// When the node is not start or end of a statement, (ex. "if(...) {", "}")
 			// add semicolon and write in the line context.
@@ -653,7 +678,6 @@ public class MethodDecompiler extends AbstractDecompiler {
 			for(int j = 0; j < args.length; j++) {
 				args[j] = opStack.pop();
 			}
-			println(args);
 			// build arguments
 			// argN-1, argN-2, ..., arg1
 			for(int j = args.length - 1; j > 0; j--) {
@@ -662,7 +686,6 @@ public class MethodDecompiler extends AbstractDecompiler {
 			// argN-1, argN-2, ..., arg1, arg0
 			sb.append(args[0]);
 		}
-		println("@@@ " + sb.toString());
 		return sb.toString();
 	}
 
