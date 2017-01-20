@@ -17,7 +17,7 @@ public class OperandStack extends SimpleStack {
 	 * @param element int value
 	 */
 	public void push(int element) {
-		push(Integer.toString(element));
+		push(Integer.toString(element), "int");
 	}
 
 	/**
@@ -25,7 +25,7 @@ public class OperandStack extends SimpleStack {
 	 * @param element long value
 	 */
 	public void push(long element) {
-		push(Long.toString(element) + "L");
+		push(Long.toString(element) + "L", "long");
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class OperandStack extends SimpleStack {
 	 * @param element float value
 	 */
 	public void push(float element) {
-		push(Float.toString(element) + "f");
+		push(Float.toString(element) + "f", "float");
 	}
 
 	/**
@@ -41,6 +41,6 @@ public class OperandStack extends SimpleStack {
 	 * @param element double value
 	 */
 	public void push(double element) {
-		push(Double.toString(element) + "d");
+		push(Double.toString(element) + "d", "double");
 	}
 }
