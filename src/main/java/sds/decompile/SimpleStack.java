@@ -11,12 +11,14 @@ import java.util.Stack;
 public abstract class SimpleStack {
 	int current;
 	Stack<String> stack;
+	Stack<String> type;
 
 	/**
 	 * constructor.
 	 */
 	public SimpleStack() {
 		this.stack = new Stack<>();
+		this.type  = new Stack<>();
 		this.current = 0;
 	}
 
@@ -42,22 +44,6 @@ public abstract class SimpleStack {
 			stack.push(element);
 		}
 		current++;
-	}
-
-	/**
-	 * push element to stack in specified index.
-	 * @param index
-	 * @param element 
-	 */
-	public void push(int index, String element) {
-		if(element == null) {
-			throw new IllegalArgumentException("argument is null.");
-		}
-		if(element.length() == 0) {
-			stack.add(index, "\"\"");
-		} else {
-			stack.add(index, element);
-		}
 	}
 
 	/**
