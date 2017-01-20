@@ -18,7 +18,7 @@ public abstract class SimpleStack {
 	 */
 	public SimpleStack() {
 		this.stack = new Stack<>();
-		this.type  = new Stack<>();
+		this.type = new Stack<>();
 		this.current = 0;
 	}
 
@@ -31,7 +31,27 @@ public abstract class SimpleStack {
 	}
 
 	/**
-	 * push element to stack.
+	 * push element and type onto each stack.
+	 * @param element
+	 * @param type 
+	 */
+	public void push(String element, String type) {
+		if(element == null) {
+			throw new IllegalArgumentException("argument is null.");
+		}
+		if(type == null) {
+			throw new IllegalArgumentException("type is null");
+		}
+		if(element.length() == 0) {
+			stack.push("\"\"");
+		} else {
+			stack.push(element);
+		}
+		this.type.push(type);
+	}
+
+	/**
+	 * push element onto stack.
 	 * @param element
 	 */
 	public void push(String element) {
@@ -44,6 +64,29 @@ public abstract class SimpleStack {
 			stack.push(element);
 		}
 		current++;
+	}
+
+	/**
+	 * returns top element of type stack.
+	 * @return top element
+	 */
+	public String popType() {
+		if(type.empty()) {
+			throw new IllegalStateException("type stack is empty.");
+		}
+		return type.pop();
+	}
+
+	/**
+	 * return top element of stack.
+	 * @param popType whether pop type stack
+	 * @return top element
+	 */
+	public String pop(boolean popType) {
+		if(popType) {
+			type.pop();
+		}
+		return pop();
 	}
 
 	/**
@@ -62,7 +105,8 @@ public abstract class SimpleStack {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(stack);
+		sb.append("stack: ").append(stack).append("\n")
+			.append("type : ").append(type);
 		return sb.toString();
 	}
 }
