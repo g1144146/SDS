@@ -9,7 +9,6 @@ import java.util.Stack;
  * {@link OperandStack <code>OperandStack</code>}.
  */
 public abstract class SimpleStack {
-	int current;
 	Stack<String> stack;
 	Stack<String> type;
 
@@ -19,15 +18,6 @@ public abstract class SimpleStack {
 	public SimpleStack() {
 		this.stack = new Stack<>();
 		this.type = new Stack<>();
-		this.current = 0;
-	}
-
-	/**
-	 * returns this stack's current size.
-	 * @return current size
-	 */
-	public int getCurrentStackSize() {
-		return current;
 	}
 
 	/**
@@ -63,7 +53,6 @@ public abstract class SimpleStack {
 		} else {
 			stack.push(element);
 		}
-		current++;
 	}
 
 	/**
@@ -98,7 +87,6 @@ public abstract class SimpleStack {
 			throw new IllegalStateException("stack is empty.");
 		}
 		String element = stack.pop();
-		current--;
 		return element;
 	}
 
