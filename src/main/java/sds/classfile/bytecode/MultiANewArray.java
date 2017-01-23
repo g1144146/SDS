@@ -31,7 +31,7 @@ public class MultiANewArray extends CpRefOpcode {
 	 * return value of dimensions of the array.
 	 * @return value of dimensions of the array
 	 */
-	public int getDemensions() {
+	public int getDimensions() {
 		return dimensions;
 	}
 

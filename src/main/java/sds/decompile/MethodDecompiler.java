@@ -633,7 +633,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case multianewarray:
 						MultiANewArray mana = (MultiANewArray)opcode;
 						String multiArrayType = mana.getOperand().replace("/", ".");
-						String[] dimArray = new String[mana.getDemensions()];
+						String[] dimArray = new String[mana.getDimensions()];
 						for(int j = 0; j < dimArray.length; j++) {
 							dimArray[j] = opStack.pop(typePop);
 						}
@@ -645,7 +645,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 							manType.append("[]");
 						}
 						print("@@@ arraytype: "); println(multiArrayType);
-						print("@@@ demension: "); println(mana.getDemensions());
+						print("@@@ demension: "); println(mana.getDimensions());
 						print("@@@ dimarray: "); println(dimArray);
 						manArray.append("[").append(dimArray[dimArray.length - 1]).append("]");
 						manType.append("[]");
