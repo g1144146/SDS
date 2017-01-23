@@ -2,6 +2,7 @@ package sds.classfile.bytecode;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
 
 /**
  * This class is for
@@ -22,9 +23,9 @@ public class Wide extends CpRefOpcode {
 	}
 
 	@Override
-	public void read(ClassFileStream data) throws IOException {
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
 		if(data.readByte() == MnemonicTable.iinc.getOpcode()) {
-			super.read(data);
+			super.read(data, pool);
 			return;
 		}
 		this.constByte = data.readShort();
