@@ -32,9 +32,8 @@ public class PushOpcode extends OpcodeInfo {
 			this.value = data.readByte();
 			return;
 		}
-		if(this.getOpcodeType() == MnemonicTable.sipush) {
-			this.value = data.readShort();
-		}
+		// sipush
+		this.value = data.readShort();
 	}
 
 	/**
