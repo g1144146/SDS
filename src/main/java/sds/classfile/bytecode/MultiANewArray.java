@@ -4,6 +4,8 @@ import java.io.IOException;
 import sds.classfile.ClassFileStream;
 import sds.classfile.ConstantPool;
 
+import static sds.util.DescriptorParser.parse;
+
 /**
  * This class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.multianewarray">
@@ -26,6 +28,7 @@ public class MultiANewArray extends CpRefOpcode {
 	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
 		super.read(data, pool);
 		this.dimensions = data.readByte();
+		operand = parse(operand, false);	
 	}
 
 	/**
