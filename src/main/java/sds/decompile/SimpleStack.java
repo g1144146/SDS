@@ -41,21 +41,6 @@ public abstract class SimpleStack {
 	}
 
 	/**
-	 * push element onto stack.
-	 * @param element
-	 */
-	public void push(String element) {
-		if(element == null) {
-			throw new IllegalArgumentException("argument is null.");
-		}
-		if(element.length() == 0) {
-			stack.push("\"\"");
-		} else {
-			stack.push(element);
-		}
-	}
-
-	/**
 	 * returns top element of type stack.
 	 * @return top element
 	 */
