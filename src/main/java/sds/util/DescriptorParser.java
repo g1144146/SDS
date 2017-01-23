@@ -14,8 +14,8 @@ public class DescriptorParser {
 
 	/**
 	 * returns parsed descriptor.
-	 * @param desc
-	 * @return 
+	 * @param desc descriptor
+	 * @return parsed descriptor
 	 */
 	public static String parse(String desc) {
 		return parse(desc, false);
@@ -28,10 +28,10 @@ public class DescriptorParser {
 	 * @return parsed descriptor
 	 */
 	public static String parse(String desc, boolean isAttribute) {
-		String obj = "(" + objPattern + "|\\[" + objPattern + ")";
-		String primPattern = "(B|\\[B|C|\\[C|D|\\[D|F|\\[F|V|I|\\[I|J|\\[J|S|\\[S|Z|\\[Z|\\(|\\))";
+		String obj = "(" + objPattern + "|\\[+" + objPattern + ")";
+		String primPattern = "(B|\\[+B|C|\\[+C|D|\\[+D|F|\\[+F|V|I|\\[+I|J|\\[+J|S|\\[+S|Z|\\[+Z|\\(|\\))";
 		String genericsPattern = "T[A-Z]";
-		String gen = "(" + genericsPattern + "|\\[" + genericsPattern + ")";
+		String gen = "(" + genericsPattern + "|\\[+" + genericsPattern + ")";
 		String colon = "(;:|::|:)"; // for Signature Attribute
 		String wildcard = "(\\+|\\*)";
 		String diamondOperator = "(<|>)";
@@ -44,11 +44,21 @@ public class DescriptorParser {
 		StringBuilder sb = new StringBuilder();
 		while(m.find()) {
 			String s = m.group();
-			if(s.startsWith("[")) { // primitive array
-				if(s.length() == 2) {
-					sb.append(parseType(s.substring(1))).append("[]");
-				} else { // object or generics array
-					sb.append(s.subSequence(2, s.length())).append("[]");
+			if(s.startsWith("[")) { // array
+				String type;
+				if(s.matches(primPattern)) { // primitive array
+					// PRIM_TYPE,
+					type = parseType(s.substring(s.length() - 1));
+					// PRIM_TYPE
+					type = type.substring(0, type.length() - 1);
+				} else {
+					// OBJ_TYPE
+					type = s.substring(s.lastIndexOf("[") + 2, s.length());
+				}
+				sb.append(type);
+				// TYPE[][]...
+				for(int i = 0; i <= s.lastIndexOf("["); i++) {
+					sb.append("[]");
 				}
 			} else if(s.startsWith("L") || s.matches("T[A-Z]+")) { // object or generics
 				sb.append(s.subSequence(1, s.length()));
