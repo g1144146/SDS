@@ -15,6 +15,7 @@ import sds.classfile.bytecode.PushOpcode;
 
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
 import static sds.classfile.bytecode.MnemonicTable.*;
+import static sds.util.Printer.print;
 import static sds.util.Printer.println;
 
 /**
@@ -67,26 +68,28 @@ public class MethodDecompiler extends AbstractDecompiler {
 			// args
 			if(! method.getAccessFlag().contains("static")) {
 				// in case of method is not static, the method has own as argument.
-				local.push("this");
+				local.push("this", caller);
 			}
 			String[][] args = method.getArgs();
 			int length = args.length;
 			if(length > 0) {
 				for(int i = 0; i < length - 1 ; i++) {
 					methodDeclaration.append(args[i][0]).append(" ").append(args[i][1]).append(", ");
-					if(args[i][0].matches("double|long")) {
-						local.push("arg_" + i);
-						local.push("arg_" + i);
+					String type = args[i][0];
+					if(type.matches("double|long")) {
+						local.push("arg_" + i, type);
+						local.push("arg_" + i, type);
 					} else {
-						local.push("arg_" + i);
+						local.push("arg_" + i, type);
 					}
 				}
-				methodDeclaration.append(args[length - 1][0]).append(" ").append(args[length - 1][1]);
-				if(args[args.length - 1][0].matches("double|long")) {
-					local.push("arg_" + (length - 1));
-					local.push("arg_" + (length - 1));
+				String type = args[length - 1][0];
+				methodDeclaration.append(type).append(" ").append(args[length - 1][1]);
+				if(type.matches("double|long")) {
+					local.push("arg_" + (length - 1), type);
+					local.push("arg_" + (length - 1), type);
 				} else {
-					local.push("arg_" + (length - 1));
+					local.push("arg_" + (length - 1), type);
 				}
 			}
 			methodDeclaration.append(") ");
@@ -118,6 +121,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 	}
 
 	private void buildMethodBody(LineInstructions[] insts, CFNode[] nodes) {
+		boolean typePop = true;
 		for(int i = 0; i < insts.length; i++) {
 			CFNode node = nodes[i];
 			LineInstructions inst = insts[i];
@@ -129,7 +133,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 //				println("stack: " + opStack);
 				switch(opcode.getOpcodeType()) {
 					case nop: break;
-					case aconst_null: opStack.push("null"); break;
+					case aconst_null: opStack.push("null", "null"); break;
 					case iconst_m1:   opStack.push(-1);     break;
 					case iconst_0:    opStack.push(0);      break;
 					case iconst_1:    opStack.push(1);      break;
@@ -151,36 +155,39 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case ldc:
 					case ldc_w:
 					case ldc2_w:
-						opStack.push(((CpRefOpcode)opcode).getOperand());
+						CpRefOpcode lcdOpcode = (CpRefOpcode)opcode;
+						opStack.push(lcdOpcode.getOperand(), lcdOpcode.getType());
 						break;
 					case iload:
 					case lload:
 					case fload:
 					case dload:
 					case aload:
-						String loaded = local.load(((IndexOpcode)opcode).getIndex());
-						opStack.push(loaded);
-						break;
-					case iload_0: opStack.push(local.load(0)); break;
-					case iload_1: opStack.push(local.load(1)); break;
-					case iload_2: opStack.push(local.load(2)); break;
-					case iload_3: opStack.push(local.load(3)); break;
-					case lload_0: opStack.push(local.load(0)); break;
-					case lload_1: opStack.push(local.load(1)); break;
-					case lload_2: opStack.push(local.load(2)); break;
-					case lload_3: opStack.push(local.load(3)); break;
-					case fload_0: opStack.push(local.load(0)); break;
-					case fload_1: opStack.push(local.load(1)); break;
-					case fload_2: opStack.push(local.load(2)); break;
-					case fload_3: opStack.push(local.load(3)); break;
-					case dload_0: opStack.push(local.load(0)); break;
-					case dload_1: opStack.push(local.load(1)); break;
-					case dload_2: opStack.push(local.load(2)); break;
-					case dload_3: opStack.push(local.load(3)); break;
-					case aload_0: opStack.push(local.load(0)); break;
-					case aload_1: opStack.push(local.load(1)); break;
-					case aload_2: opStack.push(local.load(2)); break;
-					case aload_3: opStack.push(local.load(3)); break;
+						load(((IndexOpcode)opcode).getIndex()); break;
+					case iload_0:
+					case lload_0:
+					case fload_0:
+					case dload_0:
+					case aload_0:
+						load(0); break;
+					case iload_1:
+					case lload_1:
+					case fload_1:
+					case dload_1:
+					case aload_1:
+						load(1); break;
+					case iload_2:
+					case lload_2:
+					case fload_2:
+					case dload_2:
+					case aload_2:
+						load(2); break;
+					case iload_3:
+					case lload_3:
+					case fload_3:
+					case dload_3:
+					case aload_3:
+						load(3); break;
 					case iaload:
 					case laload:
 					case faload:
@@ -189,41 +196,43 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case baload:
 					case caload:
 					case saload:
-						String arrayIndex = opStack.pop();
+						String arrayIndex = opStack.pop(typePop);
 						String refedArray = opStack.pop();
-						opStack.push(refedArray + "[" + arrayIndex + "]");
+						String arrayType  = opStack.popType();
+						opStack.push(refedArray + "[" + arrayIndex + "]", arrayType);
 						break;
 					case istore:
 					case fstore:
 					case astore:
-						IndexOpcode inOp = (IndexOpcode)opcode;
-						line.append(local.load(inOp.getIndex())).append(" = ").append(opStack.pop());
-						break;
 					case lstore:
 					case dstore:
-						IndexOpcode inOpDL = (IndexOpcode)opcode;
-						line.append(local.load(inOpDL.getIndex(), true)).append(" = ").append(opStack.pop());
+						IndexOpcode inOp = (IndexOpcode)opcode;
+						line.append(getStored(inOp.getIndex()));
 						break;
-					case istore_0: line.append(local.load(0)).append(" = ").append(opStack.pop()); break;
-					case istore_1: line.append(local.load(1)).append(" = ").append(opStack.pop()); break;
-					case istore_2: line.append(local.load(2)).append(" = ").append(opStack.pop()); break;
-					case istore_3: line.append(local.load(3)).append(" = ").append(opStack.pop()); break;
-					case fstore_0: line.append(local.load(0)).append(" = ").append(opStack.pop()); break;
-					case fstore_1: line.append(local.load(1)).append(" = ").append(opStack.pop()); break;
-					case fstore_2: line.append(local.load(2)).append(" = ").append(opStack.pop()); break;
-					case fstore_3: line.append(local.load(3)).append(" = ").append(opStack.pop()); break;
-					case astore_0: line.append(local.load(0)).append(" = ").append(opStack.pop()); break;
-					case astore_1: line.append(local.load(1)).append(" = ").append(opStack.pop()); break;
-					case astore_2: line.append(local.load(2)).append(" = ").append(opStack.pop()); break;
-					case astore_3: line.append(local.load(3)).append(" = ").append(opStack.pop()); break;
-					case lstore_0: line.append(local.load(0, true)).append(" = ").append(opStack.pop()); break;
-					case lstore_1: line.append(local.load(1, true)).append(" = ").append(opStack.pop()); break;
-					case lstore_2: line.append(local.load(2, true)).append(" = ").append(opStack.pop()); break;
-					case lstore_3: line.append(local.load(3, true)).append(" = ").append(opStack.pop()); break;
-					case dstore_0: line.append(local.load(0, true)).append(" = ").append(opStack.pop()); break;
-					case dstore_1: line.append(local.load(1, true)).append(" = ").append(opStack.pop()); break;
-					case dstore_2: line.append(local.load(2, true)).append(" = ").append(opStack.pop()); break;
-					case dstore_3: line.append(local.load(3, true)).append(" = ").append(opStack.pop()); break;
+					case istore_0:
+					case fstore_0:
+					case astore_0:
+					case lstore_0:
+					case dstore_0:
+						line.append(getStored(0)); break;
+					case istore_1:
+					case fstore_1:
+					case astore_1:
+					case lstore_1:
+					case dstore_1:
+						line.append(getStored(1)); break;
+					case istore_2:
+					case fstore_2:
+					case astore_2:
+					case lstore_2:
+					case dstore_2:
+						line.append(getStored(2)); break;
+					case istore_3:
+					case fstore_3:
+					case astore_3:
+					case lstore_3:
+					case dstore_3:
+						line.append(getStored(3)); break;
 					case iastore:
 					case lastore:
 					case fastore:
@@ -232,115 +241,132 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case bastore:
 					case castore:
 					case sastore:
-						String arrayRef = opStack.pop();
-						int index = Integer.parseInt(opStack.pop());
-						String storingValue = opStack.pop();
+						String arrayRef = opStack.pop(typePop);
+						int index = Integer.parseInt(opStack.pop(typePop));
+						String storingValue = opStack.pop(typePop);
 						line.append(arrayRef).append("[").append(index).append("]")
 							.append(" = ").append(storingValue);
 						break;
 					case pop:
-						line.append(opStack.pop());
+						line.append(opStack.pop(typePop));
 						break;
 					case pop2:
-						opStack.pop();
-						opStack.pop();
+						opStack.pop(typePop);
+						opStack.pop(typePop);
 						break;
 					case dup:
 						String dup = opStack.pop();
-						opStack.push(dup);
-						opStack.push(dup);
+						String dupType = opStack.popType();
+						opStack.push(dup, dupType);
+						opStack.push(dup, dupType);
 						break;
 					case dup_x1:
-						String dup_x1_2 = opStack.pop();
-						String dup_x1_1 = opStack.pop();
-						opStack.push(dup_x1_1);
-						opStack.push(dup_x1_2);
-						opStack.push(dup_x1_1);
+						String dup_x1_2  = opStack.pop();
+						String dup_x1_1  = opStack.pop();
+						String type_x1_2 = opStack.popType();
+						String type_x1_1 = opStack.popType();
+						opStack.push(dup_x1_1, type_x1_1);
+						opStack.push(dup_x1_2, type_x1_2);
+						opStack.push(dup_x1_1, type_x1_1);
 						break;
 					case dup_x2:
-						String dup_x2_3 = opStack.pop();
-						String dup_x2_2 = opStack.pop();
-						String dup_x2_1 = opStack.pop();
-						opStack.push(dup_x2_1);
-						opStack.push(dup_x2_2);
-						opStack.push(dup_x2_3);
-						opStack.push(dup_x2_1);
+						String dup_x2_3  = opStack.pop();
+						String dup_x2_2  = opStack.pop();
+						String dup_x2_1  = opStack.pop();
+						String type_x2_3 = opStack.popType();
+						String type_x2_2 = opStack.popType();
+						String type_x2_1 = opStack.popType();
+						opStack.push(dup_x2_1, type_x2_1);
+						opStack.push(dup_x2_2, type_x2_2);
+						opStack.push(dup_x2_3, type_x2_3);
+						opStack.push(dup_x2_1, type_x2_1);
 						break;
 					case dup2:
-						String dup2_1 = opStack.pop();
-						String dup2_2 = opStack.pop();
-						opStack.push(dup2_2);
-						opStack.push(dup2_1);
-						opStack.push(dup2_2);
-						opStack.push(dup2_1);
+						String dup2_1  = opStack.pop();
+						String dup2_2  = opStack.pop();
+						String type2_1 = opStack.popType();
+						String type2_2 = opStack.popType();
+						opStack.push(dup2_2, type2_2);
+						opStack.push(dup2_1, type2_1);
+						opStack.push(dup2_2, type2_2);
+						opStack.push(dup2_1, type2_1);
 						break;
 					case dup2_x1:
 						String dup2_x1_3 = opStack.pop();
 						String dup2_x1_2 = opStack.pop();
 						String dup2_x1_1 = opStack.pop();
-						opStack.push(dup2_x1_1);
-						opStack.push(dup2_x1_2);
-						opStack.push(dup2_x1_3);
-						opStack.push(dup2_x1_1);
-						opStack.push(dup2_x1_2);
+						String type2_x1_3 = opStack.popType();
+						String type2_x1_2 = opStack.popType();
+						String type2_x1_1 = opStack.popType();
+						opStack.push(dup2_x1_1, type2_x1_1);
+						opStack.push(dup2_x1_2, type2_x1_2);
+						opStack.push(dup2_x1_3, type2_x1_3);
+						opStack.push(dup2_x1_1, type2_x1_1);
+						opStack.push(dup2_x1_2, type2_x1_2);
 						break;
 					case dup2_x2:
 						String dup2_x2_4 = opStack.pop();
 						String dup2_x2_3 = opStack.pop();
 						String dup2_x2_2 = opStack.pop();
 						String dup2_x2_1 = opStack.pop();
-						opStack.push(dup2_x2_1);
-						opStack.push(dup2_x2_2);
-						opStack.push(dup2_x2_3);
-						opStack.push(dup2_x2_4);
-						opStack.push(dup2_x2_1);
-						opStack.push(dup2_x2_2);
+						String type2_x2_4 = opStack.popType();
+						String type2_x2_3 = opStack.popType();
+						String type2_x2_2 = opStack.popType();
+						String type2_x2_1 = opStack.popType();
+						opStack.push(dup2_x2_1, type2_x2_1);
+						opStack.push(dup2_x2_2, type2_x2_2);
+						opStack.push(dup2_x2_3, type2_x2_3);
+						opStack.push(dup2_x2_4, type2_x2_4);
+						opStack.push(dup2_x2_1, type2_x2_1);
+						opStack.push(dup2_x2_2, type2_x2_2);
 						break;
 					case swap:
 						String two = opStack.pop();
 						String one = opStack.pop();
-						opStack.push(two);
-						opStack.push(one);
+						String typeTwo = opStack.popType();
+						String typeOne = opStack.popType();
+						opStack.push(two, typeTwo);
+						opStack.push(one, typeOne);
 						break;
-					case iadd:
-					case ladd:
-					case fadd:
-					case dadd: calculate(" + "); break;
-					case isub:
-					case lsub:
-					case fsub:
-					case dsub: calculate(" - "); break;
-					case imul:
-					case lmul:
-					case fmul:
-					case dmul: calculate(" * "); break;
-					case idiv:
-					case ldiv:
-					case fdiv:
-					case ddiv: calculate(" / "); break;
-					case irem:
-					case lrem:
-					case frem:
-					case drem: calculate(" % "); break;
+					case iadd: calculate(" + ", "int");    break;
+					case ladd: calculate(" + ", "long");   break;
+					case fadd: calculate(" + ", "float");  break;
+					case dadd: calculate(" + ", "double"); break;
+					case isub: calculate(" - ", "int");    break;
+					case lsub: calculate(" - ", "long");   break;
+					case fsub: calculate(" - ", "float");  break;
+					case dsub: calculate(" - ", "double"); break;
+					case imul: calculate(" * ", "int");    break;
+					case lmul: calculate(" * ", "long");   break;
+					case fmul: calculate(" * ", "float");  break;
+					case dmul: calculate(" * ", "double"); break;
+					case idiv: calculate(" / ", "int");    break;
+					case ldiv: calculate(" / ", "long");   break;
+					case fdiv: calculate(" / ", "float");  break;
+					case ddiv: calculate(" / ", "double"); break;
+					case irem: calculate(" % ", "int");    break;
+					case lrem: calculate(" % ", "long");   break;
+					case frem: calculate(" % ", "float");  break;
+					case drem: calculate(" % ", "double"); break;
 					case ineg:
 					case lneg:
 					case fneg:
 					case dneg:
 						String minus = "-(" + opStack.pop() + ")";
-						opStack.push(minus);
+						opStack.push(minus, opStack.popType());
 						break;
-					case ishl:
-					case lshl:  calculate(" << ");  break;
-					case ishr:
-					case lshr:  calculate(" >> ");  break;
-					case iushr:
-					case lushr: calculate(" >>> "); break;
-					case iand:
-					case land:  calculate(" & ");   break;
-					case ior:
-					case lor:   calculate(" | ");   break;
-					case ixor:
-					case lxor:  calculate(" ^ ");   break;
+					case ishl:  calculate(" << ", "int");   break;
+					case lshl:  calculate(" << ", "long");  break;
+					case ishr:  calculate(" >> ", "int");   break;
+					case lshr:  calculate(" >> ", "long");  break;
+					case iushr: calculate(" >>> ", "int");  break;
+					case lushr: calculate(" >>> ", "long"); break;
+					case iand:  calculate(" & ", "int");    break;
+					case land:  calculate(" & ", "long");   break;
+					case ior:   calculate(" | ", "int");    break;
+					case lor:   calculate(" | ", "long");   break;
+					case ixor:  calculate(" ^ ", "int");    break;
+					case lxor:  calculate(" ^ ", "long");   break;
 					case iinc:
 						Iinc inc = (Iinc)opcode;
 						line.append(local.load(inc.getIndex()));
@@ -376,9 +402,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case fcmpg:
 					case dcmpl:
 					case dcmpg:
-						String cmpNum_2 = opStack.pop();
-						String cmpNum_1 = opStack.pop();
-						opStack.push("(" + cmpNum_1 + "OPERATOR" + cmpNum_2 + ")");
+						String cmpNum_2 = opStack.pop(typePop);
+						String cmpNum_1 = opStack.pop(typePop);
+						opStack.push("(" + cmpNum_1 + "OPERATOR" + cmpNum_2 + ")", "boolean");
 						break;
 					case ifeq:
 						// if(node.getType() == LoopEntry) {
@@ -423,43 +449,43 @@ public class MethodDecompiler extends AbstractDecompiler {
 						// }
 						break;
 					case if_icmpeq:
-						String ieq_2 = opStack.pop();
-						String ieq_1 = opStack.pop();
+						String ieq_2 = opStack.pop(typePop);
+						String ieq_1 = opStack.pop(typePop);
 						line.append("if(").append(ieq_1).append(" == ").append(ieq_2).append(")");
 						break;
 					case if_icmpne:
-						String ine_2 = opStack.pop();
-						String ine_1 = opStack.pop();
+						String ine_2 = opStack.pop(typePop);
+						String ine_1 = opStack.pop(typePop);
 						line.append("if(").append(ine_1).append(" != ").append(ine_2).append(")");
 						break;
 					case if_icmplt:
-						String ilt_2 = opStack.pop();
-						String ilt_1 = opStack.pop();
+						String ilt_2 = opStack.pop(typePop);
+						String ilt_1 = opStack.pop(typePop);
 						line.append("if(").append(ilt_1).append(" < ").append(ilt_2).append(")");
 						break;
 					case if_icmpge:
-						String ige_2 = opStack.pop();
-						String ige_1 = opStack.pop();
+						String ige_2 = opStack.pop(typePop);
+						String ige_1 = opStack.pop(typePop);
 						line.append("if(").append(ige_1).append(" >= ").append(ige_2).append(")");
 						break;
 					case if_icmpgt:
-						String igt_2 = opStack.pop();
-						String igt_1 = opStack.pop();
+						String igt_2 = opStack.pop(typePop);
+						String igt_1 = opStack.pop(typePop);
 						line.append("if(").append(igt_1).append(" > ").append(igt_2).append(")");
 						break;
 					case if_icmple:
-						String ile_2 = opStack.pop();
-						String ile_1 = opStack.pop();
+						String ile_2 = opStack.pop(typePop);
+						String ile_1 = opStack.pop(typePop);
 						line.append("if(").append(ile_1).append(" <= ").append(ile_2).append(")");
 						break;
 					case if_acmpeq:
-						String aeq_2 = opStack.pop();
-						String aeq_1 = opStack.pop();
+						String aeq_2 = opStack.pop(typePop);
+						String aeq_1 = opStack.pop(typePop);
 						line.append("if(").append(aeq_1).append(" == ").append(aeq_2).append(")");
 						break;
 					case if_acmpne:
-						String ane_2 = opStack.pop();
-						String ane_1 = opStack.pop();
+						String ane_2 = opStack.pop(typePop);
+						String ane_1 = opStack.pop(typePop);
 						line.append("if(").append(ane_1).append(" != ").append(ane_2).append(")");
 						break;
 					case _goto:
@@ -473,7 +499,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case freturn:
 					case dreturn:
 					case areturn:
-						line.append("return ").append(opStack.pop());
+						line.append("return ").append(opStack.pop(typePop));
 						break;
 					case _return:
 						if(i != nodes.length - 1) {
@@ -484,27 +510,28 @@ public class MethodDecompiler extends AbstractDecompiler {
 						break;
 					case getstatic:
 						CpRefOpcode getSta = (CpRefOpcode)opcode;
-						String getStaticField = getSta.getOperand().split("\\|")[0];
-						opStack.push(getStaticField);
+						// Xxx.yyy.FIELD|type
+						String[] getStaticField = getSta.getOperand().split("\\|");
+						opStack.push(getStaticField[0], getStaticField[1]);
 						break;
 					case putstatic:
 						CpRefOpcode putSta = (CpRefOpcode)opcode;
 						String putStaticField = putSta.getOperand().split("\\|")[0];
-						line.append(putStaticField).append(" = ").append(opStack.pop());
+						line.append(putStaticField).append(" = ").append(opStack.pop(typePop));
 						break;
 					case getfield:
 						CpRefOpcode getField = (CpRefOpcode)opcode;
-						String get = getField.getOperand().split("\\|")[0];
-						String getDeclaration = opStack.pop() + ".";
-						String[] getNames = get.split("\\.");
-						opStack.push(getDeclaration + getNames[getNames.length - 1]);
+						String get[] = getField.getOperand().split("\\|");
+						String getDeclaration = opStack.pop(typePop) + ".";
+						String[] getNames = get[0].split("\\.");
+						opStack.push(getDeclaration + getNames[getNames.length - 1], get[1]);
 						break;
 					case putfield:
 						CpRefOpcode putField = (CpRefOpcode)opcode;
 						String put = putField.getOperand().split("\\|")[0];
 						String[] putNames = put.split("\\.");
-						String value = opStack.pop();
-						String putCaller = opStack.pop();
+						String value = opStack.pop(typePop);
+						String putCaller = opStack.pop(typePop);
 						line.append(putCaller).append(".").append(putNames[putNames.length - 1])
 							.append(" = ").append(value);
 						break;
@@ -519,7 +546,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						// xxx.yyy.zzz.method
 						String[] virMethod = virOperand[0].split("\\.");
 						// caller.method
-						virtual.append(opStack.pop()).append(".").append(virMethod[virMethod.length - 1])
+						virtual.append(opStack.pop(typePop)).append(".").append(virMethod[virMethod.length - 1])
 						// caller.method(args1,args2,...)
 								.append("(").append(virArgs).append(")");
 						if(! pushOntoStack(opcodes, opcode, virtual.toString())) {
@@ -535,17 +562,18 @@ public class MethodDecompiler extends AbstractDecompiler {
 						// stack: [obj, obj] (after calling getMethodArgs())
 						String special = "new " + spMethod + "(" + getMethodArgs(spDesc) + ")";
 						// stack: [obj]
-						opStack.pop();
+						opStack.pop(typePop);
 						if(! pushOntoStack(opcodes, opcode, special)) {
 							line.append(special);
 						} else {
 							// stack: [obj, invoked_method]
 							// stack: [obj]
 							String element = opStack.pop();
+							String type    = opStack.popType();
 							// stack: []
-							opStack.pop();
+							opStack.pop(typePop);
 							// stack: [invoked_method]
-							opStack.push(element);
+							opStack.push(element, type);
 						}
 						break;
 					case invokestatic:
@@ -564,7 +592,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						String[] interMethod = interOperand[0].split("\\.");
 						String interArgs = getMethodArgs(interDesc);
 						StringBuilder inter = new StringBuilder();
-						inter.append(opStack.pop()).append(".").append(interMethod[interMethod.length - 1])
+						inter.append(opStack.pop(typePop)).append(".").append(interMethod[interMethod.length - 1])
 							.append("(").append(interArgs).append(")");
 						if(! pushOntoStack(opcodes, opcode, inter.toString())) {
 							line.append(inter.toString());
@@ -573,59 +601,68 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case inovokedynamic: break;
 					case _new:
 						String newClass = ((CpRefOpcode)opcode).getOperand();
-						opStack.push(newClass.replace("/", "."));
+						String classType = newClass.replace("/", ".");
+						opStack.push(classType, classType);
 						break;
 					case newarray:
 						String type = ((NewArray)opcode).getType();
-						String primLen = opStack.pop();
-						opStack.push("new " + type + "[" + primLen + "]");
+						String primLen = opStack.pop(typePop);
+						opStack.push("new " + type + "[" + primLen + "]", type + "[]");
 						break;
 					case anewarray:
 						String objType = ((CpRefOpcode)opcode).getOperand();
-						String objLen = opStack.pop();
-						opStack.push("new " + objType.replace("/", ".") + "[" + objLen + "]");
+						String aNewArrayType = objType.replace("/", ".");
+						String objLen = opStack.pop(typePop);
+						opStack.push("new " + aNewArrayType + "[" + objLen + "]", aNewArrayType + "[]");
 						break;
 					case arraylength:
-						opStack.push(opStack.pop() + ".length");
+						opStack.push(opStack.pop(typePop) + ".length", "int");
 						break;
 					case athrow: break;
 					case checkcast:
 						String casted = ((CpRefOpcode)opcode).getOperand().replace("/", ".");
-						opStack.push("((" + casted + ")" + opStack.pop() + ")");
+						opStack.push("((" + casted + ")" + opStack.pop(typePop) + ")", casted);
 						break;
 					case _instanceof:
 						String instanceType = ((CpRefOpcode)opcode).getOperand().replace("/", ".");
-						opStack.push("(" + opStack.pop() + " instanceof " + instanceType + ")");
+						opStack.push("(" + opStack.pop(typePop) + " instanceof " + instanceType + ")", "boolean");
 						break;
 					case monitorenter: break;
 					case monitorexit: break;
 					case wide: break;
 					case multianewarray:
 						MultiANewArray mana = (MultiANewArray)opcode;
+						String multiArrayType = mana.getOperand().replace("/", ".");
 						String[] dimArray = new String[mana.getDemensions()];
 						for(int j = 0; j < dimArray.length; j++) {
-							dimArray[j] = opStack.pop();
+							dimArray[j] = opStack.pop(typePop);
 						}
 						StringBuilder manArray = new StringBuilder();
-						manArray.append("new ").append(mana.getOperand().replace("/", "."));
+						StringBuilder manType  = new StringBuilder(multiArrayType);
+						manArray.append("new ").append(multiArrayType);
 						for(int j = 0; j < dimArray.length - 1; j++) {
 							manArray.append("[").append(dimArray[j]).append("]");
+							manType.append("[]");
 						}
+						print("@@@ arraytype: "); println(multiArrayType);
+						print("@@@ demension: "); println(mana.getDemensions());
+						print("@@@ dimarray: "); println(dimArray);
 						manArray.append("[").append(dimArray[dimArray.length - 1]).append("]");
-						opStack.push(manArray.toString());
+						manType.append("[]");
+						opStack.push(manArray.toString(), manType.toString());
 						break;
 					case ifnull:
 						if(node.getType() == LoopEntry) {
 							
 						} else {
-							String ifn = "if(" + opStack.pop() + " == null) {";
+							String ifn = "if(" + opStack.pop(typePop) + " == null) {";
 						}
 						break;
 					case ifnonnull:
 						if(node.getType() == LoopEntry) {
 							
 						} else {
-							String ifnonn = "if(" + opStack.pop() + " != null) {";
+							String ifnonn = "if(" + opStack.pop(typePop) + " != null) {";
 						}
 						break;
 					case goto_w: break;
@@ -635,9 +672,8 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case impdep2: break;
 					default: break;
 				}
-//				println(opcode + ", current: " + opStack.getCurrentStackSize());
-//				println("local: " + local);
-//				println("stack: " + opStack + "\n");
+				println("local: " + local);
+				println("stack: " + opStack + "\n");
 			}
 			// When the node is not start or end of a statement, (ex. "if(...) {", "}")
 			// add semicolon and write in the line context.
@@ -648,21 +684,37 @@ public class MethodDecompiler extends AbstractDecompiler {
 		}
 	}
 
-	private void calculate(String operator) {
-		String value_1 = opStack.pop(); // value_1
-		String value_2  = opStack.pop(); // value_2
+	private void calculate(String operator, String type) {
+		String value_1 = opStack.pop(true); // right
+		String value_2 = opStack.pop(true); // left
 		String expr;
 		if(operator.contains("<") || operator.contains(">")) {
 			expr = "(" + value_2 + operator + value_1 + ")";
 		} else {
 			expr = "(" + value_1 + operator + value_2 + ")";
 		}
-		opStack.push(expr);
+		opStack.push(expr, type);
+	}
+
+	private void load(int index) {
+		opStack.push(local.load(index), local.loadType(index));
 	}
 
 	private void castPrimitive(String type) {
-		String casted = "((" + type + ")" + opStack.pop() + ")";
-		opStack.push(casted);
+		String casted = "((" + type + ")" + opStack.pop(true) + ")";
+		opStack.push(casted, type);
+	}
+
+	private String getStored(int index) {
+		String stored = opStack.pop();
+		String type  = opStack.popType();
+		int before = local.size();
+		String value = local.load(index, type);
+		int after  = local.size();
+		if(before == after) {
+			return value + " = " + stored;
+		}
+		return type + " " + value + " = " + stored;
 	}
 
 	private String getMethodArgs(String descriptor) {
@@ -676,7 +728,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 			}
 			// get arguments from stack
 			for(int j = 0; j < args.length; j++) {
-				args[j] = opStack.pop();
+				args[j] = opStack.pop(true);
 			}
 			// build arguments
 			// argN-1, argN-2, ..., arg1
@@ -690,17 +742,17 @@ public class MethodDecompiler extends AbstractDecompiler {
 	}
 
 	/**
-	 * this method is for invoke method instruction<br>
+	 * this method is for invoke method instruction.
 	 * 
 	 * push element onto operand stack
-	 * when specified opcode is end in current node has all opcodes.<br>
+	 * when specified opcode is end in current node has all opcodes.
 	 * 
 	 * in case of the opcode is end,
 	 * it is necessary to push element onto openrand stack
-	 * because there is some processing in the next.<br>
+	 * because there is some processing in the next.
 	 * 
 	 * on the other hand, in case of that is not end,
-	 * it is necessary to write processing of invoking method to decompiled source code
+	 * it is necessary to write processing of invoking method on decompiled source
 	 * because no opcode is in the next.
 	 * 
 	 * @param opcodes node has all opcodes
@@ -715,7 +767,12 @@ public class MethodDecompiler extends AbstractDecompiler {
 					// end opcode
 					return false;
 				}
-				opStack.push(element);
+				CpRefOpcode invoke = (CpRefOpcode)opcode;
+				String[] operand = invoke.getOperand().split("\\|");
+				String desc = operand[1];
+				String type = operand[0].endsWith("<init>") ?
+						operand[0].replace(".<init>", "") : desc.substring(desc.indexOf(")") + 1);
+				opStack.push(element, type);
 				return true;
 			}
 		}

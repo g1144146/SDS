@@ -3,7 +3,6 @@ package sds.classfile.bytecode;
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
 import sds.classfile.ConstantPool;
-import sds.classfile.bytecode.MnemonicTable;
 
 import static sds.classfile.bytecode.MnemonicTable.ldc;
 import static sds.classfile.bytecode.MnemonicTable.ldc_w;
