@@ -2,6 +2,7 @@ package sds.classfile.bytecode;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
+import sds.classfile.ConstantPool;
 
 /**
  * This class is for
@@ -22,8 +23,8 @@ public class MultiANewArray extends CpRefOpcode {
 	}
 
 	@Override
-	public void read(ClassFileStream data) throws IOException {
-		super.read(data);
+	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
+		super.read(data, pool);
 		this.dimensions = data.readByte();
 	}
 
