@@ -241,9 +241,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case bastore:
 					case castore:
 					case sastore:
-						String arrayRef = opStack.pop(typePop);
-						int index = Integer.parseInt(opStack.pop(typePop));
 						String storingValue = opStack.pop(typePop);
+						int index = Integer.parseInt(opStack.pop(typePop));
+						String arrayRef = opStack.pop(typePop);
 						line.append(arrayRef).append("[").append(index).append("]")
 							.append(" = ").append(storingValue);
 						break;
