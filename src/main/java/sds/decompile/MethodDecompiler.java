@@ -637,19 +637,16 @@ public class MethodDecompiler extends AbstractDecompiler {
 						for(int j = 0; j < dimArray.length; j++) {
 							dimArray[j] = opStack.pop(typePop);
 						}
-						StringBuilder manArray = new StringBuilder();
-						StringBuilder manType  = new StringBuilder(multiArrayType);
-						manArray.append("new ").append(multiArrayType);
-						for(int j = 0; j < dimArray.length - 1; j++) {
-							manArray.append("[").append(dimArray[j]).append("]");
-							manType.append("[]");
-						}
-						print("@@@ arraytype: "); println(multiArrayType);
-						print("@@@ demension: "); println(mana.getDimensions());
+						StringBuilder manArray = new StringBuilder("new ");
+						// new XXX
+						manArray.append(multiArrayType.substring(0, multiArrayType.indexOf("]") - 1));
 						print("@@@ dimarray: "); println(dimArray);
-						manArray.append("[").append(dimArray[dimArray.length - 1]).append("]");
-						manType.append("[]");
-						opStack.push(manArray.toString(), manType.toString());
+						for(int j = dimArray.length - 1; j > 0; j--) {
+							manArray.append("[").append(dimArray[j]).append("]");
+						}
+						// new XXX[n][m]...
+						manArray.append("[").append(dimArray[0]).append("]");
+						opStack.push(manArray.toString(), multiArrayType);
 						break;
 					case ifnull:
 						if(node.getType() == LoopEntry) {
