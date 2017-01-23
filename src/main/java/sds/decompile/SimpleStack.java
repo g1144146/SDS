@@ -32,11 +32,7 @@ public abstract class SimpleStack {
 		if(type == null) {
 			throw new IllegalArgumentException("type is null");
 		}
-		if(element.length() == 0) {
-			stack.push("\"\"");
-		} else {
-			stack.push(element);
-		}
+		stack.push(element);
 		this.type.push(type);
 	}
 

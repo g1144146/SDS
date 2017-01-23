@@ -90,9 +90,14 @@ public class CpRefOpcode extends OpcodeInfo {
 				case C_FLOAT:   this.type = "float";  break;
 				case C_INTEGER: this.type = "int";    break;
 				case C_LONG:    this.type = "long";   break;
-				case C_STRING:  this.type = "java.lang.String"; break;
+				case C_STRING:
+					this.type = "java.lang.String";
+					operand = "\"" + operand + "\"";
+					break;
 				case C_CLASS:   this.type = extract(pool.get(index - 1), pool); break;
 				case C_METHOD_HANDLE: break;
+				default:
+					throw new IllegalStateException("LDC opcode refers unknown constant type info.");
 			}
 		}
 	}
