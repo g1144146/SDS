@@ -5,10 +5,12 @@ import java.util.Set;
 import sds.assemble.LineInstructions;
 import sds.classfile.bytecode.BranchOpcode;
 import sds.classfile.bytecode.OpcodeInfo;
+import sds.classfile.bytecode.Opcodes;
 import sds.classfile.bytecode.LookupSwitch;
 import sds.classfile.bytecode.TableSwitch;
 
 import static sds.assemble.controlflow.CFNodeType.Entry;
+import static sds.assemble.controlflow.CFNodeType.OneLineEntry;
 import static sds.assemble.controlflow.CFNodeType.Exit;
 import static sds.assemble.controlflow.CFNodeType.LoopExit;
 import static sds.assemble.controlflow.CFNodeType.StringSwitch;
@@ -26,6 +28,8 @@ public class CFNode {
 	private CFNode  immediateDominator;
 	private OpcodeInfo start;
 	private OpcodeInfo end;
+	private Opcodes opcodes;
+	private int[] jumpPoints;
 	private int jumpPoint = -1;
 	private int[] switchJump = new int[0];
 	private int hash;
@@ -39,33 +43,34 @@ public class CFNode {
 
 	/**
 	 * constructor.
-	 * @param inst instrcutions of a line.
+	 * @param inst instructions of a line.
 	 */
 	public CFNode(LineInstructions inst) {
-		int size = inst.getOpcodes().size();
-		this.start = inst.getOpcodes().getAll()[0];
+		this.opcodes = inst.getOpcodes();
+		int size = opcodes.size();
+		this.start = opcodes.getAll()[0];
 		if(size == 1) {
 			this.end = start;
 		} else {
-			this.end = inst.getOpcodes().getAll()[size-1];
+			this.end = opcodes.getAll()[size-1];
 		}
 		StringBuilder sb = new StringBuilder();
-		for(OpcodeInfo info : inst.getOpcodes().getAll()) {
+		for(OpcodeInfo info : opcodes.getAll()) {
 			sb.append(info.getOpcodeType()).append(" ");
 		}
 		this.instStr = sb.toString();
 
-		this.nodeType = CFNodeType.getType(inst.getOpcodes(), end);
-		if(nodeType == Entry) { // if_xx
-			for(OpcodeInfo op : inst.getOpcodes().getAll()) {
+		this.nodeType = CFNodeType.getType(opcodes, end);
+		if(check(Entry, OneLineEntry)) { // if_xx
+			for(OpcodeInfo op : opcodes.getAll()) {
 				if(op instanceof BranchOpcode) {
 					this.jumpPoint = ((BranchOpcode)op).getBranch() + op.getPc();
 				}
 			}
-		} else if(nodeType == Exit || nodeType == LoopExit) { // goto
+		} else if(check(Exit, LoopExit)) { // goto
 			this.jumpPoint = ((BranchOpcode)end).getBranch() + end.getPc();
-		} else if(nodeType == Switch) { // switch
-			for(OpcodeInfo op : inst.getOpcodes().getAll()) {
+		} else if(check(Switch)) { // switch
+			for(OpcodeInfo op : opcodes.getAll()) {
 				if(op instanceof LookupSwitch) {
 					LookupSwitch look = (LookupSwitch)op;
 					this.switchJump = new int[look.getMatch().length + 1];
@@ -86,7 +91,7 @@ public class CFNode {
 					break;
 				}
 			}
- 		} else if(nodeType == StringSwitch) { // switch statement with string
+ 		} else if(check(StringSwitch)) { // switch statement with string
 			if(end instanceof LookupSwitch) {
 				LookupSwitch look = (LookupSwitch)end;
 				this.switchJump = new int[look.getMatch().length + 1];
@@ -104,8 +109,8 @@ public class CFNode {
 				}
 				switchJump[switchJump.length - 1] = table.getDefault() + table.getPc();
 			}
-		} else if(nodeType == SynchronizedExit) { // end of synchronized
-			for(OpcodeInfo info : inst.getOpcodes().getAll()) {
+		} else if(check(SynchronizedExit)) { // end of synchronized
+			for(OpcodeInfo info : opcodes.getAll()) {
 				if(info instanceof BranchOpcode) {
 					this.jumpPoint = ((BranchOpcode)info).getBranch() + info.getPc();
 					break;
@@ -133,6 +138,15 @@ public class CFNode {
 
 		this.parents    = new LinkedHashSet<>();
 		this.children   = new LinkedHashSet<>();
+	}
+
+	private boolean check(CFNodeType... type) {
+		for(CFNodeType t : type) {
+			if(nodeType == t) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
