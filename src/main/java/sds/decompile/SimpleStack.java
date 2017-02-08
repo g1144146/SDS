@@ -67,15 +67,18 @@ public abstract class SimpleStack {
 		if(stack.empty()) {
 			throw new IllegalStateException("stack is empty.");
 		}
-		String element = stack.pop();
-		return element;
+		return stack.pop();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("stack: ").append(stack).append("\n")
-			.append("type : ").append(type);
-		return sb.toString();
+		StringBuilder sb = new StringBuilder("[");
+		if(stack.size() > 0) {
+			for(int i = 0; i < stack.size() - 1; i++) {
+				sb.append(type.get(i)).append(": ").append(stack.get(i)).append(", ");
+			}
+			sb.append(type.get(type.size() - 1)).append(": ").append(stack.get(stack.size() - 1));
+		}
+		return sb.append("]").toString();
 	}
 }
