@@ -9,6 +9,10 @@ public class LocalStack extends SimpleStack {
 		super();
 	}
 
+	/**
+	 * returns current stack size.
+	 * @return stack size
+	 */
 	public int size() {
 		return stack.size();
 	}

@@ -21,7 +21,7 @@ public abstract class SimpleStack {
 	}
 
 	/**
-	 * push element and type onto each stack.
+	 * pushes element and type onto each stack.
 	 * @param element
 	 * @param type 
 	 */
@@ -48,7 +48,7 @@ public abstract class SimpleStack {
 	}
 
 	/**
-	 * return top element of stack.
+	 * returns top element of stack.
 	 * @param popType whether pop type stack
 	 * @return top element
 	 */
