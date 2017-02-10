@@ -3,6 +3,11 @@ package sds.classfile.bytecode;
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
 
+import static sds.classfile.bytecode.MnemonicTable._goto;
+import static sds.classfile.bytecode.MnemonicTable.goto_w;
+import static sds.classfile.bytecode.MnemonicTable.jsr;
+import static sds.classfile.bytecode.MnemonicTable.jsr_w;
+
  /**
  * This class is for opcode has branch.<br>
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.if_cond">
@@ -52,6 +57,16 @@ public class BranchOpcode extends OpcodeInfo {
 	 */
 	public int getBranch() {
 		return branch;
+	}
+
+	/**
+	 * returns whether this opcode is if_xx.
+	 * @return in case of this opcode is if_xx, it returns true.
+	 * otherwise, it returns false.
+	 */
+	public boolean isIf() {
+		return  (opcodeType != _goto) && (opcodeType != goto_w) &&
+				(opcodeType !=   jsr) && (opcodeType !=  jsr_w);
 	}
 
 	@Override
