@@ -4,17 +4,29 @@ import sds.assemble.BaseContent;
 import sds.assemble.LineInstructions;
 import sds.assemble.MethodContent;
 import sds.assemble.controlflow.CFNode;
+import sds.assemble.controlflow.CFEdge;
+import sds.classfile.bytecode.BranchOpcode;
 import sds.classfile.bytecode.CpRefOpcode;
 import sds.classfile.bytecode.Iinc;
 import sds.classfile.bytecode.IndexOpcode;
 import sds.classfile.bytecode.InvokeInterface;
 import sds.classfile.bytecode.MultiANewArray;
+import sds.classfile.bytecode.MnemonicTable;
 import sds.classfile.bytecode.NewArray;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.PushOpcode;
 
+import static sds.assemble.controlflow.NodeTypeChecker.check;
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
+import static sds.assemble.controlflow.CFNodeType.LoopExit;
+import static sds.assemble.controlflow.CFNodeType.Entry;
+import static sds.assemble.controlflow.CFNodeType.OneLineEntry;
+import static sds.assemble.controlflow.CFNodeType.OneLineEntryBreak;
+import static sds.assemble.controlflow.CFNodeType.Exit;
+import static sds.assemble.controlflow.CFEdgeType.TrueBranch;
+import static sds.assemble.controlflow.CFEdgeType.FalseBranch;
 import static sds.classfile.bytecode.MnemonicTable.*;
+import static sds.decompile.DecompiledResult.INCREMENT;
 import static sds.util.Printer.print;
 import static sds.util.Printer.println;
 
@@ -44,8 +56,6 @@ public class MethodDecompiler extends AbstractDecompiler {
 		this.local = new LocalStack();
 		addAnnotation(method.getAnnotation());
 		addDeclaration(method);
-		result.changeIndent(DecompiledResult.INCREMENT);
-		result.writeEndScope();
 	}
 
 	@Override
@@ -115,22 +125,51 @@ public class MethodDecompiler extends AbstractDecompiler {
 //		println(">>> " + methodDeclaration.toString());
 
 		// method body
-		result.changeIndent(DecompiledResult.INCREMENT);
+		result.changeIndent(INCREMENT);
 		buildMethodBody(method.getInst(), method.getNodes());
-		result.changeIndent(DecompiledResult.DECREMENT);
+		result.writeEndScope();
 	}
 
 	private void buildMethodBody(LineInstructions[] insts, CFNode[] nodes) {
 		boolean typePop = true;
+		CFNode falseNode = null;
 		for(int i = 0; i < insts.length; i++) {
 			CFNode node = nodes[i];
 			LineInstructions inst = insts[i];
 			StringBuilder line = new StringBuilder();
-			OpcodeInfo[] opcodes = inst.getOpcodes().getAll();
+			OpcodeInfo[] opcodes = node.getOpcodes().getAll();
+			boolean addSemicolon = true;
+			if(check(node, Entry, OneLineEntry, OneLineEntryBreak)) {
+				line.append("if(");
+				// in the range of
+				// Entry-node ~ FALSE-node of the node (jump point node of Entry-node in case of FALSE),
+				// there is case that Exit-node doesn't exist.
+				// then, it doesn't unindent and add end scope to source code.
+				// so, in the case, it holds FALSE-node,
+				// and unindents and adds end scope at the time of processing FALSE-node.
+				for(CFEdge edge : node.getChildren()) {
+					if(edge.getType() == FalseBranch) {
+						int index = i;
+						CFNode terminal = edge.getDest();
+						boolean hasExit = false;
+						while(! nodes[index].equals(terminal)) {
+							hasExit |= (nodes[index].getType() == Exit);
+							index++;
+						}
+						if(! hasExit) {
+							falseNode = terminal;
+						}
+						break;
+					}
+				}
+			}
+			if(falseNode != null && falseNode.equals(node)) {
+				result.writeEndScope();
+			}
 			for(OpcodeInfo opcode : opcodes) {
 //				println(opcode + ", current: " + opStack.getCurrentStackSize());
 //				println("local: " + local);
-//				println("stack: " + opStack);
+				println("stack: " + opStack);
 				switch(opcode.getOpcodeType()) {
 					case nop: break;
 					case aconst_null: opStack.push("null", "null"); break;
@@ -407,88 +446,120 @@ public class MethodDecompiler extends AbstractDecompiler {
 						opStack.push("(" + cmpNum_1 + "OPERATOR" + cmpNum_2 + ")", "boolean");
 						break;
 					case ifeq:
-						// if(node.getType() == LoopEntry) {
-							
-						// } else {
-						// 	String eq = opStack.pop().replace("OPERATOR", " != ");
-						// }
+						if(check(node, LoopEntry)) {
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							line.append(getIfExpr(" == ")).append(") ");
+							break;
+						} else {
+							line.append(getIfExpr(" == "));
+						}
+						addSemicolon = false;
 						break;
 					case ifne:
-						// if(node.getType() == LoopEntry) {
-							
-						// } else {
-						// 	String ne = opStack.pop().replace("OPERATOR", " == ");
-						// }
+						if(check(node, LoopEntry)) {
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							line.append(getIfExpr(" != ")).append(") ");
+							break;
+						} else {
+							line.append(getIfExpr(" != "));
+						}
+						addSemicolon = false;
 						break;
 					case iflt:
-						// if(node.getType() == LoopEntry) {
-							
-						// } else {
-						// 	String lt = opStack.pop().replace("OPERATOR", " >= ");
-						// }
+						if(check(node, LoopEntry)) {
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							line.append(getIfExpr(" >= ")).append(") ");
+							break;
+						} else {
+							line.append(getIfExpr(" >= "));
+						}
+						addSemicolon = false;
 						break;
 					case ifge:
-						// if(node.getType() == LoopEntry) {
-							
-						// } else {
-						// 	String ge = opStack.pop().replace("OPERATOR", " < ");
-						// }
+						if(check(node, LoopEntry)) {
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							line.append(getIfExpr(" < ")).append(") ");
+							break;
+						} else {
+							line.append(getIfExpr(" < "));
+						}
+						addSemicolon = false;
 						break;
 					case ifgt:
-						// if(node.getType() == LoopEntry) {
-							
-						// } else {
-						// 	String gt = opStack.pop().replace("OPERATOR", " <= ");
-						// }
+						if(check(node, LoopEntry)) {
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							line.append(getIfExpr(" <= ")).append(") ");
+							break;
+						} else {
+							line.append(getIfExpr(" <= "));
+						}
+						addSemicolon = false;
 						break;
 					case ifle:
-						// if(node.getType() == LoopEntry) {
-							
-						// } else {
-						// 	String le = opStack.pop().replace("OPERATOR", " > ");
-						// }
+						if(check(node, LoopEntry)) {
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							line.append(getIfExpr(" > ")).append(") ");
+							break;
+						} else {
+							line.append(getIfExpr(" > "));
+						}
+						addSemicolon = false;
 						break;
 					case if_icmpeq:
 						String ieq_2 = opStack.pop(typePop);
 						String ieq_1 = opStack.pop(typePop);
-						line.append("if(").append(ieq_1).append(" == ").append(ieq_2).append(")");
+						line.append("(").append(ieq_1).append(" == ").append(ieq_2).append(")");
+						addSemicolon = false;
 						break;
 					case if_icmpne:
 						String ine_2 = opStack.pop(typePop);
 						String ine_1 = opStack.pop(typePop);
-						line.append("if(").append(ine_1).append(" != ").append(ine_2).append(")");
+						line.append("(").append(ine_1).append(" != ").append(ine_2).append(")");
+						addSemicolon = false;
 						break;
 					case if_icmplt:
 						String ilt_2 = opStack.pop(typePop);
 						String ilt_1 = opStack.pop(typePop);
-						line.append("if(").append(ilt_1).append(" < ").append(ilt_2).append(")");
+						line.append("(").append(ilt_1).append(" < ").append(ilt_2).append(")");
+						addSemicolon = false;
 						break;
 					case if_icmpge:
 						String ige_2 = opStack.pop(typePop);
 						String ige_1 = opStack.pop(typePop);
-						line.append("if(").append(ige_1).append(" >= ").append(ige_2).append(")");
+						line.append("(").append(ige_1).append(" >= ").append(ige_2).append(")");
+						addSemicolon = false;
 						break;
 					case if_icmpgt:
 						String igt_2 = opStack.pop(typePop);
 						String igt_1 = opStack.pop(typePop);
-						line.append("if(").append(igt_1).append(" > ").append(igt_2).append(")");
+						line.append("(").append(igt_1).append(" > ").append(igt_2).append(")");
+						addSemicolon = false;
 						break;
 					case if_icmple:
 						String ile_2 = opStack.pop(typePop);
 						String ile_1 = opStack.pop(typePop);
-						line.append("if(").append(ile_1).append(" <= ").append(ile_2).append(")");
+						line.append("(").append(ile_1).append(" <= ").append(ile_2).append(")");
+						addSemicolon = false;
 						break;
 					case if_acmpeq:
 						String aeq_2 = opStack.pop(typePop);
 						String aeq_1 = opStack.pop(typePop);
-						line.append("if(").append(aeq_1).append(" == ").append(aeq_2).append(")");
+						line.append("(").append(aeq_1).append(" == ").append(aeq_2).append(")");
+						addSemicolon = false;
 						break;
 					case if_acmpne:
 						String ane_2 = opStack.pop(typePop);
 						String ane_1 = opStack.pop(typePop);
-						line.append("if(").append(ane_1).append(" != ").append(ane_2).append(")");
+						line.append("(").append(ane_1).append(" != ").append(ane_2).append(")");
+						addSemicolon = false;
 						break;
 					case _goto:
+//						addSemicolon = false;
+//						result.write(line.toString());
+//						line = line.delete(0, line.length());
+						if(line.length() == 0) {
+							line.append(opStack.pop(typePop));
+						}
 						break;
 					case jsr: break;
 					case ret: break;
@@ -505,7 +576,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						if(i != nodes.length - 1) {
 							// in case of this return instruction is not end of opcode,
 							// specifies "return;".
-							line.append("return");
+							line.append("return;");
 						}
 						break;
 					case getstatic:
@@ -640,7 +711,6 @@ public class MethodDecompiler extends AbstractDecompiler {
 						StringBuilder manArray = new StringBuilder("new ");
 						// new XXX
 						manArray.append(multiArrayType.substring(0, multiArrayType.indexOf("]") - 1));
-						print("@@@ dimarray: "); println(dimArray);
 						for(int j = dimArray.length - 1; j > 0; j--) {
 							manArray.append("[").append(dimArray[j]).append("]");
 						}
@@ -652,15 +722,17 @@ public class MethodDecompiler extends AbstractDecompiler {
 						if(node.getType() == LoopEntry) {
 							
 						} else {
-							String ifn = "if(" + opStack.pop(typePop) + " == null) {";
+							line.append("(").append(opStack.pop(typePop)).append(" == null)");
 						}
+						addSemicolon = false;
 						break;
 					case ifnonnull:
 						if(node.getType() == LoopEntry) {
 							
 						} else {
-							String ifnonn = "if(" + opStack.pop(typePop) + " != null) {";
+							line.append("(").append(opStack.pop(typePop)).append(" != null)");
 						}
+						addSemicolon = false;
 						break;
 					case goto_w: break;
 					case jsr_w: break;
@@ -669,15 +741,30 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case impdep2: break;
 					default: break;
 				}
-				println("local: " + local);
+//				println("local: " + local);
 				println("stack: " + opStack + "\n");
 			}
-			// When the node is not start or end of a statement, (ex. "if(...) {", "}")
-			// add semicolon and write in the line context.
-			if(true) {
-				line.append(";");
+			if(check(node, LoopEntry, Entry)) {
+				line.append(") {");
+			}
+			if(line.length() > 0) {
+				// When the node is not start or end of a statement, (ex. "if(...) {", "}")
+				// add semicolon and write in the line context.
+				if(addSemicolon) {
+					line.append(";");
+				}
 				result.write(line.toString());
 			}
+			indent(node);
+		}
+	}
+
+	private void indent(CFNode node) {
+		if(check(node, LoopEntry, Entry)) {
+			result.changeIndent(INCREMENT);
+		}
+		if(check(node, LoopExit, Exit)) {
+			result.writeEndScope();
 		}
 	}
 
@@ -686,6 +773,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 		String value_2 = opStack.pop(true); // left
 		String expr;
 		if(operator.contains("<") || operator.contains(">")) {
+			// shift operator
 			expr = "(" + value_2 + operator + value_1 + ")";
 		} else {
 			expr = "(" + value_1 + operator + value_2 + ")";
@@ -702,6 +790,79 @@ public class MethodDecompiler extends AbstractDecompiler {
 		opStack.push(casted, type);
 	}
 
+	private String addLogicOperator(CFNode node, String line) {
+		if(! line.contains("#LOGIC#")) {
+			return line;
+		}
+		int index = 0;
+		BranchOpcode[] branches = new BranchOpcode[node.getJumpPoints().length];
+		for(OpcodeInfo opcode : node.getOpcodes().getAll()) {
+			if((opcode instanceof BranchOpcode)) {
+				BranchOpcode branch = (BranchOpcode)opcode;
+				if(branch.isIf()) {
+					branches[index] = branch;
+					index++;
+				}
+			}
+		}
+		String[] exprs  = line.split("#LOGIC#");
+		String[] logics = new String[exprs.length - 1];
+		StringBuilder ifLine = new StringBuilder();
+		for(int i = 0; i < branches.length; i++) {
+			if(i < branches.length - 1) {
+				int jump = branches[i].getBranch();
+				for(CFEdge edge : node.getChildren()) {
+					if((edge.getType() == TrueBranch) && edge.getDest().isInPcRange(jump)) {
+						ifLine.append(changeToNegative(branches[i].getOpcodeType(), exprs[i]));
+					} else if((edge.getType() == FalseBranch) && edge.getDest().isInPcRange(jump)) {
+						logics[i] = "&&";
+					}
+				}
+			} else {
+				ifLine.append(exprs[i]);
+			}
+		}
+		return ifLine.toString();
+	}
+
+	private String changeToNegative(MnemonicTable type, String condition) {
+		switch(type) {
+			case if_icmpeq:
+			case if_acmpeq:
+			case ifnull:
+			case ifeq:
+				if(condition.contains("==")) {
+					return condition.replace("==", "!=");
+				}
+				return "(! " + condition + ")";
+			case if_icmpne:
+			case if_acmpne:
+			case ifnonnull:
+			case ifne:      return condition.replace("!=", "==");
+			case if_icmplt:
+			case iflt:      return condition.replace("<" , ">=");
+			case if_icmpgt:
+			case ifgt:      return condition.replace(">" , "<=");
+			case if_icmple:
+			case ifle:      return condition.replace("<=", ">");
+			case if_icmpge:
+			case ifge:      return condition.replace(">=", "<");
+			default:
+				throw new IllegalArgumentException(type + " opcode is not if_xx opcode.");
+		}
+	}
+
+	private String getIfExpr(String cmpOperator) {
+		String expr = opStack.pop();
+		String type = opStack.popType();
+		if(expr.contains("OPERATOR") || type.equals("boolean")) {
+			return expr.replace("OPERATOR", cmpOperator);
+		}
+		// in case of comparing int value and 0, no opcode push 0 onto stack.
+		// so, it is necessary to append comparing operator and 0 to popped element.
+		return "(" + expr + cmpOperator + "0)";
+	}
+
 	private String getStored(int index) {
 		String stored = opStack.pop();
 		String type  = opStack.popType();
@@ -709,8 +870,10 @@ public class MethodDecompiler extends AbstractDecompiler {
 		String value = local.load(index, type);
 		int after  = local.size();
 		if(before == after) {
+			// storing
 			return value + " = " + stored;
 		}
+		// declaring
 		return type + " " + value + " = " + stored;
 	}
 
