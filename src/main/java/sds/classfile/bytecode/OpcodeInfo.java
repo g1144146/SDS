@@ -3,7 +3,6 @@ package sds.classfile.bytecode;
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
 import sds.classfile.ConstantPool;
-
 import sds.classfile.Info;
 
 /**
@@ -11,8 +10,8 @@ import sds.classfile.Info;
  * @author inagaki
  */
 public class OpcodeInfo implements Info {
-	private MnemonicTable opcodeType;
 	private int pc;
+	MnemonicTable opcodeType;
 
 	OpcodeInfo(MnemonicTable opcodeType, int pc) {
 		this.opcodeType = opcodeType;
