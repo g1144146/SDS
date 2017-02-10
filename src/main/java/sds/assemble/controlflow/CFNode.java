@@ -1,5 +1,6 @@
 package sds.assemble.controlflow;
 
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import sds.assemble.LineInstructions;
@@ -9,13 +10,17 @@ import sds.classfile.bytecode.Opcodes;
 import sds.classfile.bytecode.LookupSwitch;
 import sds.classfile.bytecode.TableSwitch;
 
+import static sds.assemble.controlflow.NodeTypeChecker.check;
 import static sds.assemble.controlflow.CFNodeType.Entry;
 import static sds.assemble.controlflow.CFNodeType.OneLineEntry;
+import static sds.assemble.controlflow.CFNodeType.OneLineEntryBreak;
 import static sds.assemble.controlflow.CFNodeType.Exit;
 import static sds.assemble.controlflow.CFNodeType.LoopExit;
 import static sds.assemble.controlflow.CFNodeType.StringSwitch;
 import static sds.assemble.controlflow.CFNodeType.SynchronizedExit;
 import static sds.assemble.controlflow.CFNodeType.Switch;
+import static sds.classfile.bytecode.MnemonicTable._goto;
+import static sds.classfile.bytecode.MnemonicTable.goto_w;
 
 /**
  * This class is for node of control flow graph.
@@ -29,8 +34,9 @@ public class CFNode {
 	private OpcodeInfo start;
 	private OpcodeInfo end;
 	private Opcodes opcodes;
-	private int[] jumpPoints;
-	private int jumpPoint = -1;
+	private int[] jumpPoints = new int[0];
+//	private int jumpPoint = -1;
+	private int gotoPoint = -1;
 	private int[] switchJump = new int[0];
 	private int hash;
 	private String instStr;
@@ -61,15 +67,24 @@ public class CFNode {
 		this.instStr = sb.toString();
 
 		this.nodeType = CFNodeType.getType(opcodes, end);
-		if(check(Entry, OneLineEntry)) { // if_xx
+		if(check(this, Entry, OneLineEntry, OneLineEntryBreak)) { // if_xx
+			int[] points = new int[opcodes.size()];
+			int ifCount = 0;
 			for(OpcodeInfo op : opcodes.getAll()) {
 				if(op instanceof BranchOpcode) {
-					this.jumpPoint = ((BranchOpcode)op).getBranch() + op.getPc();
+					int branch = ((BranchOpcode)op).getBranch() + op.getPc();
+					if(op.getOpcodeType() == _goto || op.getOpcodeType() == goto_w) {
+						this.gotoPoint = branch;
+						continue;
+					}
+					points[ifCount] = branch;
+					ifCount++;
 				}
 			}
-		} else if(check(Exit, LoopExit)) { // goto
-			this.jumpPoint = ((BranchOpcode)end).getBranch() + end.getPc();
-		} else if(check(Switch)) { // switch
+			jumpPoints = Arrays.copyOf(points, ifCount);
+		} else if(check(this, Exit, LoopExit)) { // goto
+			this.gotoPoint = ((BranchOpcode)end).getBranch() + end.getPc();
+		} else if(check(this, Switch)) { // switch
 			for(OpcodeInfo op : opcodes.getAll()) {
 				if(op instanceof LookupSwitch) {
 					LookupSwitch look = (LookupSwitch)op;
@@ -91,7 +106,7 @@ public class CFNode {
 					break;
 				}
 			}
- 		} else if(check(StringSwitch)) { // switch statement with string
+ 		} else if(check(this, StringSwitch)) { // switch statement with string
 			if(end instanceof LookupSwitch) {
 				LookupSwitch look = (LookupSwitch)end;
 				this.switchJump = new int[look.getMatch().length + 1];
@@ -109,10 +124,10 @@ public class CFNode {
 				}
 				switchJump[switchJump.length - 1] = table.getDefault() + table.getPc();
 			}
-		} else if(check(SynchronizedExit)) { // end of synchronized
+		} else if(check(this, SynchronizedExit)) { // end of synchronized
 			for(OpcodeInfo info : opcodes.getAll()) {
 				if(info instanceof BranchOpcode) {
-					this.jumpPoint = ((BranchOpcode)info).getBranch() + info.getPc();
+					this.gotoPoint = ((BranchOpcode)info).getBranch() + info.getPc();
 					break;
 				}
 			}
@@ -140,22 +155,28 @@ public class CFNode {
 		this.children   = new LinkedHashSet<>();
 	}
 
-	private boolean check(CFNodeType... type) {
-		for(CFNodeType t : type) {
-			if(nodeType == t) {
-				return true;
-			}
-		}
-		return false;
+	/**
+	 * returns opcodes which this node has.
+	 * @return opcodes
+	 */
+	public Opcodes getOpcodes() {
+		return opcodes;
 	}
 
 	/**
-	 * returns index into code array of jump point.<br>
-	 * if this node type is Entry or Exit (and that of Loop), this method returns -1.
+	 * returns indexes into code array of jump point.
+	 * @return jump point indexes
+	 */
+	public int[] getJumpPoints() {
+		return jumpPoints;
+	}
+
+	/**
+	 * returns index into code array of jump point.
 	 * @return jump point index
 	 */
-	public int getJumpPoint() {
-		return jumpPoint;
+	public int getGotoPoint() {
+		return gotoPoint;
 	}
 
 	/**
@@ -236,6 +257,9 @@ public class CFNode {
 	 * @param type edge type
 	 */
 	public void addParent(CFNode parent, CFEdgeType type) {
+		if(equals(parent)) {
+			return;
+		}
 		if(!isRoot()) {
 			CFEdge edge = new CFEdge(this, parent, type);
 			if(parents.isEmpty()) {
@@ -263,6 +287,9 @@ public class CFNode {
 	 * @param type edge type
 	 */
 	public void addChild(CFNode child, CFEdgeType type) {
+		if(equals(child)) {
+			return;
+		}
 		CFEdge edge = new CFEdge(this, child, type);
 		if(!children.contains(edge)) {
 			children.add(edge);
