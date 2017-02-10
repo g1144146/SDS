@@ -5,11 +5,15 @@ import sds.assemble.LineInstructions;
 import sds.classfile.bytecode.MnemonicTable;
 
 import static sds.assemble.controlflow.DominatorNodeSearcher.searchCommon;
+import static sds.assemble.controlflow.NodeTypeChecker.check;
+import static sds.assemble.controlflow.NodeTypeChecker.checkNone;
 import static sds.assemble.controlflow.CFNodeType.Entry;
 import static sds.assemble.controlflow.CFNodeType.End;
 import static sds.assemble.controlflow.CFNodeType.Exit;
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
 import static sds.assemble.controlflow.CFNodeType.LoopExit;
+import static sds.assemble.controlflow.CFNodeType.OneLineEntry;
+import static sds.assemble.controlflow.CFNodeType.OneLineEntryBreak;
 import static sds.assemble.controlflow.CFNodeType.SynchronizedEntry;
 import static sds.assemble.controlflow.CFNodeType.SynchronizedExit;
 import static sds.assemble.controlflow.CFNodeType.StringSwitch;
@@ -77,15 +81,15 @@ public class CFGBuilder {
 			setParentAndChildNodeForCatch(isGoto, index);
 			// processing for setting parent and child.
 			if(index > 0) {
-				if(! checkType(nodes[index-1], Exit, LoopExit, End, Switch, StringSwitch)) {
-					if(nodes[index-1].getType() == Entry) {
+				if(checkNone(nodes[index - 1], Exit, LoopExit, End, Switch, StringSwitch)) {
+					if(check(nodes[index-1], Entry)) {
 						addParentAndChild(index, index - 1, TrueBranch);
 					} else {
 						addParentAndChild(index, index - 1, Normal);
 					}
 				}
-			} else if(index == nodes.length-1) {
-				if(! checkType(n, Exit, LoopExit, Switch, StringSwitch)) {
+			} else if(index == nodes.length - 1) {
+				if(checkNone(n, Exit, LoopExit, Switch, StringSwitch)) {
 					if(n.getType() == Entry) {
 						addParentAndChild(index, index, TrueBranch);
 					} else {
@@ -95,16 +99,6 @@ public class CFGBuilder {
 			}
 			index++;
 		}
-	}
-
-	private boolean checkType(CFNode node, CFNodeType... types) {
-		CFNodeType nodeType = node.getType();
-		for(CFNodeType type : types) {
-			if(nodeType == type) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private void setParentAndChildNodeForTry(boolean isGoto, int index) {
@@ -153,27 +147,33 @@ public class CFGBuilder {
 		int index = 0;
 		int synchCount = 0;
 		for(CFNode n : nodes) {
-			CFNodeType type = n.getType();
-			if(type == Exit || type == Entry) {
+			if(check(n, Exit, Entry, OneLineEntry, OneLineEntryBreak)) {
 				for(int i = index; i < nodes.length; i++) {
-					if(nodes[i].isInPcRange(n.getJumpPoint())) {
-						if(type == Entry) {
-							addParentAndChild(i, index, FalseBranch);
-						} else {
-							addParentAndChild(i, index, Normal);
+					// jump for IF opcode
+					for(int jump : n.getJumpPoints()) {
+						// in case of nodes[i] has some if_xx opcode,
+						// the node has some jump points.
+						for(int k = i; k < nodes.length; k++) {
+							if(nodes[k].isInPcRange(jump)) {
+								addParentAndChild(k, index, FalseBranch);
+								break;
+							}
 						}
-						break;
+					}
+					 // jump for GOTO opcode
+					if(nodes[i].isInPcRange(n.getGotoPoint())) {
+						addParentAndChild(i, index, Normal);
 					}
 				}
-			} else if(type == LoopExit) {
+			} else if(check(n, LoopExit)) {
 				for(int i = 0; i < index; i++) {
-					if(nodes[i].isInPcRange(n.getJumpPoint())) {
+					if(nodes[i].isInPcRange(n.getGotoPoint())) {
 						nodes[i].nodeType = LoopEntry;
 						n.addChild(nodes[i]);
 						break;
 					}
 				}
-			} else if(type == Switch || type == StringSwitch) {
+			} else if(check(n, Switch, StringSwitch)) {
 				int[] jumpPoints = n.getSwitchJump();
 				int offsetIndex = 0;
 				for(int i = 0; i < nodes.length; i++) {
@@ -185,7 +185,7 @@ public class CFGBuilder {
 						}
 					}
 				}
-			} else if((type == SynchronizedEntry) && (nodes[index].synchIndent == 0)) {
+			} else if(check(n, SynchronizedEntry) && (nodes[index].synchIndent == 0)) {
 				// in case of synchIndent is over zero,
 				// the node has already analyzed synchronized statement.
 				synchCount++;
@@ -193,11 +193,11 @@ public class CFGBuilder {
 				while((synchCount > 0) && (synchIndex < nodes.length)) {
 					// count > 0: for nested synchronized statement.
 					nodes[synchIndex].synchIndent += synchCount;
-					if(nodes[synchIndex].getType() == SynchronizedEntry) {
+					if(check(nodes[synchIndex], SynchronizedEntry)) {
 						synchCount++;
-					} else if(nodes[synchIndex].getType() == SynchronizedExit) {
+					} else if(check(nodes[synchIndex], SynchronizedExit)) {
 						synchCount--;
-						int jumpPoint = nodes[synchIndex].getJumpPoint();
+						int jumpPoint = nodes[synchIndex].getGotoPoint();
 						for(int j = synchIndex; j < nodes.length; j++) {
 							if(nodes[j].isInPcRange(jumpPoint)) {
 								addParentAndChild(j, synchIndex, Normal);
