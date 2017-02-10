@@ -1,10 +1,15 @@
 package sds.assemble.controlflow;
 
 import sds.classfile.bytecode.BranchOpcode;
+import sds.classfile.bytecode.MnemonicTable;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.Opcodes;
 import sds.classfile.bytecode.SwitchOpcode;
 
+import static sds.classfile.bytecode.MnemonicTable._goto;
+import static sds.classfile.bytecode.MnemonicTable.goto_w;
+import static sds.classfile.bytecode.MnemonicTable.jsr;
+import static sds.classfile.bytecode.MnemonicTable.jsr_w;
 import static sds.classfile.bytecode.MnemonicTable.monitorenter;
 import static sds.classfile.bytecode.MnemonicTable.monitorexit;
 
@@ -17,6 +22,8 @@ public enum CFNodeType {
 	Normal,
 	Entry,
 	Exit,
+	OneLineEntry,
+	OneLineEntryBreak,
 	Switch,
 	StringSwitch,
 	SynchronizedEntry,
@@ -32,11 +39,11 @@ public enum CFNodeType {
 	 * @return node type
 	 */
 	public static CFNodeType getType(Opcodes opcodes, OpcodeInfo end) {
-		if(hasSomeSwitchOpcode(opcodes)) {
-			return StringSwitch;
+		CFNodeType type;
+		if((type = searchTypeFromOpcodes(opcodes, end)) != Normal) {
+			return type;
 		}
 
-		CFNodeType type;
 		if((type = searchType(end)) != Normal) {
 			return type;
 		}
@@ -50,14 +57,47 @@ public enum CFNodeType {
 		return type;
 	}
 
-	private static boolean hasSomeSwitchOpcode(Opcodes opcodes) {
-		int count = 0;
+	private static CFNodeType searchTypeFromOpcodes(Opcodes opcodes, OpcodeInfo end) {
+		int switchCount = 0;
+		int ifCount = 0;
+		int gotoCount = 0;
 		for(OpcodeInfo info : opcodes.getAll()) {
 			if(info instanceof SwitchOpcode) {
-				count++;
+				switchCount++;
+			} else if(info instanceof BranchOpcode) {
+				MnemonicTable type = info.getOpcodeType();
+				if((type == _goto) || (type == goto_w)) {
+					gotoCount++;
+				} else if((type == jsr) || (type == jsr_w)) {
+					// todo
+				} else {
+					ifCount++;
+				}
 			}
 		}
-		return count > 1;
+		if(switchCount > 1) {
+			return StringSwitch;
+		}
+		if(ifCount > 0) {
+			if((end instanceof BranchOpcode) && (searchBranchType(end) == Entry)) {
+				return Entry;
+			}
+			// in case of "if(XXX) break;", opcode sequence is next:
+			// op_1, op_2, ..., if_xx, goto
+			int size = opcodes.size();
+			OpcodeInfo beforeLast = opcodes.getAll()[size - 2];
+			if(gotoCount > 0) {
+				if((beforeLast instanceof BranchOpcode) && (searchBranchType(beforeLast) == Entry)) {
+					return OneLineEntryBreak;
+				}
+			}
+			return OneLineEntry;
+		}
+		if(gotoCount > 0) {
+			// Exit or LoopExit
+			return searchBranchType(end);
+		}
+		return Normal;
 	}
 	
 	private static CFNodeType searchType(OpcodeInfo op) {
@@ -82,7 +122,7 @@ public enum CFNodeType {
 			case jsr:
 			case jsr_w:
 				// todo
-				break;
+				throw new RuntimeException("it doesn't cope with jsr.");
 			case _goto:
 			case goto_w:
 				if(branch.getBranch() > 0) {
