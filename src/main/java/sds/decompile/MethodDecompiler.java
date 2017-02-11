@@ -139,8 +139,10 @@ public class MethodDecompiler extends AbstractDecompiler {
 			StringBuilder line = new StringBuilder();
 			OpcodeInfo[] opcodes = node.getOpcodes().getAll();
 			boolean addSemicolon = true;
+			ConditionalExprBuilder builder = null;
 			if(check(node, Entry, OneLineEntry, OneLineEntryBreak)) {
-				line.append("if(");
+//				line.append("if(");
+				builder = new ConditionalExprBuilder(node);
 				// in the range of
 				// Entry-node ~ FALSE-node of the node (jump point node of Entry-node in case of FALSE),
 				// there is case that Exit-node doesn't exist.
@@ -448,60 +450,72 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case ifeq:
 						if(check(node, LoopEntry)) {
 						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
-							line.append(getIfExpr(" == ")).append(") ");
+							builder.addExpr(opStack.pop(), opStack.pop(typePop), " == ");
+//							line.append(getIfExpr(" == ")).append(") ");
 							break;
 						} else {
-							line.append(getIfExpr(" == "));
+							builder.addExpr(opStack.pop(), opStack.pop(typePop), " == ");
+//							line.append(getIfExpr(" == "));
 						}
 						addSemicolon = false;
 						break;
 					case ifne:
 						if(check(node, LoopEntry)) {
 						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
-							line.append(getIfExpr(" != ")).append(") ");
+//							line.append(getIfExpr(" != ")).append(") ");
+							builder.addExpr(opStack.pop(), opStack.pop(typePop), " != ");
 							break;
 						} else {
-							line.append(getIfExpr(" != "));
+//							line.append(getIfExpr(" != "));
+							builder.addExpr(opStack.pop(), opStack.pop(typePop), " != ");
 						}
 						addSemicolon = false;
 						break;
 					case iflt:
 						if(check(node, LoopEntry)) {
 						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
-							line.append(getIfExpr(" >= ")).append(") ");
+//							line.append(getIfExpr(" >= ")).append(") ");
+							builder.addExpr(opStack.pop(), opStack.pop(typePop), " >= ");
 							break;
 						} else {
-							line.append(getIfExpr(" >= "));
+//							line.append(getIfExpr(" >= "));
+							builder.addExpr(opStack.pop(), opStack.pop(typePop), " >= ");
 						}
 						addSemicolon = false;
 						break;
 					case ifge:
 						if(check(node, LoopEntry)) {
 						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
-							line.append(getIfExpr(" < ")).append(") ");
+//							line.append(getIfExpr(" < ")).append(") ");
+							builder.addExpr(opStack.pop(), opStack.pop(typePop), " < ");
 							break;
 						} else {
-							line.append(getIfExpr(" < "));
+//							line.append(getIfExpr(" < "));
+							builder.addExpr(opStack.pop(), opStack.pop(typePop), " < ");
 						}
 						addSemicolon = false;
 						break;
 					case ifgt:
 						if(check(node, LoopEntry)) {
 						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
-							line.append(getIfExpr(" <= ")).append(") ");
+//							line.append(getIfExpr(" <= ")).append(") ");
+							builder.addExpr(opStack.pop(), opStack.pop(typePop), " <= ");
 							break;
 						} else {
-							line.append(getIfExpr(" <= "));
+//							line.append(getIfExpr(" <= "));
+							builder.addExpr(opStack.pop(), opStack.pop(typePop), " <= ");
 						}
 						addSemicolon = false;
 						break;
 					case ifle:
 						if(check(node, LoopEntry)) {
 						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
-							line.append(getIfExpr(" > ")).append(") ");
+//							line.append(getIfExpr(" > ")).append(") ");
+							builder.addExpr(opStack.pop(), opStack.pop(typePop), " > ");
 							break;
 						} else {
-							line.append(getIfExpr(" > "));
+//							line.append(getIfExpr(" > "));
+							builder.addExpr(opStack.pop(), opStack.pop(typePop), " > ");
 						}
 						addSemicolon = false;
 						break;
@@ -509,48 +523,56 @@ public class MethodDecompiler extends AbstractDecompiler {
 						String ieq_2 = opStack.pop(typePop);
 						String ieq_1 = opStack.pop(typePop);
 						line.append("(").append(ieq_1).append(" == ").append(ieq_2).append(")");
+						builder.addExpr("(" + ieq_1 + " == " + ieq_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_icmpne:
 						String ine_2 = opStack.pop(typePop);
 						String ine_1 = opStack.pop(typePop);
 						line.append("(").append(ine_1).append(" != ").append(ine_2).append(")");
+						builder.addExpr("(" + ine_1 + " != " + ine_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_icmplt:
 						String ilt_2 = opStack.pop(typePop);
 						String ilt_1 = opStack.pop(typePop);
 						line.append("(").append(ilt_1).append(" < ").append(ilt_2).append(")");
+						builder.addExpr("(" + ilt_1 + " < " + ilt_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_icmpge:
 						String ige_2 = opStack.pop(typePop);
 						String ige_1 = opStack.pop(typePop);
 						line.append("(").append(ige_1).append(" >= ").append(ige_2).append(")");
+						builder.addExpr("(" + ige_1 + " >= " + ige_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_icmpgt:
 						String igt_2 = opStack.pop(typePop);
 						String igt_1 = opStack.pop(typePop);
 						line.append("(").append(igt_1).append(" > ").append(igt_2).append(")");
+						builder.addExpr("(" + igt_1 + " > " + igt_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_icmple:
 						String ile_2 = opStack.pop(typePop);
 						String ile_1 = opStack.pop(typePop);
 						line.append("(").append(ile_1).append(" <= ").append(ile_2).append(")");
+						builder.addExpr("(" + ile_1 + " <= " + ile_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_acmpeq:
 						String aeq_2 = opStack.pop(typePop);
 						String aeq_1 = opStack.pop(typePop);
 						line.append("(").append(aeq_1).append(" == ").append(aeq_2).append(")");
+						builder.addExpr("(" + aeq_1 + " == " + aeq_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_acmpne:
 						String ane_2 = opStack.pop(typePop);
 						String ane_1 = opStack.pop(typePop);
 						line.append("(").append(ane_1).append(" != ").append(ane_2).append(")");
+						builder.addExpr("(" + ane_1 + " != " + ane_2 + ")");
 						addSemicolon = false;
 						break;
 					case _goto:
@@ -745,7 +767,10 @@ public class MethodDecompiler extends AbstractDecompiler {
 				println("stack: " + opStack + "\n");
 			}
 			if(check(node, LoopEntry, Entry)) {
-				line.append(") {");
+				line.append(builder.build());
+			}
+			if(check(node, OneLineEntry, OneLineEntryBreak)) {
+				line = new StringBuilder(builder.build()).append(line.toString());
 			}
 			if(line.length() > 0) {
 				// When the node is not start or end of a statement, (ex. "if(...) {", "}")
@@ -788,79 +813,6 @@ public class MethodDecompiler extends AbstractDecompiler {
 	private void castPrimitive(String type) {
 		String casted = "((" + type + ")" + opStack.pop(true) + ")";
 		opStack.push(casted, type);
-	}
-
-	private String addLogicOperator(CFNode node, String line) {
-		if(! line.contains("#LOGIC#")) {
-			return line;
-		}
-		int index = 0;
-		BranchOpcode[] branches = new BranchOpcode[node.getJumpPoints().length];
-		for(OpcodeInfo opcode : node.getOpcodes().getAll()) {
-			if((opcode instanceof BranchOpcode)) {
-				BranchOpcode branch = (BranchOpcode)opcode;
-				if(branch.isIf()) {
-					branches[index] = branch;
-					index++;
-				}
-			}
-		}
-		String[] exprs  = line.split("#LOGIC#");
-		String[] logics = new String[exprs.length - 1];
-		StringBuilder ifLine = new StringBuilder();
-		for(int i = 0; i < branches.length; i++) {
-			if(i < branches.length - 1) {
-				int jump = branches[i].getBranch();
-				for(CFEdge edge : node.getChildren()) {
-					if((edge.getType() == TrueBranch) && edge.getDest().isInPcRange(jump)) {
-						ifLine.append(changeToNegative(branches[i].getOpcodeType(), exprs[i]));
-					} else if((edge.getType() == FalseBranch) && edge.getDest().isInPcRange(jump)) {
-						logics[i] = "&&";
-					}
-				}
-			} else {
-				ifLine.append(exprs[i]);
-			}
-		}
-		return ifLine.toString();
-	}
-
-	private String changeToNegative(MnemonicTable type, String condition) {
-		switch(type) {
-			case if_icmpeq:
-			case if_acmpeq:
-			case ifnull:
-			case ifeq:
-				if(condition.contains("==")) {
-					return condition.replace("==", "!=");
-				}
-				return "(! " + condition + ")";
-			case if_icmpne:
-			case if_acmpne:
-			case ifnonnull:
-			case ifne:      return condition.replace("!=", "==");
-			case if_icmplt:
-			case iflt:      return condition.replace("<" , ">=");
-			case if_icmpgt:
-			case ifgt:      return condition.replace(">" , "<=");
-			case if_icmple:
-			case ifle:      return condition.replace("<=", ">");
-			case if_icmpge:
-			case ifge:      return condition.replace(">=", "<");
-			default:
-				throw new IllegalArgumentException(type + " opcode is not if_xx opcode.");
-		}
-	}
-
-	private String getIfExpr(String cmpOperator) {
-		String expr = opStack.pop();
-		String type = opStack.popType();
-		if(expr.contains("OPERATOR") || type.equals("boolean")) {
-			return expr.replace("OPERATOR", cmpOperator);
-		}
-		// in case of comparing int value and 0, no opcode push 0 onto stack.
-		// so, it is necessary to append comparing operator and 0 to popped element.
-		return "(" + expr + cmpOperator + "0)";
 	}
 
 	private String getStored(int index) {
