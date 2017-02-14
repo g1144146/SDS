@@ -1,25 +1,25 @@
-package sds.decompile;
+package sds.decompile.cond_expr;
 
 import java.util.ArrayList;
 import java.util.List;
-import sds.assemble.controlflow.CFEdge;
+import java.util.HashSet;
+import java.util.Set;
 import sds.assemble.controlflow.CFNode;
-import sds.classfile.bytecode.BranchOpcode;
-import sds.classfile.bytecode.OpcodeInfo;
-import sds.classfile.bytecode.MnemonicTable;
 
 import static sds.assemble.controlflow.CFNodeType.Entry;
+import static sds.assemble.controlflow.CFNodeType.OneLineEntry;
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
-import static sds.assemble.controlflow.CFEdgeType.FalseBranch;
-import static sds.assemble.controlflow.CFEdgeType.TrueBranch;
 import static sds.assemble.controlflow.NodeTypeChecker.check;
+import static sds.decompile.cond_expr.Expression.Child.TRUE;
+import static sds.decompile.cond_expr.Expression.Child.FALSE;
+import static sds.decompile.cond_expr.Expression.Child.OWN;
 
 /**
- * This builder class is for conditional expression.
+ * This builder class is for conditional expression of "if" and "while" statement.
  * @author inagaki
  */
 public class ConditionalExprBuilder {
-	private List<String> exprs;
+	private List<Expression> exprs;
 	private CFNode node;
 	private StringBuilder result;
 
@@ -27,7 +27,7 @@ public class ConditionalExprBuilder {
 		this.node = node;
 		this.exprs = new ArrayList<>();
 		this.result = new StringBuilder("");
-		if(check(node, Entry)) {
+		if(check(node, Entry, OneLineEntry)) {
 			result.append("if(");
 			return;
 		}
@@ -35,27 +35,38 @@ public class ConditionalExprBuilder {
 	}
 
 	/**
-	 * adds part of expression.
+	 * append part of expression.
 	 * @param expr expression
 	 * @param type expression type
 	 * @param cmpOperator comparing operator
 	 */
-	public void addExpr(String expr, String type, String cmpOperator) {
-		if(expr.contains("OPERATOR") || type.equals("boolean")) {
-			addExpr(expr.replace("OPERATOR", cmpOperator));
+	public void append(String expr, String type, String cmpOperator) {
+		if(type.equals("boolean")) {
+			if(expr.contains("OPERATOR")) {
+				append(expr.replace("OPERATOR", cmpOperator));
+			} else {
+				// for example, "str.equals(another)"
+				// in this case, restores reversed expression.
+				if(cmpOperator.equals(" == ")) {
+					append("(! " + expr + ")");
+				} else {
+					// cmpOperator is " != ".
+					append(expr);
+				}
+			}
 			return;
 		}
 		// in case of comparing int value and 0, no opcode push 0 onto stack.
 		// so, it is necessary to append comparing operator and 0 to popped element.
-		addExpr("(" + expr + cmpOperator + "0)");
+		append("(" + expr + cmpOperator + "0)");
 	}
 
 	/**
-	 * adds part of expression.
+	 * appends part of expression.
 	 * @param expr expression
 	 */
-	public void addExpr(String expr) {
-		exprs.add(expr);
+	public void append(String expr) {
+		exprs.add(new Expression(exprs.size(), expr, node));
 	}
 
 	/**
@@ -64,73 +75,151 @@ public class ConditionalExprBuilder {
 	 */
 	public String build() {
 		// processing
+		setExprBranch();
+		// compine expression which same destination has with OR.
+		combineExpr(TRUE, " || ");
+		// compine expression in case of child type of the expression is OWN. 
+		combineExpr();
+		// compine expression which same destination has with AND.
+		combineExpr(FALSE, " && ");
+
 		addLogicalOperator();
 		result.append(") ");
 		return check(node, Entry, LoopEntry) ? result.append("{").toString() : result.toString();
 	}
 
-	private void addLogicalOperator() {
+	private void setExprBranch() {
+		for(int i = 0; i < exprs.size() - 1; i++) {
+			int jump = exprs.get(i).jumpPoint;
+			for(int j = i + 1; j < exprs.size(); j++) {
+				if(exprs.get(j).isDestination(jump)) {
+					exprs.get(i).falseExpr = exprs.get(j);
+				}
+			}
+			if(i < exprs.size() - 1) {
+				exprs.get(i).trueExpr = exprs.get(i + 1);
+			}
+		}
+	}
+
+	/**
+	 * combines expression in case of combinable condition expressions exist.
+	 * for example,
+	 * in case of there are expr_a and expr_b,
+	 * when child type of the exprs is FALSE, the exprs are combinable with OR.
+	 * on the other hand, when the type is TRUE, the exprs are combinable with AND.
+	 */
+	private void combineExpr(Expression.Child type, String logical) {
 		if(exprs.size() < 2) {
 			return;
 		}
-		BranchOpcode[] branches = getBranches();
-		String[] logics = new String[exprs.size() - 1];
-		StringBuilder ifLine = new StringBuilder();
-		for(int i = 0; i < branches.length; i++) {
-			if(i < branches.length - 1) {
-				int jump = branches[i].getBranch();
-				for(CFEdge edge : node.getChildren()) {
-					if((edge.getType() == TrueBranch) && edge.getDest().isInPcRange(jump)) {
-						ifLine.append(changeToNegative(branches[i].getOpcodeType(), exprs.get(i)));
-					} else if((edge.getType() == FalseBranch) && edge.getDest().isInPcRange(jump)) {
-						logics[i] = "&&";
+		Set<Expression> removeSet = new HashSet<>();
+		// combining expressions
+		// if type == TRUE, with 'OR'.
+		// if type == FALSE, with 'AND'.
+		int index = 0;
+		for(Expression ex : exprs) {
+			if(removeSet.contains(ex) || ex.child != type) {
+				continue;
+			}
+			Expression next = ex.trueExpr;
+			while(next != null) {
+				if((ex.jumpPoint == next.jumpPoint) && (next.child == type)) {
+					ex.combine(next, logical);
+					removeSet.add(next);
+					next = next.trueExpr;
+					continue;
+				}
+				break;
+			}
+			index++;
+		}
+		updateExprs(removeSet);
+	}
+
+
+	/**
+	 * this method for child type of expression is OWN.
+	 * for example,
+	 * there are expr_a, expr_b and expr_c, and these expressions is next:
+	 *  - expr_a: child type of this expression is OWN.
+	 *  - expr_b: this expression is destination in case of expr_a is FALSE.
+	 *  - expr_c: this expression is destination in case of expr_a is TRUE.
+	 * then, expr_b and destination expression in case of expr_c are equal,
+	 * expr_a and expr_c is combinable.
+	 * when child type of expr_c is TRUE, the expressions combine with AND.
+	 * on the other hand, when the type is FALSE, the expressions combine with OR.
+	 */
+	private void combineExpr() {
+		if(exprs.size() < 2) {
+			return;
+		}
+		Set<Expression> removeSet = new HashSet<>();
+		for(Expression ex : exprs) {
+			if(removeSet.contains(ex) || ex.child != OWN) {
+				continue;
+			}
+			Expression destination = ex.falseExpr;
+			Expression next = ex.trueExpr;
+			if(destination == null || next == null) {
+				continue;
+			}
+			if(destination.equals(next.trueExpr)) {
+				if(next.child == TRUE) {
+					ex.reverse();
+					ex.combine(next, " && ");
+				} else {
+					ex.combine(next, " || ");
+				}
+				removeSet.add(next);
+			}
+		}
+		updateExprs(removeSet);
+	}
+
+	/**
+	 * makes new List except for elements that removeSet has.
+	 */
+	private void updateExprs(Set<Expression> removeSet) {
+		List<Expression> newList = new ArrayList<>();
+		for(Expression ex : exprs) {
+			if(! removeSet.contains(ex)) {
+				newList.add(ex);
+			}
+		}
+		this.exprs = newList;
+	}
+
+	private void addLogicalOperator() {
+		if(exprs.size() < 2) {
+			result.append(exprs.get(0).expr);
+			return;
+		}
+		String[] logicals = new String[exprs.size() - 1];
+		int index = 0;
+		for(Expression ex : exprs) {
+			if(index >= logicals.length) {
+				break;
+			}
+			if(ex.child == TRUE) {
+				logicals[index] = (logicals[index] == null) ? " || " : logicals[index];
+			} else if(ex.child == FALSE) {
+				logicals[index] = (logicals[index] == null) ? " && " : logicals[index];
+			} else { // ex.child == OWN
+				for(int i = index; i < exprs.size(); i++) {
+					Expression next = exprs.get(i);
+					// the front of destination of this expression is OR operator.
+					if(next.isDestination(ex.jumpPoint) && (! next.equals(ex))) {
+						logicals[i] = " || ";
+						break;
 					}
 				}
-			} else {
-				result.append(exprs.get(i));
 			}
+			index++;
 		}
-	}
-
-	private BranchOpcode[] getBranches() {
-		int index = 0;
-		BranchOpcode[] branches = new BranchOpcode[node.getJumpPoints().length];
-		for(OpcodeInfo opcode : node.getOpcodes().getAll()) {
-			if((opcode instanceof BranchOpcode)) {
-				BranchOpcode branch = (BranchOpcode)opcode;
-				if(branch.isIf()) {
-					branches[index] = branch;
-					index++;
-				}
-			}
+		for(int i = 0; i < logicals.length; i++) {
+			result.append(exprs.get(i).expr).append(logicals[i]);
 		}
-		return branches;
-	}
-
-	private String changeToNegative(MnemonicTable type, String condition) {
-		switch(type) {
-			case if_icmpeq:
-			case if_acmpeq:
-			case ifnull:
-			case ifeq:
-				if(condition.contains("==")) {
-					return condition.replace("==", "!=");
-				}
-				return "(! " + condition + ")";
-			case if_icmpne:
-			case if_acmpne:
-			case ifnonnull:
-			case ifne:      return condition.replace("!=", "==");
-			case if_icmplt:
-			case iflt:      return condition.replace("<" , ">=");
-			case if_icmpgt:
-			case ifgt:      return condition.replace(">" , "<=");
-			case if_icmple:
-			case ifle:      return condition.replace("<=", ">");
-			case if_icmpge:
-			case ifge:      return condition.replace(">=", "<");
-			default:
-				throw new IllegalArgumentException(type + " opcode is not if_xx opcode.");
-		}
+		result.append(exprs.get(exprs.size() - 1).expr);
 	}
 }

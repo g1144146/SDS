@@ -15,6 +15,7 @@ import sds.classfile.bytecode.MnemonicTable;
 import sds.classfile.bytecode.NewArray;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.PushOpcode;
+import sds.decompile.cond_expr.ConditionalExprBuilder;
 
 import static sds.assemble.controlflow.NodeTypeChecker.check;
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
@@ -141,7 +142,6 @@ public class MethodDecompiler extends AbstractDecompiler {
 			boolean addSemicolon = true;
 			ConditionalExprBuilder builder = null;
 			if(check(node, Entry, OneLineEntry, OneLineEntryBreak)) {
-//				line.append("if(");
 				builder = new ConditionalExprBuilder(node);
 				// in the range of
 				// Entry-node ~ FALSE-node of the node (jump point node of Entry-node in case of FALSE),
@@ -171,7 +171,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 			for(OpcodeInfo opcode : opcodes) {
 //				println(opcode + ", current: " + opStack.getCurrentStackSize());
 //				println("local: " + local);
-				println("stack: " + opStack);
+//				println("stack: " + opStack);
 				switch(opcode.getOpcodeType()) {
 					case nop: break;
 					case aconst_null: opStack.push("null", "null"); break;
@@ -447,132 +447,112 @@ public class MethodDecompiler extends AbstractDecompiler {
 						String cmpNum_1 = opStack.pop(typePop);
 						opStack.push("(" + cmpNum_1 + "OPERATOR" + cmpNum_2 + ")", "boolean");
 						break;
-					case ifeq:
+					case ifeq: // (x == y)
 						if(check(node, LoopEntry)) {
 						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
-							builder.addExpr(opStack.pop(), opStack.pop(typePop), " == ");
-//							line.append(getIfExpr(" == ")).append(") ");
+							builder.append(opStack.pop(), opStack.popType(), " == ");
 							break;
 						} else {
-							builder.addExpr(opStack.pop(), opStack.pop(typePop), " == ");
-//							line.append(getIfExpr(" == "));
+							builder.append(opStack.pop(), opStack.popType(), " == ");
 						}
 						addSemicolon = false;
 						break;
-					case ifne:
+					case ifne: // (x != y)
 						if(check(node, LoopEntry)) {
 						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
-//							line.append(getIfExpr(" != ")).append(") ");
-							builder.addExpr(opStack.pop(), opStack.pop(typePop), " != ");
+							builder.append(opStack.pop(), opStack.popType(), " != ");
 							break;
 						} else {
-//							line.append(getIfExpr(" != "));
-							builder.addExpr(opStack.pop(), opStack.pop(typePop), " != ");
+							builder.append(opStack.pop(), opStack.popType(), " != ");
 						}
 						addSemicolon = false;
 						break;
-					case iflt:
+					case iflt: // (x < y)
 						if(check(node, LoopEntry)) {
 						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
-//							line.append(getIfExpr(" >= ")).append(") ");
-							builder.addExpr(opStack.pop(), opStack.pop(typePop), " >= ");
+							builder.append(opStack.pop(), opStack.popType(), " < ");
 							break;
 						} else {
-//							line.append(getIfExpr(" >= "));
-							builder.addExpr(opStack.pop(), opStack.pop(typePop), " >= ");
+							builder.append(opStack.pop(), opStack.popType(), " < ");
 						}
 						addSemicolon = false;
 						break;
-					case ifge:
+					case ifge: // (x >= y)
 						if(check(node, LoopEntry)) {
 						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
-//							line.append(getIfExpr(" < ")).append(") ");
-							builder.addExpr(opStack.pop(), opStack.pop(typePop), " < ");
+							builder.append(opStack.pop(), opStack.popType(), " >= ");
 							break;
 						} else {
-//							line.append(getIfExpr(" < "));
-							builder.addExpr(opStack.pop(), opStack.pop(typePop), " < ");
+							builder.append(opStack.pop(), opStack.popType(), " >= ");
 						}
 						addSemicolon = false;
 						break;
-					case ifgt:
+					case ifgt: // (x > y)
 						if(check(node, LoopEntry)) {
 						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
-//							line.append(getIfExpr(" <= ")).append(") ");
-							builder.addExpr(opStack.pop(), opStack.pop(typePop), " <= ");
+							builder.append(opStack.pop(), opStack.popType(), " > ");
 							break;
 						} else {
-//							line.append(getIfExpr(" <= "));
-							builder.addExpr(opStack.pop(), opStack.pop(typePop), " <= ");
+							builder.append(opStack.pop(), opStack.popType(), " > ");
 						}
 						addSemicolon = false;
 						break;
-					case ifle:
+					case ifle: // (x <= y)
 						if(check(node, LoopEntry)) {
 						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
-//							line.append(getIfExpr(" > ")).append(") ");
-							builder.addExpr(opStack.pop(), opStack.pop(typePop), " > ");
+							builder.append(opStack.pop(), opStack.popType(), " <= ");
 							break;
 						} else {
-//							line.append(getIfExpr(" > "));
-							builder.addExpr(opStack.pop(), opStack.pop(typePop), " > ");
+							builder.append(opStack.pop(), opStack.popType(), " <= ");
 						}
 						addSemicolon = false;
 						break;
 					case if_icmpeq:
 						String ieq_2 = opStack.pop(typePop);
 						String ieq_1 = opStack.pop(typePop);
-						line.append("(").append(ieq_1).append(" == ").append(ieq_2).append(")");
-						builder.addExpr("(" + ieq_1 + " == " + ieq_2 + ")");
+						builder.append("(" + ieq_1 + " == " + ieq_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_icmpne:
 						String ine_2 = opStack.pop(typePop);
 						String ine_1 = opStack.pop(typePop);
-						line.append("(").append(ine_1).append(" != ").append(ine_2).append(")");
-						builder.addExpr("(" + ine_1 + " != " + ine_2 + ")");
+						builder.append("(" + ine_1 + " != " + ine_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_icmplt:
 						String ilt_2 = opStack.pop(typePop);
 						String ilt_1 = opStack.pop(typePop);
-						line.append("(").append(ilt_1).append(" < ").append(ilt_2).append(")");
-						builder.addExpr("(" + ilt_1 + " < " + ilt_2 + ")");
+						builder.append("(" + ilt_1 + " < " + ilt_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_icmpge:
 						String ige_2 = opStack.pop(typePop);
 						String ige_1 = opStack.pop(typePop);
-						line.append("(").append(ige_1).append(" >= ").append(ige_2).append(")");
-						builder.addExpr("(" + ige_1 + " >= " + ige_2 + ")");
+						builder.append("(" + ige_1 + " >= " + ige_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_icmpgt:
 						String igt_2 = opStack.pop(typePop);
 						String igt_1 = opStack.pop(typePop);
-						line.append("(").append(igt_1).append(" > ").append(igt_2).append(")");
-						builder.addExpr("(" + igt_1 + " > " + igt_2 + ")");
+						builder.append("(" + igt_1 + " > " + igt_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_icmple:
 						String ile_2 = opStack.pop(typePop);
 						String ile_1 = opStack.pop(typePop);
-						line.append("(").append(ile_1).append(" <= ").append(ile_2).append(")");
-						builder.addExpr("(" + ile_1 + " <= " + ile_2 + ")");
+						builder.append("(" + ile_1 + " <= " + ile_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_acmpeq:
 						String aeq_2 = opStack.pop(typePop);
 						String aeq_1 = opStack.pop(typePop);
-						line.append("(").append(aeq_1).append(" == ").append(aeq_2).append(")");
-						builder.addExpr("(" + aeq_1 + " == " + aeq_2 + ")");
+						builder.append("(" + aeq_1 + " == " + aeq_2 + ")");
 						addSemicolon = false;
 						break;
 					case if_acmpne:
 						String ane_2 = opStack.pop(typePop);
 						String ane_1 = opStack.pop(typePop);
-						line.append("(").append(ane_1).append(" != ").append(ane_2).append(")");
-						builder.addExpr("(" + ane_1 + " != " + ane_2 + ")");
+						builder.append("(" + ane_1 + " != " + ane_2 + ")");
 						addSemicolon = false;
 						break;
 					case _goto:
@@ -664,7 +644,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 							String element = opStack.pop();
 							String type    = opStack.popType();
 							// stack: []
-							opStack.pop(typePop);
+							if(opStack.stack.size() > 0) {
+								opStack.pop(typePop);
+							}
 							// stack: [invoked_method]
 							opStack.push(element, type);
 						}
@@ -764,7 +746,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 					default: break;
 				}
 //				println("local: " + local);
-				println("stack: " + opStack + "\n");
+//				println("stack: " + opStack + "\n");
 			}
 			if(check(node, LoopEntry, Entry)) {
 				line.append(builder.build());
@@ -861,7 +843,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 	 * 
 	 * in case of the opcode is end,
 	 * it is necessary to push element onto openrand stack
-	 * because there is some processing in the next.
+	 * because there are some processing in the next.
 	 * 
 	 * on the other hand, in case of that is not end,
 	 * it is necessary to write processing of invoking method on decompiled source
