@@ -1,4 +1,4 @@
-package sds.decompile;
+package sds.decompile.stack;
 
 /**
  * This class is for local variable stack.

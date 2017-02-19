@@ -1,4 +1,4 @@
-package sds.decompile;
+package sds.decompile.stack;
 
 import java.util.Stack;
 
@@ -18,6 +18,14 @@ public abstract class SimpleStack {
 	public SimpleStack() {
 		this.stack = new Stack<>();
 		this.type = new Stack<>();
+	}
+
+	/**
+	 * returns stack size.
+	 * @return stack size
+	 */
+	public int size() {
+		return stack.size();
 	}
 
 	/**
