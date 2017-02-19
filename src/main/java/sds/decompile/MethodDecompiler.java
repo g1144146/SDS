@@ -1,17 +1,17 @@
 package sds.decompile;
 
+import sds.decompile.stack.LocalStack;
+import sds.decompile.stack.OperandStack;
 import sds.assemble.BaseContent;
 import sds.assemble.LineInstructions;
 import sds.assemble.MethodContent;
 import sds.assemble.controlflow.CFNode;
 import sds.assemble.controlflow.CFEdge;
-import sds.classfile.bytecode.BranchOpcode;
 import sds.classfile.bytecode.CpRefOpcode;
 import sds.classfile.bytecode.Iinc;
 import sds.classfile.bytecode.IndexOpcode;
 import sds.classfile.bytecode.InvokeInterface;
 import sds.classfile.bytecode.MultiANewArray;
-import sds.classfile.bytecode.MnemonicTable;
 import sds.classfile.bytecode.NewArray;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.PushOpcode;
@@ -88,19 +88,19 @@ public class MethodDecompiler extends AbstractDecompiler {
 					methodDeclaration.append(args[i][0]).append(" ").append(args[i][1]).append(", ");
 					String type = args[i][0];
 					if(type.matches("double|long")) {
-						local.push("arg_" + i, type);
-						local.push("arg_" + i, type);
+						local.push(args[i][1], type);
+						local.push(args[i][1], type);
 					} else {
-						local.push("arg_" + i, type);
+						local.push(args[i][1], type);
 					}
 				}
 				String type = args[length - 1][0];
 				methodDeclaration.append(type).append(" ").append(args[length - 1][1]);
 				if(type.matches("double|long")) {
-					local.push("arg_" + (length - 1), type);
-					local.push("arg_" + (length - 1), type);
+					local.push(args[length - 1][1], type);
+					local.push(args[length - 1][1], type);
 				} else {
-					local.push("arg_" + (length - 1), type);
+					local.push(args[length - 1][1], type);
 				}
 			}
 			methodDeclaration.append(") ");
@@ -127,6 +127,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 
 		// method body
 		result.changeIndent(INCREMENT);
+		println("\n>>> " + methodDeclaration + " <<<");
 		buildMethodBody(method.getInst(), method.getNodes());
 		result.writeEndScope();
 	}
@@ -644,7 +645,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 							String element = opStack.pop();
 							String type    = opStack.popType();
 							// stack: []
-							if(opStack.stack.size() > 0) {
+							if(opStack.size() > 0) {
 								opStack.pop(typePop);
 							}
 							// stack: [invoked_method]

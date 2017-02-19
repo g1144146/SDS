@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 import sds.assemble.controlflow.CFNode;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static sds.assemble.controlflow.CFNodeType.Entry;
 import static sds.assemble.controlflow.CFNodeType.OneLineEntry;
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
@@ -13,6 +15,7 @@ import static sds.assemble.controlflow.NodeTypeChecker.check;
 import static sds.decompile.cond_expr.Expression.Child.TRUE;
 import static sds.decompile.cond_expr.Expression.Child.FALSE;
 import static sds.decompile.cond_expr.Expression.Child.OWN;
+import static sds.util.Printer.println;
 
 /**
  * This builder class is for conditional expression of "if" and "while" statement.
@@ -74,36 +77,55 @@ public class ConditionalExprBuilder {
 	 * @return conditional expression
 	 */
 	public String build() {
-		// processing
+		// setting true and false expression of that.
 		setExprBranch();
-		// compine expression which same destination has with OR.
+		println("[initialized]: " + exprs);
+
+		int len = exprs.size();
 		combineExpr(TRUE, " || ");
+		output(len, "combine TRUE");
+		
+		len = exprs.size();
+		combineExpr(OWN, "");
+		output(len, "combine OWN");
+
 		// compine expression in case of child type of the expression is OWN. 
+		len = exprs.size();
 		combineExpr();
-		// compine expression which same destination has with AND.
+		output(len, "combine BOTH");
+
+		len = exprs.size();
 		combineExpr(FALSE, " && ");
+		output(len, "FALSE");
+
+		len = exprs.size();
+		combineCommonFactor();
+		output(len, "combine Last");
 
 		addLogicalOperator();
 		result.append(") ");
+		println("*** " + result + " ***");
 		return check(node, Entry, LoopEntry) ? result.append("{").toString() : result.toString();
+	}
+
+	private void output(int len, String phase) {
+		if(len != exprs.size()) println("[after " + phase + "]: " + exprs);
 	}
 
 	private void setExprBranch() {
 		for(int i = 0; i < exprs.size() - 1; i++) {
+			exprs.get(i).trueExpr = exprs.get(i + 1);
 			int jump = exprs.get(i).jumpPoint;
-			for(int j = i + 1; j < exprs.size(); j++) {
+			for(int j = i; j < exprs.size(); j++) {
 				if(exprs.get(j).isDestination(jump)) {
 					exprs.get(i).falseExpr = exprs.get(j);
 				}
-			}
-			if(i < exprs.size() - 1) {
-				exprs.get(i).trueExpr = exprs.get(i + 1);
 			}
 		}
 	}
 
 	/**
-	 * combines expression in case of combinable condition expressions exist.
+	 * combines each expression in case of expressions have same destination.
 	 * for example,
 	 * in case of there are expr_a and expr_b,
 	 * when child type of the exprs is FALSE, the exprs are combinable with OR.
@@ -114,25 +136,49 @@ public class ConditionalExprBuilder {
 			return;
 		}
 		Set<Expression> removeSet = new HashSet<>();
+		if(type == OWN) {
+			int index = 0;
+			for(Expression ex : exprs) {
+				Expression next = ex.trueExpr;
+				if(nonNull(next) &&(ex.jumpPoint == next.jumpPoint) && (next.child == type) && (0 < index)) {
+					Expression.Child beforeChild = exprs.get(index - 1).child;
+					Expression.Child nextTrue = next.trueExpr.child;
+					if((beforeChild == OWN) && nonNull(nextTrue) && (nextTrue == OWN)) {
+						removeSet.addAll(combineExpr(index - 1, index, new HashSet<>()));
+						break;
+					}
+				}
+				index++;
+			}
+			updateExprs(removeSet);
+			removeSet.clear();
+			println("[in the middle]: " + exprs);
+		}
 		// combining expressions
 		// if type == TRUE, with 'OR'.
 		// if type == FALSE, with 'AND'.
-		int index = 0;
 		for(Expression ex : exprs) {
 			if(removeSet.contains(ex) || ex.child != type) {
 				continue;
 			}
 			Expression next = ex.trueExpr;
-			while(next != null) {
+			while(nonNull(next)) {
 				if((ex.jumpPoint == next.jumpPoint) && (next.child == type)) {
-					ex.combine(next, logical);
+					if(type == OWN) {
+						if((searchDestinationChild(next.falseExpr) == TRUE)) {
+							ex.combine(next, " || ");
+						} else {
+							ex.combine(next, " && ");
+						}
+					} else {
+						ex.combine(next, logical);
+					}
 					removeSet.add(next);
 					next = next.trueExpr;
 					continue;
 				}
 				break;
 			}
-			index++;
 		}
 		updateExprs(removeSet);
 	}
@@ -151,27 +197,84 @@ public class ConditionalExprBuilder {
 	 * on the other hand, when the type is FALSE, the expressions combine with OR.
 	 */
 	private void combineExpr() {
+		updateExprs(combineExpr(0, exprs.size(), new HashSet<>()));
+	}
+
+	private Set<Expression> combineExpr(int from, int until, Set<Expression> removeSet) {
+		if((exprs.size() < 2) || (from == until)) {
+			return removeSet;
+		}
+		Expression ex = exprs.get(from);
+		if((! removeSet.contains(ex)) && (ex.child == OWN) && (ex.falseExpr != null)) {
+			Expression destination = ex.falseExpr;
+			Expression next = ex.trueExpr;
+			int index = from + 1;
+			while(nonNull(destination)) {
+				if(destination.equals(next.trueExpr)) {
+					if(searchDestinationChild(next) == TRUE) {
+						ex.reverse();
+						ex.combine(next, " && ");
+					} else {
+						if(next.child == OWN) {
+							next.reverse();
+						}
+						ex.combine(next, " || ");
+					}
+					removeSet.add(next);
+				}
+				destination = next.falseExpr;
+				next = next.trueExpr;
+				index++;
+				if(isNull(next) || (next.child != OWN) || (index >= until)) {
+					break;
+				}
+			}
+		}
+		return combineExpr(from + 1, until, removeSet);
+	}
+
+	private Expression.Child searchDestinationChild(Expression expr) {
+		while(expr.child == OWN) {
+			expr = expr.falseExpr;
+		}
+		return expr.child;
+	}
+
+	/**
+	 * for example, it defines opcode sequence to next:<br>
+	 *   1. if_a N<br>
+	 *   2. if_b X<br>
+	 *   3. if_c M<br>
+	 *   4. if_d X<br>
+	 * in this case, if_a and if_b are combinable.<br>
+	 * in the same way, if_c and if_d is too.<br>
+	 * if destination of N or M is TRUE, each if_x combines with 'OR'.
+	 * otherwise, if the destination is FALSE, it combines with 'AND'.
+	 */
+	private void combineCommonFactor() {
 		if(exprs.size() < 2) {
 			return;
 		}
+		int[] counter = new int[exprs.get(exprs.size() - 1).jumpPoint];
+		for(Expression ex : exprs) {
+			if(ex.child == FALSE) {
+				counter[ex.jumpPoint - 1]++;
+			}
+		}
 		Set<Expression> removeSet = new HashSet<>();
 		for(Expression ex : exprs) {
-			if(removeSet.contains(ex) || ex.child != OWN) {
-				continue;
-			}
-			Expression destination = ex.falseExpr;
 			Expression next = ex.trueExpr;
-			if(destination == null || next == null) {
+			if(removeSet.contains(ex) || isNull(next) || next.child != FALSE) {
 				continue;
 			}
-			if(destination.equals(next.trueExpr)) {
-				if(next.child == TRUE) {
-					ex.reverse();
-					ex.combine(next, " && ");
-				} else {
+			if((ex.jumpPoint != next.jumpPoint) && (counter[next.jumpPoint - 1] > 1)) {
+				if(ex.child == TRUE) {
 					ex.combine(next, " || ");
+					removeSet.add(next);
+				} else if(ex.child == FALSE) {
+					ex.combine(next, " && ");
+					removeSet.add(next);
 				}
-				removeSet.add(next);
 			}
 		}
 		updateExprs(removeSet);
@@ -181,6 +284,9 @@ public class ConditionalExprBuilder {
 	 * makes new List except for elements that removeSet has.
 	 */
 	private void updateExprs(Set<Expression> removeSet) {
+		if(removeSet.isEmpty()) {
+			return;
+		}
 		List<Expression> newList = new ArrayList<>();
 		for(Expression ex : exprs) {
 			if(! removeSet.contains(ex)) {
@@ -192,7 +298,7 @@ public class ConditionalExprBuilder {
 
 	private void addLogicalOperator() {
 		if(exprs.size() < 2) {
-			result.append(exprs.get(0).expr);
+			result.append(exprs.get(0).getExpr());
 			return;
 		}
 		String[] logicals = new String[exprs.size() - 1];
@@ -202,24 +308,28 @@ public class ConditionalExprBuilder {
 				break;
 			}
 			if(ex.child == TRUE) {
-				logicals[index] = (logicals[index] == null) ? " || " : logicals[index];
+				logicals[index] = isNull(logicals[index]) ? " || " : logicals[index];
 			} else if(ex.child == FALSE) {
-				logicals[index] = (logicals[index] == null) ? " && " : logicals[index];
+				logicals[index] = isNull(logicals[index]) ? " && " : logicals[index];
 			} else { // ex.child == OWN
-				for(int i = index; i < exprs.size(); i++) {
-					Expression next = exprs.get(i);
-					// the front of destination of this expression is OR operator.
-					if(next.isDestination(ex.jumpPoint) && (! next.equals(ex))) {
-						logicals[i] = " || ";
-						break;
+				Expression next = ex.trueExpr;
+				int logicIndex = index;
+				while(nonNull(next) && (logicIndex < logicals.length)) {
+					for(int jump : ex.getOwnDest()) {
+						if(next.isDestination(jump)) {
+							logicals[logicIndex] = (exprs.get(logicIndex).child == TRUE) ? " || " : " && ";
+							break;
+						}
 					}
+					logicIndex++;
+					next = next.trueExpr;
 				}
 			}
 			index++;
 		}
 		for(int i = 0; i < logicals.length; i++) {
-			result.append(exprs.get(i).expr).append(logicals[i]);
+			result.append(exprs.get(i).getExpr()).append(logicals[i]);
 		}
-		result.append(exprs.get(exprs.size() - 1).expr);
+		result.append(exprs.get(exprs.size() - 1).getExpr());
 	}
 }
