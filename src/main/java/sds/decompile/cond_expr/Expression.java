@@ -7,9 +7,9 @@ import sds.assemble.controlflow.CFNode;
 import sds.classfile.bytecode.BranchOpcode;
 import sds.classfile.bytecode.OpcodeInfo;
 
-import static java.util.Objects.isNull;
 import static sds.assemble.controlflow.CFEdgeType.FalseBranch;
 import static sds.assemble.controlflow.CFEdgeType.TrueBranch;
+import static java.util.Objects.isNull;
 import static sds.util.Printer.println;
 /**
  * This class is for conditional expression.
@@ -148,14 +148,32 @@ public class Expression {
 		return (range[0] <= pc) && (pc <= range[1]);
 	}
 
+	/**
+	 * returns whether destination of this expression is equal to specified expression's.
+	 * @param expr target expression
+	 * @return if the destination is equal to specified, this method returns true.<br>
+	 * otherwise, it returns false.
+	 */
 	public boolean equalsDest(Expression expr) {
 		return jumpPoint == expr.jumpPoint;
 	}
 
+	/**
+	 * returns whether this expression child type is equal to specified expression's.
+	 * @param expr target expression
+	 * @return if the type is equal to specified, this method returns true.<br>
+	 * otherwise, it returns false.
+	 */
 	public boolean equalsChild(Expression expr) {
 		return equalsChild(expr.child);
 	}
 
+	/**
+	 * returns whether this expression child type is equal to specified that.
+	 * @param expr target expression
+	 * @return if the type is equal to specified, this method returns true.<br>
+	 * otherwise, it returns false.
+	 */
 	public boolean equalsChild(Expression.Child child) {
 		return this.child.is(child);
 	}
