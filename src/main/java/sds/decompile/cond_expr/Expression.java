@@ -27,6 +27,14 @@ public class Expression {
 
 	public enum Child {
 		TRUE, FALSE, OWN;
+
+		public boolean is(Child child) {
+			return ordinal() == child.ordinal();
+		}
+
+		public boolean isNot(Child child) {
+			return (! is(child));
+		}
 	}
 
 	public Expression(int number, String expr, CFNode node) {
@@ -93,7 +101,7 @@ public class Expression {
 		this.trueExpr = newExpr.trueExpr;
 		this.falseExpr = newExpr.falseExpr;
 		this.child = newExpr.child;
-		if(child == Child.OWN) {
+		if(equalsChild(Child.OWN)) {
 			int[] replaced = new int[ownDest.length + 1];
 			System.arraycopy(ownDest, 0, replaced, 0, ownDest.length);
 			replaced[replaced.length - 1] = newExpr.jumpPoint;
@@ -123,7 +131,7 @@ public class Expression {
 	 * @return jump points
 	 */
 	public int[] getOwnDest() {
-		if(child != Child.OWN) {
+		if(child.isNot(Child.OWN)) {
 			throw new IllegalStateException(child + " type expression must not call this method.");
 		}
 		return ownDest;
@@ -138,6 +146,18 @@ public class Expression {
 	 */
 	public boolean isDestination(int pc) {
 		return (range[0] <= pc) && (pc <= range[1]);
+	}
+
+	public boolean equalsDest(Expression expr) {
+		return jumpPoint == expr.jumpPoint;
+	}
+
+	public boolean equalsChild(Expression expr) {
+		return equalsChild(expr.child);
+	}
+
+	public boolean equalsChild(Expression.Child child) {
+		return this.child.is(child);
 	}
 
 	/**

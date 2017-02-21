@@ -6,15 +6,16 @@ import java.util.HashSet;
 import java.util.Set;
 import sds.assemble.controlflow.CFNode;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static sds.assemble.controlflow.CFNodeType.Entry;
 import static sds.assemble.controlflow.CFNodeType.OneLineEntry;
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
-import static sds.assemble.controlflow.NodeTypeChecker.check;
 import static sds.decompile.cond_expr.Expression.Child.TRUE;
 import static sds.decompile.cond_expr.Expression.Child.FALSE;
 import static sds.decompile.cond_expr.Expression.Child.OWN;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static sds.assemble.controlflow.NodeTypeChecker.check;
 import static sds.util.Printer.println;
 
 /**
@@ -136,14 +137,14 @@ public class ConditionalExprBuilder {
 			return;
 		}
 		Set<Expression> removeSet = new HashSet<>();
-		if(type == OWN) {
+		if(type.is(OWN)) {
 			int index = 0;
 			for(Expression ex : exprs) {
 				Expression next = ex.trueExpr;
-				if(nonNull(next) &&(ex.jumpPoint == next.jumpPoint) && (next.child == type) && (0 < index)) {
+				if(nonNull(next) && ex.equalsDest(next) && next.equalsChild(type) && (0 < index)) {
 					Expression.Child beforeChild = exprs.get(index - 1).child;
 					Expression.Child nextTrue = next.trueExpr.child;
-					if((beforeChild == OWN) && nonNull(nextTrue) && (nextTrue == OWN)) {
+					if(beforeChild.is(OWN) && nonNull(nextTrue) && nextTrue.is(OWN)) {
 						removeSet.addAll(combineExpr(index - 1, index, new HashSet<>()));
 						break;
 					}
@@ -158,14 +159,14 @@ public class ConditionalExprBuilder {
 		// if type == TRUE, with 'OR'.
 		// if type == FALSE, with 'AND'.
 		for(Expression ex : exprs) {
-			if(removeSet.contains(ex) || ex.child != type) {
+			if(removeSet.contains(ex) || type.isNot(ex.child)) {
 				continue;
 			}
 			Expression next = ex.trueExpr;
 			while(nonNull(next)) {
-				if((ex.jumpPoint == next.jumpPoint) && (next.child == type)) {
-					if(type == OWN) {
-						if((searchDestinationChild(next.falseExpr) == TRUE)) {
+				if(ex.equalsDest(next) && type.is(next.child)) {
+					if(type.is(OWN)) {
+						if(searchDestinationChild(next.falseExpr).is(TRUE)) {
 							ex.combine(next, " || ");
 						} else {
 							ex.combine(next, " && ");
@@ -205,17 +206,17 @@ public class ConditionalExprBuilder {
 			return removeSet;
 		}
 		Expression ex = exprs.get(from);
-		if((! removeSet.contains(ex)) && (ex.child == OWN) && (ex.falseExpr != null)) {
+		if((! removeSet.contains(ex)) && ex.equalsChild(OWN) && nonNull(ex.falseExpr)) {
 			Expression destination = ex.falseExpr;
 			Expression next = ex.trueExpr;
 			int index = from + 1;
 			while(nonNull(destination)) {
 				if(destination.equals(next.trueExpr)) {
-					if(searchDestinationChild(next) == TRUE) {
+					if(searchDestinationChild(next).is(TRUE)) {
 						ex.reverse();
 						ex.combine(next, " && ");
 					} else {
-						if(next.child == OWN) {
+						if(next.equalsChild(OWN)) {
 							next.reverse();
 						}
 						ex.combine(next, " || ");
@@ -225,7 +226,7 @@ public class ConditionalExprBuilder {
 				destination = next.falseExpr;
 				next = next.trueExpr;
 				index++;
-				if(isNull(next) || (next.child != OWN) || (index >= until)) {
+				if(isNull(next) || next.child.isNot(OWN) || (index >= until)) {
 					break;
 				}
 			}
@@ -234,7 +235,7 @@ public class ConditionalExprBuilder {
 	}
 
 	private Expression.Child searchDestinationChild(Expression expr) {
-		while(expr.child == OWN) {
+		while(expr.equalsChild(OWN)) {
 			expr = expr.falseExpr;
 		}
 		return expr.child;
@@ -257,21 +258,21 @@ public class ConditionalExprBuilder {
 		}
 		int[] counter = new int[exprs.get(exprs.size() - 1).jumpPoint];
 		for(Expression ex : exprs) {
-			if(ex.child == FALSE) {
+			if(ex.equalsChild(FALSE)) {
 				counter[ex.jumpPoint - 1]++;
 			}
 		}
 		Set<Expression> removeSet = new HashSet<>();
 		for(Expression ex : exprs) {
 			Expression next = ex.trueExpr;
-			if(removeSet.contains(ex) || isNull(next) || next.child != FALSE) {
+			if(removeSet.contains(ex) || isNull(next) || ex.child.isNot(FALSE)) {
 				continue;
 			}
-			if((ex.jumpPoint != next.jumpPoint) && (counter[next.jumpPoint - 1] > 1)) {
-				if(ex.child == TRUE) {
+			if((! ex.equalsDest(next)) && (counter[next.jumpPoint - 1] > 1)) {
+				if(ex.equalsChild(TRUE)) {
 					ex.combine(next, " || ");
 					removeSet.add(next);
-				} else if(ex.child == FALSE) {
+				} else if(ex.equalsChild(FALSE)) {
 					ex.combine(next, " && ");
 					removeSet.add(next);
 				}
@@ -307,9 +308,9 @@ public class ConditionalExprBuilder {
 			if(index >= logicals.length) {
 				break;
 			}
-			if(ex.child == TRUE) {
+			if(ex.equalsChild(TRUE)) {
 				logicals[index] = isNull(logicals[index]) ? " || " : logicals[index];
-			} else if(ex.child == FALSE) {
+			} else if(ex.equalsChild(FALSE)) {
 				logicals[index] = isNull(logicals[index]) ? " && " : logicals[index];
 			} else { // ex.child == OWN
 				Expression next = ex.trueExpr;
