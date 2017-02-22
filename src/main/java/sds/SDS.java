@@ -90,7 +90,7 @@ public class SDS {
 	}
 
 	private void printClassFile(ClassFile cf, boolean output) {
-		if(! output) {
+		if(output) {
 			return;
 		}
 		try {

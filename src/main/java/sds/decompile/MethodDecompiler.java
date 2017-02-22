@@ -18,9 +18,11 @@ import sds.classfile.bytecode.PushOpcode;
 import sds.decompile.cond_expr.ConditionalExprBuilder;
 
 import static sds.assemble.controlflow.NodeTypeChecker.check;
+import static sds.assemble.controlflow.CFNodeType.End;
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
 import static sds.assemble.controlflow.CFNodeType.LoopExit;
 import static sds.assemble.controlflow.CFNodeType.Entry;
+import static sds.assemble.controlflow.CFNodeType.Normal;
 import static sds.assemble.controlflow.CFNodeType.OneLineEntry;
 import static sds.assemble.controlflow.CFNodeType.OneLineEntryBreak;
 import static sds.assemble.controlflow.CFNodeType.Exit;
@@ -128,20 +130,23 @@ public class MethodDecompiler extends AbstractDecompiler {
 		// method body
 		result.changeIndent(INCREMENT);
 		println("\n>>> " + methodDeclaration + " <<<");
-		buildMethodBody(method.getInst(), method.getNodes());
+		buildMethodBody(method.getNodes());
 		result.writeEndScope();
 	}
 
-	private void buildMethodBody(LineInstructions[] insts, CFNode[] nodes) {
+	private void buildMethodBody(CFNode[] nodes) {
 		boolean typePop = true;
 		CFNode falseNode = null;
-		for(int i = 0; i < insts.length; i++) {
+		for(int i = 0; i < nodes.length; i++) {
 			CFNode node = nodes[i];
-			LineInstructions inst = insts[i];
 			StringBuilder line = new StringBuilder();
 			OpcodeInfo[] opcodes = node.getOpcodes().getAll();
 			boolean addSemicolon = true;
 			ConditionalExprBuilder builder = null;
+			
+			if(falseNode != null && falseNode.equals(node)) {
+				result.writeEndScope();
+			}
 			if(check(node, Entry, OneLineEntry, OneLineEntryBreak)) {
 				builder = new ConditionalExprBuilder(node);
 				// in the range of
@@ -156,7 +161,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						CFNode terminal = edge.getDest();
 						boolean hasExit = false;
 						while(! nodes[index].equals(terminal)) {
-							hasExit |= (nodes[index].getType() == Exit);
+							hasExit |= check(nodes[index], Exit);
 							index++;
 						}
 						if(! hasExit) {
@@ -165,10 +170,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						break;
 					}
 				}
-			}
-			if(falseNode != null && falseNode.equals(node)) {
-				result.writeEndScope();
-			}
+			} 
 			for(OpcodeInfo opcode : opcodes) {
 //				println(opcode + ", current: " + opStack.getCurrentStackSize());
 //				println("local: " + local);
@@ -511,49 +513,105 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case if_icmpeq:
 						String ieq_2 = opStack.pop(typePop);
 						String ieq_1 = opStack.pop(typePop);
-						builder.append("(" + ieq_1 + " == " + ieq_2 + ")");
+						if(check(node, LoopEntry)) {
+							
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							builder.append("(" + ieq_1 + " == " + ieq_2 + ")");
+							break;
+						} else {
+							builder.append("(" + ieq_1 + " == " + ieq_2 + ")");
+						}
 						addSemicolon = false;
 						break;
 					case if_icmpne:
 						String ine_2 = opStack.pop(typePop);
 						String ine_1 = opStack.pop(typePop);
-						builder.append("(" + ine_1 + " != " + ine_2 + ")");
+						if(check(node, LoopEntry)) {
+							
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							builder.append("(" + ine_1 + " != " + ine_2 + ")");
+							break;
+						} else {
+							builder.append("(" + ine_1 + " != " + ine_2 + ")");
+						}
 						addSemicolon = false;
 						break;
 					case if_icmplt:
 						String ilt_2 = opStack.pop(typePop);
 						String ilt_1 = opStack.pop(typePop);
-						builder.append("(" + ilt_1 + " < " + ilt_2 + ")");
+						if(check(node, LoopEntry)) {
+							
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							builder.append("(" + ilt_1 + " < " + ilt_2 + ")");
+							break;
+						} else {
+							builder.append("(" + ilt_1 + " < " + ilt_2 + ")");
+						}
 						addSemicolon = false;
 						break;
 					case if_icmpge:
 						String ige_2 = opStack.pop(typePop);
 						String ige_1 = opStack.pop(typePop);
-						builder.append("(" + ige_1 + " >= " + ige_2 + ")");
+						if(check(node, LoopEntry)) {
+							
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							builder.append("(" + ige_1 + " >= " + ige_2 + ")");
+							break;
+						} else {
+							builder.append("(" + ige_1 + " >= " + ige_2 + ")");
+						}
 						addSemicolon = false;
 						break;
 					case if_icmpgt:
 						String igt_2 = opStack.pop(typePop);
 						String igt_1 = opStack.pop(typePop);
-						builder.append("(" + igt_1 + " > " + igt_2 + ")");
+						if(check(node, LoopEntry)) {
+							
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							builder.append("(" + igt_1 + " > " + igt_2 + ")");
+							break;
+						} else {
+							builder.append("(" + igt_1 + " > " + igt_2 + ")");
+						}
 						addSemicolon = false;
 						break;
 					case if_icmple:
 						String ile_2 = opStack.pop(typePop);
 						String ile_1 = opStack.pop(typePop);
-						builder.append("(" + ile_1 + " <= " + ile_2 + ")");
+						if(check(node, LoopEntry)) {
+							
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							builder.append("(" + ile_1 + " <= " + ile_2 + ")");
+							break;
+						} else {
+							builder.append("(" + ile_1 + " <= " + ile_2 + ")");
+						}
 						addSemicolon = false;
 						break;
 					case if_acmpeq:
 						String aeq_2 = opStack.pop(typePop);
 						String aeq_1 = opStack.pop(typePop);
-						builder.append("(" + aeq_1 + " == " + aeq_2 + ")");
+						if(check(node, LoopEntry)) {
+							
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							builder.append("(" + aeq_1 + " == " + aeq_2 + ")");
+							break;
+						} else {
+							builder.append("(" + aeq_1 + " == " + aeq_2 + ")");
+						}
 						addSemicolon = false;
 						break;
 					case if_acmpne:
 						String ane_2 = opStack.pop(typePop);
 						String ane_1 = opStack.pop(typePop);
-						builder.append("(" + ane_1 + " != " + ane_2 + ")");
+						if(check(node, LoopEntry)) {
+							
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							builder.append("(" + ane_1 + " != " + ane_2 + ")");
+							break;
+						} else {
+							builder.append("(" + ane_1 + " != " + ane_2 + ")");
+						}
 						addSemicolon = false;
 						break;
 					case _goto:
@@ -724,18 +782,24 @@ public class MethodDecompiler extends AbstractDecompiler {
 						opStack.push(manArray.toString(), multiArrayType);
 						break;
 					case ifnull:
-						if(node.getType() == LoopEntry) {
+						if(check(node, LoopEntry)) {
 							
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							builder.append("(" + opStack.pop(typePop) + " == null)");
+							break;
 						} else {
-							line.append("(").append(opStack.pop(typePop)).append(" == null)");
+							builder.append("(" + opStack.pop(typePop) + " == null)");
 						}
 						addSemicolon = false;
 						break;
 					case ifnonnull:
 						if(node.getType() == LoopEntry) {
 							
+						} else if(check(node, OneLineEntry, OneLineEntryBreak)) {
+							builder.append("(" + opStack.pop(typePop) + " != null)");
+							break;
 						} else {
-							line.append("(").append(opStack.pop(typePop)).append(" != null)");
+							builder.append("(" + opStack.pop(typePop) + " != null)");
 						}
 						addSemicolon = false;
 						break;
@@ -749,11 +813,30 @@ public class MethodDecompiler extends AbstractDecompiler {
 //				println("local: " + local);
 //				println("stack: " + opStack + "\n");
 			}
-			if(check(node, LoopEntry, Entry)) {
+
+			if(check(node, LoopEntry)) {
+				// processing
+			} else if(check(node, Entry, OneLineEntry, OneLineEntryBreak)) {
+				String processing = line.toString();
+				line = new StringBuilder();
+				if(node.getParents().size() == 1) {
+					CFNode dominator = node.getImmediateDominator();
+					if(check(dominator, Entry)) {
+						// this node has Entry node as immediate dominator node.
+						// then, this node is "else-if".
+						line.append("else ");
+					} else if(check(dominator, OneLineEntry, OneLineEntryBreak)) {
+						if(dominator.getChildren().size() == 2) {
+							// this node has two nodes in case of if-statement is "true" and "false".
+							// then, this node is "else-if".
+							line.append("else ");
+						}
+					}	
+				}
 				line.append(builder.build());
-			}
-			if(check(node, OneLineEntry, OneLineEntryBreak)) {
-				line = new StringBuilder(builder.build()).append(line.toString());
+				if(check(node, OneLineEntry, OneLineEntryBreak)) {
+					line.append(processing);
+				}
 			}
 			if(line.length() > 0) {
 				// When the node is not start or end of a statement, (ex. "if(...) {", "}")

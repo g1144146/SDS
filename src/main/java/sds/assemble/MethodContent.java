@@ -67,10 +67,12 @@ public class MethodContent extends MemberContent {
 				this.args = new String[argArray.length][2];
 				for(int i = 0; i < argArray.length; i++) {
 					this.args[i][0] = argArray[i];
-					this.args[i][1] = "arg_" + String.valueOf(i);
+//					String s = new String(new char[]{(char)((int)'a' + i)});
+//					this.args[i][1] = "arg_" + String.valueOf(i);
+					this.args[i][1] = new String(new char[]{(char)((int)'a' + i)});
 				}
 			} else {
-				this.args = new String[][]{{arg, "arg_0"}};
+				this.args = new String[][]{{arg, "a"}};
 			}
 		}
 		// attriutes
@@ -79,16 +81,16 @@ public class MethodContent extends MemberContent {
 		}
 		// print
 		if(valContent != null) {
-			System.out.println("[local variable]");
-			System.out.println(valContent);
+//			System.out.println("[local variable]");
+//			System.out.println(valContent);
 		}
 		if(exContent != null && exContent.from.length > 0) {
-			System.out.println("[exception]");
-			System.out.println(exContent);
+//			System.out.println("[exception]");
+//			System.out.println(exContent);
 		}
 		if(args != null) {
 			for(String[] arg : args) {
-				System.out.println(arg[0] + " " + arg[1]);
+//				System.out.println(arg[0] + " " + arg[1]);
 			}
 		}
 		// set CFG
