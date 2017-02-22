@@ -92,7 +92,7 @@ public class CpRefOpcode extends OpcodeInfo {
 				case C_LONG:    this.type = "long";   break;
 				case C_STRING:
 					this.type = "String";
-					operand = "\"" + operand + "\"";
+					operand = "\"" + escape(operand) + "\"";
 					break;
 				case C_CLASS:   this.type = extract(pool.get(index - 1), pool); break;
 				case C_METHOD_HANDLE: break;
@@ -100,6 +100,10 @@ public class CpRefOpcode extends OpcodeInfo {
 					throw new IllegalStateException("LDC opcode refers unknown constant type info.");
 			}
 		}
+	}
+
+	private String escape(String string) {
+		return string.replaceAll("\n", "\\\\n");
 	}
 
 	/**
