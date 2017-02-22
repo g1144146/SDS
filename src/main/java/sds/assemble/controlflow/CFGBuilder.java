@@ -162,7 +162,11 @@ public class CFGBuilder {
 					}
 					 // jump for GOTO opcode
 					if(nodes[i].isInPcRange(n.getGotoPoint())) {
-						addParentAndChild(i, index, Normal);
+						if(check(n, OneLineEntry, OneLineEntryBreak)) {
+							addParentAndChild(i, index, TrueBranch);
+						} else {
+							addParentAndChild(i, index, Normal);
+						}
 					}
 				}
 			} else if(check(n, LoopExit)) {
