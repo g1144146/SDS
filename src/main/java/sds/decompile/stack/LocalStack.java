@@ -10,14 +10,6 @@ public class LocalStack extends SimpleStack {
 	}
 
 	/**
-	 * returns current stack size.
-	 * @return stack size
-	 */
-	public int size() {
-		return stack.size();
-	}
-
-	/**
 	 * return returns variable type of specified index.
 	 * @param index stack index
 	 * @return variable type
