@@ -4,6 +4,8 @@ import java.io.IOException;
 import sds.classfile.ClassFileStream;
 import sds.classfile.ConstantPool;
 
+import static sds.util.DescriptorParser.replace;
+
 /**
  * This class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.5">
@@ -32,7 +34,7 @@ public class Exceptions extends AttributeInfo {
 	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
 		this.exceptionTable = new String[data.readShort()];
 		for(int i = 0; i < exceptionTable.length; i++) {
-			exceptionTable[i] = extract(pool.get(data.readShort()-1), pool).replace("/", ".");
+			exceptionTable[i] = replace(extract(pool.get(data.readShort()-1), pool).replace("/", "."));
 		}
 	}
 }

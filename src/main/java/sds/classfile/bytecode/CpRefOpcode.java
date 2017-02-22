@@ -91,7 +91,7 @@ public class CpRefOpcode extends OpcodeInfo {
 				case C_INTEGER: this.type = "int";    break;
 				case C_LONG:    this.type = "long";   break;
 				case C_STRING:
-					this.type = "java.lang.String";
+					this.type = "String";
 					operand = "\"" + operand + "\"";
 					break;
 				case C_CLASS:   this.type = extract(pool.get(index - 1), pool); break;

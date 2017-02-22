@@ -18,6 +18,7 @@ import sds.classfile.constantpool.Utf8Info;
 
 import static sds.classfile.constantpool.ConstantType.*;
 import static sds.util.DescriptorParser.parse;
+import static sds.util.DescriptorParser.replace;
 
 /**
  * This class is for extracting value from
@@ -51,7 +52,7 @@ public class Utf8ValueExtractor {
 				return ""+((DoubleInfo)info).getValue();
 			case C_CLASS:
 				ClassInfo ci = (ClassInfo)info;
-				return extract(pool.get(ci.getNameIndex()-1), pool).replace("/", ".");
+				return replace(extract(pool.get(ci.getNameIndex()-1), pool).replace("/", "."));
 			case C_STRING:
 				StringInfo si = (StringInfo)info;
 				return extract(pool.get(si.getStringIndex()-1), pool);

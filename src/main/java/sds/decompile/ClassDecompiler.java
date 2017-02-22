@@ -52,7 +52,10 @@ public class ClassDecompiler extends AbstractDecompiler {
 		}
 
 		// extends classes
-		classDeclaration.append(" extends ").append(cc.getSuperClass());
+		String extendClass = cc.getSuperClass();
+		if(! extendClass.equals("Object")) {
+			classDeclaration.append(" extends ").append(extendClass);
+		}
 
 		// implements interfaces
 		if(cc.getInterfaces().length > 0) {

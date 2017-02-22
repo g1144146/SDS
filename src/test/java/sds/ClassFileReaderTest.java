@@ -67,7 +67,7 @@ public class ClassFileReaderTest {
 		for(int i = 0; i < pool.size(); i++) {
 			assert pool.get(i).toString().startsWith(constantPool[index++]);
 		}
-		assertThat(extract(pool.get(cf.superClass-1), pool), is("java.lang.Object"));
+		assertThat(extract(pool.get(cf.superClass-1), pool), is("Object"));
 		assertThat(extract(pool.get(cf.thisClass-1), pool), is("Hello"));
 		String source = ((SourceFile)cf.attr.iterator().next()).getSourceFile();
 		assertThat(source, is("Hello.java"));
@@ -81,7 +81,7 @@ public class ClassFileReaderTest {
 		{
 			assertThat(m.getAccessFlags(), is("private "));
 			String descAndName = m.getDescriptor() + " " + m.getName();
-			assertThat(descAndName, is("java.lang.String field"));
+			assertThat(descAndName, is("String field"));
 			
 			Iterator<AttributeInfo> itr = m.getAttr().iterator();
 			RuntimeVisibleAnnotations a1 = (RuntimeVisibleAnnotations)itr.next();
@@ -146,7 +146,7 @@ public class ClassFileReaderTest {
 						, is("generics_type"));
 			}
 			Exceptions e = (Exceptions)itr.next();
-			assertThat(e.getExceptionTable()[0], is("java.lang.Exception"));
+			assertThat(e.getExceptionTable()[0], is("Exception"));
 			sds.classfile.attributes.Deprecated dep
 					= (sds.classfile.attributes.Deprecated)itr.next();
 			assertThat(dep.getType(), is(AttributeType.Deprecated));
@@ -157,7 +157,7 @@ public class ClassFileReaderTest {
 			// runtime visible annotations , and items of that.
 			RuntimeVisibleAnnotations rva = (RuntimeVisibleAnnotations)itr.next();
 			String depAnn = rva.getAnnotations()[0];
-			assertThat(depAnn, is("@java.lang.Deprecated"));
+			assertThat(depAnn, is("@Deprecated"));
 			String rep = rva.getAnnotations()[1];
 			assertThat(rep
 					, is("@sds.RepeatableRuntimeAnnotation("
@@ -197,20 +197,22 @@ public class ClassFileReaderTest {
 		assertThat(classes[1].getNumber("access_flag"), is("public static final enum "));
 		assertThat(classes[1].getNumber("inner")      , is("sds.AnnotatedTest$Type"));
 		assertThat(classes[2].getNumber("access_flag"), is("public static final class "));
+		// modify
 		assertThat(classes[2].getNumber("inner")      , is("java.lang.invoke.MethodHandles$Lookup"));
 
 		BootstrapMethods.BSM[] bsm = ((BootstrapMethods)cfAnItr.next()).getBSM();
+		// modify
 		assertThat(
 				bsm[0].getBSMRef()
 				, is("java.lang.invoke.LambdaMetafactory.metafactory|("
 						+ "java.lang.invoke.MethodHandles$Lookup"
-						+ ",java.lang.String"
+						+ ",String"
 						+ ",java.lang.invoke.MethodType"
 						+ ",java.lang.invoke.MethodType"
 						+ ",java.lang.invoke.MethodHandle"
 						+ ",java.lang.invoke.MethodType)"
 					+ "java.lang.invoke.CallSite"));
-		assertThat(bsm[0].getBSMArgs()[0], is("(java.lang.Object)void"));
-		assertThat(bsm[0].getBSMArgs()[1], is("sds.AnnotatedTest.lambda$method$0|(java.lang.Object)void"));
+		assertThat(bsm[0].getBSMArgs()[0], is("(Object)void"));
+		assertThat(bsm[0].getBSMArgs()[1], is("sds.AnnotatedTest.lambda$method$0|(Object)void"));
 	}
 }

@@ -11,6 +11,15 @@ import java.util.regex.Pattern;
  */
 public class DescriptorParser {
 	private static final String objPattern  = "L[a-z\\.]*[0-9a-zA-Z_\\$\\.]+";
+	private static final String lang = "java.lang.";
+	private static String[] langPackages = new String[] {
+		"java.lang.annotation",
+		"java.lang.instrument",
+		"java.lang.invoke",
+		"java.lang.management",
+		"java.lang.ref",
+		"java.lang.reflect"
+	};
 
 	/**
 	 * returns parsed descriptor.
@@ -54,6 +63,7 @@ public class DescriptorParser {
 				} else {
 					// OBJ_TYPE
 					type = s.substring(s.lastIndexOf("[") + 2, s.length());
+					type = replace(type);
 				}
 				sb.append(type);
 				// TYPE[][]...
@@ -61,7 +71,8 @@ public class DescriptorParser {
 					sb.append("[]");
 				}
 			} else if(s.startsWith("L") || s.matches("T[A-Z]+")) { // object or generics
-				sb.append(s.subSequence(1, s.length()));
+				String object = replace(s.substring(1, s.length()));
+				sb.append(object);
 			} else if(s.matches("\\(|\\)|<|>")) { // parentheses and diamond operator
 				sb.append(s);
 			} else if(s.equals(";:")) { // generics contains some extended interfaces
@@ -84,6 +95,19 @@ public class DescriptorParser {
 		if(parsed.endsWith(","))  parsed =  parsed.substring(0, parsed.length()-1);
 		if(parsed.contains(",)")) parsed = parsed.replace(",)", ")");
 		return parsed;
+	}
+
+	public static String replace(String target) {
+		if(! target.startsWith(lang)) {
+			return target;
+		}
+		System.out.println("@@@  desc parser: " + target.replace(lang, ""));
+		for(String _package : langPackages) {
+			if(target.startsWith(_package)) {
+				return target;
+			}
+		}
+		return target.replace(lang, "");
 	}
 
 	/**

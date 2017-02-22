@@ -11,7 +11,7 @@ import static sds.util.DescriptorParser.parseImportClass;
 public class DescriptorParserTest {
 	@Test
 	public void testParse() {
-		assertThat(parse("(Ljava/lang/System;)V"), is("(java.lang.System)void"));
+		assertThat(parse("(Ljava/lang/System;)V"), is("(System)void"));
 		assertThat(parse("(IID)Ljava/lang/reflect/Method;")
 				, is("(int,int,double)java.lang.reflect.Method"));
 		assertThat(parse("(BCDFIJSZ)V")
@@ -27,7 +27,7 @@ public class DescriptorParserTest {
 							+ "Ljava/lang/invoke/MethodType;)"
 						+ "Ljava/lang/invoke/CallSite;")
 				, is("(java.lang.invoke.MethodHandles$Lookup"
-							+ ",java.lang.String,java.lang.invoke.MethodType"
+							+ ",String,java.lang.invoke.MethodType"
 							+ ",java.lang.invoke.MethodType"
 							+ ",java.lang.invoke.MethodHandle"
 							+ ",java.lang.invoke.MethodType)"
