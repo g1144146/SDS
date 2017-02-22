@@ -63,7 +63,7 @@ public class DescriptorParser {
 				} else {
 					// OBJ_TYPE
 					type = s.substring(s.lastIndexOf("[") + 2, s.length());
-					type = replace(type);
+					type = removeJavaLangPrefix(type);
 				}
 				sb.append(type);
 				// TYPE[][]...
@@ -71,7 +71,7 @@ public class DescriptorParser {
 					sb.append("[]");
 				}
 			} else if(s.startsWith("L") || s.matches("T[A-Z]+")) { // object or generics
-				String object = replace(s.substring(1, s.length()));
+				String object = removeJavaLangPrefix(s.substring(1, s.length()));
 				sb.append(object);
 			} else if(s.matches("\\(|\\)|<|>")) { // parentheses and diamond operator
 				sb.append(s);
@@ -97,11 +97,15 @@ public class DescriptorParser {
 		return parsed;
 	}
 
-	public static String replace(String target) {
+	/**
+	 * returns class name which removed java.lang prefix in case of java.lang package class.
+	 * @param target class name
+	 * @return removed class name
+	 */
+	public static String removeJavaLangPrefix(String target) {
 		if(! target.startsWith(lang)) {
 			return target;
 		}
-		System.out.println("@@@  desc parser: " + target.replace(lang, ""));
 		for(String _package : langPackages) {
 			if(target.startsWith(_package)) {
 				return target;
