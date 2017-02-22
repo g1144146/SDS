@@ -214,7 +214,7 @@ public class Expression {
 		if(target.contains(">="))   return target.replace(">=", "<");
 		if(target.contains("<="))   return target.replace("<=", ">");
 		if(target.contains(">"))    return target.replace(">" , "<=");
-		if(target.contains(">"))    return target.replace("<" , ">=");
+		if(target.contains("<"))    return target.replace("<" , ">=");
 		if(target.startsWith("(!")) return target.replace("(!", "(");
 		return "(! " + target + ")";
 	}
