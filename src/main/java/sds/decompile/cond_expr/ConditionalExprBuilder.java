@@ -265,7 +265,7 @@ public class ConditionalExprBuilder {
 		Set<Expression> removeSet = new HashSet<>();
 		for(Expression ex : exprs) {
 			Expression next = ex.trueExpr;
-			if(removeSet.contains(ex) || isNull(next) || ex.child.isNot(FALSE)) {
+			if(removeSet.contains(ex) || isNull(next) || next.child.isNot(FALSE)) {
 				continue;
 			}
 			if((! ex.equalsDest(next)) && (counter[next.jumpPoint - 1] > 1)) {
