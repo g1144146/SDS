@@ -7,8 +7,10 @@ import sds.assemble.controlflow.CFNode;
 import sds.classfile.bytecode.BranchOpcode;
 import sds.classfile.bytecode.OpcodeInfo;
 
+import static sds.assemble.controlflow.CFNodeType.Entry;
 import static sds.assemble.controlflow.CFEdgeType.FalseBranch;
 import static sds.assemble.controlflow.CFEdgeType.TrueBranch;
+import static sds.assemble.controlflow.NodeTypeChecker.check;
 import static java.util.Objects.isNull;
 import static sds.util.Printer.println;
 /**
@@ -41,7 +43,11 @@ public class Expression {
 		this.range = new int[]{ -1, 0 };
 		setRange(number, node);
 		this.exprs = new String[]{expr};
-		setChild(node);
+		if(check(node, Entry)) {
+			setChild(node);
+		} else {
+			setOneLineChild(node);
+		}
 	}
 
 	private void setRange(int number, CFNode node) {
@@ -85,6 +91,30 @@ public class Expression {
 		if(isNull(child)) {
 			this.child = Child.OWN;
 			this.ownDest = new int[]{ jumpPoint };
+		}
+	}
+
+	private void setOneLineChild(CFNode node) {
+		OpcodeInfo[] opcodes = node.getOpcodes().getAll();
+		int[] trueRange = new int[2];
+		for(int i = opcodes.length - 1; i >= 0; i--) {
+			if(isIf(opcodes[i])) {
+				BranchOpcode branch = (BranchOpcode)opcodes[i];
+				trueRange[0] = branch.getPc();
+				trueRange[1] = opcodes[opcodes.length - 1].getPc();
+				break;
+			}
+		}
+		if(node.isInPcRange(jumpPoint)) {
+			if((trueRange[0] < jumpPoint) && (jumpPoint <= trueRange[1])) {
+				this.child = Child.TRUE;
+			} else {
+				this.child = Child.OWN;
+				this.ownDest = new int[]{ jumpPoint };
+			}
+		} else {
+			this.child = Child.FALSE;
+			reverse();
 		}
 	}
 
