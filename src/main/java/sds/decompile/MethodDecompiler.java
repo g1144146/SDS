@@ -3,7 +3,6 @@ package sds.decompile;
 import sds.decompile.stack.LocalStack;
 import sds.decompile.stack.OperandStack;
 import sds.assemble.BaseContent;
-import sds.assemble.LineInstructions;
 import sds.assemble.MethodContent;
 import sds.assemble.controlflow.CFNode;
 import sds.assemble.controlflow.CFEdge;
@@ -145,12 +144,15 @@ public class MethodDecompiler extends AbstractDecompiler {
 			OpcodeInfo[] opcodes = node.getOpcodes().getAll();
 			boolean addSemicolon = true;
 			ConditionalExprBuilder builder = null;
-			
+
 			if(elseNode != null && elseNode.equals(node)) {
 				result.writeEndScope();
 			}
 			if(falseNode != null && falseNode.equals(node)) {
 				result.writeEndScope();
+			}
+			if(check(node, LoopEntry)) {
+				builder= new ConditionalExprBuilder(node);
 			}
 			if(check(node, Entry, OneLineEntry, OneLineEntryBreak)) {
 				builder = new ConditionalExprBuilder(node);
@@ -159,20 +161,10 @@ public class MethodDecompiler extends AbstractDecompiler {
 				// then, it doesn't unindent and add end scope to source code.
 				// so, in the case, it holds FALSE-node,
 				// and unindents and adds end scope at the time of processing FALSE-node.
-				for(CFEdge edge : node.getChildren()) {
-					if(edge.getType() == FalseBranch) {
-						int index = i;
-						CFNode terminal = edge.getDest();
-						while(! nodes[index].equals(terminal)) {
-							index++;
-						}
-						if(checkNone(nodes[index - 1], Exit)) {
-							falseNode = terminal;
-						}
-						break;
-					}
-				}
-			} 
+				falseNode = getIfTerminal(i, node, nodes);
+			}
+
+			// opcode analysis
 			for(OpcodeInfo opcode : opcodes) {
 //				println(opcode);
 //				println("local: " + local);
@@ -453,168 +445,89 @@ public class MethodDecompiler extends AbstractDecompiler {
 						opStack.push("(" + cmpNum_1 + "OPERATOR" + cmpNum_2 + ")", "boolean");
 						break;
 					case ifeq: // (x == y)
+						String eq = opStack.pop();
 						if(check(node, LoopEntry)) {
-						} else if(isOneLineIf(node)) {
-							builder.append(opStack.pop(), opStack.popType(), " == ");
-							break;
+							builder.append("(" + line + ")", opStack.popType(), " == ");
 						} else {
-							builder.append(opStack.pop(), opStack.popType(), " == ");
+							builder.append(eq, opStack.popType(), " == ");
 						}
-						addSemicolon = false;
+						line.delete(0, line.length());
 						break;
 					case ifne: // (x != y)
+						String ne = opStack.pop();
 						if(check(node, LoopEntry)) {
-						} else if(isOneLineIf(node)) {
-							builder.append(opStack.pop(), opStack.popType(), " != ");
-							break;
+							builder.append("(" + line + ")", opStack.popType(), " != ");
 						} else {
-							builder.append(opStack.pop(), opStack.popType(), " != ");
+							builder.append(ne, opStack.popType(), " != ");
 						}
-						addSemicolon = false;
+						line.delete(0, line.length());
 						break;
 					case iflt: // (x < y)
+						String lt = opStack.pop();
 						if(check(node, LoopEntry)) {
-						} else if(isOneLineIf(node)) {
-							builder.append(opStack.pop(), opStack.popType(), " < ");
-							break;
+							builder.append("(" + line + ")", opStack.popType(), " < ");
 						} else {
-							builder.append(opStack.pop(), opStack.popType(), " < ");
+							builder.append(lt, opStack.popType(), " < ");
 						}
-						addSemicolon = false;
+						line.delete(0, line.length());
 						break;
 					case ifge: // (x >= y)
+						String ge = opStack.pop();
 						if(check(node, LoopEntry)) {
-						} else if(isOneLineIf(node)) {
-							builder.append(opStack.pop(), opStack.popType(), " >= ");
-							break;
+							builder.append("(" + line + ")", opStack.popType(), " >= ");
 						} else {
-							builder.append(opStack.pop(), opStack.popType(), " >= ");
+							builder.append(ge, opStack.popType(), " >= ");
 						}
-						addSemicolon = false;
+						line.delete(0, line.length());
 						break;
 					case ifgt: // (x > y)
+						String gt = opStack.pop();
 						if(check(node, LoopEntry)) {
-						} else if(isOneLineIf(node)) {
-							builder.append(opStack.pop(), opStack.popType(), " > ");
-							break;
+							builder.append("(" + line + ")", opStack.popType(), " > ");
 						} else {
-							builder.append(opStack.pop(), opStack.popType(), " > ");
+							builder.append(gt, opStack.popType(), " > ");
 						}
-						addSemicolon = false;
+						line.delete(0, line.length());
 						break;
 					case ifle: // (x <= y)
+						String le = opStack.pop();
 						if(check(node, LoopEntry)) {
-						} else if(isOneLineIf(node)) {
-							builder.append(opStack.pop(), opStack.popType(), " <= ");
-							break;
+							builder.append("(" + line + ")", opStack.popType(), " <= ");
 						} else {
-							builder.append(opStack.pop(), opStack.popType(), " <= ");
+							builder.append(le, opStack.popType(), " <= ");
 						}
-						addSemicolon = false;
+						line.delete(0, line.length());
 						break;
 					case if_icmpeq:
-						String ieq_2 = opStack.pop(typePop);
-						String ieq_1 = opStack.pop(typePop);
-						if(check(node, LoopEntry)) {
-							
-						} else if(isOneLineIf(node)) {
-							builder.append("(" + ieq_1 + " == " + ieq_2 + ")");
-							break;
-						} else {
-							builder.append("(" + ieq_1 + " == " + ieq_2 + ")");
-						}
-						addSemicolon = false;
+						builder.append(makeExprInt(" == ", line.toString(), node));
+						line.delete(0, line.length());
 						break;
 					case if_icmpne:
-						String ine_2 = opStack.pop(typePop);
-						String ine_1 = opStack.pop(typePop);
-						if(check(node, LoopEntry)) {
-							
-						} else if(isOneLineIf(node)) {
-							builder.append("(" + ine_1 + " != " + ine_2 + ")");
-							break;
-						} else {
-							builder.append("(" + ine_1 + " != " + ine_2 + ")");
-						}
-						addSemicolon = false;
+						builder.append(makeExprInt(" != ", line.toString(), node));
+						line.delete(0, line.length());
 						break;
 					case if_icmplt:
-						String ilt_2 = opStack.pop(typePop);
-						String ilt_1 = opStack.pop(typePop);
-						if(check(node, LoopEntry)) {
-							
-						} else if(isOneLineIf(node)) {
-							builder.append("(" + ilt_1 + " < " + ilt_2 + ")");
-							break;
-						} else {
-							builder.append("(" + ilt_1 + " < " + ilt_2 + ")");
-						}
-						addSemicolon = false;
+						builder.append(makeExprInt(" < " , line.toString(), node));
+						line.delete(0, line.length());
 						break;
 					case if_icmpge:
-						String ige_2 = opStack.pop(typePop);
-						String ige_1 = opStack.pop(typePop);
-						if(check(node, LoopEntry)) {
-							
-						} else if(isOneLineIf(node)) {
-							builder.append("(" + ige_1 + " >= " + ige_2 + ")");
-							break;
-						} else {
-							builder.append("(" + ige_1 + " >= " + ige_2 + ")");
-						}
-						addSemicolon = false;
+						builder.append(makeExprInt(" >= ", line.toString(), node));
+						line.delete(0, line.length());
 						break;
 					case if_icmpgt:
-						String igt_2 = opStack.pop(typePop);
-						String igt_1 = opStack.pop(typePop);
-						if(check(node, LoopEntry)) {
-							
-						} else if(isOneLineIf(node)) {
-							builder.append("(" + igt_1 + " > " + igt_2 + ")");
-							break;
-						} else {
-							builder.append("(" + igt_1 + " > " + igt_2 + ")");
-						}
-						addSemicolon = false;
-						break;
+						builder.append(makeExprInt(" > " , line.toString(), node));
+						line.delete(0, line.length());break;
 					case if_icmple:
-						String ile_2 = opStack.pop(typePop);
-						String ile_1 = opStack.pop(typePop);
-						if(check(node, LoopEntry)) {
-							
-						} else if(isOneLineIf(node)) {
-							builder.append("(" + ile_1 + " <= " + ile_2 + ")");
-							break;
-						} else {
-							builder.append("(" + ile_1 + " <= " + ile_2 + ")");
-						}
-						addSemicolon = false;
+						builder.append(makeExprInt(" <= ", line.toString(), node));
+						line.delete(0, line.length());
 						break;
 					case if_acmpeq:
-						String aeq_2 = opStack.pop(typePop);
-						String aeq_1 = opStack.pop(typePop);
-						if(check(node, LoopEntry)) {
-							
-						} else if(isOneLineIf(node)) {
-							builder.append("(" + aeq_1 + " == " + aeq_2 + ")");
-							break;
-						} else {
-							builder.append("(" + aeq_1 + " == " + aeq_2 + ")");
-						}
-						addSemicolon = false;
+						builder.append(makeExprInt(" == ", line.toString(), node));
+						line.delete(0, line.length());
 						break;
 					case if_acmpne:
-						String ane_2 = opStack.pop(typePop);
-						String ane_1 = opStack.pop(typePop);
-						if(check(node, LoopEntry)) {
-							
-						} else if(isOneLineIf(node)) {
-							builder.append("(" + ane_1 + " != " + ane_2 + ")");
-							break;
-						} else {
-							builder.append("(" + ane_1 + " != " + ane_2 + ")");
-						}
-						addSemicolon = false;
+						builder.append(makeExprInt(" != ", line.toString(), node));
+						line.delete(0, line.length());
 						break;
 					case _goto:
 //						addSemicolon = false;
@@ -784,26 +697,12 @@ public class MethodDecompiler extends AbstractDecompiler {
 						opStack.push(manArray.toString(), multiArrayType);
 						break;
 					case ifnull:
-						if(check(node, LoopEntry)) {
-							
-						} else if(isOneLineIf(node)) {
-							builder.append("(" + opStack.pop(typePop) + " == null)");
-							break;
-						} else {
-							builder.append("(" + opStack.pop(typePop) + " == null)");
-						}
-						addSemicolon = false;
+						builder.append(makeExprNull(" == ", line.toString(), node));
+						line.delete(0, line.length());
 						break;
 					case ifnonnull:
-						if(node.getType() == LoopEntry) {
-							
-						} else if(isOneLineIf(node)) {
-							builder.append("(" + opStack.pop(typePop) + " != null)");
-							break;
-						} else {
-							builder.append("(" + opStack.pop(typePop) + " != null)");
-						}
-						addSemicolon = false;
+						builder.append(makeExprNull(" != ", line.toString(), node));
+						line.delete(0, line.length());
 						break;
 					case goto_w: break;
 					case jsr_w: break;
@@ -820,63 +719,34 @@ public class MethodDecompiler extends AbstractDecompiler {
 			// checking "else" block
 			if((! isIfNode(node)) && (node.getParents().size() == 1)) {
 				CFNode dominator = node.getImmediateDominator();
-				if(isIfNode(dominator)) {
-					// in general, when current node is "else" block,
-					// the node is not Entry, OneLineEntry and OneLineEntryBreak.
-					// in case of immediate dominator node of current node is
-					// Entry, OneLineEntry or OneLineEntryBreak, current node is "else" block.
-					// and, it is necessary to hold terminal node of if-else statement
-					// for to unindent and add end scope of "else" block.
-					CFNode ifElseTerminal = null;
-					if(check(nodes[i - 1], Exit)) {
-						// jump point of Exit node is if-else terminal.
-						ifElseTerminal = nodes[i - 1].getChildren().iterator().next().getDest();
-					} else { // OneLineEntry or OneLineEntryBreak
-						for(CFEdge edge : dominator.getChildren()) {
-							if(edge.getType() == TrueBranch) {
-								// jump point of goto which TrueBranch destination node has.
-								ifElseTerminal = edge.getDest();
-								break;
-							}
-						}
-					}
-					if(isElseBlock(ifElseTerminal)) {
-						elseNode = ifElseTerminal;
-						result.write("else {");
-						result.changeIndent(INCREMENT);
-					}
+				// in general, when current node is "else" block,
+				// the node is not Entry, OneLineEntry and OneLineEntryBreak.
+				// in case of immediate dominator node of current node is
+				// Entry, OneLineEntry or OneLineEntryBreak, current node is "else" block.
+				// and, it is necessary to hold terminal node of if-else statement
+				// for to unindent and add end scope of "else" block.
+				if((elseNode = getIfElseTerminal(dominator, nodes[i - 1])) != null) {
+					result.write("else {");
+					result.changeIndent(INCREMENT);
 				}
 			}
 
 			if(check(node, LoopEntry)) {
-				// processing
+				line = new StringBuilder();
+				line.append(builder.build());
+				addSemicolon = false;
 			} else if(isIfNode(node)) {
+				// elif block
 				String processing = line.toString();
 				line = new StringBuilder();
-				if(node.getParents().size() == 1) {
-					CFNode dominator = node.getImmediateDominator();
-					if(isIfNode(dominator)) {
-						CFEdge edge = node.getParents().iterator().next();
-						if(check(node, Entry)) {
-							// this node has Entry node as immediate dominator node.
-							// in addition, this node connects to the Entry node with FalseBranch.
-							// then, this node is "else-if".
-							if(edge.getType() == FalseBranch) {
-								line.append("else ");
-							}
-						} else {
-							// this node has two nodes in case of if-statement is "true" and "false".
-							// then, this node is "else-if".
-							if(dominator.getChildren().size() == 2) {
-								line.append("else ");
-							}
-						}
-					}
+				if(isElifBlock(node)) {
+					line.append("else ");
 				}
 				line.append(builder.build());
 				if(checkNone(node, Entry)) {
 					line.append(processing);
 				}
+				addSemicolon = checkNone(node, Entry);
 			}
 			if(line.length() > 0) {
 				// When the node is not start or end of a statement, (ex. "if(...) {", "}")
@@ -903,7 +773,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 			int count = 0;
 			for(CFEdge edge : ifElseTerminal.getParents()) {
 				CFNode dest = edge.getDest();
-				if(isOneLineIf(dest) || check(dest, Exit)) {
+				if(check(dest, OneLineEntry, OneLineEntryBreak) || check(dest, Exit)) {
 					count++;
 				}
 			}
@@ -911,13 +781,29 @@ public class MethodDecompiler extends AbstractDecompiler {
 		}
 		return false;
 	}
-
-	private boolean isIfNode(CFNode node) {
-		return check(node, Entry) || isOneLineIf(node);
+	
+	private boolean isElifBlock(CFNode node) {
+		if(node.getParents().size() == 1) {
+			CFNode dominator = node.getImmediateDominator();
+			if(isIfNode(dominator)) {
+				CFEdge edge = node.getParents().iterator().next();
+				if(check(node,Entry)) {
+					// this node has Entry node as immediate dominator node.
+					// in addition, this node connects to the Entry node with FalseBranch.
+					// then, this node is "else-if" block.
+					return edge.getType() == FalseBranch;
+				} else {
+					// this node has two nodes in case of if-statement is "true" and "false".
+					// then, this node is "else-if" block.
+					return dominator.getChildren().size() == 2;
+				}
+			}
+		}
+		return false;
 	}
 
-	private boolean isOneLineIf(CFNode node) {
-		return check(node, OneLineEntry, OneLineEntryBreak);
+	private boolean isIfNode(CFNode node) {
+		return check(node, Entry, OneLineEntry, OneLineEntryBreak);
 	}
 
 	private void indent(CFNode node) {
@@ -927,6 +813,30 @@ public class MethodDecompiler extends AbstractDecompiler {
 		if(check(node, LoopExit, Exit)) {
 			result.writeEndScope();
 		}
+	}
+
+	private String makeExprInt(String operator, String line, CFNode node) {
+		String value_2 = opStack.pop(true);
+		String value_1 = opStack.pop(true);
+		if(check(node, LoopEntry) && line.contains(" = ")) {
+			String[] storeLine = line.split(" = ");
+			// ex). ((x = ??) > y)
+			if(storeLine[1].equals(value_1)) {
+				return "((" + line + ")" + operator + value_2 + ")";
+			} else if(storeLine[1].equals(value_2)) {
+				return "(" + value_1 + operator + "(" + line + "))";
+			}
+		}
+		return "(" + value_1 + operator + value_2 + ")";
+	}
+
+	private String makeExprNull(String operator, String line, CFNode node) {
+		String value = opStack.pop(true);
+		if(check(node, LoopEntry)) {
+			// ex). ((val = ??) == null)
+			return "((" + line + ")" + operator + "null)";
+		}
+		return "(" + value + operator + "null)";
 	}
 
 	private void calculate(String operator, String type) {
@@ -987,6 +897,37 @@ public class MethodDecompiler extends AbstractDecompiler {
 			sb.append(args[0]);
 		}
 		return sb.toString();
+	}
+
+	private CFNode getIfTerminal(int index, CFNode target, CFNode[] nodes) {
+		for(CFEdge edge : target.getChildren()) {
+			if(edge.getType() == FalseBranch) {
+				CFNode terminal = edge.getDest();
+				while(! nodes[index].equals(terminal)) {
+					index++;
+				}
+				if(checkNone(nodes[index - 1], Exit)) {
+					return terminal;
+				}
+			}
+		}
+		return null;
+	}
+
+	private CFNode getIfElseTerminal(CFNode dominator, CFNode before) {
+		CFNode ifElseTerminal = null;
+		if(isIfNode(dominator)) {
+			if(check(before, Exit)) {
+				ifElseTerminal = before.getChildren().iterator().next().getDest();
+			} else {
+				for(CFEdge edge : dominator.getChildren()) {
+					if(edge.getType() == TrueBranch) {
+						ifElseTerminal = edge.getDest();
+					}
+				}
+			}
+		}
+		return isElseBlock(ifElseTerminal) ? ifElseTerminal : null;
 	}
 
 	/**
