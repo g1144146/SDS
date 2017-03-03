@@ -1,5 +1,9 @@
 package sds.decompile;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 import sds.decompile.stack.LocalStack;
 import sds.decompile.stack.OperandStack;
 import sds.assemble.BaseContent;
@@ -16,6 +20,8 @@ import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.PushOpcode;
 import sds.decompile.cond_expr.ConditionalExprBuilder;
 
+import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 import static sds.assemble.controlflow.NodeTypeChecker.check;
 import static sds.assemble.controlflow.NodeTypeChecker.checkNone;
 import static sds.assemble.controlflow.CFNodeType.End;
@@ -125,7 +131,6 @@ public class MethodDecompiler extends AbstractDecompiler {
 		// method declaration
 		// ex). public void method(int i, int k) throws Exception {...
 		result.write(methodDeclaration.toString());
-//		println(">>> " + methodDeclaration.toString());
 
 		// method body
 		result.changeIndent(INCREMENT);
@@ -136,32 +141,36 @@ public class MethodDecompiler extends AbstractDecompiler {
 
 	private void buildMethodBody(CFNode[] nodes) {
 		boolean typePop = true;
-		CFNode falseNode = null;
-		CFNode elseNode  = null;
+		Set<CFNode> falseNode = new HashSet<>();
+		Set<CFNode> elseNode  = new HashSet<>();
+		Set<CFNode> incrementIgnoreNode = new HashSet<>();
 		for(int i = 0; i < nodes.length; i++) {
 			CFNode node = nodes[i];
-			StringBuilder line = new StringBuilder();
+			LineBuilder line = new LineBuilder();
 			OpcodeInfo[] opcodes = node.getOpcodes().getAll();
 			boolean addSemicolon = true;
 			ConditionalExprBuilder builder = null;
+			LoopStatementBuilder loop = null;
 
-			if(elseNode != null && elseNode.equals(node)) {
+			if(elseNode.contains(node)) {
 				result.writeEndScope();
-			}
-			if(falseNode != null && falseNode.equals(node)) {
+			} else if(falseNode.contains(node)) {
 				result.writeEndScope();
 			}
 			if(check(node, LoopEntry)) {
-				builder= new ConditionalExprBuilder(node);
+//				builder = new ConditionalExprBuilder(node);
+				loop = new LoopStatementBuilder();
 			}
 			if(check(node, Entry, OneLineEntry, OneLineEntryBreak)) {
-				builder = new ConditionalExprBuilder(node);
+				builder = new ConditionalExprBuilder();
 				// There is jump point node of Entry-node in case of FALSE,
 				// and there is case that the node is not Exit-node.
 				// then, it doesn't unindent and add end scope to source code.
 				// so, in the case, it holds FALSE-node,
 				// and unindents and adds end scope at the time of processing FALSE-node.
-				falseNode = getIfTerminal(i, node, nodes);
+				if(check(node, Entry)) {
+					falseNode.add(getIfTerminal(i, node, nodes));
+				}
 			}
 
 			// opcode analysis
@@ -282,8 +291,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						String storingValue = opStack.pop(typePop);
 						String primIndex = opStack.pop(typePop);
 						String arrayRef = opStack.pop(typePop);
-						line.append(arrayRef).append("[").append(primIndex).append("]")
-							.append(" = ").append(storingValue);
+						line.append(arrayRef, "[", primIndex, "]", " = ", storingValue);
 						break;
 					case pop:
 						line.append(opStack.pop(typePop));
@@ -447,94 +455,162 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case ifeq: // (x == y)
 						String eq = opStack.pop();
 						if(check(node, LoopEntry)) {
-							builder.append("(" + line + ")", opStack.popType(), " == ");
+							loop.accept(line.toString(), node);
+							if(line.toString().matches("java\\.util\\.Iterator .+ = .+\\.iterator\\(\\)")) {
+								loop.accept(eq, opStack.popType(), " == ", node);
+							} else {
+								loop.accept("(" + line + ")", opStack.popType(), " == ", node);
+							}
 						} else {
-							builder.append(eq, opStack.popType(), " == ");
+							builder.append(eq, opStack.popType(), " == ", node);
 						}
 						line.delete(0, line.length());
 						break;
 					case ifne: // (x != y)
 						String ne = opStack.pop();
 						if(check(node, LoopEntry)) {
-							builder.append("(" + line + ")", opStack.popType(), " != ");
+							loop.accept(line.toString(), node);
+							loop.accept("(" + line + ")", opStack.popType(), " != ", node);
 						} else {
-							builder.append(ne, opStack.popType(), " != ");
+							builder.append(ne, opStack.popType(), " != ", node);
 						}
 						line.delete(0, line.length());
 						break;
 					case iflt: // (x < y)
 						String lt = opStack.pop();
 						if(check(node, LoopEntry)) {
-							builder.append("(" + line + ")", opStack.popType(), " < ");
+							loop.accept(line.toString(), node);
+							loop.accept("(" + line + ")", opStack.popType(), " < ", node);
 						} else {
-							builder.append(lt, opStack.popType(), " < ");
+							builder.append(lt, opStack.popType(), " < ", node);
 						}
 						line.delete(0, line.length());
 						break;
 					case ifge: // (x >= y)
 						String ge = opStack.pop();
 						if(check(node, LoopEntry)) {
-							builder.append("(" + line + ")", opStack.popType(), " >= ");
+							loop.accept(line.toString(), node);
+							loop.accept("(" + line + ")", opStack.popType(), " >= ", node);
 						} else {
-							builder.append(ge, opStack.popType(), " >= ");
+							builder.append(ge, opStack.popType(), " >= ", node);
 						}
 						line.delete(0, line.length());
 						break;
 					case ifgt: // (x > y)
 						String gt = opStack.pop();
 						if(check(node, LoopEntry)) {
-							builder.append("(" + line + ")", opStack.popType(), " > ");
+							loop.accept(line.toString(), node);
+							loop.accept("(" + line + ")", opStack.popType(), " < ", node);
+//							builder.append("(" + line + ")", opStack.popType(), " > ", node);
 						} else {
-							builder.append(gt, opStack.popType(), " > ");
+							builder.append(gt, opStack.popType(), " > ", node);
 						}
 						line.delete(0, line.length());
 						break;
 					case ifle: // (x <= y)
 						String le = opStack.pop();
 						if(check(node, LoopEntry)) {
-							builder.append("(" + line + ")", opStack.popType(), " <= ");
+							loop.accept(line.toString(), node);
+							loop.accept("(" + line + ")", opStack.popType(), " <= ", node);
+//							builder.append("(" + line + ")", opStack.popType(), " <= ", node);
 						} else {
-							builder.append(le, opStack.popType(), " <= ");
+							builder.append(le, opStack.popType(), " <= ", node);
 						}
 						line.delete(0, line.length());
 						break;
 					case if_icmpeq:
-						builder.append(makeExprInt(" == ", line.toString(), node));
+						if(check(node, LoopEntry)) {
+							loop.accept(line.toString(), node);
+							loop.accept(makeExprInt(" == ", line.toString(), node), node);
+						} else {
+							builder.append(makeExprInt(" == ", line.toString(), node), node);
+						}
 						line.delete(0, line.length());
 						break;
 					case if_icmpne:
-						builder.append(makeExprInt(" != ", line.toString(), node));
+						if(check(node, LoopEntry)) {
+							loop.accept(line.toString(), node);
+							loop.accept(makeExprInt(" != ", line.toString(), node), node);
+						} else {
+							builder.append(makeExprInt(" != ", line.toString(), node), node);
+						}
 						line.delete(0, line.length());
 						break;
 					case if_icmplt:
-						builder.append(makeExprInt(" < " , line.toString(), node));
+						if(check(node, LoopEntry)) {
+							loop.accept(line.toString(), node);
+							loop.accept(makeExprInt(" < ", line.toString(), node), node);
+						} else {
+							builder.append(makeExprInt(" < ", line.toString(), node), node);
+						}
 						line.delete(0, line.length());
 						break;
 					case if_icmpge:
-						builder.append(makeExprInt(" >= ", line.toString(), node));
+						if(check(node, LoopEntry)) {
+							if(line.dumppedSize() > 1) {
+								loop.accept(line.getDumpped(), node);
+							} else {
+								loop.accept(line.toString(), node);
+							}
+							if(loop.isForEachArray()) {
+								// in case of "for(Type element : ARRAY)", 
+								// LoopExit node has incremental instruction.
+								// then, it is necessary to delete increment because
+								// the increment exists in source code.
+								incrementIgnoreNode.add(node);
+							}
+							loop.accept(makeExprInt(" >= ", line.toString(), node), node);
+						} else {
+							builder.append(makeExprInt(" >= ", line.toString(), node), node);
+						}
 						line.delete(0, line.length());
 						break;
 					case if_icmpgt:
-						builder.append(makeExprInt(" > " , line.toString(), node));
-						line.delete(0, line.length());break;
+						if(check(node, LoopEntry)) {
+							loop.accept(line.toString(), node);
+							loop.accept(makeExprInt(" > ", line.toString(), node), node);
+						} else {
+							builder.append(makeExprInt(" > ", line.toString(), node), node);
+						}
+						line.delete(0, line.length());
+						break;
 					case if_icmple:
-						builder.append(makeExprInt(" <= ", line.toString(), node));
+						if(check(node, LoopEntry)) {
+							loop.accept(line.toString(), node);
+							loop.accept(makeExprInt(" <= ", line.toString(), node), node);
+						} else {
+							builder.append(makeExprInt(" <= ", line.toString(), node), node);
+						}
 						line.delete(0, line.length());
 						break;
 					case if_acmpeq:
-						builder.append(makeExprInt(" == ", line.toString(), node));
+						if(check(node, LoopEntry)) {
+							loop.accept(line.toString(), node);
+							loop.accept(makeExprInt(" <= ", line.toString(), node), node);
+						} else {
+							builder.append(makeExprInt(" <= ", line.toString(), node), node);
+						}
 						line.delete(0, line.length());
 						break;
 					case if_acmpne:
-						builder.append(makeExprInt(" != ", line.toString(), node));
+						if(check(node, LoopEntry)) {
+							loop.accept(line.toString(), node);
+							loop.accept(makeExprInt(" != ", line.toString(), node), node);
+						} else {
+							builder.append(makeExprInt(" != ", line.toString(), node), node);
+						}
 						line.delete(0, line.length());
 						break;
 					case _goto:
-//						addSemicolon = false;
-//						result.write(line.toString());
-//						line = line.delete(0, line.length());
-						if(line.length() == 0) {
+						if(incrementIgnoreNode.contains(node.getChildren().iterator().next().getDest())) {
+							line.delete(0, line.length());
+							break;
+						}
+						if((line.length() == 0) && (opStack.size() > 0)) {
 							line.append(opStack.pop(typePop));
+						}
+						if(check(node, OneLineEntryBreak)) {
+							line.append("break");
 						}
 						break;
 					case jsr: break;
@@ -546,13 +622,13 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case freturn:
 					case dreturn:
 					case areturn:
-						line.append("return ").append(opStack.pop(typePop));
+						line.append("return ", opStack.pop(typePop));
 						break;
 					case _return:
 						if(i != nodes.length - 1) {
 							// in case of this return instruction is not end of opcode,
 							// specifies "return;".
-							line.append("return;");
+							line.append("return");
 						}
 						break;
 					case getstatic:
@@ -564,7 +640,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case putstatic:
 						CpRefOpcode putSta = (CpRefOpcode)opcode;
 						String putStaticField = putSta.getOperand().split("\\|")[0];
-						line.append(putStaticField).append(" = ").append(opStack.pop(typePop));
+						line.append(putStaticField, " = ", opStack.pop(typePop));
 						break;
 					case getfield:
 						CpRefOpcode getField = (CpRefOpcode)opcode;
@@ -579,8 +655,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						String[] putNames = put.split("\\.");
 						String value = opStack.pop(typePop);
 						String putCaller = opStack.pop(typePop);
-						line.append(putCaller).append(".").append(putNames[putNames.length - 1])
-							.append(" = ").append(value);
+						line.append(putCaller, ".", putNames[putNames.length - 1], " = ", value);
 						break;
 					case invokevirtual:
 						CpRefOpcode virOpcode = (CpRefOpcode)opcode;
@@ -697,11 +772,21 @@ public class MethodDecompiler extends AbstractDecompiler {
 						opStack.push(manArray.toString(), multiArrayType);
 						break;
 					case ifnull:
-						builder.append(makeExprNull(" == ", line.toString(), node));
+						if(check(node, LoopEntry)) {
+							loop.accept(line.toString(), node);
+							loop.accept(makeExprNull(" == ", line.toString(), node), node);
+						} else {
+							builder.append(makeExprNull(" == ", line.toString(), node), node);
+						}
 						line.delete(0, line.length());
 						break;
 					case ifnonnull:
-						builder.append(makeExprNull(" != ", line.toString(), node));
+						if(check(node, LoopEntry)) {
+							loop.accept(line.toString(), node);
+							loop.accept(makeExprNull(" != ", line.toString(), node), node);
+						} else {
+							builder.append(makeExprNull(" != ", line.toString(), node), node);
+						}
 						line.delete(0, line.length());
 						break;
 					case goto_w: break;
@@ -725,28 +810,36 @@ public class MethodDecompiler extends AbstractDecompiler {
 				// Entry, OneLineEntry or OneLineEntryBreak, current node is "else" block.
 				// and, it is necessary to hold terminal node of if-else statement
 				// for to unindent and add end scope of "else" block.
-				if((elseNode = getIfElseTerminal(dominator, nodes[i - 1])) != null) {
+				if(getIfElseTerminal(dominator, nodes[i - 1]) != null) {
+					elseNode.add(getIfElseTerminal(dominator, nodes[i - 1]));
 					result.write("else {");
 					result.changeIndent(INCREMENT);
 				}
 			}
 
 			if(check(node, LoopEntry)) {
-				line = new StringBuilder();
-				line.append(builder.build());
+				String loopDeclare = line.length() > 0 ? loop.build(line.toString()) : loop.build();
+				if(loopDeclare.contains("#VAL#")) {
+					String[] separated = line.toString().split(" ");
+					loopDeclare = loopDeclare.replace("#VAL#", separated[1]);
+				}
+				line = new LineBuilder();
+				line.append(loopDeclare);
 				addSemicolon = false;
 			} else if(isIfNode(node)) {
 				// elif block
 				String processing = line.toString();
-				line = new StringBuilder();
+				line = new LineBuilder();
 				if(isElifBlock(node)) {
 					line.append("else ");
 				}
-				line.append(builder.build());
-				if(checkNone(node, Entry)) {
-					line.append(processing);
-				}
+				line.append("if").append(builder.build()).append(" ");
 				addSemicolon = checkNone(node, Entry);
+				if(addSemicolon) {
+					line.append(processing);
+				} else {
+					line.append("{"); 
+				}
 			}
 			if(line.length() > 0) {
 				// When the node is not start or end of a statement, (ex. "if(...) {", "}")
@@ -754,6 +847,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 				if(addSemicolon) {
 					line.append(";");
 				}
+//				println(opcodes);
 				result.write(line.toString());
 			}
 			indent(node);
@@ -773,7 +867,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 			int count = 0;
 			for(CFEdge edge : ifElseTerminal.getParents()) {
 				CFNode dest = edge.getDest();
-				if(check(dest, OneLineEntry, OneLineEntryBreak) || check(dest, Exit)) {
+				if(check(dest, OneLineEntry, OneLineEntryBreak, Exit)) {
 					count++;
 				}
 			}
@@ -966,5 +1060,51 @@ public class MethodDecompiler extends AbstractDecompiler {
 			}
 		}
 		throw new IllegalArgumentException("the specified opcode is not in the opcodes.");
+	}
+
+	private class LineBuilder {
+		private StringBuilder sb;
+		private List<String> list;
+
+		public LineBuilder() {
+			this.sb = new StringBuilder();
+			this.list = new ArrayList<>();
+		}
+
+		public int dumppedSize() {
+			return list.size();
+		}
+
+		public String[] getDumpped() {
+			return list.toArray(new String[0]);
+		}
+
+		public StringBuilder append(String s) {
+			list.add(s);
+			return sb.append(s);
+		}
+
+		public StringBuilder append(String... strs) {
+			StringBuilder sb = new StringBuilder();
+			for(String s : strs) {
+				sb.append(s);
+			}
+			list.add(sb.toString());
+			return this.sb.append(sb.toString());
+		}
+
+		public void delete(int start, int end) {
+			list.clear();
+			sb.delete(start, end);
+		}
+
+		public int length() {
+			return sb.length();
+		}
+
+		@Override
+		public String toString() {
+			return sb.toString();
+		}
 	}
 }

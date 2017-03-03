@@ -6,16 +6,12 @@ import java.util.HashSet;
 import java.util.Set;
 import sds.assemble.controlflow.CFNode;
 
-import static sds.assemble.controlflow.CFNodeType.Entry;
-import static sds.assemble.controlflow.CFNodeType.OneLineEntry;
-import static sds.assemble.controlflow.CFNodeType.LoopEntry;
 import static sds.decompile.cond_expr.Expression.Child.TRUE;
 import static sds.decompile.cond_expr.Expression.Child.FALSE;
 import static sds.decompile.cond_expr.Expression.Child.OWN;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static sds.assemble.controlflow.NodeTypeChecker.check;
 import static sds.util.Printer.println;
 
 /**
@@ -24,18 +20,11 @@ import static sds.util.Printer.println;
  */
 public class ConditionalExprBuilder {
 	private List<Expression> exprs;
-	private CFNode node;
 	private StringBuilder result;
 
-	public ConditionalExprBuilder(CFNode node) {
-		this.node = node;
+	public ConditionalExprBuilder() {
 		this.exprs = new ArrayList<>();
-		this.result = new StringBuilder("");
-		if(check(node, Entry, OneLineEntry)) {
-			result.append("if(");
-			return;
-		}
-		result.append("while(");
+		this.result = new StringBuilder();
 	}
 
 	/**
@@ -43,33 +32,35 @@ public class ConditionalExprBuilder {
 	 * @param expr expression
 	 * @param type expression type
 	 * @param cmpOperator comparing operator
+	 * @param node node has expression
 	 */
-	public void append(String expr, String type, String cmpOperator) {
+	public void append(String expr, String type, String cmpOperator, CFNode node) {
 		if(type.equals("boolean")) {
 			if(expr.contains("OPERATOR")) {
-				append(expr.replace("OPERATOR", cmpOperator));
+				append(expr.replace("OPERATOR", cmpOperator), node);
 			} else {
 				// for example, "str.equals(another)"
 				// in this case, restores reversed expression.
 				if(cmpOperator.equals(" == ")) {
-					append("(! " + expr + ")");
+					append("(! " + expr + ")", node);
 				} else {
 					// cmpOperator is " != ".
-					append(expr);
+					append("(" + expr + ")", node);
 				}
 			}
 			return;
 		}
 		// in case of comparing int value and 0, no opcode push 0 onto stack.
 		// so, it is necessary to append comparing operator and 0 to popped element.
-		append("(" + expr + cmpOperator + "0)");
+		append("(" + expr + cmpOperator + "0)", node);
 	}
 
 	/**
 	 * appends part of expression.
 	 * @param expr expression
+	 * @param node node has expression
 	 */
-	public void append(String expr) {
+	public void append(String expr, CFNode node) {
 		exprs.add(new Expression(exprs.size(), expr, node));
 	}
 
@@ -78,9 +69,11 @@ public class ConditionalExprBuilder {
 	 * @return conditional expression
 	 */
 	public String build() {
+		result.append("(");
+		
 		// setting true and false expression of that.
 		setExprBranch();
-		println("[initialized]: " + exprs);
+//		println("[initialized]: " + exprs);
 
 		int len = exprs.size();
 		combineExpr(TRUE, " || ");
@@ -104,13 +97,14 @@ public class ConditionalExprBuilder {
 		output(len, "combine Last");
 
 		addLogicalOperator();
-		result.append(") ");
-		println("*** " + result + " ***");
-		return check(node, Entry, LoopEntry) ? result.append("{").toString() : result.toString();
+		result.append(")");
+//		println("*** " + result + " ***");
+
+		return result.toString();
 	}
 
 	private void output(int len, String phase) {
-		if(len != exprs.size()) println("[after " + phase + "]: " + exprs);
+//		if(len != exprs.size()) println("[after " + phase + "]: " + exprs);
 	}
 
 	private void setExprBranch() {
@@ -138,6 +132,7 @@ public class ConditionalExprBuilder {
 		}
 		Set<Expression> removeSet = new HashSet<>();
 		if(type.is(OWN)) {
+			int len = exprs.size();
 			int index = 0;
 			for(Expression ex : exprs) {
 				Expression next = ex.trueExpr;
@@ -153,7 +148,7 @@ public class ConditionalExprBuilder {
 			}
 			updateExprs(removeSet);
 			removeSet.clear();
-			println("[in the middle]: " + exprs);
+			output(len, "in the middle");
 		}
 		// combining expressions
 		// if type == TRUE, with 'OR'.
@@ -256,7 +251,13 @@ public class ConditionalExprBuilder {
 		if(exprs.size() < 2) {
 			return;
 		}
-		int[] counter = new int[exprs.get(exprs.size() - 1).jumpPoint];
+		int max = 0;
+		for(Expression ex : exprs) {
+			if(max < ex.jumpPoint) {
+				max = ex.jumpPoint;
+			}
+		}
+		int[] counter = new int[max];
 		for(Expression ex : exprs) {
 			if(ex.equalsChild(FALSE)) {
 				counter[ex.jumpPoint - 1]++;

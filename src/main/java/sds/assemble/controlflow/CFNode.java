@@ -291,8 +291,13 @@ public class CFNode {
 			return;
 		}
 		CFEdge edge = new CFEdge(this, child, type);
-		if(!children.contains(edge)) {
+		if(check(this, OneLineEntry, OneLineEntryBreak)) {
+			children.remove(edge);
 			children.add(edge);
+		} else {
+			if(!children.contains(edge)) {
+				children.add(edge);
+			}
 		}
 	}
 

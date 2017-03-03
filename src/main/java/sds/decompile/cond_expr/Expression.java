@@ -43,11 +43,7 @@ public class Expression {
 		this.range = new int[]{ -1, 0 };
 		setRange(number, node);
 		this.exprs = new String[]{expr};
-		if(check(node, Entry)) {
-			setChild(node);
-		} else {
-			setOneLineChild(node);
-		}
+		setChild(node);
 	}
 
 	private void setRange(int number, CFNode node) {
@@ -88,13 +84,6 @@ public class Expression {
 				break;
 			}
 		}
-		if(isNull(child)) {
-			this.child = Child.OWN;
-			this.ownDest = new int[]{ jumpPoint };
-		}
-	}
-
-	private void setOneLineChild(CFNode node) {
 		OpcodeInfo[] opcodes = node.getOpcodes().getAll();
 		int[] trueRange = new int[2];
 		for(int i = opcodes.length - 1; i >= 0; i--) {
@@ -112,9 +101,6 @@ public class Expression {
 				this.child = Child.OWN;
 				this.ownDest = new int[]{ jumpPoint };
 			}
-		} else {
-			this.child = Child.FALSE;
-			reverse();
 		}
 	}
 
@@ -124,7 +110,7 @@ public class Expression {
 	 * @param logical logical operator
 	 */
 	public void combine(Expression newExpr, String logical) {
-		println("\t" + toString());
+//		println("\t" + toString());
 
 		this.exprs = new String[]{ getExpr(), newExpr.getExpr() };
 		this.logical = logical;	
@@ -140,7 +126,7 @@ public class Expression {
 		range[1] = newExpr.range[1];
 		this.jumpPoint = newExpr.jumpPoint;
 
-		println("\t" + toString());
+//		println("\t" + toString());
 	}
 
 	/**
