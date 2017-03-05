@@ -20,15 +20,9 @@ import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.bytecode.PushOpcode;
 import sds.decompile.cond_expr.ConditionalExprBuilder;
 
-import static java.util.Objects.nonNull;
-import static java.util.Objects.isNull;
-import static sds.assemble.controlflow.NodeTypeChecker.check;
-import static sds.assemble.controlflow.NodeTypeChecker.checkNone;
-import static sds.assemble.controlflow.CFNodeType.End;
 import static sds.assemble.controlflow.CFNodeType.LoopEntry;
 import static sds.assemble.controlflow.CFNodeType.LoopExit;
 import static sds.assemble.controlflow.CFNodeType.Entry;
-import static sds.assemble.controlflow.CFNodeType.Normal;
 import static sds.assemble.controlflow.CFNodeType.OneLineEntry;
 import static sds.assemble.controlflow.CFNodeType.OneLineEntryBreak;
 import static sds.assemble.controlflow.CFNodeType.Exit;
@@ -38,23 +32,22 @@ import static sds.assemble.controlflow.CFEdgeType.TrueBranch;
 import static sds.assemble.controlflow.CFEdgeType.FalseBranch;
 import static sds.classfile.bytecode.MnemonicTable.*;
 import static sds.decompile.DecompiledResult.INCREMENT;
-import static sds.util.Printer.print;
+
+import static sds.assemble.controlflow.NodeTypeChecker.check;
+import static sds.assemble.controlflow.NodeTypeChecker.checkNone;
 import static sds.util.Printer.println;
 
 /**
  * This class is for decompiling contents of method.
- *
  * @author inagaki
  */
 public class MethodDecompiler extends AbstractDecompiler {
-
 	private OperandStack opStack;
 	private LocalStack local;
 	private String caller;
 
 	/**
 	 * constructor.
-	 *
 	 * @param result decompiled source
 	 * @param caller caller class has this method
 	 */
@@ -65,7 +58,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 
 	@Override
 	public void decompile(BaseContent content) {
-		MethodContent method = (MethodContent) content;
+		MethodContent method = (MethodContent)content;
 		this.opStack = new OperandStack();
 		this.local = new LocalStack();
 		addAnnotation(method.getAnnotation());
@@ -74,13 +67,13 @@ public class MethodDecompiler extends AbstractDecompiler {
 
 	@Override
 	void addDeclaration(BaseContent content) {
-		MethodContent method = (MethodContent) content;
+		MethodContent method = (MethodContent)content;
 		StringBuilder methodDeclaration = new StringBuilder();
 		// access flag
 		methodDeclaration.append(method.getAccessFlag());
 
 		// in case of method is not static initializer
-		if(!method.getName().equals("<clinit>")) {
+		if(! method.getName().equals("<clinit>")) {
 			if(method.getName().contains("<init>")) {
 				// in case of Constructor, it is unnecessary return type declaration.
 				methodDeclaration.append(method.getName().replace("<init>", caller)).append("(");
@@ -90,14 +83,14 @@ public class MethodDecompiler extends AbstractDecompiler {
 				methodDeclaration.append(returnType).append(" ").append(method.getName()).append("(");
 			}
 			// args
-			if(!method.getAccessFlag().contains("static")) {
+			if(! method.getAccessFlag().contains("static")) {
 				// in case of method is not static, the method has own as argument.
 				local.push("this", caller);
 			}
 			String[][] args = method.getArgs();
 			int length = args.length;
 			if(length > 0) {
-				for(int i = 0; i < length - 1; i++) {
+				for(int i = 0; i < length - 1 ; i++) {
 					methodDeclaration.append(args[i][0]).append(" ").append(args[i][1]).append(", ");
 					String type = args[i][0];
 					if(type.matches("double|long")) {
@@ -147,7 +140,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 	private void buildMethodBody(CFNode[] nodes) {
 		boolean typePop = true;
 		Set<CFNode> falseNode = new HashSet<>();
-		Set<CFNode> elseNode = new HashSet<>();
+		Set<CFNode> elseNode  = new HashSet<>();
 		Set<CFNode> incrementIgnoreNode = new HashSet<>();
 		for(int i = 0; i < nodes.length; i++) {
 			CFNode node = nodes[i];
@@ -181,61 +174,30 @@ public class MethodDecompiler extends AbstractDecompiler {
 //				println("local: " + local);
 //				println("stack: " + opStack);
 				switch(opcode.getOpcodeType()) {
-					case nop:
-						break;
-					case aconst_null:
-						opStack.push("null", "null");
-						break;
-					case iconst_m1:
-						opStack.push(-1);
-						break;
-					case iconst_0:
-						opStack.push(0);
-						break;
-					case iconst_1:
-						opStack.push(1);
-						break;
-					case iconst_2:
-						opStack.push(2);
-						break;
-					case iconst_3:
-						opStack.push(3);
-						break;
-					case iconst_4:
-						opStack.push(4);
-						break;
-					case iconst_5:
-						opStack.push(5);
-						break;
-					case lconst_0:
-						opStack.push(0L);
-						break;
-					case lconst_1:
-						opStack.push(1L);
-						break;
-					case fconst_0:
-						opStack.push(0.0f);
-						break;
-					case fconst_1:
-						opStack.push(1.0f);
-						break;
-					case fconst_2:
-						opStack.push(2.0f);
-						break;
-					case dconst_0:
-						opStack.push(0.0d);
-						break;
-					case dconst_1:
-						opStack.push(1.0d);
-						break;
+					case nop: break;
+					case aconst_null: opStack.push("null", "null"); break;
+					case iconst_m1:   opStack.push(-1);     break;
+					case iconst_0:    opStack.push(0);      break;
+					case iconst_1:    opStack.push(1);      break;
+					case iconst_2:    opStack.push(2);      break;
+					case iconst_3:    opStack.push(3);      break;
+					case iconst_4:    opStack.push(4);      break;
+					case iconst_5:    opStack.push(5);      break;
+					case lconst_0:    opStack.push(0L);     break;
+					case lconst_1:    opStack.push(1L);     break;
+					case fconst_0:    opStack.push(0.0f);   break;
+					case fconst_1:    opStack.push(1.0f);   break;
+					case fconst_2:    opStack.push(2.0f);   break;
+					case dconst_0:    opStack.push(0.0d);   break;
+					case dconst_1:    opStack.push(1.0d);   break;
 					case bipush:
 					case sipush:
-						opStack.push(((PushOpcode) opcode).getValue());
+						opStack.push(((PushOpcode)opcode).getValue());
 						break;
 					case ldc:
 					case ldc_w:
 					case ldc2_w:
-						CpRefOpcode lcdOpcode = (CpRefOpcode) opcode;
+						CpRefOpcode lcdOpcode = (CpRefOpcode)opcode;
 						opStack.push(lcdOpcode.getOperand(), lcdOpcode.getType());
 						break;
 					case iload:
@@ -243,36 +205,31 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case fload:
 					case dload:
 					case aload:
-						load(((IndexOpcode) opcode).getIndex());
-						break;
+						load(((IndexOpcode)opcode).getIndex()); break;
 					case iload_0:
 					case lload_0:
 					case fload_0:
 					case dload_0:
 					case aload_0:
-						load(0);
-						break;
+						load(0); break;
 					case iload_1:
 					case lload_1:
 					case fload_1:
 					case dload_1:
 					case aload_1:
-						load(1);
-						break;
+						load(1); break;
 					case iload_2:
 					case lload_2:
 					case fload_2:
 					case dload_2:
 					case aload_2:
-						load(2);
-						break;
+						load(2); break;
 					case iload_3:
 					case lload_3:
 					case fload_3:
 					case dload_3:
 					case aload_3:
-						load(3);
-						break;
+						load(3); break;
 					case iaload:
 					case laload:
 					case faload:
@@ -283,7 +240,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case saload:
 						String arrayIndex = opStack.pop(typePop);
 						String refedArray = opStack.pop();
-						String arrayType = opStack.popType();
+						String arrayType  = opStack.popType();
 						opStack.push(refedArray + "[" + arrayIndex + "]", arrayType);
 						break;
 					case istore:
@@ -291,7 +248,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case astore:
 					case lstore:
 					case dstore:
-						IndexOpcode inOp = (IndexOpcode) opcode;
+						IndexOpcode inOp = (IndexOpcode)opcode;
 						line.append(getStored(inOp.getIndex()));
 						break;
 					case istore_0:
@@ -299,29 +256,25 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case astore_0:
 					case lstore_0:
 					case dstore_0:
-						line.append(getStored(0));
-						break;
+						line.append(getStored(0)); break;
 					case istore_1:
 					case fstore_1:
 					case astore_1:
 					case lstore_1:
 					case dstore_1:
-						line.append(getStored(1));
-						break;
+						line.append(getStored(1)); break;
 					case istore_2:
 					case fstore_2:
 					case astore_2:
 					case lstore_2:
 					case dstore_2:
-						line.append(getStored(2));
-						break;
+						line.append(getStored(2)); break;
 					case istore_3:
 					case fstore_3:
 					case astore_3:
 					case lstore_3:
 					case dstore_3:
-						line.append(getStored(3));
-						break;
+						line.append(getStored(3)); break;
 					case iastore:
 					case lastore:
 					case fastore:
@@ -349,8 +302,8 @@ public class MethodDecompiler extends AbstractDecompiler {
 						opStack.push(dup, dupType);
 						break;
 					case dup_x1:
-						String dup_x1_1 = opStack.pop();
-						String dup_x1_2 = opStack.pop();
+						String dup_x1_1  = opStack.pop();
+						String dup_x1_2  = opStack.pop();
 						String type_x1_1 = opStack.popType();
 						String type_x1_2 = opStack.popType();
 						opStack.push(dup_x1_1, type_x1_1);
@@ -358,9 +311,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 						opStack.push(dup_x1_1, type_x1_1);
 						break;
 					case dup_x2:
-						String dup_x2_1 = opStack.pop();
-						String dup_x2_2 = opStack.pop();
-						String dup_x2_3 = opStack.pop();
+						String dup_x2_1  = opStack.pop();
+						String dup_x2_2  = opStack.pop();
+						String dup_x2_3  = opStack.pop();
 						String type_x2_1 = opStack.popType();
 						String type_x2_2 = opStack.popType();
 						String type_x2_3 = opStack.popType();
@@ -370,8 +323,8 @@ public class MethodDecompiler extends AbstractDecompiler {
 						opStack.push(dup_x2_1, type_x2_1);
 						break;
 					case dup2:
-						String dup2_1 = opStack.pop();
-						String dup2_2 = opStack.pop();
+						String dup2_1  = opStack.pop();
+						String dup2_2  = opStack.pop();
 						String type2_1 = opStack.popType();
 						String type2_2 = opStack.popType();
 						opStack.push(dup2_2, type2_2);
@@ -416,66 +369,26 @@ public class MethodDecompiler extends AbstractDecompiler {
 						opStack.push(two, typeTwo);
 						opStack.push(one, typeOne);
 						break;
-					case iadd:
-						calculate(" + ", "int");
-						break;
-					case ladd:
-						calculate(" + ", "long");
-						break;
-					case fadd:
-						calculate(" + ", "float");
-						break;
-					case dadd:
-						calculate(" + ", "double");
-						break;
-					case isub:
-						calculate(" - ", "int");
-						break;
-					case lsub:
-						calculate(" - ", "long");
-						break;
-					case fsub:
-						calculate(" - ", "float");
-						break;
-					case dsub:
-						calculate(" - ", "double");
-						break;
-					case imul:
-						calculate(" * ", "int");
-						break;
-					case lmul:
-						calculate(" * ", "long");
-						break;
-					case fmul:
-						calculate(" * ", "float");
-						break;
-					case dmul:
-						calculate(" * ", "double");
-						break;
-					case idiv:
-						calculate(" / ", "int");
-						break;
-					case ldiv:
-						calculate(" / ", "long");
-						break;
-					case fdiv:
-						calculate(" / ", "float");
-						break;
-					case ddiv:
-						calculate(" / ", "double");
-						break;
-					case irem:
-						calculate(" % ", "int");
-						break;
-					case lrem:
-						calculate(" % ", "long");
-						break;
-					case frem:
-						calculate(" % ", "float");
-						break;
-					case drem:
-						calculate(" % ", "double");
-						break;
+					case iadd: calculate(" + ", "int");    break;
+					case ladd: calculate(" + ", "long");   break;
+					case fadd: calculate(" + ", "float");  break;
+					case dadd: calculate(" + ", "double"); break;
+					case isub: calculate(" - ", "int");    break;
+					case lsub: calculate(" - ", "long");   break;
+					case fsub: calculate(" - ", "float");  break;
+					case dsub: calculate(" - ", "double"); break;
+					case imul: calculate(" * ", "int");    break;
+					case lmul: calculate(" * ", "long");   break;
+					case fmul: calculate(" * ", "float");  break;
+					case dmul: calculate(" * ", "double"); break;
+					case idiv: calculate(" / ", "int");    break;
+					case ldiv: calculate(" / ", "long");   break;
+					case fdiv: calculate(" / ", "float");  break;
+					case ddiv: calculate(" / ", "double"); break;
+					case irem: calculate(" % ", "int");    break;
+					case lrem: calculate(" % ", "long");   break;
+					case frem: calculate(" % ", "float");  break;
+					case drem: calculate(" % ", "double"); break;
 					case ineg:
 					case lneg:
 					case fneg:
@@ -483,102 +396,43 @@ public class MethodDecompiler extends AbstractDecompiler {
 						String minus = "-(" + opStack.pop() + ")";
 						opStack.push(minus, opStack.popType());
 						break;
-					case ishl:
-						calculate(" << ", "int");
-						break;
-					case lshl:
-						calculate(" << ", "long");
-						break;
-					case ishr:
-						calculate(" >> ", "int");
-						break;
-					case lshr:
-						calculate(" >> ", "long");
-						break;
-					case iushr:
-						calculate(" >>> ", "int");
-						break;
-					case lushr:
-						calculate(" >>> ", "long");
-						break;
-					case iand:
-						calculate(" & ", "int");
-						break;
-					case land:
-						calculate(" & ", "long");
-						break;
-					case ior:
-						calculate(" | ", "int");
-						break;
-					case lor:
-						calculate(" | ", "long");
-						break;
-					case ixor:
-						calculate(" ^ ", "int");
-						break;
-					case lxor:
-						calculate(" ^ ", "long");
-						break;
+					case ishl:  calculate(" << ", "int");   break;
+					case lshl:  calculate(" << ", "long");  break;
+					case ishr:  calculate(" >> ", "int");   break;
+					case lshr:  calculate(" >> ", "long");  break;
+					case iushr: calculate(" >>> ", "int");  break;
+					case lushr: calculate(" >>> ", "long"); break;
+					case iand:  calculate(" & ", "int");    break;
+					case land:  calculate(" & ", "long");   break;
+					case ior:   calculate(" | ", "int");    break;
+					case lor:   calculate(" | ", "long");   break;
+					case ixor:  calculate(" ^ ", "int");    break;
+					case lxor:  calculate(" ^ ", "long");   break;
 					case iinc:
-						Iinc inc = (Iinc) opcode;
+						Iinc inc = (Iinc)opcode;
 						line.append(local.load(inc.getIndex()));
 						int _const = inc.getConst();
-						if(_const == 1) {
-							line.append("++");
-						} else if(_const == -1) {
-							line.append("--");
-						} else if(_const > 1) {
-							line.append(" += ").append(_const);
-						} else if(_const < -1) {
-							line.append(" -= ").append(_const);
-						}
+						if(_const == 1)       line.append("++");
+						else if(_const == -1) line.append("--");
+						else if(_const > 1)   line.append(" += ").append(_const);
+						else if(_const < -1)  line.append(" -= ").append(_const);
 						// in case of "_const == 0", ignoring
 						break;
-					case i2l:
-						castPrimitive("long");
-						break;
-					case i2f:
-						castPrimitive("float");
-						break;
-					case i2d:
-						castPrimitive("double");
-						break;
-					case l2i:
-						castPrimitive("int");
-						break;
-					case l2f:
-						castPrimitive("float");
-						break;
-					case l2d:
-						castPrimitive("double");
-						break;
-					case f2i:
-						castPrimitive("int");
-						break;
-					case f2l:
-						castPrimitive("long");
-						break;
-					case f2d:
-						castPrimitive("double");
-						break;
-					case d2i:
-						castPrimitive("int");
-						break;
-					case d2l:
-						castPrimitive("long");
-						break;
-					case d2f:
-						castPrimitive("float");
-						break;
-					case i2b:
-						castPrimitive("byte");
-						break;
-					case i2c:
-						castPrimitive("char");
-						break;
-					case i2s:
-						castPrimitive("short");
-						break;
+					case i2l: castPrimitive("long");   break;
+					case i2f: castPrimitive("float");  break;
+					case i2d: castPrimitive("double"); break;
+					case l2i: castPrimitive("int");    break;
+					case l2f: castPrimitive("float");  break;
+					case l2d: castPrimitive("double"); break;
+					case f2i: castPrimitive("int");    break;
+					case f2l: castPrimitive("long");   break;
+					case f2d: castPrimitive("double"); break;
+					case d2i: castPrimitive("int");    break;
+					case d2l: castPrimitive("long");   break;
+					case d2f: castPrimitive("float");  break;
+					case i2b: castPrimitive("byte");   break;
+					case i2c: castPrimitive("char");   break;
+					case i2s: castPrimitive("short");  break;
 					case lcmp:
 					case fcmpl:
 					case fcmpg:
@@ -600,7 +454,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(eq, opStack.popType(), " == ", node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case ifne: // (x != y)
 						String ne = opStack.pop();
@@ -610,7 +464,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(ne, opStack.popType(), " != ", node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case iflt: // (x < y)
 						String lt = opStack.pop();
@@ -620,7 +474,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(lt, opStack.popType(), " < ", node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case ifge: // (x >= y)
 						String ge = opStack.pop();
@@ -630,7 +484,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(ge, opStack.popType(), " >= ", node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case ifgt: // (x > y)
 						String gt = opStack.pop();
@@ -641,7 +495,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(gt, opStack.popType(), " > ", node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case ifle: // (x <= y)
 						String le = opStack.pop();
@@ -652,7 +506,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(le, opStack.popType(), " <= ", node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case if_icmpeq:
 						if(check(node, LoopEntry)) {
@@ -661,7 +515,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(makeExprInt(" == ", line.toString(), node), node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case if_icmpne:
 						if(check(node, LoopEntry)) {
@@ -670,7 +524,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(makeExprInt(" != ", line.toString(), node), node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case if_icmplt:
 						if(check(node, LoopEntry)) {
@@ -679,7 +533,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(makeExprInt(" < ", line.toString(), node), node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case if_icmpge:
 						if(check(node, LoopEntry)) {
@@ -699,7 +553,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(makeExprInt(" >= ", line.toString(), node), node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case if_icmpgt:
 						if(check(node, LoopEntry)) {
@@ -708,7 +562,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(makeExprInt(" > ", line.toString(), node), node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case if_icmple:
 						if(check(node, LoopEntry)) {
@@ -717,7 +571,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(makeExprInt(" <= ", line.toString(), node), node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case if_acmpeq:
 						if(check(node, LoopEntry)) {
@@ -726,7 +580,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(makeExprInt(" <= ", line.toString(), node), node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case if_acmpne:
 						if(check(node, LoopEntry)) {
@@ -735,11 +589,11 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(makeExprInt(" != ", line.toString(), node), node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case _goto:
 						if(incrementIgnoreNode.contains(node.getChildren().iterator().next().getDest())) {
-							line.delete(0, line.length());
+							line.delete();
 							break;
 						}
 						if((line.length() == 0) && (opStack.size() > 0) && node.getEnd().equals(opcode)) {
@@ -749,14 +603,10 @@ public class MethodDecompiler extends AbstractDecompiler {
 							line.append("break");
 						}
 						break;
-					case jsr:
-						break;
-					case ret:
-						break;
-					case tableswitch:
-						break;
-					case lookupswitch:
-						break;
+					case jsr: break;
+					case ret: break;
+					case tableswitch: break;
+					case lookupswitch: break;
 					case ireturn:
 					case lreturn:
 					case freturn:
@@ -772,25 +622,25 @@ public class MethodDecompiler extends AbstractDecompiler {
 						}
 						break;
 					case getstatic:
-						CpRefOpcode getSta = (CpRefOpcode) opcode;
+						CpRefOpcode getSta = (CpRefOpcode)opcode;
 						// Xxx.yyy.FIELD|type
 						String[] getStaticField = getSta.getOperand().split("\\|");
 						opStack.push(getStaticField[0], getStaticField[1]);
 						break;
 					case putstatic:
-						CpRefOpcode putSta = (CpRefOpcode) opcode;
+						CpRefOpcode putSta = (CpRefOpcode)opcode;
 						String putStaticField = putSta.getOperand().split("\\|")[0];
 						line.append(putStaticField, " = ", opStack.pop(typePop));
 						break;
 					case getfield:
-						CpRefOpcode getField = (CpRefOpcode) opcode;
+						CpRefOpcode getField = (CpRefOpcode)opcode;
 						String get[] = getField.getOperand().split("\\|");
 						String getDeclaration = opStack.pop(typePop) + ".";
 						String[] getNames = get[0].split("\\.");
 						opStack.push(getDeclaration + getNames[getNames.length - 1], get[1]);
 						break;
 					case putfield:
-						CpRefOpcode putField = (CpRefOpcode) opcode;
+						CpRefOpcode putField = (CpRefOpcode)opcode;
 						String put = putField.getOperand().split("\\|")[0];
 						String[] putNames = put.split("\\.");
 						String value = opStack.pop(typePop);
@@ -798,7 +648,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						line.append(putCaller, ".", putNames[putNames.length - 1], " = ", value);
 						break;
 					case invokevirtual:
-						CpRefOpcode virOpcode = (CpRefOpcode) opcode;
+						CpRefOpcode virOpcode = (CpRefOpcode)opcode;
 						// 0: xxx.yyy.zzz.method
 						// 1: (args_1,args_2,...)returnType
 						String[] virOperand = virOpcode.getOperand().split("\\|");
@@ -809,14 +659,14 @@ public class MethodDecompiler extends AbstractDecompiler {
 						String[] virMethod = virOperand[0].split("\\.");
 						// caller.method
 						virtual.append(opStack.pop(typePop)).append(".").append(virMethod[virMethod.length - 1])
-								// caller.method(args1,args2,...)
+						// caller.method(args1,args2,...)
 								.append("(").append(virArgs).append(")");
-						if(!pushOntoStack(opcodes, opcode, virtual.toString())) {
+						if(! pushOntoStack(opcodes, opcode, virtual.toString())) {
 							line.append(virtual.toString());
 						}
 						break;
 					case invokespecial:
-						CpRefOpcode specialOpcode = (CpRefOpcode) opcode;
+						CpRefOpcode specialOpcode = (CpRefOpcode)opcode;
 						String[] specialOperand = specialOpcode.getOperand().split("\\|");
 						String spMethod = specialOperand[0].replace(".<init>", "");
 						String spDesc = specialOperand[1];
@@ -825,13 +675,13 @@ public class MethodDecompiler extends AbstractDecompiler {
 						String special = "new " + spMethod + "(" + getMethodArgs(spDesc) + ")";
 						// stack: [obj]
 						opStack.pop(typePop);
-						if(!pushOntoStack(opcodes, opcode, special)) {
+						if(! pushOntoStack(opcodes, opcode, special)) {
 							line.append(special);
 						} else {
 							// stack: [obj, invoked_method]
 							// stack: [obj]
 							String element = opStack.pop();
-							String type = opStack.popType();
+							String type    = opStack.popType();
 							// stack: []
 							if(opStack.size() > 0) {
 								opStack.pop(typePop);
@@ -841,41 +691,40 @@ public class MethodDecompiler extends AbstractDecompiler {
 						}
 						break;
 					case invokestatic:
-						CpRefOpcode staticOpcode = (CpRefOpcode) opcode;
+						CpRefOpcode staticOpcode =(CpRefOpcode)opcode;
 						String[] staticOperand = staticOpcode.getOperand().split("\\|");
 						String staticDesc = staticOperand[1];
 						String st = staticOperand[0] + "(" + getMethodArgs(staticDesc) + ")";
-						if(!pushOntoStack(opcodes, opcode, st)) {
+						if(! pushOntoStack(opcodes, opcode, st)) {
 							line.append(st);
 						}
 						break;
 					case invokeinterface:
-						InvokeInterface interfaceOpcode = (InvokeInterface) opcode;
+						InvokeInterface interfaceOpcode = (InvokeInterface)opcode;
 						String[] interOperand = interfaceOpcode.getOperand().split("\\|");
 						String interDesc = interOperand[1];
 						String[] interMethod = interOperand[0].split("\\.");
 						String interArgs = getMethodArgs(interDesc);
 						StringBuilder inter = new StringBuilder();
 						inter.append(opStack.pop(typePop)).append(".").append(interMethod[interMethod.length - 1])
-								.append("(").append(interArgs).append(")");
-						if(!pushOntoStack(opcodes, opcode, inter.toString())) {
+							.append("(").append(interArgs).append(")");
+						if(! pushOntoStack(opcodes, opcode, inter.toString())) {
 							line.append(inter.toString());
 						}
 						break;
-					case inovokedynamic:
-						break;
+					case inovokedynamic: break;
 					case _new:
-						String newClass = ((CpRefOpcode) opcode).getOperand();
+						String newClass = ((CpRefOpcode)opcode).getOperand();
 						String classType = newClass.replace("/", ".");
 						opStack.push(classType, classType);
 						break;
 					case newarray:
-						String type = ((NewArray) opcode).getType();
+						String type = ((NewArray)opcode).getType();
 						String primLen = opStack.pop(typePop);
 						opStack.push("new " + type + "[" + primLen + "]", type + "[]");
 						break;
 					case anewarray:
-						String objType = ((CpRefOpcode) opcode).getOperand();
+						String objType = ((CpRefOpcode)opcode).getOperand();
 						String aNewArrayType = objType.replace("/", ".");
 						String objLen = opStack.pop(typePop);
 						opStack.push("new " + aNewArrayType + "[" + objLen + "]", aNewArrayType + "[]");
@@ -883,27 +732,24 @@ public class MethodDecompiler extends AbstractDecompiler {
 					case arraylength:
 						opStack.push(opStack.pop(typePop) + ".length", "int");
 						break;
-					case athrow:
-						break;
+					case athrow: break;
 					case checkcast:
-						String casted = ((CpRefOpcode) opcode).getOperand().replace("/", ".");
+						String casted = ((CpRefOpcode)opcode).getOperand().replace("/", ".");
 						opStack.push("((" + casted + ")" + opStack.pop(typePop) + ")", casted);
 						break;
 					case _instanceof:
-						String instanceType = ((CpRefOpcode) opcode).getOperand().replace("/", ".");
+						String instanceType = ((CpRefOpcode)opcode).getOperand().replace("/", ".");
 						opStack.push("(" + opStack.pop(typePop) + " instanceof " + instanceType + ")", "boolean");
 						break;
 					case monitorenter:
-						line.delete(0, line.length());
+						line.delete();
 						line.append("synchronized(", opStack.pop(typePop), ") {");
 						addSemicolon = false;
 						break;
-					case monitorexit:
-						break;
-					case wide:
-						break;
+					case monitorexit: break;
+					case wide: break;
 					case multianewarray:
-						MultiANewArray mana = (MultiANewArray) opcode;
+						MultiANewArray mana = (MultiANewArray)opcode;
 						String multiArrayType = mana.getOperand().replace("/", ".");
 						String[] dimArray = new String[mana.getDimensions()];
 						for(int j = 0; j < dimArray.length; j++) {
@@ -926,7 +772,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(makeExprNull(" == ", line.toString(), node), node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
 					case ifnonnull:
 						if(check(node, LoopEntry)) {
@@ -935,20 +781,14 @@ public class MethodDecompiler extends AbstractDecompiler {
 						} else {
 							builder.append(makeExprNull(" != ", line.toString(), node), node);
 						}
-						line.delete(0, line.length());
+						line.delete();
 						break;
-					case goto_w:
-						break;
-					case jsr_w:
-						break;
-					case breakpoint:
-						break;
-					case impdep1:
-						break;
-					case impdep2:
-						break;
-					default:
-						break;
+					case goto_w: break;
+					case jsr_w: break;
+					case breakpoint: break;
+					case impdep1: break;
+					case impdep2: break;
+					default: break;
 				}
 //				println("local: " + local);
 //				println("line:  " + line);
@@ -956,7 +796,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 			}
 
 			// checking "else" block
-			if((!isIfNode(node)) && (node.getParents().size() == 1)) {
+			if((! isIfNode(node)) && (node.getParents().size() == 1)) {
 				CFNode dominator = node.getImmediateDominator();
 				// in general, when current node is "else" block,
 				// the node is not Entry, OneLineEntry and OneLineEntryBreak.
@@ -992,7 +832,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 				if(addSemicolon) {
 					line.append(processing);
 				} else {
-					line.append("{");
+					line.append("{"); 
 				}
 			}
 			if(line.length() > 0) {
@@ -1010,8 +850,8 @@ public class MethodDecompiler extends AbstractDecompiler {
 	}
 
 	/**
-	 * in case of specified node is terminal of if-else block, the node has more two parents. and,
-	 * (parents_size - 1) of the parents must be TrueBranch.
+	 * in case of specified node is terminal of if-else block, the node has more two parents.
+	 * and, (parents_size - 1) of the parents must be TrueBranch.
 	 */
 	private boolean isElseBlock(CFNode ifElseTerminal) {
 		if(ifElseTerminal == null) {
@@ -1030,13 +870,13 @@ public class MethodDecompiler extends AbstractDecompiler {
 		}
 		return false;
 	}
-
+	
 	private boolean isElifBlock(CFNode node) {
 		if(node.getParents().size() == 1) {
 			CFNode dominator = node.getImmediateDominator();
 			if(isIfNode(dominator)) {
 				CFEdge edge = node.getParents().iterator().next();
-				if(check(node, Entry)) {
+				if(check(node,Entry)) {
 					// this node has Entry node as immediate dominator node.
 					// in addition, this node connects to the Entry node with FalseBranch.
 					// then, this node is "else-if" block.
@@ -1112,10 +952,10 @@ public class MethodDecompiler extends AbstractDecompiler {
 
 	private String getStored(int index) {
 		String stored = opStack.pop();
-		String type = opStack.popType();
+		String type  = opStack.popType();
 		int before = local.size();
 		String value = local.load(index, type);
-		int after = local.size();
+		int after  = local.size();
 		if(before == after) {
 			// storing
 			return value + " = " + stored;
@@ -1128,7 +968,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 		StringBuilder sb = new StringBuilder("");
 		if((descriptor.indexOf("(") + 1) < descriptor.indexOf(")")) {
 			String[] args;
-			if(descriptor.contains(",")) {
+			if(descriptor.contains(",")){
 				args = new String[descriptor.split(",").length];
 			} else {
 				args = new String[1];
@@ -1152,7 +992,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 		for(CFEdge edge : target.getChildren()) {
 			if(edge.getType() == FalseBranch) {
 				CFNode terminal = edge.getDest();
-				while(!nodes[index].equals(terminal)) {
+				while(! nodes[index].equals(terminal)) {
 					index++;
 				}
 				if(checkNone(nodes[index - 1], Exit)) {
@@ -1181,15 +1021,18 @@ public class MethodDecompiler extends AbstractDecompiler {
 
 	/**
 	 * this method is for invoke method instruction.
-	 *
-	 * push element onto operand stack when specified opcode is end in current node has all opcodes.
-	 *
-	 * in case of the opcode is end, it is necessary to push element onto openrand stack because there are
-	 * some processing in the next.
-	 *
-	 * on the other hand, in case of that is not end, it is necessary to write processing of invoking method
-	 * on decompiled source because no opcode is in the next.
-	 *
+	 * 
+	 * push element onto operand stack
+	 * when specified opcode is end in current node has all opcodes.
+	 * 
+	 * in case of the opcode is end,
+	 * it is necessary to push element onto openrand stack
+	 * because there are some processing in the next.
+	 * 
+	 * on the other hand, in case of that is not end,
+	 * it is necessary to write processing of invoking method on decompiled source
+	 * because no opcode is in the next.
+	 * 
 	 * @param opcodes node has all opcodes
 	 * @param opcode one of the node has opcodes.
 	 * @param element element for pushing onto operand stack
@@ -1202,11 +1045,11 @@ public class MethodDecompiler extends AbstractDecompiler {
 					// end opcode
 					return false;
 				}
-				CpRefOpcode invoke = (CpRefOpcode) opcode;
+				CpRefOpcode invoke = (CpRefOpcode)opcode;
 				String[] operand = invoke.getOperand().split("\\|");
 				String desc = operand[1];
-				String type = operand[0].endsWith("<init>")
-						? operand[0].replace(".<init>", "") : desc.substring(desc.indexOf(")") + 1);
+				String type = operand[0].endsWith("<init>") ?
+						operand[0].replace(".<init>", "") : desc.substring(desc.indexOf(")") + 1);
 				opStack.push(element, type);
 				return true;
 			}
@@ -1215,7 +1058,6 @@ public class MethodDecompiler extends AbstractDecompiler {
 	}
 
 	private class LineBuilder {
-
 		private StringBuilder sb;
 		private List<String> list;
 
@@ -1246,9 +1088,9 @@ public class MethodDecompiler extends AbstractDecompiler {
 			return this.sb.append(sb.toString());
 		}
 
-		public void delete(int start, int end) {
+		public void delete() {
 			list.clear();
-			sb.delete(start, end);
+			sb.delete(0, sb.length());
 		}
 
 		public int length() {
