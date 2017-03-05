@@ -61,6 +61,8 @@ public enum CFNodeType {
 		int switchCount = 0;
 		int ifCount = 0;
 		int gotoCount = 0;
+		int synchCount = 0;
+		int synchExitCount = 0;
 		for(OpcodeInfo info : opcodes.getAll()) {
 			if(info instanceof SwitchOpcode) {
 				switchCount++;
@@ -73,11 +75,17 @@ public enum CFNodeType {
 				} else {
 					ifCount++;
 				}
+			} else if(info.getOpcodeType() == monitorenter) {
+				synchCount++;
+			} else if(info.getOpcodeType() == monitorexit) {
+				synchExitCount++;
 			}
 		}
-		if(switchCount > 1) {
-			return StringSwitch;
-		}
+
+		if(switchCount    > 0) return (switchCount > 1) ? StringSwitch : Switch;
+		if(synchCount     > 0) return SynchronizedEntry;
+		if(synchExitCount > 0) return SynchronizedExit;
+
 		if(ifCount > 0) {
 			if((end instanceof BranchOpcode) && (searchBranchType(end) == Entry)) {
 				return Entry;
@@ -101,19 +109,9 @@ public enum CFNodeType {
 	}
 	
 	private static CFNodeType searchType(OpcodeInfo op) {
-		if(op instanceof BranchOpcode) {
-			return searchBranchType(op);
-		}
-		if(op instanceof SwitchOpcode) {
-			return Switch;
-		}
-		if(op.getOpcodeType() == monitorenter) {
-			return SynchronizedEntry;
-		}
-		if(op.getOpcodeType() == monitorexit) {
-			return SynchronizedExit;
-		}
-		return isReturn(op) ? End : Normal;
+		if(op instanceof BranchOpcode) return searchBranchType(op);
+		if(isReturn(op))               return End;
+		return Normal;
 	}
 
 	private static CFNodeType searchBranchType(OpcodeInfo op) {
