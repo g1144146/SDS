@@ -29,22 +29,21 @@ import static sds.classfile.bytecode.MnemonicTable.goto_w;
 public class CFNode {
 	private Set<CFEdge> parents;
 	private Set<CFEdge> children;
-	private CFNode dominator;
-	private CFNode  immediateDominator;
 	private OpcodeInfo start;
 	private OpcodeInfo end;
 	private Opcodes opcodes;
 	private int[] jumpPoints = new int[0];
-//	private int jumpPoint = -1;
 	private int gotoPoint = -1;
 	private int[] switchJump = new int[0];
 	private int hash;
 	private String instStr;
 	// package-private fields.
+	CFNode dominator;
+	CFNode  immediateDominator;
 	CFNodeType nodeType;
 	boolean inTry      = false;
-	boolean isCatch    = false;
-	boolean isFinally  = false;
+	boolean inCatch    = false;
+	boolean inFinally  = false;
 	int synchIndent = 0;
 
 	/**
@@ -156,6 +155,19 @@ public class CFNode {
 	}
 
 	/**
+	 * returns try-catch-finally flag.<br>
+	 * the flag is 3bit, and each bit is "finally", "catch" and "try".
+	 * @return try-catch-finally flag
+	 */
+	public int isTryCatchFinally() {
+		int flag = 0;
+		if(inTry)     flag |= 0x01;
+		if(inCatch)   flag |= 0x02;
+		if(inFinally) flag |= 0x04;
+		return flag;
+	}
+
+	/**
 	 * returns opcodes which this node has.
 	 * @return opcodes
 	 */
@@ -225,22 +237,6 @@ public class CFNode {
 	 */
 	public CFNode getDominator() {
 		return dominator;
-	}
-
-	/**
-	 * sets immediate dominator node.
-	 * @param node immediate dominator node
-	 */
-	public void setImmediateDominator(CFNode node) {
-		this.immediateDominator = node;
-	}
-
-	/**
-	 * sets dominator node.
-	 * @param node dominator node
-	 */
-	public void setDominator(CFNode node) {
-		this.dominator = node;
 	}
 
 	/**
@@ -357,13 +353,13 @@ public class CFNode {
 		sb.append("#").append(start.getPc()).append("-").append(end.getPc())
 			.append(" [").append(nodeType).append("]").append("\n");
 		if(inTry)     sb.append("  in try\n");
-		if(isCatch)   sb.append("  in catch\n");
-		if(isFinally) sb.append("  in finally\n");
+		if(inCatch)   sb.append("  in catch\n");
+		if(inFinally) sb.append("  in finally\n");
 		if(synchIndent > 0) sb.append("  in synchronized ").append(synchIndent).append("\n");
 		sb.append("  opcodes: ").append(instStr).append("\n");
 		if(parents.size() == 1) {
 			sb.append("  immediate dominator: ").append(parents.iterator().next());
-		} else if(parents.size() > 1) {
+		} else if((parents.size() > 1) && (dominator != null)) {
 			sb.append("  dominator: ")
 				.append(dominator.getStart().getPc()).append("-")
 				.append(dominator.getEnd().getPc())

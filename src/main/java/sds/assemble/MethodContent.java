@@ -84,7 +84,7 @@ public class MethodContent extends MemberContent {
 //			System.out.println("[local variable]");
 //			System.out.println(valContent);
 		}
-		if(exContent != null && exContent.from.length > 0) {
+		if(exContent != null && exContent.table.length > 0) {
 //			System.out.println("[exception]");
 //			System.out.println(exContent);
 		}
@@ -319,43 +319,31 @@ public class MethodContent extends MemberContent {
 	 * This class is for contents of method's try-catch-finally statement.
 	 */
 	public class ExceptionContent {
-		private int[] from, to, target;
+		private int[][] table;
 		private String[] exception;
 
 		ExceptionContent(ExceptionTable[] table, String[] exception) {
-			this.from = new int[table.length];
-			this.to = new int[table.length];
-			this.target = new int[table.length];
+			this.table = new int[table.length][3];
 			for(int i = 0; i < table.length; i++) {
-				from[i] = table[i].getNumber("start_pc");
-				to[i] = table[i].getNumber("end_pc");
-				target[i] = table[i].getNumber("handler_pc");
+				this.table[i] = new int[] {
+					table[i].getNumber("start_pc"),
+					table[i].getNumber("end_pc"),
+					table[i].getNumber("handler_pc")
+				};
 			}
 			this.exception = exception;
 		}
 
 		/**
-		 * returns from-indexes into code array.
-		 * @return from-indexes
+		 * returns pc range and target pc table.<br>
+		 * detail of table[table_size][3] is next:<br>
+		 *	table[x][0]: from<br>
+		 *	table[x][1]: to<br>
+		 *	table[x][2]: target
+		 * @return indexes table
 		 */
-		public int[] getFrom() {
-			return from != null ? from : new int[0];
-		}
-
-		/**
-		 * returns to-indexes into code array.
-		 * @return to-indexes
-		 */
-		public int[] getTo() {
-			return to != null ? to : new int[0];
-		}
-
-		/**
-		 * returns target indexes into code array.
-		 * @return target indexes
-		 */
-		public int[] getTarget() {
-			return target != null ? target : new int[0];
+		public int[][] getTable() {
+			return table;
 		}
 
 		/**
@@ -371,37 +359,20 @@ public class MethodContent extends MemberContent {
 		 * to_index-1).<br>
 		 * if the array index didn't find, this method returns empty array.
 		 * @param pc index into code array
-		 * @param isAny whether the range has no exception
 		 * @param gotoStart whether start instruction of node is goto
 		 * @return array indexes
 		 */
-		public int[] getIndexInRange(int pc, boolean isAny, boolean gotoStart) {
+		public int[] getIndexInRange(int pc, boolean gotoStart) {
 			int range = 0;
-			int[] indexes = new int[from.length];
-			for(int i = 0; i < from.length; i++) {
+			int[] indexes = new int[table.length];
+			for(int i = 0; i < table.length; i++) {
 				if(gotoStart) {
-					if(from[i] <= pc && pc <= to[i]) {
-						if(isAny) {
-							if(exception[i].equals("any")) {
-								indexes[range++] = i;
-							}
-						} else {
-							if(! exception[i].equals("any")) {
-								indexes[range++] = i;
-							}
-						}
+					if(table[i][0] <= pc && pc <= table[i][1] && (! exception[i].equals("any"))) {
+						indexes[range++] = i;
 					}
 				} else {
-					if(from[i] <= pc && pc < to[i]) {
-						if(isAny) {
-							if(exception[i].equals("any")) {
-								indexes[range++] = i;
-							}
-						} else {
-							if(!exception[i].equals("any")) {
-								indexes[range++] = i;
-							}
-						}
+					if(table[i][0] <= pc && pc < table[i][1] && (! exception[i].equals("any"))) {
+						indexes[range++] = i;
 					}
 				}
 			}
@@ -411,14 +382,14 @@ public class MethodContent extends MemberContent {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
-			for(int i = 0; i < from.length - 1; i++) {
-				sb.append(from[i]).append("-").append(to[i])
-						.append(", ").append(target[i]).append(", ")
+			for(int i = 0; i < table.length - 1; i++) {
+				sb.append(table[i][0]).append("-").append(table[i][1])
+						.append(", ").append(table[i][2]).append(", ")
 						.append(exception[i]).append(System.getProperty("line.separator"));
 			}
-			sb.append(from[from.length - 1]).append("-").append(to[from.length - 1])
-					.append(", ").append(target[from.length - 1]).append(", ")
-					.append(exception[from.length - 1]);
+			sb.append(table[table.length - 1][0]).append("-").append(table[table.length - 1][1])
+					.append(", ").append(table[table.length - 1][2]).append(", ")
+					.append(exception[exception.length - 1]);
 			return sb.toString();
 		}
 	}

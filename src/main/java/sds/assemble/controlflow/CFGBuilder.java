@@ -1,5 +1,8 @@
 package sds.assemble.controlflow;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.HashSet;
 import sds.assemble.MethodContent.ExceptionContent;
 import sds.assemble.LineInstructions;
 import sds.classfile.bytecode.MnemonicTable;
@@ -74,15 +77,10 @@ public class CFGBuilder {
 	private void setParentAndChildNode() {
 		int index = 0;
 		for(CFNode n : nodes) {
-			// processing for try-catch-finally
-			boolean isGoto = (n.getStart().getOpcodeType() == _goto)
-						  || (n.getStart().getOpcodeType() == goto_w);
-			setParentAndChildNodeForTry(isGoto, index);
-			setParentAndChildNodeForCatch(isGoto, index);
 			// processing for setting parent and child.
 			if(index > 0) {
 				if(checkNone(nodes[index - 1], Exit, LoopExit, End, Switch, StringSwitch)) {
-					if(check(nodes[index-1], Entry)) {
+					if(check(nodes[index - 1], Entry)) {
 						addParentAndChild(index, index - 1, TrueBranch);
 					} else {
 						addParentAndChild(index, index - 1, Normal);
@@ -90,7 +88,7 @@ public class CFGBuilder {
 				}
 			} else if(index == nodes.length - 1) {
 				if(checkNone(n, Exit, LoopExit, Switch, StringSwitch)) {
-					if(n.getType() == Entry) {
+					if(check(n, Entry)) {
 						addParentAndChild(index, index, TrueBranch);
 					} else {
 						addParentAndChild(index, index, Normal);
@@ -99,48 +97,90 @@ public class CFGBuilder {
 			}
 			index++;
 		}
-	}
-
-	private void setParentAndChildNodeForTry(boolean isGoto, int index) {
-		int[] tryIndex = ex.getIndexInRange(nodes[index].getStart().getPc(), false, isGoto);
-		if(tryIndex.length > 0) {
-			nodes[index].inTry = true;
-			for(int ti : tryIndex) { // for catch
-				int catchIndex = ex.getTarget()[ti];
-				for(int i = index; i < nodes.length; i++) {
-					if(nodes[i].isInPcRange(catchIndex)) {
-						nodes[i].isCatch = true;
-						addParentAndChild(i, index, JumpToCatch);
-						break;
-					}
-				}
+		// for try-catch-finally
+		for(int i = 0; i < nodes.length; i++) {
+			MnemonicTable type = nodes[i].getStart().getOpcodeType();
+			boolean isGoto = ((type == _goto) || (type == goto_w));
+			if(setParentAndChildNodeForTryCatchFinally(isGoto, i)) {
+				break;
 			}
 		}
 	}
 
-	private void setParentAndChildNodeForCatch(boolean isGoto, int index) {
-		int[] catchTypeIndex = ex.getIndexInRange(nodes[index].getStart().getPc(), true, isGoto);
-		if(catchTypeIndex.length > 0) {
-			for(int ci : catchTypeIndex) {
-				int finallyIndex = ex.getTarget()[ci];
-				for(int i = index; i < nodes.length; i++) { // for finally
-					if(nodes[i].isInPcRange(finallyIndex)) {
-						if(nodes[i].getType() != SynchronizedExit) {
-							// because ExceptionTable attribute contains synchronized statement,
-							// excluding in case of node type is SynchronizedExit
-							nodes[i].isFinally = true;
-							addParentAndChild(i, index, JumpToFinally);
-							MnemonicTable type = nodes[i + 1].getEnd().getOpcodeType();
-							if((i + 1) < nodes.length && type == athrow) {
-								nodes[i + 1].isFinally = true;
-								addParentAndChild(i + 1, i, Normal);
+	private boolean setParentAndChildNodeForTryCatchFinally(boolean isGoto, int index) {
+		int[] tryIndex = ex.getIndexInRange(nodes[index].getStart().getPc(), isGoto);
+		if(tryIndex.length > 0) {
+			nodes[index].inTry = true;
+			Set<Integer> jumpSet = new HashSet<>();
+			jumpSet.add(index);
+			for(int ti : tryIndex) {
+				// for catch
+				int[][] table = ex.getTable();
+				int catchTarget = table[ti][2];
+				int finallyTarget = -1;
+				for(int i = index; i < nodes.length; i++) {
+					if(nodes[i].isInPcRange(catchTarget)) {
+						nodes[i].inCatch = true;
+						jumpSet.add(i);
+						addParentAndChild(i, index, JumpToCatch);
+						int from = 0;
+						int to   = 0;
+						for(int j = 0; j < table.length; j++) {
+							if(table[j][0] == catchTarget) {
+								from = table[j][0];
+								to   = table[j][1];
+								finallyTarget = table[j][2];
+								break;
+							}
+						}
+						for(int j = i; j < nodes.length; j++) {
+							int start = nodes[j].getStart().getPc();
+							int end   = nodes[j].getEnd().getPc();
+							if((from <= start) && (end < to)) {
+								jumpSet.add(j);
+							}
+						}
+						break;
+					}
+				}
+				// for finally
+				for(int[] from : table) {
+					if(from[0] == finallyTarget) {
+						for(int i = index; i < nodes.length; i++) {
+							if(nodes[i].isInPcRange(finallyTarget)) {
+								nodes[i].inFinally = true;
+								for(int jump : jumpSet) {
+									addParentAndChild(i, jump, JumpToFinally);
+								}
+								break;
+							}
+						}
+						break;
+					}
+				}
+				// for finally (part2)
+				String[] exceptions = ex.getException();
+				for(int i = 0; i < table.length; i++) {
+					if((table[i][0] == table[ti][0]) && (table[i][1] == table[ti][1])) {
+						if(exceptions[i].equals("any")) {
+							int target = table[i][2];
+							for(int j = index; j < nodes.length; j++) {
+								if(nodes[j].isInPcRange(target)) {
+									nodes[j].inFinally = true;
+									for(int jump : jumpSet) {
+										addParentAndChild(j, jump, JumpToFinally);
+									}
+									break;
+								}
 							}
 							break;
 						}
 					}
 				}
 			}
+			return true;
 		}
+		return false;
 	}
 
 	private void setJumpPointNode() {
@@ -224,7 +264,7 @@ public class CFGBuilder {
 		for(int i = nodes.length - 1; i > 0; i--) {
 			if(nodes[i].getParents().size() == 1) { // immediate dominator
 				CFNode n = nodes[i].getParents().iterator().next().getDest();
-				nodes[i].setImmediateDominator(n);
+				nodes[i].immediateDominator = n;
 			} else if(nodes[i].getParents().size() > 1) { // dominator
 				CFEdge[] parents = nodes[i].getParents().toArray(new CFEdge[0]);
 				CFNode candidate = null;
@@ -237,7 +277,7 @@ public class CFGBuilder {
 						}
 					}
 				}
-				nodes[i].setDominator(candidate);
+				nodes[i].dominator = candidate;
 			}
 		}
 	}
