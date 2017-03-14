@@ -138,7 +138,7 @@ public class Code extends AttributeInfo {
 			if(catchType == 0) {
 				this.catchType = "any";
 			} else {
-				this.catchType = extract(pool.get(catchType), pool);
+				this.catchType = extract(pool.get(catchType - 1), pool);
 			}
 		}
 
