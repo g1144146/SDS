@@ -132,6 +132,19 @@ public class CpRefOpcode extends OpcodeInfo {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof CpRefOpcode)) {
+			return false;
+		}
+		CpRefOpcode opcode = (CpRefOpcode)obj;
+		boolean flag = true;
+		flag &= (index == opcode.index);
+		flag &= operand.equals(opcode.operand);
+		flag &= type.equals(opcode.type);
+		return super.equals(obj) && flag;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(super.toString());
 		sb.append(": #").append(index).append("(").append(operand);

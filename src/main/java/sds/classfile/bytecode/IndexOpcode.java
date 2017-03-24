@@ -66,6 +66,15 @@ public class IndexOpcode extends OpcodeInfo {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof IndexOpcode)) {
+			return false;
+		}
+		IndexOpcode opcode = (IndexOpcode)obj;
+		return super.equals(obj) && (index == opcode.index);
+	}
+
+	@Override
 	public String toString() {
 		return super.toString() + ": " + index;
 	}

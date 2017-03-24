@@ -28,6 +28,15 @@ public abstract class SwitchOpcode extends OpcodeInfo {
 		this.defaultByte = data.readInt();
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof SwitchOpcode)) {
+			return false;
+		}
+		SwitchOpcode opcode = (SwitchOpcode)obj;
+		return super.equals(obj) && (defaultByte == opcode.defaultByte);
+	}
+
 	/**
 	 * returns default byte.<br>
 	 * jump point of default key is "defaultByte + pc".

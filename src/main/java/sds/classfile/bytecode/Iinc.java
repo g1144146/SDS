@@ -45,6 +45,18 @@ public class Iinc extends OpcodeInfo {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Iinc)) {
+			return false;
+		}
+		Iinc opcode = (Iinc)obj;
+		boolean flag = true;
+		flag &= (index == opcode.index);
+		flag &= (_const == opcode._const);
+		return super.equals(obj) && flag;
+	}
+
+	@Override
 	public String toString() {
 		return super.toString() + ": " + index + ", " + _const;
 	}

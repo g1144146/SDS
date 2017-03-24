@@ -45,6 +45,15 @@ public class PushOpcode extends OpcodeInfo {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof PushOpcode)) {
+			return false;
+		}
+		PushOpcode opcode = (PushOpcode)obj;
+		return super.equals(obj) && (value == opcode.value);
+	}
+
+	@Override
 	public String toString() {
 		return super.toString() + ": " + value;
 	}

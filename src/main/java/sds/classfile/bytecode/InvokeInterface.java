@@ -38,6 +38,15 @@ public class InvokeInterface extends CpRefOpcode {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof InvokeInterface)) {
+			return false;
+		}
+		InvokeInterface opcode = (InvokeInterface)obj;
+		return super.equals(obj) && (count == opcode.count);
+	}
+
+	@Override
 	public String toString() {
 		return super.toString() + ", " + count;
 	}

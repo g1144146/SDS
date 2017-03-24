@@ -70,6 +70,15 @@ public class BranchOpcode extends OpcodeInfo {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof BranchOpcode)) {
+			return false;
+		}
+		BranchOpcode opcode = (BranchOpcode)obj;
+		return super.equals(obj) && (branch == opcode.branch);
+	}
+
+	@Override
 	public String toString() {
 		return super.toString() + ": " + (branch + getPc());
 	}

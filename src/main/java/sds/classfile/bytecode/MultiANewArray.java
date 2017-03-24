@@ -40,6 +40,15 @@ public class MultiANewArray extends CpRefOpcode {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof MultiANewArray)) {
+			return false;
+		}
+		MultiANewArray opcode = (MultiANewArray)obj;
+		return super.equals(obj) && (dimensions == opcode.dimensions);
+	}
+
+	@Override
 	public String toString() {
 		return super.toString() + ", " + dimensions;
 	}

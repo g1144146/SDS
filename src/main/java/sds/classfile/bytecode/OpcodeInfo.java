@@ -48,6 +48,15 @@ public class OpcodeInfo implements Info {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof OpcodeInfo)) {
+			return false;
+		}
+		OpcodeInfo opcode = (OpcodeInfo)obj;
+		return opcodeType == opcode.opcodeType;
+	}
+
+	@Override
 	public String toString() {
 		return opcodeType.toString();
 	}

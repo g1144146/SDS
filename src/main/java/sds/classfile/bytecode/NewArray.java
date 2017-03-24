@@ -48,6 +48,15 @@ public class NewArray extends OpcodeInfo {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof NewArray)) {
+			return false;
+		}
+		NewArray opcode = (NewArray)obj;
+		return super.equals(obj) && atype.equals(opcode.atype);
+	}
+
+	@Override
 	public String toString() {
 		return super.toString() + ": " + atype;
 	}

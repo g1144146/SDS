@@ -33,11 +33,20 @@ public class Wide extends CpRefOpcode {
 
 	/**
 	 * returns const.<br>
-	 * if opcode item of this opcode is {@link Iinc <code>Iinc</code>}, const value equals -1.
+	 * if opcode item of this opcode is {@link Wide <code>Wide</code>}, const value equals -1.
 	 * @return const
 	 */
 	public int getConst() {
 		return constByte;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Wide)) {
+			return false;
+		}
+		Wide opcode = (Wide)obj;
+		return super.equals(obj) && (constByte == opcode.constByte);
 	}
 
 	@Override

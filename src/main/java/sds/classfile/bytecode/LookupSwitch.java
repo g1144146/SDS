@@ -1,6 +1,7 @@
 package sds.classfile.bytecode;
 
 import java.io.IOException;
+import java.util.Arrays;
 import sds.classfile.ClassFileStream;
 
 /**
@@ -44,6 +45,18 @@ public class LookupSwitch extends SwitchOpcode {
 	 */
 	public int[] getOffset() {
 		return offset;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof LookupSwitch)) {
+			return false;
+		}
+		LookupSwitch opcode = (LookupSwitch)obj;
+		boolean flag = true;
+		flag &= Arrays.equals(match,  opcode.match);
+		flag &= Arrays.equals(offset, opcode.offset);
+		return super.equals(obj) && flag;
 	}
 
 	@Override

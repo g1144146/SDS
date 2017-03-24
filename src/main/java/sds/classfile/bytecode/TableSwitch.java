@@ -38,6 +38,15 @@ public class TableSwitch extends SwitchOpcode {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof TableSwitch)) {
+			return false;
+		}
+		TableSwitch opcode = (TableSwitch)obj;
+		return super.equals(obj) && java.util.Arrays.equals(jumpOffsets, opcode.jumpOffsets);
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < jumpOffsets.length; i++) {
