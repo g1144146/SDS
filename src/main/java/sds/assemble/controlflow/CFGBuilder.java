@@ -1,6 +1,5 @@
 package sds.assemble.controlflow;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.HashSet;
 import sds.assemble.MethodContent.ExceptionContent;
@@ -26,7 +25,6 @@ import static sds.assemble.controlflow.CFEdgeType.JumpToCatch;
 import static sds.assemble.controlflow.CFEdgeType.JumpToFinally;
 import static sds.assemble.controlflow.CFEdgeType.Normal;
 import static sds.assemble.controlflow.CFEdgeType.TrueBranch;
-import static sds.classfile.bytecode.MnemonicTable.athrow;
 import static sds.classfile.bytecode.MnemonicTable._goto;
 import static sds.classfile.bytecode.MnemonicTable.goto_w;
 
@@ -147,7 +145,8 @@ public class CFGBuilder {
 				for(int[] from : table) {
 					if(from[0] == finallyTarget) {
 						for(int i = index; i < nodes.length; i++) {
-							if(nodes[i].isInPcRange(finallyTarget)) {
+							int start = nodes[i].getStart().getPc();
+							if(start == finallyTarget) {
 								nodes[i].inFinally = true;
 								for(int jump : jumpSet) {
 									addParentAndChild(i, jump, JumpToFinally);
@@ -165,7 +164,8 @@ public class CFGBuilder {
 						if(exceptions[i].equals("any")) {
 							int target = table[i][2];
 							for(int j = index; j < nodes.length; j++) {
-								if(nodes[j].isInPcRange(target)) {
+								int start = nodes[j].getStart().getPc();
+								if(start == target) {
 									nodes[j].inFinally = true;
 									for(int jump : jumpSet) {
 										addParentAndChild(j, jump, JumpToFinally);
