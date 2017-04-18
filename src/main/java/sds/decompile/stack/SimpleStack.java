@@ -83,9 +83,10 @@ public abstract class SimpleStack {
 		StringBuilder sb = new StringBuilder("[");
 		if(stack.size() > 0) {
 			for(int i = 0; i < stack.size() - 1; i++) {
-				sb.append(type.get(i)).append(": ").append(stack.get(i)).append(", ");
+				sb.append("{").append(type.get(i)).append(": ").append(stack.get(i)).append("}").append(", ");
 			}
-			sb.append(type.get(type.size() - 1)).append(": ").append(stack.get(stack.size() - 1));
+			sb.append("{").append(type.get(type.size() - 1))
+				.append(": ").append(stack.get(stack.size() - 1)).append("}");
 		}
 		return sb.append("]").toString();
 	}
