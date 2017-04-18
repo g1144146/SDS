@@ -165,6 +165,7 @@ public class AccessFlags {
 		if(checkFlag(accessFlag, ACC_PUBLIC))     sb.append("public ");
 		if(checkFlag(accessFlag, ACC_STATIC))     sb.append("static ");
 		if(checkFlag(accessFlag, ACC_FINAL))      sb.append("final ");
+		if(checkFlag(accessFlag, ACC_ABSTRACT))   sb.append("abstract ");
 		if(checkFlag(accessFlag, ACC_SYNTHETIC))  sb.append("synthetic ");
 		if(checkFlag(accessFlag, ACC_ANNOTATION)) sb.append("@interface ");
 		if(checkFlag(accessFlag, ACC_ENUM))       sb.append("enum ");
@@ -208,11 +209,7 @@ public class AccessFlags {
 	}
 
 	private static String getLocalValAccessFlag(int accessFlag) {
-		StringBuilder sb = new StringBuilder("");
-		if(checkFlag(accessFlag, ACC_FINAL))     sb.append("final ");
-		if(checkFlag(accessFlag, ACC_SYNTHETIC)) sb.append("synthetic ");
-		if(checkFlag(accessFlag, ACC_MANDATED))  sb.append("mandated ");
-		return sb.toString();
+		return checkFlag(accessFlag, ACC_FINAL) ? "final " : "";
 	}
 
 	private static boolean checkFlag(int accessFlag, int target) {
