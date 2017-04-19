@@ -1,6 +1,6 @@
 # SDS
 
-[![Build Status](https://travis-ci.org/g1144146/SDS.svg?branch=master)](https://travis-ci.org/g1144146/SDS)
+[![Build Status](https://travis-ci.org/g1144146/SDS.svg?branch=master)](https://travis-ci.org/g1144146/SDS)  [![Coverage Status](https://coveralls.io/repos/github/g1144146/SDS/badge.svg?branch=master)](https://coveralls.io/github/g1144146/SDS?branch=master)
 
 ---
 # Overview
