@@ -31,13 +31,10 @@ jar {
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 }
 
-// build << {
-//     copy {
-//         from configurations.runtime
-//         into 'build/libs'
-//     }
-// }
-
 task initDirs({
     sourceSets*.resources*.each({ it.mkdirs() })
 })
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2'
+}
