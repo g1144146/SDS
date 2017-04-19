@@ -1,5 +1,7 @@
 # SDS
 
+[![Build Status](https://travis-ci.org/g1144146/SDS.svg?branch=master)](https://travis-ci.org/g1144146/SDS)
+
 ---
 # Overview
 
