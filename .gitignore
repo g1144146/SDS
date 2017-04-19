@@ -3,7 +3,6 @@
 target
 
 .git
-.gradle
 
 .classpath
 .settings
