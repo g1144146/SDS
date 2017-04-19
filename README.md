@@ -1,6 +1,6 @@
 # SDS
 
-[![Build Status](https://travis-ci.org/g1144146/SDS.svg?branch=master)](https://travis-ci.org/g1144146/SDS)  [![Coverage Status](https://coveralls.io/repos/github/g1144146/SDS/badge.svg?branch=master)](https://coveralls.io/github/g1144146/SDS?branch=master)
+[![Build Status](https://travis-ci.org/g1144146/SDS.svg?branch=master)](https://travis-ci.org/g1144146/SDS)  [![Coverage Status](https://coveralls.io/repos/github/g1144146/SDS/badge.svg)](https://coveralls.io/github/g1144146/SDS)  [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat)](https://github.com/g1144146/SDS/blob/master/LICENSE)
 
 ---
 # Overview
