@@ -2,7 +2,7 @@ package sds.classfile.attributes;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 import static sds.util.AccessFlags.get;
 
@@ -13,82 +13,49 @@ import static sds.util.AccessFlags.get;
  * @author inagaki
  */
 public class InnerClasses extends AttributeInfo {
-	private Classes[] classes;
+    private String[][] classes;
 
-	/**
-	 * constructor.
-	 */
-	public InnerClasses() {
-		super(AttributeType.InnerClasses);
-	}
+    /**
+     * constructor.
+     * @param data classfile stream
+     * @param pool constant-pool
+     * @throws IOException 
+     */
+    public InnerClasses(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        super(AttributeType.InnerClasses);
+        this.classes = new String[data.readShort()][4];
+        for(int i = 0; i < classes.length; i++) {
+            int innerClassInfoIndex = data.readShort();
+            int outerClassInfoIndex = data.readShort();
+            int innerNameIndex = data.readShort();
+            int accessFlags = data.readShort();
+            if(checkRange(innerClassInfoIndex-1, pool.length)) {
+                classes[i][0] = extract(innerClassInfoIndex, pool);
+            }
+            if(checkRange(outerClassInfoIndex-1, pool.length)) {
+                classes[i][1] = extract(outerClassInfoIndex, pool);
+            }
+            if(checkRange(innerNameIndex-1, pool.length)) {
+                classes[i][2]  = extract(innerNameIndex, pool);
+            }
+            classes[i][3] = get(accessFlags, "nested");
+        }
+    }
 
-	/**
-	 * returns inner classes.
-	 * @return classes
-	 */
-	public Classes[] getClasses() {
-		return classes;
-	}
+    private boolean checkRange(int index, int size) {
+        return (0 <= index) && (index < size);
+    }
 
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.classes = new Classes[data.readShort()];
-		for(int i = 0; i < classes.length; i++) {
-			classes[i] = new Classes(data, pool);
-		}
-	}
-
-	/**
-	 * This class is for inner class.
-	 */
-	public class Classes {
-		private String innerClass;
-		private String outerClass;
-		private String innerName;
-		private String innerClassAccessFlags;
-
-		Classes(ClassFileStream data, ConstantPool pool) throws IOException {
-			int innerClassInfoIndex = data.readShort();
-			int outerClassInfoIndex = data.readShort();
-			int innerNameIndex = data.readShort();
-			int accessFlags = data.readShort();
-			if(checkRange(innerClassInfoIndex-1, pool.size())) {
-				this.innerClass = extract(pool.get(innerClassInfoIndex-1), pool);
-			}
-			if(checkRange(outerClassInfoIndex-1, pool.size())) {
-				this.outerClass = extract(pool.get(outerClassInfoIndex-1), pool);
-			}
-			if(checkRange(innerNameIndex-1, pool.size())) {
-				this.innerName  = extract(pool.get(innerNameIndex-1), pool);
-			}
-			this.innerClassAccessFlags = get(accessFlags, "nested");
-		}
-
-		private boolean checkRange(int index, int size) {
-			return (0 <= index) && (index < size);
-		}
-
-		/**
-		 * returns string accord with specified key.<br><br>
-		 * if key is "inner", it returns inner class.<br>
-		 * if key is "outer", it returns class has this inner class.<br>
-		 * if key is "inner_name", it returns inner class name.<br>
-		 * if key is "access_flag", it returns access flag 
-		 * of inner class.<br>
-		 * by default, it returns string of length 0.
-		 * @param key value name
-		 * @return string
-		 */
-		public String getNumber(String key) {
-			switch(key) {
-				case "inner":       return innerClass;
-				case "outer":       return outerClass;
-				case "inner_name":  return innerName;
-				case "access_flag": return innerClassAccessFlags;
-				default:
-					System.out.println("Invalid key in InnerClasses: " + key);
-					return "";
-			}
-		}
-	}
+    /**
+     * returns inner classes.<br>
+     * when one of array index defines N, the array content is next:<br>
+     * - classes[N][0]: inner class<br>
+     * - classes[N][1]: outer class<br>
+     * - classes[N][2]: inner class name<br>
+     * - classes[N][3]: inner class access flag
+     * @return classes
+     */
+    public String[][] getClasses() {
+        return classes;
+    }
 }

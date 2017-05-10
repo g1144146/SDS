@@ -1,10 +1,9 @@
 package sds.classfile.constantpool;
 
-import java.io.IOException;
-import java.io.DataInput;
-import sds.classfile.ClassFileStream;
-
-import static sds.classfile.constantpool.ConstantType.*;
+import static sds.classfile.constantpool.ConstantType.C_INTEGER;
+import static sds.classfile.constantpool.ConstantType.C_LONG;
+import static sds.classfile.constantpool.ConstantType.C_FLOAT;
+import static sds.classfile.constantpool.ConstantType.C_DOUBLE;
 
 /**
  * This adapter class is for
@@ -18,22 +17,12 @@ import static sds.classfile.constantpool.ConstantType.*;
  * Constant_Double_Info</a>.
  * @author inagakikenichi
  */
-abstract class NumberInfo extends ConstantInfo {
+public abstract class NumberInfo extends ConstantInfo {
 	Number number;
 
-	NumberInfo(int tag) {
+	NumberInfo(int tag, Number number) {
 		super(tag);
-	}
-
-	@Override
-	public void read(ClassFileStream data) throws IOException, NumberTypeException {
-		switch(this.getTag()) {
-			case C_INTEGER: this.number = data.readInt();    break;
-			case C_FLOAT:   this.number = data.readFloat();  break;
-			case C_LONG:    this.number = data.readLong();   break;
-			case C_DOUBLE:  this.number = data.readDouble(); break;
-			default: throw new NumberTypeException("unknown number type: " + this.getTag());
-		}
+        this.number = number;
 	}
 
 	@Override
@@ -49,4 +38,99 @@ abstract class NumberInfo extends ConstantInfo {
 		}
 		return sb.toString();
 	}
+}
+
+/**
+ * This class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.4">
+ * Constant_Integer_Info</a>.
+ */
+class IntInfo extends NumberInfo {
+    /**
+     * constructor.
+     * @param value int value
+     */
+    public IntInfo(int value) {
+        super(C_INTEGER, value);
+    }
+    
+    /**
+     * returns int value.
+     * @return value
+     */
+    public int getValue() {
+        return this.number.intValue();
+    }
+}
+
+
+/**
+ * This class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.4">
+ * Constant_Float_Info</a>.
+ */
+class FloatInfo extends NumberInfo {
+    /**
+     * constructor.
+     * @param value float value
+     */
+    public FloatInfo(float value) {
+        super(C_FLOAT, value);
+    }
+    
+    /**
+     * returns float value.
+     * @return value
+     */
+    public float getValue() {
+        return this.number.floatValue();
+    }
+}
+
+/**
+ * This class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.5">
+ * Constant_Long_Info</a>.
+ * @author inagaki
+ */
+class LongInfo extends NumberInfo {
+    /**
+     * constructor.
+     * @param value long value
+     */
+    public LongInfo(long value) {
+        super(C_LONG, value);
+    }
+    
+    /**
+     * returns long value.
+     * @return value
+     */
+    public long getValue() {
+        return this.number.longValue();
+    }
+}
+
+/**
+ * This class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.5">
+ * Constant_Double_Info</a>.
+ * @author inagaki
+ */
+class DoubleInfo extends NumberInfo {
+    /**
+     * constructor.
+     * @param value double value
+     */
+    public DoubleInfo(double value) {
+        super(C_DOUBLE, value);
+    }
+    
+    /**
+     * returns double value.
+     * @return value
+     */
+    public double getValue() {
+        return this.number.doubleValue();
+    }
 }

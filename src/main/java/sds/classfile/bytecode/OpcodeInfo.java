@@ -1,8 +1,5 @@
 package sds.classfile.bytecode;
 
-import java.io.IOException;
-import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
 import sds.classfile.Info;
 
 /**
@@ -10,54 +7,41 @@ import sds.classfile.Info;
  * @author inagaki
  */
 public class OpcodeInfo implements Info {
-	private int pc;
-	MnemonicTable opcodeType;
+    int pc;
+    MnemonicTable opcodeType;
 
-	OpcodeInfo(MnemonicTable opcodeType, int pc) {
-		this.opcodeType = opcodeType;
-		this.pc = pc;
-	}
+    OpcodeInfo(MnemonicTable opcodeType, int pc) {
+        this.opcodeType = opcodeType;
+        this.pc = pc;
+    }
 
-	/**
-	 * reads info from classfile.<br>
-	 * method for opcode info.
-	 * @param data classfile stream
-	 * @throws IOException 
-	 */
-	public void read(ClassFileStream data) throws IOException {}
+    /**
+     * returns opcode type.
+     * @return opcode type.
+     */
+    public MnemonicTable getType() {
+        return opcodeType;
+    }
 
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		read(data);
-	}
+    /**
+     * returns index into the code array.
+     * @return index
+     */
+    public int getPc() {
+        return pc;
+    }
 
-	/**
-	 * returns opcode type.
-	 * @return opcode type.
-	 */
-	public MnemonicTable getOpcodeType() {
-		return opcodeType;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof OpcodeInfo)) {
+            return false;
+        }
+        OpcodeInfo opcode = (OpcodeInfo)obj;
+        return opcodeType == opcode.opcodeType;
+    }
 
-	/**
-	 * returns index into the code array.
-	 * @return index
-	 */
-	public int getPc() {
-		return pc;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if(!(obj instanceof OpcodeInfo)) {
-			return false;
-		}
-		OpcodeInfo opcode = (OpcodeInfo)obj;
-		return opcodeType == opcode.opcodeType;
-	}
-
-	@Override
-	public String toString() {
-		return opcodeType.toString();
-	}
+    @Override
+    public String toString() {
+        return opcodeType.toString();
+    }
 }

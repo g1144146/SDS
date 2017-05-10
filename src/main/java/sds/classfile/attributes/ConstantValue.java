@@ -2,7 +2,7 @@ package sds.classfile.attributes;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This class is for
@@ -11,26 +11,29 @@ import sds.classfile.ConstantPool;
  * @author inagaki
  */
 public class ConstantValue extends AttributeInfo {
-	private String constantValue;
+    private String constantValue;
 
-	/**
-	 * constructor.
-	 */
-	public ConstantValue() {
-		super(AttributeType.ConstantValue);
-	}
+    /**
+     * constructor.
+     * @param data classfile stream
+     * @param pool constant-pool
+     * @throws IOException 
+     */
+    public ConstantValue(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        super(AttributeType.ConstantValue);
+        this.constantValue = extract(data.readShort(), pool);
+    }
 
-	/**
-	 * returns constant value.
-	 * @return constant value
-	 */
-	public String getConstantValue() {
-		return constantValue;
-	}
+    /**
+     * returns constant value.
+     * @return constant value
+     */
+    public String getConstantValue() {
+        return constantValue;
+    }
 
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		int constantValueIndex = data.readShort();
-		this.constantValue = extract(pool.get(constantValueIndex-1), pool);
-	}
+    @Override
+    public String toString() {
+        return super.toString() + ": " + constantValue;
+    }
 }

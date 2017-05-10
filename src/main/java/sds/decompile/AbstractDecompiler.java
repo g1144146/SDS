@@ -8,43 +8,43 @@ import sds.assemble.BaseContent.AnnotationContent;
  * @author inagaki
  */
 public abstract class AbstractDecompiler implements Decompiler {
-	DecompiledResult result;
+    DecompiledResult result;
 
-	AbstractDecompiler(DecompiledResult result) {
-		this.result = result;
-	}
+    AbstractDecompiler(DecompiledResult result) {
+        this.result = result;
+    }
 
-	abstract void addDeclaration(BaseContent content);
+    abstract void addDeclaration(BaseContent content);
 
-	void addAnnotation(AnnotationContent annotation) {
-		if(annotation != null) {
-			// runtime visible annotation
-			if(annotation.getAnnotations(true).length > 0) {
-				for(String ann : annotation.getAnnotations(true)) {
-					result.write(ann);
-				}
-			}
-			// runtime invisible annotation
-			if(annotation.getAnnotations(false).length > 0) {
-				for(String ann : annotation.getAnnotations(false)) {
-					result.write(ann);
-				}
-			}
-		}
-	}
+    void addAnnotation(AnnotationContent annotation) {
+        if(annotation != null) {
+            // runtime visible annotation
+            if(annotation.getAnnotations(true).length > 0) {
+                for(String ann : annotation.getAnnotations(true)) {
+                    result.write(ann);
+                }
+            }
+            // runtime invisible annotation
+            if(annotation.getAnnotations(false).length > 0) {
+                for(String ann : annotation.getAnnotations(false)) {
+                    result.write(ann);
+                }
+            }
+        }
+    }
 
-	/**
-	 * retunrs decompiled source.
-	 * @return decompiled source
-	 */
-	public DecompiledResult getResult() {
-		return result;
-	}
+    /**
+     * retunrs decompiled source.
+     * @return decompiled source
+     */
+    public DecompiledResult getResult() {
+        return result;
+    }
 
-	@Override
-	public void decompile(BaseContent[] contents) {
-		for(BaseContent content : contents) {
-			decompile(content);
-		}
-	}
+    @Override
+    public void decompile(BaseContent[] contents) {
+        for(BaseContent content : contents) {
+            decompile(content);
+        }
+    }
 }

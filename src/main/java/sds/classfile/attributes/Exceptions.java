@@ -1,8 +1,9 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
+import java.util.StringJoiner;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This class is for
@@ -11,28 +12,36 @@ import sds.classfile.ConstantPool;
  * @author inagaki
  */
 public class Exceptions extends AttributeInfo {
-	private String[] exceptionTable;
+    private String[] exceptionTable;
 
-	/**
-	 * constructor.
-	 */
-	public Exceptions() {
-		super(AttributeType.Exceptions);
-	}
+    /**
+     * constructor.
+     * @param data classfile stream
+     * @param pool constant-pool
+     * @throws IOException 
+     */
+    public Exceptions(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        super(AttributeType.Exceptions);
+        this.exceptionTable = new String[data.readShort()];
+        for(int i = 0; i < exceptionTable.length; i++) {
+            exceptionTable[i] = extract(data.readShort(), pool).replace("/", ".");
+        }
+    }
 
-	/**
-	 * returns exception classes.
-	 * @return exception classes
-	 */
-	public String[] getExceptionTable() {
-		return exceptionTable;
-	}
+    /**
+     * returns exception classes.
+     * @return exception classes
+     */
+    public String[] getExceptionTable() {
+        return exceptionTable;
+    }
 
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.exceptionTable = new String[data.readShort()];
-		for(int i = 0; i < exceptionTable.length; i++) {
-			exceptionTable[i] = extract(pool.get(data.readShort()-1), pool).replace("/", ".");
-		}
-	}
+    @Override
+    public String toString() {
+        StringJoiner sj = new StringJoiner(", ", "[", "]");
+        for(String ex : exceptionTable) {
+            sj.add(ex);
+        }
+        return super.toString() + ": " + sj.toString();
+    }
 }

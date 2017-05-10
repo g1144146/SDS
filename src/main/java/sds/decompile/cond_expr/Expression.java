@@ -48,7 +48,7 @@ public class Expression {
 
 	private void setRange(int number, CFNode node) {
 		int ifCount = 0;
-		for(OpcodeInfo op : node.getOpcodes().getAll()) {
+		for(OpcodeInfo op : node.getOpcodes()) {
 			if((ifCount == number)) {
 				if(range[0] == -1) {
 					range[0] = op.getPc();
@@ -84,7 +84,7 @@ public class Expression {
 				break;
 			}
 		}
-		OpcodeInfo[] opcodes = node.getOpcodes().getAll();
+		OpcodeInfo[] opcodes = node.getOpcodes();
 		int[] trueRange = new int[2];
 		for(int i = opcodes.length - 1; i >= 0; i--) {
 			if(isIf(opcodes[i])) {

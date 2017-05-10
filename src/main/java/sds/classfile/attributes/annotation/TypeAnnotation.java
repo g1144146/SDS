@@ -10,34 +10,33 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public class TypeAnnotation extends Annotation {
-	private TargetInfo targetInfo;
-	private TypePath targetPath;
+    private TargetInfo targetInfo;
+    private TypePath targetPath;
 
-	TypeAnnotation(ClassFileStream data)
-	throws IOException, TargetTypeException, ElementValueException {
-		TargetInfoFactory factory = new TargetInfoFactory();
-		this.targetInfo = factory.create(data);
-		this.targetPath = new TypePath(data);
-		this.typeIndex = data.readShort();
-		this.elementValuePairs = new ElementValuePair[data.readShort()];
-		for(int i = 0; i < elementValuePairs.length; i++) {
-			elementValuePairs[i] = new ElementValuePair(data);
-		}
-	}
+    TypeAnnotation(ClassFileStream data) throws IOException {
+        TargetInfoFactory factory = new TargetInfoFactory();
+        this.targetInfo = factory.create(data);
+        this.targetPath = new TypePath(data);
+        this.typeIndex = data.readShort();
+        this.elementValuePairs = new ElementValuePair[data.readShort()];
+        for(int i = 0; i < elementValuePairs.length; i++) {
+            elementValuePairs[i] = new ElementValuePair(data);
+        }
+    }
 
-	/**
-	 * returns type in a declaration or expression is annotated.
-	 * @return type
-	 */
-	public TargetInfo getTargetInfo() {
-		return targetInfo;
-	}
+    /**
+     * returns type in a declaration or expression is annotated.
+     * @return type
+     */
+    public TargetInfo getTargetInfo() {
+        return targetInfo;
+    }
 
-	/**
-	 * returns part of the type indicated by target_info is annotated.
-	 * @return part of the type
-	 */
-	public TypePath getTargetPath() {
-		return targetPath;
-	}
+    /**
+     * returns part of the type indicated by target_info is annotated.
+     * @return part of the type
+     */
+    public TypePath getTargetPath() {
+        return targetPath;
+    }
 }

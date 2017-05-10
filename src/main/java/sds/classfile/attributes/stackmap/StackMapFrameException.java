@@ -5,20 +5,20 @@ package sds.classfile.attributes.stackmap;
  * {@link StackMapFrame <code>StackMapFrame</code>}.
  * @author inagaki
  */
-public class StackMapFrameException extends Exception {
-	/**
-	 * constructor.
-	 * @param tag discrimination tag
-	 */
-	public StackMapFrameException(int tag) {
-		super(""+tag);
-	}
+public class StackMapFrameException extends RuntimeException {
+    /**
+     * constructor.
+     * @param tag discrimination tag
+     */
+    public StackMapFrameException(int tag) {
+        super(""+tag);
+    }
 
-	/**
-	 * constructor.
-	 * @param message message
-	 */
-	public StackMapFrameException(String message) {
-		super(message);
-	}
+    /**
+     * constructor.
+     * @param message message
+     */
+    public StackMapFrameException(String message) {
+        super(message);
+    }
 }

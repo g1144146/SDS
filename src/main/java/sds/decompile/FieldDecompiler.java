@@ -9,31 +9,31 @@ import sds.assemble.FieldContent;
  * @author inagaki
  */
 public class FieldDecompiler extends AbstractDecompiler {
-	/**
-	 * constructor.
-	 * @param result decompiled source
-	 */
-	public FieldDecompiler(DecompiledResult result) {
-		super(result);
-	}
+    /**
+     * constructor.
+     * @param result decompiled source
+     */
+    public FieldDecompiler(DecompiledResult result) {
+        super(result);
+    }
 
-	@Override
-	public void decompile(BaseContent content) {
-		FieldContent field = (FieldContent)content;
-		addAnnotation(field.getAnnotation());
-		addDeclaration(field);
-	}
+    @Override
+    public void decompile(BaseContent content) {
+        FieldContent field = (FieldContent)content;
+        addAnnotation(field.getAnnotation());
+        addDeclaration(field);
+    }
 
-	@Override
-	void addDeclaration(BaseContent content) {
-		FieldContent field = (FieldContent)content;
-		StringBuilder fieldDeclaration = new StringBuilder();
-		fieldDeclaration.append(field.getAccessFlag()).append(field.getDescriptor())
-						.append(" ").append(field.getName());
-		if(field.getConstVal() != null) {
-			fieldDeclaration.append(" = ").append(field.getConstVal());
-		}
-		fieldDeclaration.append(";");
-		result.write(fieldDeclaration.toString());
-	}
+    @Override
+    void addDeclaration(BaseContent content) {
+        FieldContent field = (FieldContent)content;
+        StringBuilder fieldDeclaration = new StringBuilder();
+        fieldDeclaration.append(field.getAccessFlag()).append(field.getDescriptor())
+                        .append(" ").append(field.getName());
+        if(field.getConstVal() != null) {
+            fieldDeclaration.append(" = ").append(field.getConstVal());
+        }
+        fieldDeclaration.append(";");
+        result.write(fieldDeclaration.toString());
+    }
 }

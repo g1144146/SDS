@@ -1,19 +1,66 @@
 package sds.classfile.attributes.stackmap;
 
 /**
- * This interface is for verification_type_info which item of union of
- * {@link StackMapFrame <code>StackMapFrame</code>} has union.
+ * This class is for
+ * Top_variable_info, Null_variable_info, UninitializedThis_variable_info
+ * Integer_variable_info, Float_variable_info,
+ * Long_variable_info and Double_variable_info
+ * which {@link VerificationTypeInfo <code>VerificationTypeInfo</code>}.
  * @author inagaki
  */
-public interface VerificationTypeInfo {
-	/**
-	 * returns discrimination tag of verification type info.
-	 * @return discrimination tag
-	 */
-	public int getTag();
-	/**
-	 * returns type of verification type info.
-	 * @return type of verification type info.
-	 */
-	public VerificationInfoType getType();
+class VerificationTypeInfo {
+    private String type;
+
+    VerificationTypeInfo(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return type + "TypeInfo";
+    }
+}
+
+/**
+ * This class is for Object_variable_info which
+ * {@link VerificationTypeInfo <code>VerificationTypeInfo</code>}.
+ * @author inagaki
+ */
+class ObjectVariableInfo extends VerificationTypeInfo {
+    private int cpoolIndex;
+
+    ObjectVariableInfo(int cpoolIndex) {
+        super("object");
+        this.cpoolIndex = cpoolIndex;
+    }
+
+    /**
+     * returns constant-pool entry index.
+     * @return constant-pool entry index
+     */
+    public int getCPoolIndex() {
+        return cpoolIndex;
+    }
+}
+
+/**
+ * This class is for Uninitialized_variable_info which
+ * {@link VerificationTypeInfo <code>VerificationTypeInfo</code>}.
+ * @author inagaki
+ */
+class UninitializedVariableInfo extends VerificationTypeInfo {
+    private int offset;
+
+    UninitializedVariableInfo(int offset) {
+        super("variable");
+        this.offset = offset;
+    }
+
+    /**
+     * returns offset.
+     * @return offset
+     */
+    public int getOffset() {
+        return offset;
+    }
 }

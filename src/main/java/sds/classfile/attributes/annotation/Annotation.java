@@ -10,31 +10,31 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public class Annotation {
-	int typeIndex;
-	ElementValuePair[] elementValuePairs;
-	
-	Annotation() {}
-	Annotation(ClassFileStream data) throws IOException, ElementValueException {
-		this.typeIndex = data.readShort();
-		this.elementValuePairs = new ElementValuePair[data.readShort()];
-		for(int i = 0; i < elementValuePairs.length; i++) {
-			elementValuePairs[i] = new ElementValuePair(data);
-		}
-	}
+    int typeIndex;
+    ElementValuePair[] elementValuePairs;
+    
+    Annotation() {}
+    Annotation(ClassFileStream data) throws IOException {
+        this.typeIndex = data.readShort();
+        this.elementValuePairs = new ElementValuePair[data.readShort()];
+        for(int i = 0; i < elementValuePairs.length; i++) {
+            elementValuePairs[i] = new ElementValuePair(data);
+        }
+    }
 
-	/**
-	 * constant-pool entry index of annotation type.
-	 * @return constant-pool entry index of annotation type
-	 */
-	public int getTypeIndex() {
-		return typeIndex;
-	}
+    /**
+     * constant-pool entry index of annotation type.
+     * @return constant-pool entry index of annotation type
+     */
+    public int getTypeIndex() {
+        return typeIndex;
+    }
 
-	/**
-	 * element-value pair in the annotation.
-	 * @return element-value pair
-	 */
-	public ElementValuePair[] getElementValuePairs() {
-		return elementValuePairs;
-	}
+    /**
+     * element-value pair in the annotation.
+     * @return element-value pair
+     */
+    public ElementValuePair[] getElementValuePairs() {
+        return elementValuePairs;
+    }
 }

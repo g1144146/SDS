@@ -148,7 +148,7 @@ public class MethodDecompiler extends AbstractDecompiler {
         for(int i = 0; i < nodes.length; i++) {
             CFNode node = nodes[i];
             LineBuilder line = new LineBuilder();
-            OpcodeInfo[] opcodes = node.getOpcodes().getAll();
+            OpcodeInfo[] opcodes = node.getOpcodes();
             boolean addSemicolon = true;
             ConditionalExprBuilder builder = null;
             LoopStatementBuilder loop = null;
@@ -177,7 +177,7 @@ public class MethodDecompiler extends AbstractDecompiler {
 //                println("[" + op.getPc() + "]" + opcode + " (catch: " + isCatch + ", finally: " + isFinally + ")");
 //                println("local: " + local);
 //                println("stack: " + opStack);
-                switch(opcode.getOpcodeType()) {
+                switch(opcode.getType()) {
                     case nop: break;
                     case aconst_null: opStack.push("null", "null"); break;
                     case iconst_m1:   opStack.push(-1);     break;
@@ -202,7 +202,7 @@ public class MethodDecompiler extends AbstractDecompiler {
                     case ldc_w:
                     case ldc2_w:
                         CpRefOpcode lcdOpcode = (CpRefOpcode)opcode;
-                        opStack.push(lcdOpcode.getOperand(), lcdOpcode.getType());
+                        opStack.push(lcdOpcode.getOperand(), lcdOpcode.getLDCType());
                         break;
                     case iload:
                     case lload:
@@ -610,7 +610,7 @@ public class MethodDecompiler extends AbstractDecompiler {
                             line.delete();
                             break;
                         }
-                        if((line.length() == 0) && (opStack.size() > 0) && (node.getOpcodes().size() > 1)) {
+                        if((line.length() == 0) && (opStack.size() > 0) && (node.getOpcodes().length > 1)) {
                             // in case of opcodes size is equal to 1,
                             // that's not the Exit node which corresponds to Entry node.
                             OpcodeInfo end = node.getEnd();
@@ -738,7 +738,7 @@ public class MethodDecompiler extends AbstractDecompiler {
                         opStack.push(classType, classType);
                         break;
                     case newarray:
-                        String type = ((NewArray)opcode).getType();
+                        String type = ((NewArray)opcode).getAType();
                         String primLen = opStack.pop(typePop);
                         opStack.push("new " + type + "[" + primLen + "]", type + "[]");
                         break;
@@ -920,7 +920,7 @@ public class MethodDecompiler extends AbstractDecompiler {
     }
 
     private int getTailIndex(OpcodeInfo opcode) {
-        switch(opcode.getOpcodeType()) {
+        switch(opcode.getType()) {
             case aload_0 :
             case astore_0: return 0;
             case aload_1 :

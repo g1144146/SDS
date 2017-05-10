@@ -1,8 +1,5 @@
 package sds.classfile.constantpool;
 
-import java.io.IOException;
-import sds.classfile.ClassFileStream;
-
 /**
  * This class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.10">
@@ -10,22 +7,26 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public class InvokeDynamicInfo extends ConstantInfo {
-	private int bootstrapMethodAttrIndex;
+	private int bsmAttrIndex;
 	private int nameAndTypeIndex;
 
-	/**
-	 * constructor.
-	 */
-	public InvokeDynamicInfo() {
+    /**
+     * constructor.
+     * @param bsmAttrIndex entry index of bootstrap method attribute
+     * @param nameAndTypeIndex constant-pool entry index of name and type
+     */
+	public InvokeDynamicInfo(int bsmAttrIndex, int nameAndTypeIndex) {
 		super(ConstantType.C_INVOKE_DYNAMIC);
+        this.bsmAttrIndex = bsmAttrIndex;
+        this.nameAndTypeIndex = nameAndTypeIndex;
 	}
 
 	/**
 	 * returns entry index of bootstrap method attribute.
 	 * @return entry index of bootstrap method attribute
 	 */
-	public int getBMAI() {
-		return bootstrapMethodAttrIndex;
+	public int getBMAIndex() {
+		return bsmAttrIndex;
 	}
 
 	/**
@@ -37,15 +38,9 @@ public class InvokeDynamicInfo extends ConstantInfo {
 	}
 
 	@Override
-	public void read(ClassFileStream data) throws IOException {
-		this.bootstrapMethodAttrIndex = data.readShort();
-		this.nameAndTypeIndex = data.readShort();
-	}
-
-	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(super.toString()).append("\t#").append(bootstrapMethodAttrIndex)
+		sb.append(super.toString()).append("\t#").append(bsmAttrIndex)
 			.append(":#").append(nameAndTypeIndex);
 		return sb.toString();
 	}

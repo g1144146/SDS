@@ -8,9 +8,9 @@ package sds.classfile.attributes.annotation;
  * @author inagaki
  */
 public interface TargetInfo {
-	/**
-	 * returns target info type.
-	 * @return target info type
-	 */
-	abstract TargetInfoType getType();
+    /**
+     * returns target info type.
+     * @return target info type
+     */
+    abstract TargetInfoType getType();
 }

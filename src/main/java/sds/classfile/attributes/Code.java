@@ -1,13 +1,12 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
-import sds.classfile.Attributes;
+import java.util.List;
+import java.util.ArrayList;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
-import sds.classfile.attributes.stackmap.StackMapTable;
 import sds.classfile.bytecode.MnemonicTable;
 import sds.classfile.bytecode.OpcodeInfo;
-import sds.classfile.bytecode.Opcodes;
+import sds.classfile.constantpool.ConstantInfo;
 import sds.classfile.constantpool.Utf8Info;
 
 /**
@@ -16,163 +15,108 @@ import sds.classfile.constantpool.Utf8Info;
  * @author inagaki
  */
 public class Code extends AttributeInfo {
-	private int maxStack;
-	private int maxLocals;
-	private Opcodes opcodes;
-	private ExceptionTable[] exceptionTable;
-	private Attributes attr;
+    private int maxStack;
+    private int maxLocals;
+    private OpcodeInfo[] opcodes;
+    private int[][] exceptionTable;
+    private String[] catchTable;
+    private AttributeInfo[] attr;
 
-	/**
-	 * constructor.
-	 */
-	public Code() {
-		super(AttributeType.Code);
-	}
+    /**
+     * constructor.
+     * @param data classfile stream
+     * @param pool constant-pool
+     * @throws IOException 
+     */
+    public Code(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        super(AttributeType.Code);
+        this.maxStack = data.readShort();
+        this.maxLocals = data.readShort();
 
-	/**
-	 * returns maximum depth of the operand stack of method.
-	 * @return maximum depth.
-	 */
-	public int getMaxStack() {
-		return maxStack;
-	}
+        readOpcode(data, pool);
+        int len = data.readShort();
+        this.exceptionTable = new int[len][3];
+        this.catchTable = new String[len];
+        for(int i = 0; i < len; i++) {
+            exceptionTable[i][0] = data.readShort();
+            exceptionTable[i][1] = data.readShort();
+            exceptionTable[i][2] = data.readShort();
+            int catchType = data.readShort();
+            catchTable[i] = (catchType == 0) ? "any" : extract(catchType, pool);
+        }
+        readAttributes(data, pool);
+    }
 
-	/**
-	 * returns number of local variables.
-	 * @return number of local variables.
-	 */
-	public int maxLocals() {
-		return maxLocals;
-	}
+    private void readOpcode(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        List<OpcodeInfo> list = new ArrayList<>();
+        int codeLen = data.readInt();
+        int filePointer = (int)data.getFilePointer();
+        int index;
+        while((index = (int)data.getFilePointer()) < codeLen + filePointer) {
+            int pc = (index - filePointer);
+            list.add(MnemonicTable.get(data, pool, pc));
+        }
+        this.opcodes = list.toArray(new OpcodeInfo[0]);
+    }
 
-	/**
-	 * returns opcode sequence of method.
-	 * @return opcode sequence
-	 */
-	public Opcodes getCode() {
-		return opcodes;
-	}
+    private void readAttributes(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        this.attr = new AttributeInfo[data.readShort()];
+        AttributeInfoFactory factory = new AttributeInfoFactory();
+        for(int i = 0; i < attr.length; i++) {
+            Utf8Info utf8 = (Utf8Info)pool[data.readShort() - 1];
+            attr[i] = factory.create(utf8.getValue(), data, pool, opcodes);
+        }
+    }
 
-	/**
-	 * returns exceptions of method.
-	 * @return exceptions
-	 */
-	public ExceptionTable[] getExceptionTable() {
-		return exceptionTable;
-	}
+    /**
+     * returns maximum depth of the operand stack of method.
+     * @return maximum depth.
+     */
+    public int getMaxStack() {
+        return maxStack;
+    }
 
-	/**
-	 * returns attributes of method.
-	 * @return attributes
-	 */
-	public Attributes getAttr() {
-		return attr;
-	}
+    /**
+     * returns number of local variables.
+     * @return number of local variables.
+     */
+    public int maxLocals() {
+        return maxLocals;
+    }
 
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws Exception {
-		this.maxStack = data.readShort();
-		this.maxLocals = data.readShort();
+    /**
+     * returns opcode sequence of method.
+     * @return opcode sequence
+     */
+    public OpcodeInfo[] getCode() {
+        return opcodes;
+    }
 
-		readOpcode(data, pool);
-		this.exceptionTable = new ExceptionTable[data.readShort()];
-		for(int i = 0; i < exceptionTable.length; i++) {
-			exceptionTable[i] = new ExceptionTable(data, pool);
-		}
-		readAttributes(data, pool);
-	}
+    /**
+     * returns exception's valid ranges of method.<br>
+     * when one of array index defines N, the array content is next:<br>
+     * - table[N][0]: start pc<br>
+     * - table[N][1]: end_pc<br>
+     * - table[N][2]: handler_pc
+     * @return exception's valid ranges
+     */
+    public int[][] getExceptionTable() {
+        return exceptionTable;
+    }
 
-	private void readOpcode(ClassFileStream data, ConstantPool pool) throws Exception {
-		this.opcodes = new Opcodes();
-		int codeLen = data.readInt();
-		int filePointer = (int)data.getFilePointer();
-		int index;
-		int pc;
-		OpcodeInfo info;
-		while((index = (int)data.getFilePointer()) < codeLen + filePointer) {
-			pc = (index - filePointer);
-			info = MnemonicTable.get(Byte.toUnsignedInt(data.readByte()), pc);
-			info.read(data, pool);
-			opcodes.add(info);
-		}
-	}
+    /**
+     * returns catched exceptions of method
+     * @return 
+     */
+    public String[] getCatchTable() {
+        return catchTable;
+    }
 
-	private void readAttributes(ClassFileStream data, ConstantPool pool) throws Exception {
-		this.attr = new Attributes(data.readShort());
-		AttributeInfoFactory factory = new AttributeInfoFactory();
-		int nameIndex;
-		String attrName;
-		AttributeInfo info;
-		for(int i = 0; i < attr.size(); i++) {
-			nameIndex = data.readShort();
-			attrName = ((Utf8Info)pool.get(nameIndex-1)).getValue();
-			info = factory.create(attrName, data.readInt());
-			attr.add(i, readAttributeContent(info, data, pool));
-		}
-	}
-
-	private AttributeInfo readAttributeContent(AttributeInfo info, ClassFileStream data, ConstantPool pool)
-	throws Exception {
-		if(info.getType() == AttributeType.StackMapTable) {
-			((StackMapTable)info).read(data, pool, opcodes);
-			return info;
-		}
-		info.read(data, pool);
-		return info;
-	}
-
-	/**
-	 * This class is for exception table of method.
-	 */
-	public class ExceptionTable {
-		private int startPc;
-		private int endPc;
-		private int handlerPc;
-		private String catchType;
-
-		ExceptionTable(ClassFileStream data, ConstantPool pool) throws IOException {
-			this.startPc = data.readShort();
-			this.endPc = data.readShort();
-			this.handlerPc = data.readShort();
-			int catchType = data.readShort();
-			if(catchType == 0) {
-				this.catchType = "any";
-			} else {
-				this.catchType = extract(pool.get(catchType - 1), pool);
-			}
-		}
-
-		/**
-		 * returns value.<br><br>
-		 * if key is "start_pc", it returns start value of
-		 * ranges in the code array at which the exception
-		 * handler is active.<br>
-		 * if key is "end_pc", it returns end value of ranges
-		 * in the code array at which the exception handler
-		 * is active.<br>
-		 * if key is "handler_pc", it returns value of start
-		 * of exception handler.<br>
-		 * by default, it returns -1.
-		 * @param key value name
-		 * @return value
-		 */
-		public int getNumber(String key) {
-			switch(key) {
-				case "start_pc":   return startPc;
-				case "end_pc":     return endPc;
-				case "handler_pc": return handlerPc;
-				default:
-					System.out.println("invalid key: " + key);
-					return -1;
-			}
-		}
-
-		/**
-		 * returns exception class.
-		 * @return exception class
-		 */
-		public String getCatchType() {
-			return catchType;
-		}
-	}
+    /**
+     * returns attributes of method.
+     * @return attributes
+     */
+    public AttributeInfo[] getAttr() {
+        return attr;
+    }
 }

@@ -2,7 +2,6 @@ package sds.classfile.attributes;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
 
 /**
  * This class is for
@@ -11,84 +10,35 @@ import sds.classfile.ConstantPool;
  * @author inagaki
  */
 public class LineNumberTable extends AttributeInfo {
-	private LNTable[] lineNumberTable;
+    private int[][] table;
 
-	/**
-	 * constrcutor.
-	 */
-	public LineNumberTable() {
-		super(AttributeType.LineNumberTable);
-	}
+    /**
+     * constructor.
+     * @param data classfile stream
+     * @throws IOException 
+     */
+    public LineNumberTable(ClassFileStream data) throws IOException {
+        super(AttributeType.LineNumberTable);
+        this.table = new int[data.readShort()][3];
+        for(int i = 0; i < table.length; i++) {
+            table[i][0] = data.readShort();
+            table[i][2] = data.readShort();
+        }
+        for(int i = 0; i < table.length - 1; i++) {
+            table[i][1] = table[i + 1][0];
+        }
+        if(table.length > 1) table[table.length - 1][1] = table[table.length - 1][0];
+    }
 
-	/**
-	 * returns line number table.
-	 * @return line number table
-	 */
-	public LNTable[] getLineNumberTable() {
-		return lineNumberTable;
-	}
-
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.lineNumberTable = new LNTable[data.readShort()];
-		for(int i = 0; i < lineNumberTable.length; i++) {
-			lineNumberTable[i] = new LNTable(data);
-			setEndPc(i);
-		}
-	}
-
-	private void setEndPc(int index) {
-		if(index == lineNumberTable.length-1) {
-			lineNumberTable[index].endPc = lineNumberTable[index].getStartPc();
-			setEndPc2(index);
-			return;
-		}
-		if(index > 0) {
-			lineNumberTable[index-1].endPc = lineNumberTable[index].startPc;
-		}
-	}
-
-	private void setEndPc2(int index) {
-		if(lineNumberTable.length > 1) {
-			lineNumberTable[index-1].endPc = lineNumberTable[index].getStartPc();
-		}
-	}
-
-	/**
-	 * This class is for line number table.
-	 */
-	public class LNTable {
-		private int startPc;
-		private int endPc;
-		private int lineNumber;
-
-		LNTable(ClassFileStream data) throws IOException {
-			this.startPc = data.readShort();
-			this.lineNumber = data.readShort();
-		}
-
-		/**
-		 * returns start number of opcode.
-		 * @return start number
-		 */
-		public int getStartPc() {
-			return startPc;
-		}
-
-		/**
-		 * returns line number in source file.
-		 * @return line number
-		 */
-		public int getLineNumber() {
-			return lineNumber;
-		}
-
-		/**
-		 * returns end number of opcode.
-		 * @return end number
-		 */
-		public int getEndPc() {
-			return endPc;
-		}
-	}
+    /**
+     * returns line number table.
+     * when one of array index defines N, the array content is next:<br>
+     * - table[N][0]: start pc<br>
+     * - table[N][1]: end pc<br>
+     * - table[N][2]: line number
+     * @return line number table
+     */
+    public int[][] getLineNumberTable() {
+        return table;
+    }
 }

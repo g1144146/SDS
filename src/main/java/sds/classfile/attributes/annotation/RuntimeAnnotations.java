@@ -2,11 +2,12 @@ package sds.classfile.attributes.annotation;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeType;
+import sds.classfile.constantpool.ConstantInfo;
+import sds.util.SDSStringBuilder;
 
-import static sds.util.AnnotationParser.parseAnnotation;
+import static sds.classfile.attributes.annotation.AnnotationParser.parseAnnotation;
 
 /**
  * This adapter class is for
@@ -14,26 +15,29 @@ import static sds.util.AnnotationParser.parseAnnotation;
  * {@link RuntimeInvisibleAnnotations <code>RuntimeInvisibleAnnotations</code>}.
  * @author inagaki
  */
-abstract class RuntimeAnnotations extends AttributeInfo {
-	private String[] annotations;
+public class RuntimeAnnotations extends AttributeInfo {
+    private String[] annotations;
 
-	RuntimeAnnotations(AttributeType type) {
-		super(type);
-	}
+    /**
+     * constructor.
+     * @param type attribute type
+     * @param data classfile stream
+     * @param pool constant-pool
+     * @throws IOException 
+     */
+    public RuntimeAnnotations(AttributeType type, ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        super(type);
+        this.annotations = new String[data.readShort()];
+        for(int i = 0; i < annotations.length; i++) {
+            annotations[i] = parseAnnotation(new Annotation(data), new SDSStringBuilder(), pool);
+        }
+    }
 
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException, ElementValueException {
-		this.annotations = new String[data.readShort()];
-		for(int i = 0; i < annotations.length; i++) {
-			annotations[i] = parseAnnotation(new Annotation(data), new StringBuilder(), pool);
-		}
-	}
-
-	/**
-	 * returns runtime annotations.
-	 * @return runtime annotations
-	 */
-	public String[] getAnnotations() {
-		return annotations;
-	}
+    /**
+     * returns runtime annotations.
+     * @return runtime annotations
+     */
+    public String[] getAnnotations() {
+        return annotations;
+    }
 }

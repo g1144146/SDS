@@ -2,7 +2,7 @@ package sds.classfile.bytecode;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This class is for
@@ -12,17 +12,12 @@ import sds.classfile.ConstantPool;
  * @author inagaki
  */
 public class InvokeDynamic extends CpRefOpcode {
-	/**
-	 * constructor.
-	 * @param pc index into the code array
-	 */
-	public InvokeDynamic(int pc) {
-		super(MnemonicTable.inovokedynamic, pc);
-	}
-
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		super.read(data, pool);
-		data.skipBytes(2);
-	}
+    /**
+     * constructor.
+     * @param pc index into the code array
+     */
+    public InvokeDynamic(ClassFileStream data, ConstantInfo[] pool, int pc) throws IOException {
+        super(data.readShort(), pool, MnemonicTable.inovokedynamic, pc);
+        data.skipBytes(2);
+    }
 }

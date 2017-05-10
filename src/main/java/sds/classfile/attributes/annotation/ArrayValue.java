@@ -8,20 +8,20 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public class ArrayValue {
-	private ElementValue[] values;
+    private ElementValue[] values;
 
-	ArrayValue(ClassFileStream data) throws IOException, ElementValueException {
-		this.values = new ElementValue[data.readShort()];
-		for(int i = 0; i < values.length; i++) {
-			values[i] = new ElementValue(data);
-		}
-	}
+    ArrayValue(ClassFileStream data) throws IOException, ElementValueException {
+        this.values = new ElementValue[data.readShort()];
+        for(int i = 0; i < values.length; i++) {
+            values[i] = new ElementValue(data);
+        }
+    }
 
-	/**
-	 * returns array of element.
-	 * @return array of element
-	 */
-	public ElementValue[] getValues() {
-		return values;
-	}
+    /**
+     * returns array of element.
+     * @return array of element
+     */
+    public ElementValue[] getValues() {
+        return values;
+    }
 }

@@ -7,18 +7,23 @@ package sds.classfile.attributes.annotation;
  * @author inagaki
  */
 public class MethodFormalParameterTarget extends AbstractTargetInfo {
-	private int formalParameterIndex;
+    private int formalParameterIndex;
 
-	MethodFormalParameterTarget(int formalParameterIndex) {
-		super(TargetInfoType.MethodFormalParameterTarget);
-		this.formalParameterIndex = formalParameterIndex;
-	}
+    MethodFormalParameterTarget(int formalParameterIndex) {
+        super(TargetInfoType.MethodFormalParameterTarget);
+        this.formalParameterIndex = formalParameterIndex;
+    }
 
-	/**
-	 * returns index of formal parameter declaration has an annotated type.
-	 * @return index of formal parameter declaration
-	 */
-	public int getIndex() {
-		return formalParameterIndex;
-	}
+    /**
+     * returns index of formal parameter declaration has an annotated type.
+     * @return index of formal parameter declaration
+     */
+    public int getIndex() {
+        return formalParameterIndex;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ": " + "index: " + formalParameterIndex;
+    }
 }

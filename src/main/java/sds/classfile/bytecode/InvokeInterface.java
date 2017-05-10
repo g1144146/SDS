@@ -2,7 +2,7 @@ package sds.classfile.bytecode;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This class is for
@@ -12,42 +12,37 @@ import sds.classfile.ConstantPool;
  * @author inagaki
  */
 public class InvokeInterface extends CpRefOpcode {
-	private int count;
+    private int count;
 
-	/**
-	 * constructor.
-	 * @param pc index into the code array
-	 */
-	public InvokeInterface(int pc) {
-		super(MnemonicTable.invokeinterface, pc);
-	}
+    /**
+     * constructor.
+     * @param pc index into the code array
+     */
+    public InvokeInterface(ClassFileStream data, ConstantInfo[] pool, int pc) throws IOException {
+        super(data.readShort(), pool, MnemonicTable.invokeinterface, pc);
+        this.count = data.readUnsignedByte();
+        data.skipBytes(1);
+    }
 
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		super.read(data, pool);
-		this.count = data.readUnsignedByte();
-		data.skipBytes(1);
-	}
+    /**
+     * returns count.
+     * @return count
+     */
+    public int getCount() {
+        return count;
+    }
 
-	/**
-	 * returns count.
-	 * @return count
-	 */
-	public int getCount() {
-		return count;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof InvokeInterface)) {
+            return false;
+        }
+        InvokeInterface opcode = (InvokeInterface)obj;
+        return super.equals(obj) && (count == opcode.count);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if(!(obj instanceof InvokeInterface)) {
-			return false;
-		}
-		InvokeInterface opcode = (InvokeInterface)obj;
-		return super.equals(obj) && (count == opcode.count);
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ", " + count;
-	}
+    @Override
+    public String toString() {
+        return super.toString() + ", " + count;
+    }
 }

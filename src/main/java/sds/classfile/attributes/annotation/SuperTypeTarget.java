@@ -7,20 +7,25 @@ package sds.classfile.attributes.annotation;
  * @author inagaki
  */
 public class SuperTypeTarget extends AbstractTargetInfo {
-	private int superTypeIndex;
+    private int superTypeIndex;
 
-	SuperTypeTarget(int superTypeIndex) {
-		super(TargetInfoType.SuperTypeTarget);
-		this.superTypeIndex = superTypeIndex;
-	}
+    SuperTypeTarget(int superTypeIndex) {
+        super(TargetInfoType.SuperTypeTarget);
+        this.superTypeIndex = superTypeIndex;
+    }
 
-	/**
-	 * returns index of annotation.<br>
-	 * the index of annotation appears on a typein the extends
-	 * or implements clause of a class or interface declaration.
-	 * @return index of annotation
-	 */
-	public int getIndex() {
-		return superTypeIndex;
-	}
+    /**
+     * returns index of annotation.<br>
+     * the index of annotation appears on a typein the extends
+     * or implements clause of a class or interface declaration.
+     * @return index of annotation
+     */
+    public int getIndex() {
+        return superTypeIndex;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ": " + "index: " + superTypeIndex;
+    }
 }

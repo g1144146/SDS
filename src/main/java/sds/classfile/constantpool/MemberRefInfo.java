@@ -1,8 +1,5 @@
 package sds.classfile.constantpool;
 
-import java.io.IOException;
-import sds.classfile.ClassFileStream;
-
 /**
  * This adapter class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.2">
@@ -13,16 +10,20 @@ import sds.classfile.ClassFileStream;
  * Constant_InterfaceMethodref_Info</a>.
  * @author inagaki
  */
-public abstract class MemberRefInfo extends ConstantInfo {
+public class MemberRefInfo extends ConstantInfo {
 	private int classIndex;
 	private int nameAndTypeIndex;
 
 	/**
-	 * constructor.
-	 * @param tag constant info tag
-	 */
-	public MemberRefInfo(int tag) {
+     * 
+     * @param tag constant info tag
+     * @param classIndex constant-pool entry index of class has member
+     * @param nameAndTypeIndex constant-pool entry index of member's name and type
+     */
+	public MemberRefInfo(int tag, int classIndex, int nameAndTypeIndex) {
 		super(tag);
+        this.classIndex = classIndex;
+        this.nameAndTypeIndex = nameAndTypeIndex;
 	}
 
 	/**
@@ -42,16 +43,7 @@ public abstract class MemberRefInfo extends ConstantInfo {
 	}
 
 	@Override
-	public void read(ClassFileStream data) throws IOException {
-		this.classIndex = data.readShort();
-		this.nameAndTypeIndex = data.readShort();
-	}
-
-	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(super.toString()).append("\t#")
-			.append(classIndex).append(".#").append(nameAndTypeIndex);
-		return sb.toString();
+		return super.toString() + "\t#" + classIndex + ".#" + nameAndTypeIndex;
 	}
 }

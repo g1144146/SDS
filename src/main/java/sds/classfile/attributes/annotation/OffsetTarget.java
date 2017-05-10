@@ -7,22 +7,27 @@ package sds.classfile.attributes.annotation;
  * @author inagaki
  */
 public class OffsetTarget extends AbstractTargetInfo {
-	private int offset;
+    private int offset;
 
-	OffsetTarget(int offset) {
-		super(TargetInfoType.OffsetTarget);
-		this.offset = offset;
-	}
+    OffsetTarget(int offset) {
+        super(TargetInfoType.OffsetTarget);
+        this.offset = offset;
+    }
 
-	/**
-	 * returns offset.<br>
-	 * code array offset of either
-	 * the instanceof bytecode instruction corresponding to the instanceof expression,
-	 * the new bytecode instruction corresponding to the new expression,
-	 * or the bytecode instruction corresponding to the method reference expression.
-	 * @return offset
-	 */
-	public int getOffset() {
-		return offset;
-	}
+    /**
+     * returns offset.<br>
+     * code array offset of either
+     * the instanceof bytecode instruction corresponding to the instanceof expression,
+     * the new bytecode instruction corresponding to the new expression,
+     * or the bytecode instruction corresponding to the method reference expression.
+     * @return offset
+     */
+    public int getOffset() {
+        return offset;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ": " + "offset: " + offset;
+    }
 }

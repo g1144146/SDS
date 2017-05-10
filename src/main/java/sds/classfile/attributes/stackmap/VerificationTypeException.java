@@ -5,12 +5,12 @@ package sds.classfile.attributes.stackmap;
  * {@link VerificationTypeInfo <code>VerificationTypeInfo</code>}.
  * @author inagaki
  */
-public class VerificationTypeException extends Exception {
-	/**
-	 * constructor.
-	 * @param tag discrimination tag
-	 */
-	public VerificationTypeException(int tag) {
-		super(""+tag);
-	}
+public class VerificationTypeException extends RuntimeException {
+    /**
+     * constructor.
+     * @param tag discrimination tag
+     */
+    public VerificationTypeException(int tag) {
+        super(""+tag);
+    }
 }

@@ -1,83 +1,90 @@
 package sds.classfile;
 
 import java.io.IOException;
+import sds.classfile.attributes.AttributeInfo;
+import sds.classfile.attributes.AttributeInfoFactory;
+import sds.classfile.constantpool.ConstantInfo;
+import sds.classfile.constantpool.Utf8Info;
 
 import static sds.util.AccessFlags.get;
 import static sds.util.DescriptorParser.parse;
-import static sds.util.Utf8ValueExtractor.extract;
 
 /**
  * This adapter class is for info of class has member.
  * @author inagaki
  */
 public class MemberInfo implements Info {
-	private String[] declaration;
-	private Attributes attr;
+    private String[] declaration;
+    private AttributeInfo[] attr;
 
-	/**
-	 * returns access flag of member.
-	 * @return access flag
-	 */
-	public String getAccessFlags() {
-		return declaration[0];
-	}
+    public MemberInfo(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        int acc = data.readShort();
+        int nameIndex = data.readShort();
+        int descIndex = data.readShort();
+        this.declaration = new String[3];
+        declaration[1] = extract(nameIndex, pool);
+        declaration[2] = parse(extract(descIndex, pool));
+        declaration[0] = get(acc, getType());
+        readAttributes(data, pool);
+    }
 
-	/**
-	 * returns member name.
-	 * @return member name
-	 */
-	public String getName() {
-		return declaration[1];
-	}
+    private void readAttributes(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        this.attr = new AttributeInfo[data.readShort()];
+        AttributeInfoFactory factory = new AttributeInfoFactory();
+        for(int i = 0; i < attr.length; i++) {
+            Utf8Info utf8 = (Utf8Info)pool[data.readShort() - 1];
+            attr[i] = factory.create(utf8.getValue(), data, pool);
+        }
+    }
 
-	/**
-	 * returns member descriptor.
-	 * @return member descriptor
-	 */
-	public String getDescriptor() {
-		return declaration[2];
-	}
+    /**
+     * returns access flag of member.
+     * @return access flag
+     */
+    public String getAccessFlags() {
+        return declaration[0];
+    }
 
-	/**
-	 * returns attributes of member.
-	 * @return attributes
-	 */
-	public Attributes getAttr() {
-		return attr;
-	}
+    /**
+     * returns member name.
+     * @return member name
+     */
+    public String getName() {
+        return declaration[1];
+    }
 
-	/**
-	 * returns type of member.
-	 * @return type
-	 */
-	public String getType() {
-		if(declaration[2].contains("(")) {
-			return "method";
-		}
-		return "field";
-	}
+    /**
+     * returns member descriptor.
+     * @return member descriptor
+     */
+    public String getDescriptor() {
+        return declaration[2];
+    }
 
-	/**
-	 * sets attributes of member.
-	 * @param attr attributes
-	 */
-	public void setAttr(Attributes attr) {
-		this.attr = attr;
-	}
+    /**
+     * returns attributes of member.
+     * @return attributes
+     */
+    public AttributeInfo[] getAttr() {
+        return attr;
+    }
 
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		int acc = data.readShort();
-		int nameIndex = data.readShort();
-		int descIndex = data.readShort();
-		this.declaration = new String[3];
-		declaration[1] = extract(pool.get(nameIndex - 1), pool);
-		declaration[2] = parse(extract(pool.get(descIndex - 1), pool));
-		declaration[0] = get(acc, getType());
-	}
+    /**
+     * returns type of member.
+     * @return type
+     */
+    public String getType() {
+        if(declaration[2].contains("(")) {
+            return "method";
+        }
+        return "field";
+    }
 
-	@Override
-	public String toString() {
-		return declaration[0] + declaration[1] + declaration[2];
-	}
+    @Override
+    public String toString() {
+        if(getType().equals("field")) {
+            return declaration[0] + declaration[2] + " " +  declaration[1];
+        }
+        return declaration[0] + declaration[1] + declaration[2];
+    }
 }

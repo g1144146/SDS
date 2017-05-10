@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeType;
-import sds.classfile.bytecode.Opcodes;
+import sds.classfile.bytecode.OpcodeInfo;
+import sds.classfile.constantpool.ConstantInfo;
 
-import static sds.util.StackMapFrameParser.parseFrame;
+import static sds.classfile.attributes.stackmap.StackMapFrameParser.parseFrame;
 
 /**
  * This class is for
@@ -18,33 +18,30 @@ import static sds.util.StackMapFrameParser.parseFrame;
  * @author inagaki
  */
 public class StackMapTable extends AttributeInfo {
-	private Map<Integer, Map<String, List<String>>> entries;
+    private Map<Integer, Map<String, List<String>>> entries;
 
-	/**
-	 * constructor.
-	 */
-	public StackMapTable() {
-		super(AttributeType.StackMapTable);
-	}
+    /**
+     * constructor.
+     * @param data classfile stream
+     * @param pool constant-pool
+     * @param opcodes opcode sequence of method
+     * @throws IOException 
+     */
+    public StackMapTable(ClassFileStream data, ConstantInfo[] pool, OpcodeInfo[] opcodes) throws IOException {
+        super(AttributeType.StackMapTable);
+        StackMapFrame[] frames = new StackMapFrame[data.readShort()];
+        StackMapFrameFactory factory = new StackMapFrameFactory();
+        for(int i = 0; i < frames.length; i++) {
+            frames[i] = factory.create(data);
+        }
+        entries = parseFrame(frames, pool, opcodes);
+    }
 
-	/**
-	 * returns entries of stack-map-table.
-	 * @return entries
-	 */
-	public Map<Integer, Map<String, List<String>>> getEntries() {
-		return entries;
-	}
-
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {}
-
-	public void read(ClassFileStream data, ConstantPool pool, Opcodes opcodes)
-	throws IOException, VerificationTypeException, StackMapFrameException {
-		StackMapFrame[] frames = new StackMapFrame[data.readShort()];
-		StackMapFrameFactory factory = new StackMapFrameFactory();
-		for(int i = 0; i < frames.length; i++) {
-			frames[i] = factory.create(data);
-		}
-		entries = parseFrame(frames, pool, opcodes);
-	}
+    /**
+     * returns entries of stack-map-table.
+     * @return entries
+     */
+    public Map<Integer, Map<String, List<String>>> getEntries() {
+        return entries;
+    }
 }

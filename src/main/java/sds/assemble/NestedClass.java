@@ -5,7 +5,11 @@ package sds.assemble;
  * @author inagaki
  */
 public class NestedClass extends ClassContent {
-	public NestedClass() {
-		super();
-	}
+    public NestedClass(String[] c) {
+        super();
+        String inner = c[0];
+        String outer = c[1];
+        String name  = c[2];
+        this.accessFlag = c[3];
+    }
 }

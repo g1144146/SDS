@@ -2,7 +2,7 @@ package sds.classfile.attributes;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This class is for
@@ -11,37 +11,40 @@ import sds.classfile.ConstantPool;
  * @author inagaki
  */
 public class EnclosingMethod extends AttributeInfo {
-	private String _class;
-	private String method;
-	
-	/**
-	 * constructor.
-	 */
-	public EnclosingMethod() {
-		super(AttributeType.EnclosingMethod);
-	}
+    private String _class;
+    private String method;
+    
+    /**
+     * constructor.
+     * @param data classfile stream
+     * @param pool constant-pool
+     * @throws IOException 
+     */
+    public EnclosingMethod(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        super(AttributeType.EnclosingMethod);
+        this._class = extract(data.readShort(), pool);
+        int methodIndex = data.readShort();
+        this.method = methodIndex > 0 ? extract(methodIndex, pool) : "";
+    }
 
-	/**
-	 * returns class of enclosing method.
-	 * @return class
-	 */
-	public String getEncClass() {
-		return _class;
-	}
+    /**
+     * returns class of enclosing method.
+     * @return class
+     */
+    public String getEncClass() {
+        return _class;
+    }
 
-	/**
-	 * returns enclosing method.
-	 * @return method
-	 */
-	public String getEncMethod() {
-		return method;
-	}
+    /**
+     * returns enclosing method.
+     * @return method
+     */
+    public String getEncMethod() {
+        return method;
+    }
 
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		int classIndex  = data.readShort();
-		this._class = extract(pool.get(classIndex-1), pool);
-		int methodIndex = data.readShort();
-		this.method = methodIndex > 0 ? extract(pool.get(methodIndex-1), pool) : "";
-	}
+    @Override
+    public String toString() {
+        return super.toString() + ": " + _class + "." + method;
+    }
 }

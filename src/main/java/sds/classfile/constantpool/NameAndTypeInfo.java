@@ -1,8 +1,5 @@
 package sds.classfile.constantpool;
 
-import java.io.IOException;
-import sds.classfile.ClassFileStream;
-
 /**
  * This class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.6">
@@ -11,17 +8,21 @@ import sds.classfile.ClassFileStream;
  */
 public class NameAndTypeInfo extends ConstantInfo {
 	private int nameIndex;
-	private int descriptorIndex;
+	private int descIndex;
 
 	/**
-	 * constructor.
-	 */
-	public NameAndTypeInfo() {
+     * constructor.
+     * @param nameIndex constant-pool entry index of name
+     * @param descIndex  constant-pool entry index of descriptor
+     */
+	public NameAndTypeInfo(int nameIndex, int descIndex) {
 		super(ConstantType.C_NAME_AND_TYPE);
+        this.nameIndex = nameIndex;
+        this.descIndex = descIndex;
 	}
 
 	/**
-	 * returns constant-pool entry index of name
+	 * returns constant-pool entry index of name.
 	 * @return constant-pool entry index of name
 	 */
 	public int getNameIndex() {
@@ -32,21 +33,12 @@ public class NameAndTypeInfo extends ConstantInfo {
 	 * returns constant-pool entry index of descriptor.
 	 * @return constant-pool entry index of descriptor
 	 */
-	public int getDescriptorIndex() {
-		return descriptorIndex;
-	}
-
-	@Override
-	public void read(ClassFileStream data) throws IOException {
-		this.nameIndex = data.readShort();
-		this.descriptorIndex = data.readShort();
+	public int getDescIndex() {
+		return descIndex;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(super.toString()).append("\t#")
-			.append(nameIndex).append(":#").append(descriptorIndex);
-		return sb.toString();
+		return super.toString() + "\t#" + nameIndex + ":#" + descIndex;
 	}
 }

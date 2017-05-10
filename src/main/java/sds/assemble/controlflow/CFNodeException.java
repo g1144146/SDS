@@ -6,11 +6,11 @@ package sds.assemble.controlflow;
  * @author inagaki
  */
 public class CFNodeException extends RuntimeException {
-	/**
-	 * constructor.
-	 * @param message messsage for notification
-	 */
-	public CFNodeException(String message) {
-		super(message);
-	}
+    /**
+     * constructor.
+     * @param message messsage for notification
+     */
+    public CFNodeException(String message) {
+        super(message);
+    }
 }

@@ -10,62 +10,27 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public class LocalVarTarget extends AbstractTargetInfo {
-	private LVTTable[] table;
+    private int[][] table;
 
-	LocalVarTarget(ClassFileStream data) throws IOException {
-		super(TargetInfoType.LocalVarTarget);
-		this.table = new LVTTable[data.readShort()];
-		for(int i = 0; i < table.length; i++) {
-			table[i] = new LVTTable(data);
-		}
-	}
+    LocalVarTarget(ClassFileStream data) throws IOException {
+        super(TargetInfoType.LocalVarTarget);
+        this.table = new int[data.readShort()][3];
+        for(int i = 0; i < table.length; i++) {
+            table[i][0] = data.readShort();
+            table[i][1] = data.readShort();
+            table[i][2] = data.readShort();
+        }
+    }
 
-	/**
-	 * returns local var table.
-	 * @return local var table
-	 */
-	public LVTTable[] getTable() {
-		return table;
-	}
-
-	/**
-	 * This class is for table which localval_target has.
-	 */
-	public class LVTTable {
-		private int startPc;
-		private int length;
-		private int index;
-
-		LVTTable(ClassFileStream data) throws IOException {
-			this.startPc = data.readShort();
-			this.length  = data.readShort();
-			this.index   = data.readShort();
-		}
-
-		/**
-		 * returns start value of ranges.
-		 * the start value of ranges in the code array at which
-		 * local variable is active.
-		 * @return start value
-		 */
-		public int getStartPc() {
-			return startPc;
-		}
-
-		/**
-		 * returns range in the code array at which local variable is active.
-		 * @return range in the code array
-		 */
-		public int getLen() {
-			return length;
-		}
-
-		/**
-		 * returns index in the local variable array of the current frame.
-		 * @return index in the local variable array
-		 */
-		public int getIndex() {
-			return index;
-		}
-	}
+    /**
+     * returns local var table.<br>
+     * when one of array index defines N, the array content is next:<br>
+     * - table[N][0]: start pc<br>
+     * - table[N][1]: length<br>
+     * - table[N][2]: index
+     * @return local var table
+     */
+    public int[][] getTable() {
+        return table;
+    }
 }

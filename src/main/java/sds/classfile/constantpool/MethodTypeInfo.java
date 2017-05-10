@@ -1,8 +1,5 @@
 package sds.classfile.constantpool;
 
-import java.io.IOException;
-import sds.classfile.ClassFileStream;
-
 /**
  * This class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.9">
@@ -10,32 +7,26 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public class MethodTypeInfo extends ConstantInfo {
-	private int descriptorIndex;
+	private int descIndex;
 
 	/**
 	 * constructor.
 	 */
-	public MethodTypeInfo() {
+	public MethodTypeInfo(int descIndex) {
 		super(ConstantType.C_METHOD_TYPE);
+        this.descIndex = descIndex;
 	}
 
 	/**
 	 * returns constant-pool entry index of descriptor of method type.
 	 * @return constant-pool entry index of descriptor of method type
 	 */
-	public int getDescriptorIndex() {
-		return descriptorIndex;
-	}
-
-	@Override
-	public void read(ClassFileStream data) throws IOException {
-		this.descriptorIndex = data.readShort();
+	public int getDescIndex() {
+		return descIndex;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(super.toString()).append("\t#").append(descriptorIndex);
-		return sb.toString();
+		return super.toString() + "\t#" + descIndex;
 	}
 }

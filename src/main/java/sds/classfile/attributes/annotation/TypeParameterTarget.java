@@ -7,22 +7,27 @@ package sds.classfile.attributes.annotation;
  * @author inagaki
  */
 public class TypeParameterTarget extends AbstractTargetInfo {
-	private int typeParameterIndex;
+    private int typeParameterIndex;
 
-	/**
-	 * constructor.
-	 * @param typeParameterIndex index of type parameter declaration is annotated
-	 */
-	public TypeParameterTarget(int typeParameterIndex) {
-		super(TargetInfoType.TypeParameterTarget);
-		this.typeParameterIndex = typeParameterIndex;
-	}
+    /**
+     * constructor.
+     * @param typeParameterIndex index of type parameter declaration is annotated
+     */
+    public TypeParameterTarget(int typeParameterIndex) {
+        super(TargetInfoType.TypeParameterTarget);
+        this.typeParameterIndex = typeParameterIndex;
+    }
 
-	/**
-	 * returns index of type parameter declaration is annotated.
-	 * @return index of type parameter declaration
-	 */
-	public int getIndex() {
-		return typeParameterIndex;
-	}
+    /**
+     * returns index of type parameter declaration is annotated.
+     * @return index of type parameter declaration
+     */
+    public int getIndex() {
+        return typeParameterIndex;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ": " + "index: " + typeParameterIndex;
+    }
 }

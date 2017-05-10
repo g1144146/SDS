@@ -7,24 +7,29 @@ package sds.classfile.attributes.annotation;
  * @author inagaki
  */
 public class ThrowsTarget extends AbstractTargetInfo {
-	private int throwsTypeIndex;
+    private int throwsTypeIndex;
 
-	ThrowsTarget(int throwsTypeIndex) {
-		super(TargetInfoType.ThrowsTarget);
-		this.throwsTypeIndex = throwsTypeIndex;
-	}
+    ThrowsTarget(int throwsTypeIndex) {
+        super(TargetInfoType.ThrowsTarget);
+        this.throwsTypeIndex = throwsTypeIndex;
+    }
 
-	/**
-	 * return index into the exception_index_table array.<br>
-	 * the index into the exception_index_table array of the
-	 * {@link sds.classfile.attributes.Exceptions
-	 * <code>Exceptions attribute</code>}
-	 * of the method_info structure enclosing the
-	 * {@link RuntimeVisibleTypeAnnotations
-	 * <code>RuntimeVisibleTypeAnnotations attribute</code>}.
-	 * @return index into the exception_index_table array
-	 */
-	public int getIndex() {
-		return throwsTypeIndex;
-	}
+    /**
+     * return index into the exception_index_table array.<br>
+     * the index into the exception_index_table array of the
+     * {@link sds.classfile.attributes.Exceptions
+     * <code>Exceptions attribute</code>}
+     * of the method_info structure enclosing the
+     * {@link RuntimeVisibleTypeAnnotations
+     * <code>RuntimeVisibleTypeAnnotations attribute</code>}.
+     * @return index into the exception_index_table array
+     */
+    public int getIndex() {
+        return throwsTypeIndex;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ": " + "index: " + throwsTypeIndex;
+    }
 }

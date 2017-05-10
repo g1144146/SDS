@@ -7,15 +7,15 @@ import sds.assemble.BaseContent;
  * @author inagaki
  */
 public interface Decompiler {
-	/**
-	 * decompiles specified contents.
-	 * @param content decompile target content
-	 */
-	public void decompile(BaseContent content);
+    /**
+     * decompiles specified contents.
+     * @param content decompile target content
+     */
+    void decompile(BaseContent content);
 
-	/**
-	 * decompiles specified contents.
-	 * @param contents decompile target contents
-	 */
-	public void decompile(BaseContent[] contents);
+    /**
+     * decompiles specified contents.
+     * @param contents decompile target contents
+     */
+    void decompile(BaseContent[] contents);
 }

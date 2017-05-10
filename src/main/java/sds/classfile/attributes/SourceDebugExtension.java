@@ -1,8 +1,9 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
+import java.util.StringJoiner;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This class is for
@@ -11,31 +12,39 @@ import sds.classfile.ConstantPool;
  * @author inagakikenichi
  */
 public class SourceDebugExtension extends AttributeInfo {
-	private int[] debugExtension;
-	private int attrLen;
+    private int[] debugExtension;
+    private int attrLen;
 
-	/**
-	 * constructor.
-	 * @param length attribute length
-	 */
-	public SourceDebugExtension(int length) {
-		super(AttributeType.SourceDebugExtension);
-		this.attrLen = length;
-	}
+    /**
+     * constructor.
+     * @param length debug extension length
+     * @param data classfile stream
+     * @param pool constant-pool
+     * @throws IOException 
+     */
+    public SourceDebugExtension(int length, ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        super(AttributeType.SourceDebugExtension);
+        this.attrLen = length;
+        this.debugExtension = new int[attrLen];
+        for(int i = 0; i < debugExtension.length; i++) {
+            debugExtension[i] = data.readUnsignedByte();
+        }
+    }
 
-	/**
-	 * returns constant-pool entry index of debugging information.
-	 * @return constant-pool entry index of debugging information
-	 */
-	public int[] getDebugExtension() {
-		return debugExtension;
-	}
+    /**
+     * returns constant-pool entry index of debugging information.
+     * @return constant-pool entry index of debugging information
+     */
+    public int[] getDebugExtension() {
+        return debugExtension;
+    }
 
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.debugExtension = new int[attrLen];
-		for(int i = 0; i < debugExtension.length; i++) {
-			debugExtension[i] = data.readUnsignedByte();
-		}
-	}
+    @Override
+    public String toString() {
+        StringJoiner sj = new StringJoiner(",", "[", "]");
+        for(int ex : debugExtension) {
+            sj.add(ex + "");
+        }
+        return super.toString() + ": " + sj.toString();
+    }
 }

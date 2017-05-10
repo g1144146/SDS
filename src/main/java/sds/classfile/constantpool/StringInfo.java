@@ -1,8 +1,5 @@
 package sds.classfile.constantpool;
 
-import java.io.IOException;
-import sds.classfile.ClassFileStream;
-
 /**
  * This class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.3">
@@ -13,10 +10,12 @@ public class StringInfo extends ConstantInfo {
 	private int stringIndex;
 
 	/**
-	 * constructor.
-	 */
-	public StringInfo() {
+     * constructor.
+     * @param stringIndex constant-pool entry index of string
+     */
+	public StringInfo(int stringIndex) {
 		super(ConstantType.C_STRING);
+        this.stringIndex = stringIndex;
 	}
 
 	/**
@@ -28,14 +27,7 @@ public class StringInfo extends ConstantInfo {
 	}
 
 	@Override
-	public void read(ClassFileStream data) throws IOException {
-		this.stringIndex = data.readShort();
-	}
-
-	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(super.toString()).append("\t#").append(stringIndex);
-		return sb.toString();
+		return super.toString() + "\t#" + stringIndex;
 	}
 }

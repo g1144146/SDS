@@ -2,105 +2,72 @@ package sds.classfile.attributes;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 import static sds.util.DescriptorParser.parse;
 
 /**
- * This adapter class is for
+ * This class is for
  * {@link LocalVariableTable <code>LocalVariableTable</code>}
  * and
  * {@link LocalVariableTypeTable <code>LocalVariableTypeTable</code>}.
  * @author inagaki
  */
-public abstract class LocalVariable extends AttributeInfo {
-	private LVTable[] localVariableTable;
+public class LocalVariable extends AttributeInfo {
+    private int[][] table;
+    private String[] name;
+    private String[] desc;
 
-	/**
-	 * constructor.
-	 * @param type attribute type
-	 */
-	LocalVariable(AttributeType type) {
-		super(type);
-	}
+    /**
+     * constructor.
+     * @param type attribute type
+     * @param data classfile stream
+     * @param pool constant-pool
+     * @throws IOException 
+     */
+    LocalVariable(AttributeType type, ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        super(type);
+        int len = data.readShort();
+        this.table = new int[len][3];
+        this.name = new String[len];
+        this.desc = new String[len];
+        for(int i = 0; i < len; i++) {
+            table[i][0] = data.readShort();
+            table[i][1] = data.readShort();
+            int nameIndex = data.readShort();
+            int descIndex = data.readShort();
+            table[i][2] = data.readShort();
+            
+            name[i] = extract(nameIndex, pool);
+            desc[i] = (descIndex-1 >= 0) ? parse(extract(descIndex, pool)) : "";
+        }
+    }
 
-	/**
-	 * return local variable table.
-	 * @return local variable table
-	 */
-	public LVTable[] getTable() {
-		return localVariableTable;
-	}
+    /**
+     * return local variable table.<br>
+     * when one of array index defines N, the array content is next:<br>
+     * - table[N][0]: start pc<br>
+     * - table[N][1]: length<br>
+     * - table[N][2]: index
+     * @return local variable table
+     */
+    public int[][] getTable() {
+        return table;
+    }
 
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.localVariableTable = new LVTable[data.readShort()];
-		for(int i = 0; i < localVariableTable.length; i++) {
-			localVariableTable[i] = new LVTable(data, pool);
-		}
-	}
-
-	/**
-	 * This class is for local variable table.
-	 */
-	public class LVTable {
-		private int startPc;
-		private int length;
-		private int index;
-		private String name;
-		private String desc;
-
-		LVTable(ClassFileStream data, ConstantPool pool) throws IOException {
-			this.startPc = data.readShort();
-			this.length = data.readShort();
-			int nameIndex = data.readShort();
-			int descIndex = data.readShort();
-			this.index = data.readShort();
-			
-			this.name = extract(pool.get(nameIndex-1), pool);
-			this.desc = (descIndex-1 >= 0) ? parse(extract(pool.get(descIndex-1), pool)) : "";
-		}
-
-		/**
-		 * returns value.<br><br>
-		 * if key is "start_pc", it returns
-		 * start value of ranges in the code array at which
-		 * local variable is active.<br>
-		 * if key is "length", it returns
-		 * range in the code array at which local variable
-		 * is active.<br>
-		 * if key is "index", it returns
-		 * index in the local variable array of
-		 * the current frame.<br>
-		 * by default, it returns -1.
-		 * @param key value name
-		 * @return value
-		 */
-		public int getNumber(String key) {
-			switch(key) {
-				case "start_pc":   return startPc;
-				case "length":     return length;
-				case "index":      return index;
-				default:
-					System.out.println("Invalid key: " + key);
-					return -1;
-			}
-		}
-
-		/**
-		 * returns local variable name.
-		 * @return name
-		 */
-		public String getName() {
-			return name;
-		}
-
-		/**
-		 * returns local variable descriptor.
-		 * @return descriptor
-		 */
-		public String getDesc() {
-			return desc;
-		}
-	}
+    /**
+     * returns local variable names.
+     * @return name
+     */
+    public String[] getName() {
+        return name;
+    }
+    
+    /**
+     * returns local variable descriptors.
+     * @return descriptor
+     */
+    public String[] getDesc() {
+        return desc;
+    }
 }

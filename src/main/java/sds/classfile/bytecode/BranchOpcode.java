@@ -1,8 +1,5 @@
 package sds.classfile.bytecode;
 
-import java.io.IOException;
-import sds.classfile.ClassFileStream;
-
 import static sds.classfile.bytecode.MnemonicTable._goto;
 import static sds.classfile.bytecode.MnemonicTable.goto_w;
 import static sds.classfile.bytecode.MnemonicTable.jsr;
@@ -34,52 +31,49 @@ import static sds.classfile.bytecode.MnemonicTable.jsr_w;
  * @author inagaki
  */
 public class BranchOpcode extends OpcodeInfo {
-	int branch;
+    private int branch;
 
-	/**
-	 * constructor.
-	 * @param opcodeType opcode type
-	 * @param pc index into the code array
-	 */
-	public BranchOpcode(MnemonicTable opcodeType, int pc) {
-		super(opcodeType, pc);
-	}
+    /**
+     * constructor.
+     * @param branch branch bytes
+     * @param opcodeType opcode type
+     * @param pc index into the code array
+     */
+    public BranchOpcode(int branch, MnemonicTable opcodeType, int pc) {
+        super(opcodeType, pc);
+        this.branch = branch;
+    }
 
-	@Override
-	public void read(ClassFileStream data) throws IOException {
-		this.branch = data.readShort();
-	}
+    /**
+     * returns branch bytes.<br>
+     * value of jump point.
+     * @return branch bytes
+     */
+    public int getBranch() {
+        return branch;
+    }
 
-	/**
-	 * returns branch bytes.<br>
-	 * value of jump point.
-	 * @return branch bytes
-	 */
-	public int getBranch() {
-		return branch;
-	}
+    /**
+     * returns whether this opcode is if_xx.
+     * @return in case of this opcode is if_xx, it returns true.
+     * otherwise, it returns false.
+     */
+    public boolean isIf() {
+        return  (opcodeType != _goto) && (opcodeType != goto_w) &&
+                (opcodeType !=   jsr) && (opcodeType !=  jsr_w);
+    }
 
-	/**
-	 * returns whether this opcode is if_xx.
-	 * @return in case of this opcode is if_xx, it returns true.
-	 * otherwise, it returns false.
-	 */
-	public boolean isIf() {
-		return  (opcodeType != _goto) && (opcodeType != goto_w) &&
-				(opcodeType !=   jsr) && (opcodeType !=  jsr_w);
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof BranchOpcode)) {
+            return false;
+        }
+        BranchOpcode opcode = (BranchOpcode)obj;
+        return super.equals(obj) && (branch == opcode.branch);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if(!(obj instanceof BranchOpcode)) {
-			return false;
-		}
-		BranchOpcode opcode = (BranchOpcode)obj;
-		return super.equals(obj) && (branch == opcode.branch);
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ": " + (branch + getPc());
-	}
+    @Override
+    public String toString() {
+        return super.toString() + ": " + (branch + getPc());
+    }
 }

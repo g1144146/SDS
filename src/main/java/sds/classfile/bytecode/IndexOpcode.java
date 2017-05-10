@@ -1,8 +1,5 @@
 package sds.classfile.bytecode;
 
-import java.io.IOException;
-import sds.classfile.ClassFileStream;
-
 /**
  * This class is for opcode has index operand.<br>
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.iload">
@@ -41,41 +38,38 @@ import sds.classfile.ClassFileStream;
  * @author inagakikenichi
  */
 public class IndexOpcode extends OpcodeInfo {
-	private int index;
+    private int index;
 
-	/**
-	 * constructor.
-	 * @param opcodeType opcode type
-	 * @param pc index into the code array
-	 */
-	public IndexOpcode(MnemonicTable opcodeType, int pc) {
-		super(opcodeType, pc);
-	}
+    /**
+     * constructor.
+     * @param index index
+     * @param opcodeType opcode type
+     * @param pc index into the code array
+     */
+    public IndexOpcode(int index, MnemonicTable opcodeType, int pc) {
+        super(opcodeType, pc);
+        this.index = index;
+    }
 
-	@Override
-	public void read(ClassFileStream data) throws IOException {
-		this.index = data.readUnsignedByte();
-	}
+    /**
+     * returns index.
+     * @return index
+     */
+    public int getIndex() {
+        return index;
+    }
 
-	/**
-	 * returns index.
-	 * @return index
-	 */
-	public int getIndex() {
-		return index;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof IndexOpcode)) {
+            return false;
+        }
+        IndexOpcode opcode = (IndexOpcode)obj;
+        return super.equals(obj) && (index == opcode.index);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if(!(obj instanceof IndexOpcode)) {
-			return false;
-		}
-		IndexOpcode opcode = (IndexOpcode)obj;
-		return super.equals(obj) && (index == opcode.index);
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ": " + index;
-	}
+    @Override
+    public String toString() {
+        return super.toString() + ": " + index;
+    }
 }

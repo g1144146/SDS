@@ -1,65 +1,60 @@
 package sds.assemble;
 
-import sds.classfile.attributes.LineNumberTable;
+import java.util.List;
+import java.util.ArrayList;
 import sds.classfile.bytecode.OpcodeInfo;
-import sds.classfile.bytecode.Opcodes;
 
 /**
  * This class is for instructions of a line of method.
  * @author inagaki
  */
 public class LineInstructions {
-	private LineNumberTable.LNTable table;
-	private Opcodes opcodes;
+    private List<OpcodeInfo> opcodes = new ArrayList<>();
 
-	/**
-	 * constructor.
-	 * @param table line number table 
-	 */
-	public LineInstructions(LineNumberTable.LNTable table) {
-		this.table = table;
-		this.opcodes = new Opcodes();
-	}
+    /**
+     * adds opcode.
+     * @param opcode opcode 
+     */
+    public void add(OpcodeInfo opcode) {
+        opcodes.add(opcode);
+    }
 
-	/**
-	 * adds opcode.
-	 * @param opcode opcode 
-	 */
-	public void addOpcode(OpcodeInfo opcode) {
-		opcodes.add(opcode);
-	}
+    /**
+     * returns opcodes of this line.
+     * @return opcodes
+     */
+    public OpcodeInfo[] getOpcodes() {
+        return opcodes.toArray(new OpcodeInfo[0]);
+    }
 
-	/**
-	 * returns line number table.
-	 * @return line number table
-	 */
-	public LineNumberTable.LNTable getTable() {
-		return table;
-	}
+    /**
+     * returns opcode from specified pc.
+     * @param pc index into the code array.
+     * @return opcode
+     */
+    public OpcodeInfo get(int pc) {
+        for(OpcodeInfo op : opcodes) {
+            if(op.getPc() == pc) {
+                return op;
+            }
+        }
+        return null;
+    }
 
-	/**
-	 * returns opcodes of this line.
-	 * @return opcodes
-	 */
-	public Opcodes getOpcodes() {
-		return opcodes;
-	}
+    /**
+     * returns values of pc of opcode.
+     * @return values
+     */
+    public int[] getKeys() {
+        return opcodes.stream().mapToInt(op -> op.getPc()).toArray();
+    }
 
-	/**
-	 * returns opcode from specified pc.
-	 * @param pc index into the code array.
-	 * @return opcode
-	 */
-	public OpcodeInfo get(int pc) {
-		return opcodes.get(pc);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		for(OpcodeInfo op : opcodes.getAll()) {
-			sb.append(op.getPc()).append(":").append(op).append("\n");
-		}
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for(OpcodeInfo op : opcodes) {
+            sb.append(op.getPc()).append(":").append(op).append("\n");
+        }
+        return sb.toString();
+    }
 }
