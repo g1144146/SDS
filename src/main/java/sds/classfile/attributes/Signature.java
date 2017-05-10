@@ -12,10 +12,7 @@ import static sds.util.DescriptorParser.parse;
 public class Signature extends AttributeInfo {
     private String signature;
 
-    /**
-     * constructor.
-     */
-    public Signature(int sigIndex, ConstantInfo[] pool) {
+    Signature(int sigIndex, ConstantInfo[] pool) {
         super(AttributeType.Signature);
         this.signature = extract(sigIndex, pool);
     }

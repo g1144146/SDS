@@ -9,9 +9,7 @@ import static sds.classfile.attributes.annotation.AnnotationParser.parseAnnotati
 
 /**
  * This class is for annotations table.<br>
- * {@link RuntimeVisibleParameterAnnotations <code>RuntimeVisibleParameterAnnotations</code>}
- * and 
- * {@link RuntimeInvisibleParameterAnnotations <code>RuntimeInvisibleParameterAnnotations</code>}
+ * {@link RuntimeParameterAnnotations <code>RuntimeVisibleParameterAnnotations</code>}
  * have item.
  * @author inagaki
  */

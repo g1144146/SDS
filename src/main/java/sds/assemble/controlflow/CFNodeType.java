@@ -34,24 +34,24 @@ public enum CFNodeType {
     
     /**
      * returns type of control flow node.
-     * @param opcodes opcode sequence
+     * @param line line opcode sequence
      * @param end end of opcode
      * @return node type
      */
-    public static CFNodeType getType(LineInstructions opcodes, OpcodeInfo end) {
+    public static CFNodeType getType(LineInstructions line, OpcodeInfo end) {
         CFNodeType type;
-        if((type = searchTypeFromOpcodes(opcodes.getOpcodes(), end)) != Normal) {
+        if((type = searchTypeFromOpcodes(line.getOpcodes(), end)) != Normal) {
             return type;
         }
 
         if((type = searchType(end)) != Normal) {
             return type;
         }
-        
+
         // processing for for-each statement.
         int index = 0;
-        int[] keys = opcodes.getKeys();
-        while((index < keys.length) && (type = searchType(opcodes.get(keys[index]))) == Normal) {
+        int[] keys = line.getKeys();
+        while((index < keys.length) && (type = searchType(line.get(keys[index]))) == Normal) {
             index++;
         }
         return type;

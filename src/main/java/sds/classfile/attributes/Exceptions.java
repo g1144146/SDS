@@ -14,13 +14,7 @@ import sds.classfile.constantpool.ConstantInfo;
 public class Exceptions extends AttributeInfo {
     private String[] exceptionTable;
 
-    /**
-     * constructor.
-     * @param data classfile stream
-     * @param pool constant-pool
-     * @throws IOException 
-     */
-    public Exceptions(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+    Exceptions(ClassFileStream data, ConstantInfo[] pool) throws IOException {
         super(AttributeType.Exceptions);
         this.exceptionTable = new String[data.readShort()];
         for(int i = 0; i < exceptionTable.length; i++) {

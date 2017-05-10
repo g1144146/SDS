@@ -9,11 +9,7 @@ package sds.classfile.constantpool;
 public class ClassInfo extends ConstantInfo {
 	private int nameIndex;
 
-	/**
-     * constructor.
-     * @param nameIndex constant entry index of class name
-     */
-	public ClassInfo(int nameIndex) {
+	ClassInfo(int nameIndex) {
 		super(ConstantType.C_CLASS);
         this.nameIndex = nameIndex;
 	}

@@ -8,7 +8,6 @@ public enum CFEdgeType {
     Normal,
     JumpToCatch,
     JumpToFinally,
-    JumpFromTry,
     TrueBranch,
     FalseBranch;
 }

@@ -9,7 +9,7 @@ import sds.classfile.ClassFileStream;
  * target_info</a> union has.<br>
  * @author inagaki
  */
-public class LocalVarTarget extends AbstractTargetInfo {
+public class LocalVarTarget extends TargetInfo {
     private int[][] table;
 
     LocalVarTarget(ClassFileStream data) throws IOException {

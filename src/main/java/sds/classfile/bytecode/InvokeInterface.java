@@ -14,11 +14,7 @@ import sds.classfile.constantpool.ConstantInfo;
 public class InvokeInterface extends CpRefOpcode {
     private int count;
 
-    /**
-     * constructor.
-     * @param pc index into the code array
-     */
-    public InvokeInterface(ClassFileStream data, ConstantInfo[] pool, int pc) throws IOException {
+    InvokeInterface(ClassFileStream data, ConstantInfo[] pool, int pc) throws IOException {
         super(data.readShort(), pool, MnemonicTable.invokeinterface, pc);
         this.count = data.readUnsignedByte();
         data.skipBytes(1);

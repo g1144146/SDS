@@ -245,7 +245,8 @@ public enum MnemonicTable {
 
     /**
      * returns opcode info.
-     * @param opcode hex of opcode
+     * @param data classfile stream
+     * @param pool constant-pool
      * @param pc index into the code array
      * @return opcode info
      * @throws UndefinedOpcodeException

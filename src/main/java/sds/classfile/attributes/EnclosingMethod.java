@@ -14,13 +14,7 @@ public class EnclosingMethod extends AttributeInfo {
     private String _class;
     private String method;
     
-    /**
-     * constructor.
-     * @param data classfile stream
-     * @param pool constant-pool
-     * @throws IOException 
-     */
-    public EnclosingMethod(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+    EnclosingMethod(ClassFileStream data, ConstantInfo[] pool) throws IOException {
         super(AttributeType.EnclosingMethod);
         this._class = extract(data.readShort(), pool);
         int methodIndex = data.readShort();

@@ -17,6 +17,12 @@ public class MemberInfo implements Info {
     private String[] declaration;
     private AttributeInfo[] attr;
 
+    /**
+     * constructor.
+     * @param data classfile stream
+     * @param pool constant-pool
+     * @throws IOException
+     */
     public MemberInfo(ClassFileStream data, ConstantInfo[] pool) throws IOException {
         int acc = data.readShort();
         int nameIndex = data.readShort();

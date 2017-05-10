@@ -8,7 +8,7 @@ package sds.classfile.attributes.stackmap;
  * which {@link VerificationTypeInfo <code>VerificationTypeInfo</code>}.
  * @author inagaki
  */
-class VerificationTypeInfo {
+public class VerificationTypeInfo {
     private String type;
 
     VerificationTypeInfo(String type) {
@@ -21,11 +21,6 @@ class VerificationTypeInfo {
     }
 }
 
-/**
- * This class is for Object_variable_info which
- * {@link VerificationTypeInfo <code>VerificationTypeInfo</code>}.
- * @author inagaki
- */
 class ObjectVariableInfo extends VerificationTypeInfo {
     private int cpoolIndex;
 
@@ -34,20 +29,11 @@ class ObjectVariableInfo extends VerificationTypeInfo {
         this.cpoolIndex = cpoolIndex;
     }
 
-    /**
-     * returns constant-pool entry index.
-     * @return constant-pool entry index
-     */
     public int getCPoolIndex() {
         return cpoolIndex;
     }
 }
 
-/**
- * This class is for Uninitialized_variable_info which
- * {@link VerificationTypeInfo <code>VerificationTypeInfo</code>}.
- * @author inagaki
- */
 class UninitializedVariableInfo extends VerificationTypeInfo {
     private int offset;
 
@@ -56,10 +42,6 @@ class UninitializedVariableInfo extends VerificationTypeInfo {
         this.offset = offset;
     }
 
-    /**
-     * returns offset.
-     * @return offset
-     */
     public int getOffset() {
         return offset;
     }

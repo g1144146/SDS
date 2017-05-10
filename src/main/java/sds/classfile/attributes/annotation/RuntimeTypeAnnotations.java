@@ -10,7 +10,12 @@ import sds.util.SDSStringBuilder;
 import static sds.classfile.attributes.annotation.AnnotationParser.parseAnnotation;
 
 /**
- * This adapter class is for RuntimeTypeAnnotations Attribute.
+ * This adapter class is for
+ * * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.20">
+ * RuntimeTypeInvisibleAnnotations Attribute</a>
+ * and
+ * * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.21">
+ * RuntimeTypeInvisibleAnnotations Attribute</a>.
  * @author inagaki
  */
 public class RuntimeTypeAnnotations extends AttributeInfo {

@@ -14,9 +14,9 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public abstract class SwitchOpcode extends OpcodeInfo {
-    int defaultByte;
+    private int defaultByte;
 
-    public SwitchOpcode(ClassFileStream data, MnemonicTable opcodeType, int pc) throws IOException {
+    SwitchOpcode(ClassFileStream data, MnemonicTable opcodeType, int pc) throws IOException {
         super(opcodeType, pc);
         for(int i = 1; ((i + pc) % 4) != 0; i++) {
             data.readByte();

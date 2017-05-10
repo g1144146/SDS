@@ -33,13 +33,7 @@ import static sds.classfile.bytecode.MnemonicTable.jsr_w;
 public class BranchOpcode extends OpcodeInfo {
     private int branch;
 
-    /**
-     * constructor.
-     * @param branch branch bytes
-     * @param opcodeType opcode type
-     * @param pc index into the code array
-     */
-    public BranchOpcode(int branch, MnemonicTable opcodeType, int pc) {
+    BranchOpcode(int branch, MnemonicTable opcodeType, int pc) {
         super(opcodeType, pc);
         this.branch = branch;
     }

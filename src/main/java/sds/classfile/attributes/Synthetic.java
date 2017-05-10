@@ -5,10 +5,7 @@ package sds.classfile.attributes;
  * @author inagaki
  */
 public class Synthetic extends AttributeInfo {
-    /**
-     * constructor.
-     */
-    public Synthetic() {
+    Synthetic() {
         super(AttributeType.Synthetic);
     }
 }

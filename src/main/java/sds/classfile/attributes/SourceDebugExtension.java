@@ -3,7 +3,6 @@ package sds.classfile.attributes;
 import java.io.IOException;
 import java.util.StringJoiner;
 import sds.classfile.ClassFileStream;
-import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This class is for
@@ -13,20 +12,11 @@ import sds.classfile.constantpool.ConstantInfo;
  */
 public class SourceDebugExtension extends AttributeInfo {
     private int[] debugExtension;
-    private int attrLen;
 
-    /**
-     * constructor.
-     * @param length debug extension length
-     * @param data classfile stream
-     * @param pool constant-pool
-     * @throws IOException 
-     */
-    public SourceDebugExtension(int length, ClassFileStream data, ConstantInfo[] pool) throws IOException {
+    SourceDebugExtension(int length, ClassFileStream data) throws IOException {
         super(AttributeType.SourceDebugExtension);
-        this.attrLen = length;
-        this.debugExtension = new int[attrLen];
-        for(int i = 0; i < debugExtension.length; i++) {
+        this.debugExtension = new int[length];
+        for(int i = 0; i < length; i++) {
             debugExtension[i] = data.readUnsignedByte();
         }
     }

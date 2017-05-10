@@ -91,13 +91,19 @@ public class AttributeInfoFactory {
             case "Signature":
                 return new Signature(data.readShort(), pool);
             case "SourceDebugExtension":
-                return new SourceDebugExtension(length, data, pool);
+                return new SourceDebugExtension(length, data);
             case "SourceFile":
                 return new SourceFile(data, pool);
             case "Synthetic":
                 return new Synthetic();
             default:
                 throw new AttributeTypeException(attrName);
+        }
+    }
+
+    class AttributeTypeException extends RuntimeException {
+        AttributeTypeException(String type) {
+            super(type);
         }
     }
 }

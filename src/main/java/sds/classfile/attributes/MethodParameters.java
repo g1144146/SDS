@@ -16,13 +16,7 @@ import static sds.util.AccessFlags.get;
 public class MethodParameters extends AttributeInfo {
     private String[][] params;
 
-    /**
-     * constructor.
-     * @param data classfile stream
-     * @param pool constant-pool
-     * @throws IOException 
-     */
-    public MethodParameters(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+    MethodParameters(ClassFileStream data, ConstantInfo[] pool) throws IOException {
         super(AttributeType.MethodParameters);
         this.params = new String[data.readByte()][2];
         for(int i = 0; i < params.length; i++) {

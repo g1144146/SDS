@@ -168,8 +168,7 @@ public class ClassFileReaderTest {
             
             // runtime visible parameter annotations , and items of that.
             RuntimeParameterAnnotations ra = (RuntimeParameterAnnotations)itr[6];
-            assertThat(ra.getParamAnnotations()[0].getAnnotations()[0]
-                    , is("@sds.RuntimeAnnotation(value = \"method_arg\")"));
+            assertThat(ra.getParamAnnotations()[0][0], is("@sds.RuntimeAnnotation(value = \"method_arg\")"));
         }
         
         // attributes which class has.

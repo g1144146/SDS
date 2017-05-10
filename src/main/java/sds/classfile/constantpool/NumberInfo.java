@@ -46,11 +46,7 @@ public abstract class NumberInfo extends ConstantInfo {
  * Constant_Integer_Info</a>.
  */
 class IntInfo extends NumberInfo {
-    /**
-     * constructor.
-     * @param value int value
-     */
-    public IntInfo(int value) {
+    IntInfo(int value) {
         super(C_INTEGER, value);
     }
     
@@ -70,11 +66,7 @@ class IntInfo extends NumberInfo {
  * Constant_Float_Info</a>.
  */
 class FloatInfo extends NumberInfo {
-    /**
-     * constructor.
-     * @param value float value
-     */
-    public FloatInfo(float value) {
+    FloatInfo(float value) {
         super(C_FLOAT, value);
     }
     
@@ -94,11 +86,7 @@ class FloatInfo extends NumberInfo {
  * @author inagaki
  */
 class LongInfo extends NumberInfo {
-    /**
-     * constructor.
-     * @param value long value
-     */
-    public LongInfo(long value) {
+    LongInfo(long value) {
         super(C_LONG, value);
     }
     
@@ -118,11 +106,7 @@ class LongInfo extends NumberInfo {
  * @author inagaki
  */
 class DoubleInfo extends NumberInfo {
-    /**
-     * constructor.
-     * @param value double value
-     */
-    public DoubleInfo(double value) {
+    DoubleInfo(double value) {
         super(C_DOUBLE, value);
     }
     

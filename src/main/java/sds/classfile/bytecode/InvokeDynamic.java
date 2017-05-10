@@ -12,11 +12,7 @@ import sds.classfile.constantpool.ConstantInfo;
  * @author inagaki
  */
 public class InvokeDynamic extends CpRefOpcode {
-    /**
-     * constructor.
-     * @param pc index into the code array
-     */
-    public InvokeDynamic(ClassFileStream data, ConstantInfo[] pool, int pc) throws IOException {
+    InvokeDynamic(ClassFileStream data, ConstantInfo[] pool, int pc) throws IOException {
         super(data.readShort(), pool, MnemonicTable.inovokedynamic, pc);
         data.skipBytes(2);
     }

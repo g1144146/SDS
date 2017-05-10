@@ -13,9 +13,8 @@ public class TargetInfoFactory {
      * @param data classfile stream
      * @return target info
      * @throws IOException
-     * @throws TargetTypeException 
      */
-    public TargetInfo create(ClassFileStream data) throws IOException, TargetTypeException {
+    public TargetInfo create(ClassFileStream data) throws IOException {
         int targetType = data.readUnsignedByte();
         switch(targetType) {
             case 0x00:
@@ -41,6 +40,12 @@ public class TargetInfoFactory {
             case 0x4A:
             case 0x4B: return new TypeArgumentTarget(data.readShort(), data.readUnsignedByte());
             default:   throw  new TargetTypeException(targetType);
+        }
+    }
+
+    class TargetTypeException extends RuntimeException {
+        TargetTypeException(int targetType) {
+            super(Integer.toString(targetType));
         }
     }
 }

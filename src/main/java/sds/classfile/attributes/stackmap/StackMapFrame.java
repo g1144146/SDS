@@ -35,10 +35,6 @@ class SameFrame implements StackMapFrame {
         this.tag = tag;
     }
 
-    /**
-     * returns verification type info.
-     * @return verification type info
-     */
     public VerificationTypeInfo getStack() {
         if(stack == null) {
             throw new UnsupportedOperationException("Not supported yet.");
@@ -85,10 +81,6 @@ class SameLocals1StackItemFrameExtended extends SameFrame {
         this.stack = factory.create(data);
     }
 
-    /**
-     * returns offset.
-     * @return offset
-     */
     public int getOffset() {
         return offset;
     }
@@ -108,18 +100,10 @@ class ChopFrame extends SameFrame {
         this.offset = offset;
     }
 
-    /**
-     * returns offset.
-     * @return offset
-     */
     public int getOffset() {
         return offset;
     }
 
-    /**
-     * returns verification type info.
-     * @return verification type info
-     */
     public VerificationTypeInfo[] getLocals() {
         if(locals == null) {
             throw new UnsupportedOperationException("Not supported yet.");
@@ -134,7 +118,7 @@ class ChopFrame extends SameFrame {
 }
 
 class AppendFrame extends ChopFrame {
-    AppendFrame(int tag, ClassFileStream data) throws IOException, VerificationTypeException {
+    AppendFrame(int tag, ClassFileStream data) throws IOException {
         super(StackMapFrameType.AppendFrame, tag, data.readShort());
         this.locals = new VerificationTypeInfo[tag - 251];
         VerificationTypeInfoFactory factory = new VerificationTypeInfoFactory();
@@ -152,7 +136,7 @@ class AppendFrame extends ChopFrame {
 class FullFrame extends ChopFrame {
     private VerificationTypeInfo[] stacks;
 
-    FullFrame(int tag, ClassFileStream data) throws IOException, VerificationTypeException {
+    FullFrame(int tag, ClassFileStream data) throws IOException {
         super(StackMapFrameType.FullFrame, tag, data.readShort());
         VerificationTypeInfoFactory factory = new VerificationTypeInfoFactory();
         this.locals = new VerificationTypeInfo[data.readShort()];
@@ -165,10 +149,6 @@ class FullFrame extends ChopFrame {
         }
     }
 
-    /**
-     * returns verification type info of stack.
-     * @return verificatino type info
-     */
     public VerificationTypeInfo[] getStacks() {
         return stacks;
     }

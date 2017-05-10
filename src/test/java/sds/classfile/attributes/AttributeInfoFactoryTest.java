@@ -47,9 +47,4 @@ public class AttributeInfoFactoryTest {
 //		assertThat(b.create(LocalVariableTypeTable.toString(), 0).getType(), is(LocalVariableTypeTable));
 //		assertThat(b.create(Deprecated.toString(), 0).getType(), is(Deprecated));
 	}
-
-//	@Test(expected = AttributeTypeException.class)
-//	public void testException() throws Exception {
-//		b.create("excpetion", 0);
-//	}
 }

@@ -11,8 +11,11 @@ import static sds.classfile.attributes.annotation.AnnotationParser.parseAnnotati
 
 /**
  * This adapter class is for
- * {@link RuntimeVisibleAnnotations <code>RuntimeVisibleAnnotations</code>} and 
- * {@link RuntimeInvisibleAnnotations <code>RuntimeInvisibleAnnotations</code>}.
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.16">
+ * RuntimeVisibleAnnotations Attribute</a>
+ * and
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.17">
+ * RuntimeInvisibleAnnotations Attribute</a>.
  * @author inagaki
  */
 public class RuntimeAnnotations extends AttributeInfo {

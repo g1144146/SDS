@@ -12,12 +12,7 @@ import sds.classfile.ClassFileStream;
 public class LineNumberTable extends AttributeInfo {
     private int[][] table;
 
-    /**
-     * constructor.
-     * @param data classfile stream
-     * @throws IOException 
-     */
-    public LineNumberTable(ClassFileStream data) throws IOException {
+    LineNumberTable(ClassFileStream data) throws IOException {
         super(AttributeType.LineNumberTable);
         this.table = new int[data.readShort()][3];
         for(int i = 0; i < table.length; i++) {

@@ -5,8 +5,7 @@ import sds.classfile.ClassFileStream;
 
 /**
  * This class is for annotations table.<br>
- * {@link RuntimeVisibleTypeAnnotations <code>RuntimeVisibleTypeAnnotations</code>} and 
- * {@link RuntimeInvisibleTypeAnnotations <code>RuntimeInvisibleTypeAnnotations</code>} have item.
+ * {@link RuntimeTypeAnnotations <code>RuntimeVisibleTypeAnnotations</code>} and
  * @author inagaki
  */
 public class TypeAnnotation extends Annotation {

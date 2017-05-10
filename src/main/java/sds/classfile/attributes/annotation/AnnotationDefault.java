@@ -24,12 +24,8 @@ public class AnnotationDefault extends AttributeInfo {
      */
     public AnnotationDefault(ClassFileStream data, ConstantInfo[] pool) throws IOException {
         super(AttributeType.AnnotationDefault);
-        try {
-            ElementValue value = new ElementValue(data);
-            this.defaultValue = parseElementValue(value, new SDSStringBuilder(), pool);
-        } catch(ElementValueException e) {
-            e.printStackTrace();
-        }
+        ElementValue value = new ElementValue(data);
+        this.defaultValue = parseElementValue(value, new SDSStringBuilder(), pool);
     }
 
     /**

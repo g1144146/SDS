@@ -13,7 +13,7 @@ public class ClassDecompiler extends AbstractDecompiler {
      * constructor.
      * @param result decompiled source
      */
-    public ClassDecompiler(DecompiledResult result) {
+    ClassDecompiler(DecompiledResult result) {
         super(result);
     }
 

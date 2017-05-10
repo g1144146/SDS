@@ -7,27 +7,23 @@ package sds.classfile.constantpool;
  * @author inagaki
  */
 public class Utf8Info extends ConstantInfo {
-	private String value;
-	
-	/**
-     * constructor.
-     * @param value string of this constant info has
-     */
-	public Utf8Info(String value) {
-		super(ConstantType.C_UTF8);
+    private String value;
+    
+    Utf8Info(String value) {
+        super(ConstantType.C_UTF8);
         this.value = value;
-	}
+    }
 
-	/**
-	 * returns string of this constant info has.
-	 * @return string
-	 */
-	public String getValue() {
-		return value;
-	}
+    /**
+     * returns string of this constant info has.
+     * @return string
+     */
+    public String getValue() {
+        return value;
+    }
 
-	@Override
-	public String toString() {
-		return super.toString() + "\t" + value;
-	}
+    @Override
+    public String toString() {
+        return super.toString() + "\t" + value;
+    }
 }

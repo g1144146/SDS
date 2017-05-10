@@ -5,13 +5,21 @@ import sds.classfile.ClassFileStream;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeType;
 import sds.classfile.constantpool.ConstantInfo;
+import sds.util.SDSStringBuilder;
+
+import static sds.classfile.attributes.annotation.AnnotationParser.parseAnnotation;
 
 /**
- * This adapter class is for RuntimeParameterAnnotations Attribute.
+ * This adapter class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.18">
+ * RuntimeParameterInvisibleAnnotations Attribute</a>
+ * and
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.19">
+ * RuntimeParameterInvisibleAnnotations Attribute</a>.
  * @author inagaki
  */
 public class RuntimeParameterAnnotations extends AttributeInfo {
-    private ParameterAnnotations[] parameterAnnotations;
+    private String[][] parameterAnnotations;
 
     /**
      * constructor.
@@ -22,9 +30,13 @@ public class RuntimeParameterAnnotations extends AttributeInfo {
      */
     public RuntimeParameterAnnotations(AttributeType type, ClassFileStream data, ConstantInfo[] pool) throws IOException {
         super(type);
-        this.parameterAnnotations = new ParameterAnnotations[data.readByte()];
+        this.parameterAnnotations = new String[data.readByte()][];
         for(int i = 0; i < parameterAnnotations.length; i++) {
-            parameterAnnotations[i] = new ParameterAnnotations(data, pool);
+            String[] annotations = new String[data.readShort()];
+            for(int j = 0; j < annotations.length; j++) {
+                annotations[j] = parseAnnotation(new Annotation(data), new SDSStringBuilder(), pool);
+            }
+            parameterAnnotations[i] = annotations;
         }
     }
 
@@ -32,7 +44,7 @@ public class RuntimeParameterAnnotations extends AttributeInfo {
      * returns runtime parameter annotations.
      * @return runtime parameter annotations
      */
-    public ParameterAnnotations[] getParamAnnotations() {
+    public String[][] getParamAnnotations() {
         return parameterAnnotations;
     }
 }

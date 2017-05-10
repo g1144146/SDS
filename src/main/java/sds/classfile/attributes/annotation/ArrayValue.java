@@ -10,7 +10,7 @@ import sds.classfile.ClassFileStream;
 public class ArrayValue {
     private ElementValue[] values;
 
-    ArrayValue(ClassFileStream data) throws IOException, ElementValueException {
+    ArrayValue(ClassFileStream data) throws IOException {
         this.values = new ElementValue[data.readShort()];
         for(int i = 0; i < values.length; i++) {
             values[i] = new ElementValue(data);

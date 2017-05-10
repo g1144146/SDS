@@ -15,11 +15,7 @@ public class Wide extends OpcodeInfo {
     private int constByte = -1;
     private CpRefOpcode ref;
 
-    /**
-     * constructor.
-     * @param pc index into the code array
-     */
-    public Wide(ClassFileStream data, ConstantInfo[] pool, int pc) throws IOException {
+    Wide(ClassFileStream data, ConstantInfo[] pool, int pc) throws IOException {
         super(MnemonicTable.wide, pc);
         int tag = data.readByte();
         if(data.readByte() == MnemonicTable.ldc.getOpcode()) {

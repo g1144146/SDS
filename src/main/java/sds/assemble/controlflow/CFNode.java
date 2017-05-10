@@ -240,64 +240,6 @@ public class CFNode {
     }
 
     /**
-     * adds parent node of this.
-     * @param parent parent node
-     */
-    public void addParent(CFNode parent) {
-        addParent(parent, CFEdgeType.Normal);
-    }
-
-    /**
-     * adds parent node of this.
-     * @param parent parent node
-     * @param type edge type
-     */
-    public void addParent(CFNode parent, CFEdgeType type) {
-        if(equals(parent)) {
-            return;
-        }
-        if(!isRoot()) {
-            CFEdge edge = new CFEdge(this, parent, type);
-            if(parents.isEmpty()) {
-                this.immediateDominator = parent;
-                this.parents.add(edge);
-            } else {
-                if(!parents.contains(edge)) {
-                    parents.add(edge);
-                }
-            }
-        }
-    }
-
-    /**
-     * adds child node of this.
-     * @param child child node
-     */
-    public void addChild(CFNode child) {
-        addChild(child, CFEdgeType.Normal);
-    }
-
-    /**
-     * adds child node of this.
-     * @param child child node
-     * @param type edge type
-     */
-    public void addChild(CFNode child, CFEdgeType type) {
-        if(equals(child)) {
-            return;
-        }
-        CFEdge edge = new CFEdge(this, child, type);
-        if(check(this, OneLineEntry, OneLineEntryBreak)) {
-            children.remove(edge);
-            children.add(edge);
-        } else {
-            if(!children.contains(edge)) {
-                children.add(edge);
-            }
-        }
-    }
-
-    /**
      * returns whether specified pc is in range of opcode pc of this opcodes.
      * @param pc index into code array
      * @return if specified pc is in range of opcode pc, this method returns true.<br>
@@ -305,15 +247,6 @@ public class CFNode {
      */
     public boolean isInPcRange(int pc) {
         return start.getPc() <= pc && pc <= end.getPc();
-    }
-
-    /**
-     * returns whether this node is root.
-     * @return if this node is root, this method returns true.<br>
-     * Otherwise, this method returns false.
-     */
-    public boolean isRoot() {
-        return start.getPc() == 0;
     }
 
     /**
@@ -330,6 +263,46 @@ public class CFNode {
      */
     public OpcodeInfo getEnd() {
         return end;
+    }
+
+    void addParent(CFNode parent, CFEdgeType type) {
+        if(equals(parent)) {
+            return;
+        }
+        if(!isRoot()) {
+            CFEdge edge = new CFEdge(this, parent, type);
+            if(parents.isEmpty()) {
+                this.immediateDominator = parent;
+                this.parents.add(edge);
+            } else {
+                if(!parents.contains(edge)) {
+                    parents.add(edge);
+                }
+            }
+        }
+    }
+
+    void addChild(CFNode child) {
+        addChild(child, CFEdgeType.Normal);
+    }
+
+    void addChild(CFNode child, CFEdgeType type) {
+        if(equals(child)) {
+            return;
+        }
+        CFEdge edge = new CFEdge(this, child, type);
+        if(check(this, OneLineEntry, OneLineEntryBreak)) {
+            children.remove(edge);
+            children.add(edge);
+        } else {
+            if(!children.contains(edge)) {
+                children.add(edge);
+            }
+        }
+    }
+
+    boolean isRoot() {
+        return start.getPc() == 0;
     }
 
     @Override

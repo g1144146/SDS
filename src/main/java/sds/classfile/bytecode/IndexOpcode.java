@@ -40,13 +40,7 @@ package sds.classfile.bytecode;
 public class IndexOpcode extends OpcodeInfo {
     private int index;
 
-    /**
-     * constructor.
-     * @param index index
-     * @param opcodeType opcode type
-     * @param pc index into the code array
-     */
-    public IndexOpcode(int index, MnemonicTable opcodeType, int pc) {
+    IndexOpcode(int index, MnemonicTable opcodeType, int pc) {
         super(opcodeType, pc);
         this.index = index;
     }

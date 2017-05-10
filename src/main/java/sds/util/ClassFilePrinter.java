@@ -242,9 +242,9 @@ public class ClassFilePrinter extends Printer {
                 println(indent + info);
                 RuntimeParameterAnnotations rvpa = (RuntimeParameterAnnotations)info;
                 int rvpaIndex = 1;
-                for(ParameterAnnotations pa : rvpa.getParamAnnotations()) {
+                for(String[] pa : rvpa.getParamAnnotations()) {
                     println(indent + indent + rvpaIndex + ".");
-                    for(String a : pa.getAnnotations()) {
+                    for(String a : pa) {
                         println(indent + indent + indent + a);
                     }
                     rvpaIndex++;

@@ -54,7 +54,7 @@ public class DominatorNodeSearcher {
         System.out.println("\n*** problem nodes ***");
         System.out.println(node1);
         System.out.println(node2);
-        throw new CFNodeException("not found common dominator node between "
+        throw new RuntimeException("not found common dominator node between "
                     + node1.getStart().getPc() + "-" + node1.getEnd().getPc()
                     + " and "
                     + node2.getStart().getPc() + "-" + node2.getEnd().getPc());

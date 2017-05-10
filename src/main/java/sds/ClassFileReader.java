@@ -21,11 +21,7 @@ public class ClassFileReader {
     private ClassFileStream stream;
     private ClassFile cf = new ClassFile();
 
-    /**
-     * constructor for classfile.
-     * @param fileName classfile name
-     */
-    public ClassFileReader(String fileName) {
+    ClassFileReader(String fileName) {
         try {
             RandomAccessFile raf = new RandomAccessFile(fileName, "r");
             this.stream = new ClassFileStream(raf);
@@ -34,11 +30,7 @@ public class ClassFileReader {
         }
     }
 
-    /**
-     * constructor for jar file.
-     * @param input
-     */
-    public ClassFileReader(InputStream input) {
+    ClassFileReader(InputStream input) {
         try {
             this.stream = new ClassFileStream(input);
         } catch(IOException e) {
@@ -46,10 +38,7 @@ public class ClassFileReader {
         }
     }
 
-    /**
-     * reads classfile.
-     */
-    public void read() {
+    void read() {
         try {
             cf.magicNumber = stream.readInt(); // 4byte
             cf.minorVersion = stream.readShort(); // 2byte

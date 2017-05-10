@@ -5,12 +5,7 @@ package sds;
  * @author inagaki
  */
 public class Main {
-
-    /**
-     * constructor.
-     * @param args command line arguments
-     */
-    public Main(String[] args) {
+    Main(String[] args) {
         SDS sds = new SDS(args);
         sds.run();
     }

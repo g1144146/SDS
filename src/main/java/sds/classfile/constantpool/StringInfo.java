@@ -7,27 +7,23 @@ package sds.classfile.constantpool;
  * @author inagaki
  */
 public class StringInfo extends ConstantInfo {
-	private int stringIndex;
+    private int stringIndex;
 
-	/**
-     * constructor.
-     * @param stringIndex constant-pool entry index of string
-     */
-	public StringInfo(int stringIndex) {
-		super(ConstantType.C_STRING);
+    StringInfo(int stringIndex) {
+        super(ConstantType.C_STRING);
         this.stringIndex = stringIndex;
-	}
+    }
 
-	/**
-	 * returns constant-pool entry index of string.
-	 * @return constant-pool entry index of string
-	 */
-	public int getStringIndex() {
-		return stringIndex;
-	}
+    /**
+     * returns constant-pool entry index of string.
+     * @return constant-pool entry index of string
+     */
+    public int getStringIndex() {
+        return stringIndex;
+    }
 
-	@Override
-	public String toString() {
-		return super.toString() + "\t#" + stringIndex;
-	}
+    @Override
+    public String toString() {
+        return super.toString() + "\t#" + stringIndex;
+    }
 }

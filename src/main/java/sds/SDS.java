@@ -19,11 +19,7 @@ public class SDS {
     private List<String> classFiles;
     private JarFile jar;
 
-    /**
-     * constructor.
-     * @param args command line arguments
-     */
-    public SDS(String[] args) {
+    SDS(String[] args) {
         this.classFiles = new ArrayList<>();
         for(String arg : args) {
             parseArg(arg);

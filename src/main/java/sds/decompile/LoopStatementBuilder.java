@@ -35,7 +35,9 @@ public class LoopStatementBuilder {
 
     /**
      * adds comparing context.
-     * @param context comparing context.
+     * @param expr expression
+     * @param type expression type
+     * @param cmpOperator comparing operator
      * @param node node has the context
      */
     public void accept(String expr, String type, String cmpOperator, CFNode node) {

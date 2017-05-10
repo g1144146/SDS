@@ -8,7 +8,7 @@ import sds.assemble.BaseContent;
  */
 public interface Decompiler {
     /**
-     * decompiles specified contents.
+     * decompiles specified content.
      * @param content decompile target content
      */
     void decompile(BaseContent content);

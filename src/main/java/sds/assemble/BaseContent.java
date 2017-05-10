@@ -30,7 +30,7 @@ public abstract class BaseContent {
      * @param info attribute
      * @param pool constant-pool
      */
-    public void analyzeAttribute(AttributeInfo info, ConstantInfo[] pool) {
+    void analyzeAttribute(AttributeInfo info, ConstantInfo[] pool) {
         switch(info.getType()) {
             case Deprecated: break;
             case RuntimeVisibleAnnotations:

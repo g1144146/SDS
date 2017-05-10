@@ -19,16 +19,12 @@ public abstract class AbstractDecompiler implements Decompiler {
     void addAnnotation(AnnotationContent annotation) {
         if(annotation != null) {
             // runtime visible annotation
-            if(annotation.getAnnotations(true).length > 0) {
-                for(String ann : annotation.getAnnotations(true)) {
-                    result.write(ann);
-                }
+            for(String ann : annotation.getAnnotations(true)) {
+                result.write(ann);
             }
             // runtime invisible annotation
-            if(annotation.getAnnotations(false).length > 0) {
-                for(String ann : annotation.getAnnotations(false)) {
-                    result.write(ann);
-                }
+            for(String ann : annotation.getAnnotations(false)) {
+                result.write(ann);
             }
         }
     }

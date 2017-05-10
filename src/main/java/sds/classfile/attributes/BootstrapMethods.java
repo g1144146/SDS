@@ -14,13 +14,7 @@ public class BootstrapMethods extends AttributeInfo {
     private String[] bsmRef;
     private String[][] bootstrapArgs;
 
-    /**
-     * constructor.
-     * @param data classfile stream
-     * @param pool constant-pool
-     * @throws IOException 
-     */
-    public BootstrapMethods(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+    BootstrapMethods(ClassFileStream data, ConstantInfo[] pool) throws IOException {
         super(AttributeType.BootstrapMethods);
         int len = data.readShort();
         this.bsmRef = new String[len];

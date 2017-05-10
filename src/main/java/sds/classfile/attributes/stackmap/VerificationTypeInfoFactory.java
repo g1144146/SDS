@@ -14,7 +14,6 @@ public class VerificationTypeInfoFactory {
      * @param data classfile stream
      * @return verification type info
      * @throws IOException
-     * @throws VerificationTypeException 
      */
     public VerificationTypeInfo create(ClassFileStream data) throws IOException {
         int tag = data.readUnsignedByte();
@@ -29,6 +28,12 @@ public class VerificationTypeInfoFactory {
             case 7: return new ObjectVariableInfo(data.readShort());
             case 8: return new UninitializedVariableInfo(data.readShort());
             default: throw new VerificationTypeException(tag);
+        }
+    }
+
+    class VerificationTypeException extends RuntimeException {
+        VerificationTypeException(int tag) {
+            super(Integer.toString(tag));
         }
     }
 }

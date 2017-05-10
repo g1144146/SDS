@@ -15,12 +15,7 @@ import static sds.util.DescriptorParser.parse;
 public class FieldContent extends MemberContent {
     private String constVal;
 
-    /**
-     * constructor.
-     * @param info field info
-     * @param pool constant-pool
-     */
-    public FieldContent(MemberInfo info, ConstantInfo[] pool) {
+    FieldContent(MemberInfo info, ConstantInfo[] pool) {
         super(info, pool);
         for(AttributeInfo a : info.getAttr()) {
             analyzeAttribute(a, pool);
@@ -28,7 +23,7 @@ public class FieldContent extends MemberContent {
     }
 
     @Override
-    public void analyzeAttribute(AttributeInfo info, ConstantInfo[] pool) {
+    void analyzeAttribute(AttributeInfo info, ConstantInfo[] pool) {
         switch(info.getType()) {
             case ConstantValue:
                 ConstantValue cv = (ConstantValue)info;

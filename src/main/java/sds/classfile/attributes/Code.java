@@ -22,13 +22,7 @@ public class Code extends AttributeInfo {
     private String[] catchTable;
     private AttributeInfo[] attr;
 
-    /**
-     * constructor.
-     * @param data classfile stream
-     * @param pool constant-pool
-     * @throws IOException 
-     */
-    public Code(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+    Code(ClassFileStream data, ConstantInfo[] pool) throws IOException {
         super(AttributeType.Code);
         this.maxStack = data.readShort();
         this.maxLocals = data.readShort();

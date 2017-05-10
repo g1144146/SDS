@@ -10,11 +10,7 @@ package sds.classfile.bytecode;
 public class NewArray extends OpcodeInfo {
     private String atype;
 
-    /**
-     * constructor.
-     * @param pc index into the code array
-     */
-    public NewArray(int type, int pc) {
+    NewArray(int type, int pc) {
         super(MnemonicTable.newarray, pc);
         switch(type) {
             case 4:  this.atype = "boolean"; break;

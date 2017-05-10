@@ -50,12 +50,7 @@ public class MethodDecompiler extends AbstractDecompiler {
     private final int CATCH   = 0x02;
     private final int FINALLY = 0x04;
 
-    /**
-     * constructor.
-     * @param result decompiled source
-     * @param caller caller class has this method
-     */
-    public MethodDecompiler(DecompiledResult result, String caller) {
+    MethodDecompiler(DecompiledResult result, String caller) {
         super(result);
         this.caller = caller;
     }
@@ -1149,25 +1144,25 @@ public class MethodDecompiler extends AbstractDecompiler {
         private StringBuilder sb;
         private List<String> list;
 
-        public LineBuilder() {
+        LineBuilder() {
             this.sb = new StringBuilder();
             this.list = new ArrayList<>();
         }
 
-        public int dumppedSize() {
+        int dumppedSize() {
             return list.size();
         }
 
-        public String[] getDumpped() {
+        String[] getDumpped() {
             return list.toArray(new String[0]);
         }
 
-        public StringBuilder append(String s) {
+        StringBuilder append(String s) {
             list.add(s);
             return sb.append(s);
         }
 
-        public StringBuilder append(String... strs) {
+        StringBuilder append(String... strs) {
             StringBuilder sb = new StringBuilder();
             for(String s : strs) {
                 sb.append(s);
@@ -1176,12 +1171,12 @@ public class MethodDecompiler extends AbstractDecompiler {
             return this.sb.append(sb.toString());
         }
 
-        public void delete() {
+        void delete() {
             list.clear();
             sb.delete(0, sb.length());
         }
 
-        public int length() {
+        int length() {
             return sb.length();
         }
 

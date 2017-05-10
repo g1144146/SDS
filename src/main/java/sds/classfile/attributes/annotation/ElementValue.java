@@ -15,7 +15,7 @@ public class ElementValue {
     private Annotation annotationValue;
     private ArrayValue arrayValue;
 
-    ElementValue(ClassFileStream data) throws IOException, ElementValueException {
+    ElementValue(ClassFileStream data) throws IOException {
         this.tag = (char)data.readByte();
         switch(tag) {
             case 'B':
@@ -31,7 +31,7 @@ public class ElementValue {
             case 'c': this.classInfoIndex  = data.readShort();         break;
             case '@': this.annotationValue = new Annotation(data);     break;
             case '[': this.arrayValue      = new ArrayValue(data);     break;
-            default:  throw new ElementValueException(tag);
+            default:  throw new RuntimeException("unknown tag: " + tag + ".");
         }
     }
 

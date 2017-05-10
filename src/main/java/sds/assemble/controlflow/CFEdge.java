@@ -11,22 +11,7 @@ public class CFEdge {
     private CFNode source;
     private CFEdgeType type;
 
-    /**
-     * constructor.
-     * @param source source node
-     * @param dest destination node
-     */
-    public CFEdge(CFNode source, CFNode dest) {
-        this(source, dest, Normal);
-    }
-
-    /**
-     * constructor.
-     * @param source source node
-     * @param dest destination node
-     * @param type edge type
-     */
-    public CFEdge(CFNode source, CFNode dest, CFEdgeType type) {
+    CFEdge(CFNode source, CFNode dest, CFEdgeType type) {
         this.source = source;
         this.dest = dest;
         this.type = type;

@@ -13,8 +13,6 @@ public class StackMapFrameFactory {
      * @param data classfile stream
      * @return stack-map-frame
      * @throws IOException
-     * @throws StackMapFrameException 
-     * @throws sds.classfile.attributes.stackmap.VerificationTypeException 
      */
     public StackMapFrame create(ClassFileStream data) throws IOException {
         int tag = data.readUnsignedByte();
@@ -43,5 +41,15 @@ public class StackMapFrameFactory {
             return new FullFrame(tag, data);
         }
         throw new StackMapFrameException(tag);
+    }
+
+    class StackMapFrameException extends RuntimeException {
+        StackMapFrameException(int tag) {
+            super(Integer.toString(tag));
+        }
+
+        StackMapFrameException(String message) {
+            super(message);
+        }
     }
 }

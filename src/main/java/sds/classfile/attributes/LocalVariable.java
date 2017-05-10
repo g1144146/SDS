@@ -8,9 +8,11 @@ import static sds.util.DescriptorParser.parse;
 
 /**
  * This class is for
- * {@link LocalVariableTable <code>LocalVariableTable</code>}
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.13">
+ * LocalVariableTable Attribute</a>.
  * and
- * {@link LocalVariableTypeTable <code>LocalVariableTypeTable</code>}.
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.14">
+ * LocalVariableTypeTable Attribute</a>.
  * @author inagaki
  */
 public class LocalVariable extends AttributeInfo {
@@ -18,13 +20,6 @@ public class LocalVariable extends AttributeInfo {
     private String[] name;
     private String[] desc;
 
-    /**
-     * constructor.
-     * @param type attribute type
-     * @param data classfile stream
-     * @param pool constant-pool
-     * @throws IOException 
-     */
     LocalVariable(AttributeType type, ClassFileStream data, ConstantInfo[] pool) throws IOException {
         super(type);
         int len = data.readShort();

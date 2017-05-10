@@ -8,8 +8,6 @@ import sds.classfile.attributes.EnclosingMethod;
 import sds.classfile.attributes.InnerClasses;
 import sds.classfile.attributes.SourceFile;
 import sds.classfile.attributes.annotation.RuntimeTypeAnnotations;
-import sds.classfile.attributes.annotation.RuntimeTypeAnnotations;
-import sds.classfile.attributes.annotation.SuperTypeTarget;
 import sds.classfile.attributes.annotation.TargetInfo;
 import sds.classfile.constantpool.ConstantInfo;
 import static sds.util.AccessFlags.get;
@@ -63,26 +61,15 @@ public class ClassContent extends BaseContent {
             fields[arrayIndex++] = new FieldContent(f, pool);
         }
 
-        InnerClasses ic = null;
         for(AttributeInfo info : cf.getAttr()) {
-            if(info instanceof InnerClasses) {
-                ic = (InnerClasses)info;
-            }
             analyzeAttribute(info, pool);
-        }
-        if(ic != null) {
-            this.nested = new NestedClass[ic.getClasses().length];
-            String[][] c = ic.getClasses();
-            for(int i = 0; i < c.length; i++) {
-                nested[i] = new NestedClass(c[i]);
-            }
         }
     }
 
-    public ClassContent() {}
+    ClassContent() {}
 
     @Override
-    public void analyzeAttribute(AttributeInfo info, ConstantInfo[] pool) {
+    void analyzeAttribute(AttributeInfo info, ConstantInfo[] pool) {
         switch(info.getType()) {
             case BootstrapMethods:
                 BootstrapMethods bsm = (BootstrapMethods)info;
@@ -103,12 +90,11 @@ public class ClassContent extends BaseContent {
                 break;
             case InnerClasses:
                 InnerClasses ic = (InnerClasses)info;
-//                for(InnerClasses.Classes c : ic.getClasses()) {
-//                    int inner = c.getNumber("inner");
-//                    int outer = c.getNumber("outer");
-//                    int name = c.getNumber("inner_name");
-//                    int accessFlag = c.getNumber("access_flag");
-//                }
+                this.nested = new NestedClass[ic.getClasses().length];
+                String[][] c = ic.getClasses();
+                for(int i = 0; i < c.length; i++) {
+                    nested[i] = new NestedClass(c[i]);
+                }
                 break;
             case RuntimeVisibleTypeAnnotations:
                 RuntimeTypeAnnotations rvta = (RuntimeTypeAnnotations)info;
@@ -187,7 +173,7 @@ public class ClassContent extends BaseContent {
 
     /**
      * returns this class.
-     * @return 
+     * @return this class
      */
     public String getThisClass() {
         return thisClass;
@@ -195,7 +181,7 @@ public class ClassContent extends BaseContent {
 
     /**
      * returns super class of this class.
-     * @return 
+     * @return super class
      */
     public String getSuperClass() {
         return superClass;
@@ -203,7 +189,7 @@ public class ClassContent extends BaseContent {
 
     /**
      * returns interfaces which this class implements.
-     * @return 
+     * @return interfaces
      */
     public String[] getInterfaces() {
         return interfaces != null ? interfaces : new String[0];
@@ -214,7 +200,7 @@ public class ClassContent extends BaseContent {
      * {@link TypeAnnotationContent <code>TypeAnnotationContent</code>}
      * for class.
      */
-    public class ClassTypeAnnotationContent extends TypeAnnotationContent {
+    class ClassTypeAnnotationContent extends TypeAnnotationContent {
         ClassTypeAnnotationContent(String[] ta, boolean isVisible) {
             super(ta, isVisible);
         }
@@ -224,12 +210,12 @@ public class ClassContent extends BaseContent {
             String annotation = isVisible ? visible[annIndex] : invisible[annIndex];
             switch(target.getType()) {
                 case SuperTypeTarget:
-                    SuperTypeTarget stt = (SuperTypeTarget)target;
-                    if(stt.getIndex() == -1) {
-                        superClass = annotation + " " + superClass;
-                    } else {
-                        interfaces[stt.getIndex()] = annotation + " " + interfaces[stt.getIndex()];
-                    }
+//                    SuperTypeTarget stt = (SuperTypeTarget)target;
+//                    if(stt.getIndex() == -1) {
+//                        superClass = annotation + " " + superClass;
+//                    } else {
+//                        interfaces[stt.getIndex()] = annotation + " " + interfaces[stt.getIndex()];
+//                    }
                     break;
                 case TypeParameterTarget:      break;
                 case TypeParameterBoundTarget: break;

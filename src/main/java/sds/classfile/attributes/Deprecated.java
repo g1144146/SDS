@@ -7,10 +7,7 @@ package sds.classfile.attributes;
  * @author inagaki
  */
 public class Deprecated extends AttributeInfo {
-    /**
-     * constructor.
-     */
-    public Deprecated() {
+    Deprecated() {
         super(AttributeType.Deprecated);
     }
 }

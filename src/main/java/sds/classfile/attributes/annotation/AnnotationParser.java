@@ -1,10 +1,5 @@
 package sds.classfile.attributes.annotation;
 
-import sds.classfile.attributes.annotation.Annotation;
-import sds.classfile.attributes.annotation.ElementValue;
-import sds.classfile.attributes.annotation.ElementValueException;
-import sds.classfile.attributes.annotation.ElementValuePair;
-import sds.classfile.attributes.annotation.EnumConstValue;
 import sds.classfile.constantpool.ConstantInfo;
 import sds.util.SDSStringBuilder;
 
@@ -26,10 +21,8 @@ public class AnnotationParser {
      * @param sb string builder for annotation info
      * @param pool constant-pool
      * @return parsed annotation
-     * @throws ElementValueException 
      */
-    public static String parseAnnotation(Annotation annotation, SDSStringBuilder sb, ConstantInfo[] pool)
-    throws ElementValueException {
+    public static String parseAnnotation(Annotation annotation, SDSStringBuilder sb, ConstantInfo[] pool) {
         sb.append("@", parse(extract(annotation.getTypeIndex(), pool)), "(");
         ElementValuePair[] evp = annotation.getElementValuePairs();
         for(int i = 0; i < evp.length; i++) {
@@ -47,10 +40,8 @@ public class AnnotationParser {
      * @param sb  string builder for element value info
      * @param pool constant-pool
      * @return parsed element value
-     * @throws ElementValueException 
      */
-    public static String parseElementValue(ElementValue element, SDSStringBuilder sb, ConstantInfo[] pool)
-    throws ElementValueException {
+    public static String parseElementValue(ElementValue element, SDSStringBuilder sb, ConstantInfo[] pool) {
         switch(element.getTag()) {
             case 'B':
                 sb.append(extract(element.getConstValueIndex(), pool));
@@ -85,10 +76,10 @@ public class AnnotationParser {
                 for(ElementValue ev : element.getArrayValue().getValues()) {
                     values.append(parseElementValue(ev, new SDSStringBuilder(), pool), ",");
                 }
-                sb.append(values.toString().substring(0, values.length()-1), "}");
+                sb.append(values.toString().substring(0, values.length() - 1), "}");
                 break;
             default:
-                throw new ElementValueException(element.getTag());
+                throw new RuntimeException(Character.toString(element.getTag()));
         }
         return sb.toString();
     }

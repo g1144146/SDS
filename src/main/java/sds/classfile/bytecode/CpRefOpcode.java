@@ -67,14 +67,7 @@ public class CpRefOpcode extends OpcodeInfo {
     String operand;
     String type = "";
 
-    /**
-     * constrcutor.
-     * @param index constant-pool entry index
-     * @param pool constant-pool
-     * @param opcodeType opcode type
-     * @param pc index into the code array
-     */
-    public CpRefOpcode(int index, ConstantInfo[] pool, MnemonicTable opcodeType, int pc) throws IOException {
+    CpRefOpcode(int index, ConstantInfo[] pool, MnemonicTable opcodeType, int pc) throws IOException {
         super(opcodeType, pc);
         MnemonicTable opType = opcodeType;
         this.index = index;

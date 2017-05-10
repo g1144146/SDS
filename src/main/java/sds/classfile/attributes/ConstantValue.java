@@ -13,13 +13,7 @@ import sds.classfile.constantpool.ConstantInfo;
 public class ConstantValue extends AttributeInfo {
     private String constantValue;
 
-    /**
-     * constructor.
-     * @param data classfile stream
-     * @param pool constant-pool
-     * @throws IOException 
-     */
-    public ConstantValue(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+    ConstantValue(ClassFileStream data, ConstantInfo[] pool) throws IOException {
         super(AttributeType.ConstantValue);
         this.constantValue = extract(data.readShort(), pool);
     }

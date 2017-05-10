@@ -14,12 +14,9 @@ import sds.classfile.attributes.LineNumberTable;
 import sds.classfile.attributes.LocalVariable;
 import sds.classfile.attributes.MethodParameters;
 import sds.classfile.attributes.annotation.AnnotationDefault;
-import sds.classfile.attributes.annotation.CatchTarget;
-import sds.classfile.attributes.annotation.ParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeParameterAnnotations;
 import sds.classfile.attributes.annotation.RuntimeTypeAnnotations;
 import sds.classfile.attributes.annotation.TargetInfo;
-import sds.classfile.attributes.annotation.ThrowsTarget;
 import sds.classfile.attributes.stackmap.StackMapTable;
 import sds.classfile.bytecode.OpcodeInfo;
 
@@ -45,14 +42,9 @@ public class MethodContent extends MemberContent {
     private String defaultAnn;
     private CFNode[] nodes;
 
-    /**
-     * constructor.
-     * @param info method info
-     * @param pool constant-pool
-     */
-    public MethodContent(MemberInfo info, ConstantInfo[] pool) {
+    MethodContent(MemberInfo info, ConstantInfo[] pool) {
         super(info, pool);
-        println(this.getName());
+        println(this.getName() + desc.substring(0, desc.indexOf(")") + 1));
         // set arguments
         String desc = this.desc;
         if(desc.indexOf("(") + 1 != desc.indexOf(")")) { // has argument
@@ -73,19 +65,19 @@ public class MethodContent extends MemberContent {
             analyzeAttribute(a, pool);
         }
         // print
-        if(valContent != null) {
+//        if(valContent != null) {
 //            System.out.println("[local variable]");
 //            System.out.println(valContent);
-        }
-        if(exContent != null && exContent.table.length > 0) {
+//        }
+//        if(exContent != null && exContent.table.length > 0) {
 //            System.out.println("[exception]");
 //            System.out.println(exContent);
-        }
-        if(args != null) {
+//        }
+//        if(args != null) {
 //            for(String[] arg : args) {
 //                System.out.println(arg[0] + " " + arg[1]);
 //            }
-        }
+//        }
         // set CFG
         if(! this.getAccessFlag().contains("abstract")) {
             CFGBuilder builder = new CFGBuilder(inst, exContent);
@@ -98,7 +90,7 @@ public class MethodContent extends MemberContent {
     }
 
     @Override
-    public void analyzeAttribute(AttributeInfo info, ConstantInfo[] pool) {
+    void analyzeAttribute(AttributeInfo info, ConstantInfo[] pool) {
         switch(info.getType()) {
             case AnnotationDefault:
                 AnnotationDefault ad = (AnnotationDefault) info;
@@ -171,7 +163,7 @@ public class MethodContent extends MemberContent {
                 break;
             case RuntimeInvisibleParameterAnnotations:
                 RuntimeParameterAnnotations ripa = (RuntimeParameterAnnotations) info;
-                ParameterAnnotations[] invisiblePA = ripa.getParamAnnotations();
+                String[][] invisiblePA = ripa.getParamAnnotations();
                 if(paContent == null) {
                     this.paContent = new ParamAnnotationContent(invisiblePA, false);
                 } else {
@@ -183,7 +175,7 @@ public class MethodContent extends MemberContent {
                 break;
             case RuntimeVisibleParameterAnnotations:
                 RuntimeParameterAnnotations rvpa = (RuntimeParameterAnnotations) info;
-                ParameterAnnotations[] visiblePA = rvpa.getParamAnnotations();
+                String[][] visiblePA = rvpa.getParamAnnotations();
                 this.paContent = new ParamAnnotationContent(visiblePA, true);
 //                System.out.println("<<<Runtime Visible Parameter Annotation>>>: ");
 //                for(String[] a : paContent.param)
@@ -492,25 +484,25 @@ public class MethodContent extends MemberContent {
         private List<String[]> invParam;
         private int paramCount;
 
-        ParamAnnotationContent(ParameterAnnotations[] pa, boolean isVisible) {
+        ParamAnnotationContent(String[][] pa, boolean isVisible) {
             super(isVisible);
             this.paramCount = pa.length;
             initAnnotation(pa, isVisible);
         }
 
-        private void setInvisible(ParameterAnnotations[] annotations) {
+        private void setInvisible(String[][] annotations) {
             type = type | INVISIBLE;
             initAnnotation(annotations, false);
         }
 
-        private void initAnnotation(ParameterAnnotations[] pa, boolean isVisible) {
+        private void initAnnotation(String[][] pa, boolean isVisible) {
             if(isVisible) {
                 param = new ArrayList<>();
             } else {
                 invParam = new ArrayList<>();
             }
             for(int i = 0; i < paramCount; i++) {
-                super.initAnnotation(pa[i].getAnnotations(), isVisible);
+                super.initAnnotation(pa[i], isVisible);
                 if(isVisible) {
                     param.add(visible);
                 } else {
@@ -560,9 +552,9 @@ public class MethodContent extends MemberContent {
             String annotation = isVisible ? visible[annIndex] : invisible[annIndex];
             switch(target.getType()) {
                 case CatchTarget:
-                    CatchTarget ct = (CatchTarget) target;
-                    exContent.getException()[ct.getIndex()]
-                            = annotation + " " + exContent.getException()[ct.getIndex()];
+//                    CatchTarget ct = (CatchTarget) target;
+//                    exContent.getException()[ct.getIndex()]
+//                            = annotation + " " + exContent.getException()[ct.getIndex()];
                     break;
                 case LocalVarTarget:
 //                    LocalVarTarget.LVTTable table = ((LocalVarTarget)target).getTable()[0];
@@ -603,8 +595,8 @@ public class MethodContent extends MemberContent {
 //                    sb.append(",").append(ot.getOffset());
                     break;
                 case ThrowsTarget:
-                    ThrowsTarget tt = (ThrowsTarget) target;
-                    exceptions[tt.getIndex()] = annotation + " " + exceptions[tt.getIndex()];
+//                    ThrowsTarget tt = (ThrowsTarget) target;
+//                    exceptions[tt.getIndex()] = annotation + " " + exceptions[tt.getIndex()];
                     break;
                 case TypeParameterTarget:
 //                    TypeParameterTarget tpt = (TypeParameterTarget)target;

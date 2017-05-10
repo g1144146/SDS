@@ -15,13 +15,7 @@ import static sds.util.AccessFlags.get;
 public class InnerClasses extends AttributeInfo {
     private String[][] classes;
 
-    /**
-     * constructor.
-     * @param data classfile stream
-     * @param pool constant-pool
-     * @throws IOException 
-     */
-    public InnerClasses(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+    InnerClasses(ClassFileStream data, ConstantInfo[] pool) throws IOException {
         super(AttributeType.InnerClasses);
         this.classes = new String[data.readShort()][4];
         for(int i = 0; i < classes.length; i++) {

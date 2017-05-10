@@ -11,13 +11,7 @@ public class Iinc extends OpcodeInfo {
     private int index;
     private int _const;
 
-    /**
-     * constructor.
-     * @param index index into the local variable array of the current frame
-     * @param _const const
-     * @param pc index into the code array
-     */
-    public Iinc(int index, int _const, int pc) {
+    Iinc(int index, int _const, int pc) {
         super(MnemonicTable.iinc, pc);
         this.index = index;
         this._const = _const;

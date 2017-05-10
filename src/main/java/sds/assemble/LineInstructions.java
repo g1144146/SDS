@@ -11,11 +11,7 @@ import sds.classfile.bytecode.OpcodeInfo;
 public class LineInstructions {
     private List<OpcodeInfo> opcodes = new ArrayList<>();
 
-    /**
-     * adds opcode.
-     * @param opcode opcode 
-     */
-    public void add(OpcodeInfo opcode) {
+    void add(OpcodeInfo opcode) {
         opcodes.add(opcode);
     }
 
