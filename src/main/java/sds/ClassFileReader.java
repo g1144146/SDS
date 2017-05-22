@@ -10,7 +10,7 @@ import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeInfoFactory;
 import sds.classfile.constantpool.ConstantInfo;
 import sds.classfile.constantpool.ConstantInfoFactory;
-import sds.classfile.constantpool.Utf8Info;
+import sds.classfile.constantpool.SkippedConstantInfo;
 import static sds.classfile.constantpool.Utf8ValueExtractor.extract;
 
 /**
@@ -64,7 +64,7 @@ public class ClassFileReader {
             pool[i] = factory.create(tag, stream);
             if(tag == ConstantInfoFactory.C_DOUBLE || tag == ConstantInfoFactory.C_LONG) {
                 i++;
-                pool[i] = null;
+                pool[i] = new SkippedConstantInfo();
             }
         }
         cf.pool = pool;
