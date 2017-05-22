@@ -6,24 +6,15 @@ package sds.classfile.constantpool;
  * Constant_String_Info</a>.
  * @author inagaki
  */
-public class StringInfo extends ConstantInfo {
-    private int stringIndex;
+public class StringInfo implements ConstantInfo {
+    final int stringIndex;
 
     StringInfo(int stringIndex) {
-        super(ConstantType.C_STRING);
         this.stringIndex = stringIndex;
-    }
-
-    /**
-     * returns constant-pool entry index of string.
-     * @return constant-pool entry index of string
-     */
-    public int getStringIndex() {
-        return stringIndex;
     }
 
     @Override
     public String toString() {
-        return super.toString() + "\t#" + stringIndex;
+        return "CONSTANT_STRING\t#" + stringIndex;
     }
 }

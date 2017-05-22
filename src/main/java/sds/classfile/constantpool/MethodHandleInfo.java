@@ -6,30 +6,13 @@ package sds.classfile.constantpool;
  * Constant_MethodHandle_Info</a>.
  * @author inagaki
  */
-public class MethodHandleInfo extends ConstantInfo {
-    private int refKind;
-    private int refIndex;
+public class MethodHandleInfo implements ConstantInfo {
+    final int refKind;
+    final int refIndex;
     
     MethodHandleInfo(int refKind, int refIndex) {
-        super(ConstantType.C_METHOD_HANDLE);
         this.refKind  = refKind;
         this.refIndex = refIndex;
-    }
-
-    /**
-     * returns kind of this method handle.
-     * @return kind of this method handle
-     */
-    public int getRefKind() {
-        return refKind;
-    }
-
-    /**
-     * returns constant-pool entry index of constant info.
-     * @return constant-pool entry index of constant info
-     */
-    public int getRefIndex() {
-        return refIndex;
     }
 
     /**
@@ -53,6 +36,6 @@ public class MethodHandleInfo extends ConstantInfo {
 
     @Override
     public String toString() {
-        return super.toString() + "\t" + getRefKindValue() + ":#" + refIndex;
+        return "CONSTANT_METHOD_HANDLE\t" + getRefKindValue() + ":#" + refIndex;
     }
 }

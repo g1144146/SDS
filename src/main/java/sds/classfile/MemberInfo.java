@@ -38,8 +38,8 @@ public class MemberInfo implements Info {
         this.attr = new AttributeInfo[data.readShort()];
         AttributeInfoFactory factory = new AttributeInfoFactory();
         for(int i = 0; i < attr.length; i++) {
-            Utf8Info utf8 = (Utf8Info)pool[data.readShort() - 1];
-            attr[i] = factory.create(utf8.getValue(), data, pool);
+            String value = extract(data.readShort(), pool);
+            attr[i] = factory.create(value, data, pool);
         }
     }
 

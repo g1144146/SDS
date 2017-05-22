@@ -8,6 +8,7 @@ import sds.classfile.bytecode.MnemonicTable;
 import sds.classfile.bytecode.OpcodeInfo;
 import sds.classfile.constantpool.ConstantInfo;
 import sds.classfile.constantpool.Utf8Info;
+import static sds.classfile.constantpool.Utf8ValueExtractor.extract;
 
 /**
  * This class is for <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.3">
@@ -57,8 +58,8 @@ public class Code extends AttributeInfo {
         this.attr = new AttributeInfo[data.readShort()];
         AttributeInfoFactory factory = new AttributeInfoFactory();
         for(int i = 0; i < attr.length; i++) {
-            Utf8Info utf8 = (Utf8Info)pool[data.readShort() - 1];
-            attr[i] = factory.create(utf8.getValue(), data, pool, opcodes);
+            String value = extract(data.readShort(), pool);
+            attr[i] = factory.create(value, data, pool, opcodes);
         }
     }
 

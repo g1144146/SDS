@@ -10,8 +10,8 @@ import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeInfoFactory;
 import sds.classfile.constantpool.ConstantInfo;
 import sds.classfile.constantpool.ConstantInfoFactory;
-import sds.classfile.constantpool.ConstantType;
 import sds.classfile.constantpool.Utf8Info;
+import static sds.classfile.constantpool.Utf8ValueExtractor.extract;
 
 /**
  * This class is for reading classfile contents.
@@ -62,7 +62,7 @@ public class ClassFileReader {
         for(int i = 0; i < pool.length; i++) {
             int tag = stream.readByte(); // 1 byte
             pool[i] = factory.create(tag, stream);
-            if(tag == ConstantType.C_DOUBLE || tag == ConstantType.C_LONG) {
+            if(tag == ConstantInfoFactory.C_DOUBLE || tag == ConstantInfoFactory.C_LONG) {
                 i++;
                 pool[i] = null;
             }
@@ -94,8 +94,8 @@ public class ClassFileReader {
         AttributeInfo[] attrs = new AttributeInfo[stream.readShort()];
         AttributeInfoFactory factory = new AttributeInfoFactory();
         for(int i = 0; i < attrs.length; i++) {
-            Utf8Info utf8Info = (Utf8Info)cf.pool[stream.readShort() - 1];
-            attrs[i] = factory.create(utf8Info.getValue(), stream, cf.pool);
+            String value = extract(stream.readShort(), cf.pool);
+            attrs[i] = factory.create(value, stream, cf.pool);
         }
         cf.attr = attrs;
     }

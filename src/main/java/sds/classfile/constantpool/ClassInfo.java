@@ -6,24 +6,18 @@ package sds.classfile.constantpool;
  * Constant_Class_Info</a>.
  * @author inagaki
  */
-public class ClassInfo extends ConstantInfo {
-	private int nameIndex;
+public class ClassInfo implements ConstantInfo {
+    /**
+	 * constant entry index of class name.
+	 */
+	final int nameIndex;
 
 	ClassInfo(int nameIndex) {
-		super(ConstantType.C_CLASS);
         this.nameIndex = nameIndex;
-	}
-
-	/**
-	 * returns constant entry index of class name.
-	 * @return constant entry index of class name
-	 */
-	public int getNameIndex() {
-		return nameIndex;
 	}
 
 	@Override
 	public String toString() {
-		return super.toString() + "\t#" + nameIndex;
+		return "CONSTANT_CLASS\t#" + nameIndex;
 	}
 }

@@ -6,15 +6,13 @@ import static sds.classfile.bytecode.MnemonicTable.ldc;
 import static sds.classfile.bytecode.MnemonicTable.ldc_w;
 import static sds.classfile.bytecode.MnemonicTable.ldc2_w;
 import sds.classfile.constantpool.ConstantInfo;
-import static sds.classfile.constantpool.ConstantType.C_CLASS;
-import static sds.classfile.constantpool.ConstantType.C_DOUBLE;
-import static sds.classfile.constantpool.ConstantType.C_FLOAT;
-import static sds.classfile.constantpool.ConstantType.C_INTEGER;
-import static sds.classfile.constantpool.ConstantType.C_LONG;
-import static sds.classfile.constantpool.ConstantType.C_METHOD_HANDLE;
-import static sds.classfile.constantpool.ConstantType.C_STRING;
 
 import static sds.classfile.bytecode.OperandExtractor.extractOperand;
+import sds.classfile.constantpool.ClassInfo;
+import sds.classfile.constantpool.ConstantInfoFactory;
+import sds.classfile.constantpool.MethodHandleInfo;
+import sds.classfile.constantpool.NumberInfo;
+import sds.classfile.constantpool.StringInfo;
 
 /**
  * This class is for opcode has constant-pool entry index.<br>
@@ -73,20 +71,23 @@ public class CpRefOpcode extends OpcodeInfo {
         this.index = index;
         this.operand = extractOperand(this, pool);
         if(opType == ldc || opType == ldc_w || opType == ldc2_w) {
-            switch(pool[index - 1].getTag()) {
-                case C_DOUBLE:  this.type = "double"; break;
-                case C_FLOAT:   this.type = "float";  break;
-                case C_INTEGER: this.type = "int";    break;
-                case C_LONG:    this.type = "long";   break;
-                case C_STRING:
-                    this.type = "String";
-                    operand = "\"" + escape(operand) + "\"";
-                    break;
-                case C_CLASS:   this.type = extract(index, pool); break;
-                case C_METHOD_HANDLE: break;
-                default:
-                    throw new IllegalStateException("LDC opcode refers unknown constant type info.");
+            ConstantInfo info = pool[index - 1];
+            if(info instanceof NumberInfo) {
+                switch(((NumberInfo)info).tag) {
+                    case ConstantInfoFactory.C_DOUBLE:  this.type = "double"; break;
+                    case ConstantInfoFactory.C_FLOAT:   this.type = "float";  break;
+                    case ConstantInfoFactory.C_INTEGER: this.type = "int";    break;
+                    case ConstantInfoFactory.C_LONG:    this.type = "long";   break;
+                    default:                            this.type = "";       break;
+                }
+            } else if(info instanceof StringInfo) {
+                this.type = "String";
+                operand = "\"" + escape(operand) + "\"";
+            } else if(info instanceof ClassInfo) {
+                this.type = extract(index, pool);
             }
+            else if(info instanceof MethodHandleInfo) /* do nothing. */;
+            else throw new IllegalStateException("LDC opcode refers unknown constant type info.");
         }
     }
 
