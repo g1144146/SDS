@@ -6,121 +6,65 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * This class is for stream of read classfile.
+ * This interface is for stream of read classfile.
  * @author inagaki
  */
-public class ClassFileStream implements AutoCloseable {
-    private DataInputStream stream;
-    private RandomAccessFile raf;
-    private long filePointer;
-
-    /**
-     * constructor.
-     * @param raf classfile stream with {@code RandomAccessFile}
-     */
-    public ClassFileStream(RandomAccessFile raf) {
-        this.raf = raf;
-    }
-
-    /**
-     * constructor.
-     * @param in
-     * @throws java.io.IOException
-     */
-    public ClassFileStream(InputStream in) throws IOException {
-        this.stream = new DataInputStream(in);
-    }
-
+public interface ClassFileStream extends AutoCloseable {
     /**
      * returns current file pointer.
      * @return file pointer
      * @throws IOException
      */
-    public long getFilePointer() throws IOException {
-        return (raf != null) ? raf.getFilePointer() : filePointer;
-    }
+    abstract long getFilePointer() throws IOException;
 
     /**
      * returns signed eight-bit value.
      * @return signed eight-bit value
      * @throws IOException
      */
-    public byte readByte() throws IOException {
-        return isRaf(Byte.BYTES) ? raf.readByte() : stream.readByte();
-    }
+    abstract byte readByte() throws IOException;
 
     /**
      * returns unsigned eight-bit value.
      * @return unsigned eight-bit value
      * @throws IOException
      */
-    public int readUnsignedByte() throws IOException {
-        return isRaf(Byte.BYTES) ? raf.readUnsignedByte() : stream.readUnsignedByte();
-    }
-
-    /**
-     * returns character.
-     * @return character
-     * @throws IOException
-     */
-    public char readChar() throws IOException {
-        return isRaf(Character.BYTES) ? raf.readChar() : stream.readChar();
-    }
+    abstract int readUnsignedByte() throws IOException;
 
     /**
      * retunrs double.
      * @return double
      * @throws IOException
      */
-    public double readDouble() throws IOException {
-        return isRaf(Double.BYTES) ? raf.readDouble() : stream.readDouble();
-    }
+    abstract double readDouble() throws IOException;
 
     /**
      * returns float.
      * @return float
      * @throws IOException
      */
-    public float readFloat() throws IOException {
-        return isRaf(Float.BYTES) ? raf.readFloat() : stream.readFloat();
-    }
+    abstract float readFloat() throws IOException;
 
     /**
      * returns signed 4-bit value.
      * @return signed 4-bit value
      * @throws IOException
      */
-    public int readInt() throws IOException {
-        return isRaf(Integer.BYTES) ? raf.readInt(): stream.readInt();
-    }
+    abstract int readInt() throws IOException;
 
     /**
      * retunrs signed 8-bit value.
-     *
      * @return signed 8-bit value
      * @throws IOException
      */
-    public long readLong() throws IOException {
-        return isRaf(Long.BYTES) ? raf.readLong() : stream.readLong();
-    }
+    abstract long readLong() throws IOException;
 
     /**
      * returns signed 2-bit value.
      * @return signed 2-bit value
      * @throws IOException
      */
-    public short readShort() throws IOException {
-        return isRaf(Short.BYTES) ? raf.readShort() : stream.readShort();
-    }
-
-    /**
-     * returns unsigned 2-bit value.
-     * @return unsigned 2-bit value
-     * @throws IOException
-     */
-    public int readUnsignedShort() throws IOException {
-        return isRaf(Short.BYTES) ? raf.readUnsignedShort() : stream.readUnsignedShort();
-    }
+    abstract short readShort() throws IOException;
 
     /**
      * reads specified byte array length from classfile stream, and returns that.
@@ -128,39 +72,52 @@ public class ClassFileStream implements AutoCloseable {
      * @return byte array
      * @throws IOException
      */
-    public byte[] readFully(byte[] b) throws IOException {
-        if(isRaf(b.length)) {
-            raf.readFully(b);
-            return b;
-        }
-        stream.readFully(b);
-        return b;
-    }
+    abstract byte[] readFully(byte[] b) throws IOException;
 
     /**
      * skips over specified bytes.
      * @param n specified bytes
      * @throws IOException
      */
-    public void skipBytes(int n) throws IOException {
-        if(isRaf(n)) {
-            raf.skipBytes(n);
-            return;
-        }
-        stream.skipBytes(n);
-    }
+    abstract void skipBytes(int n) throws IOException;
+}
 
-    private boolean isRaf(int pointer) {
-        filePointer += pointer;
-        return raf != null;
-    }
+class WithRandomAccessFile implements ClassFileStream {
+    private final RandomAccessFile raf;
 
-    @Override
-    public void close() throws IOException {
-        if((raf != null)) {
-            raf.close();
-            return;
-        }
-        stream.close();
+    WithRandomAccessFile(String fileName) throws IOException {
+        this.raf = new RandomAccessFile(fileName, "r");
     }
+    @Override public long   getFilePointer()    throws IOException { return raf.getFilePointer();   }
+    @Override public byte   readByte()          throws IOException { return raf.readByte();         }
+    @Override public int    readUnsignedByte()  throws IOException { return raf.readUnsignedByte(); }
+    @Override public double readDouble()        throws IOException { return raf.readDouble();       }
+    @Override public long   readLong()          throws IOException { return raf.readLong();         }
+    @Override public int    readInt()           throws IOException { return raf.readInt();          }
+    @Override public float  readFloat()         throws IOException { return raf.readFloat();        }
+    @Override public short  readShort()         throws IOException { return raf.readShort();        }
+    @Override public byte[] readFully(byte[] b) throws IOException { raf.readFully(b); return b;    }
+    @Override public void   skipBytes(int n)    throws IOException { raf.skipBytes(n);              }
+    @Override public void   close()             throws IOException { raf.close();                   }
+}
+
+class WithDataInputStream implements ClassFileStream {
+    private final DataInputStream stream;
+    private long pointer = 0L;
+
+    WithDataInputStream(InputStream input) throws IOException {
+        this.stream = new DataInputStream(input);
+    }
+    @Override public byte readByte()        throws IOException { return read(Byte.BYTES,    stream.readByte());         }
+    @Override public int readUnsignedByte() throws IOException { return read(Byte.BYTES,    stream.readUnsignedByte()); }
+    @Override public double readDouble()    throws IOException { return read(Double.BYTES,  stream.readDouble());       }
+    @Override public long readLong()        throws IOException { return read(Long.BYTES,    stream.readLong());         }
+    @Override public int readInt()          throws IOException { return read(Integer.BYTES, stream.readInt());          }
+    @Override public float readFloat()      throws IOException { return read(Float.BYTES,   stream.readFloat());        }
+    @Override public short readShort()      throws IOException { return read(Short.BYTES,   stream.readShort());        }
+    @Override public byte[] readFully(byte[] b) throws IOException { stream.readFully(b); return read(b.length, b);     }
+    @Override public long getFilePointer()      throws IOException { return pointer;                                    }
+    @Override public void skipBytes(int n)      throws IOException { pointer += n; stream.skipBytes(n);                 }
+    @Override public void close()               throws IOException { stream.close();                                    }
+    private <T> T read(long bytes, T readValue) { pointer += bytes; return readValue; }
 }
