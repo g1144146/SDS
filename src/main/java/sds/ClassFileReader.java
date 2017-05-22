@@ -2,9 +2,9 @@ package sds;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 import sds.classfile.ClassFileStream;
+import sds.classfile.ClassFileStreamFactory;
 import sds.classfile.MemberInfo;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeInfoFactory;
@@ -19,12 +19,12 @@ import static sds.classfile.constantpool.Utf8ValueExtractor.extract;
  */
 public class ClassFileReader {
     private ClassFileStream stream;
-    private ClassFile cf = new ClassFile();
+    private final ClassFile cf = new ClassFile();
 
     ClassFileReader(String fileName) {
         try {
-            RandomAccessFile raf = new RandomAccessFile(fileName, "r");
-            this.stream = new ClassFileStream(raf);
+            ClassFileStreamFactory factory = new ClassFileStreamFactory();
+            this.stream = factory.create(fileName);
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -32,7 +32,8 @@ public class ClassFileReader {
 
     ClassFileReader(InputStream input) {
         try {
-            this.stream = new ClassFileStream(input);
+            ClassFileStreamFactory factory = new ClassFileStreamFactory();
+            this.stream = factory.create(input);
         } catch(IOException e) {
             e.printStackTrace();
         }

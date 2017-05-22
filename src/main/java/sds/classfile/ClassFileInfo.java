@@ -7,7 +7,7 @@ import sds.classfile.constantpool.Utf8ValueExtractor;
  * This interface is for info which classfile has.
  * @author inagaki
  */
-public interface Info {
+public interface ClassFileInfo {
     /**
      * returns value of
      * {@link sds.classfile.constantpool.Utf8Info <code>Utf8Info</code>}

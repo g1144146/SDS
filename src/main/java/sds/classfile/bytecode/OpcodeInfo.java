@@ -1,12 +1,12 @@
 package sds.classfile.bytecode;
 
-import sds.classfile.Info;
+import sds.classfile.ClassFileInfo;
 
 /**
  * This class is for opcode has no operand.
  * @author inagaki
  */
-public class OpcodeInfo implements Info {
+public class OpcodeInfo implements ClassFileInfo {
     /**
      * index into the code array.
      */

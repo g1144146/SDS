@@ -4,7 +4,6 @@ import java.io.IOException;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeInfoFactory;
 import sds.classfile.constantpool.ConstantInfo;
-import sds.classfile.constantpool.Utf8Info;
 
 import static sds.util.AccessFlags.get;
 import static sds.util.DescriptorParser.parse;
@@ -13,9 +12,9 @@ import static sds.util.DescriptorParser.parse;
  * This adapter class is for info of class has member.
  * @author inagaki
  */
-public class MemberInfo implements Info {
-    private String[] declaration;
-    private AttributeInfo[] attr;
+public class MemberInfo implements ClassFileInfo {
+    private final String[] declaration;
+    public final AttributeInfo[] attr;
 
     /**
      * constructor.
@@ -31,16 +30,17 @@ public class MemberInfo implements Info {
         declaration[1] = extract(nameIndex, pool);
         declaration[2] = parse(extract(descIndex, pool));
         declaration[0] = get(acc, getType());
-        readAttributes(data, pool);
+        this.attr = readAttributes(data, pool);
     }
 
-    private void readAttributes(ClassFileStream data, ConstantInfo[] pool) throws IOException {
-        this.attr = new AttributeInfo[data.readShort()];
+    private AttributeInfo[] readAttributes(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        AttributeInfo[] attr = new AttributeInfo[data.readShort()];
         AttributeInfoFactory factory = new AttributeInfoFactory();
         for(int i = 0; i < attr.length; i++) {
             String value = extract(data.readShort(), pool);
             attr[i] = factory.create(value, data, pool);
         }
+        return attr;
     }
 
     /**
@@ -80,10 +80,7 @@ public class MemberInfo implements Info {
      * @return type
      */
     public String getType() {
-        if(declaration[2].contains("(")) {
-            return "method";
-        }
-        return "field";
+        return declaration[2].contains("(") ? "method" : "field";
     }
 
     @Override
