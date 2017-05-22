@@ -10,28 +10,28 @@ public class AccessFlagsTest {
     @Test
     public void getTest() {
         // class and nested.
-        assertThat(get(ACC_PUBLIC | ACC_FINAL | ACC_SYNTHETIC | ACC_INTERFACE, "class")
+        assertThat(get(PUBLIC.key | FINAL.key | SYNTHETIC.key | INTERFACE.key, "class")
                 , is("public final synthetic interface "));
-        assertThat(get(ACC_PUBLIC | ACC_FINAL | ACC_ENUM, "class"), is("public final enum "));
-        assertThat(get(ACC_PUBLIC | ACC_ANNOTATION, "class"), is("public @interface "));
-        assertThat(get(ACC_PUBLIC | ACC_FINAL | ACC_STATIC, "nested"), is("public static final class "));
+        assertThat(get(PUBLIC.key | FINAL.key | ENUM.key, "class"), is("public final enum "));
+        assertThat(get(PUBLIC.key | ANNOTATION.key, "class"), is("public @interface "));
+        assertThat(get(PUBLIC.key | FINAL.key | STATIC.key, "nested"), is("public static final class "));
 
         // field.
-        assertThat(get(ACC_PUBLIC | ACC_FINAL | ACC_STATIC | ACC_VOLATILE | ACC_TRANSIENT | ACC_SYNTHETIC | ACC_ENUM,
+        assertThat(get(PUBLIC.key | FINAL.key | STATIC.key | VOLATILE.key | TRANSIENT.key | SYNTHETIC.key | ENUM.key,
                         "field"), is("public static final volatile transient synthetic enum "));
-        assertThat(get(ACC_PRIVATE | ACC_FINAL | ACC_STATIC, "field"), is("private static final "));
-        assertThat(get(ACC_PROTECTED | ACC_FINAL, "field"), is("protected final "));
+        assertThat(get(PRIVATE.key | FINAL.key | STATIC.key, "field"), is("private static final "));
+        assertThat(get(PROTECTED.key | FINAL.key, "field"), is("protected final "));
 
         // method
-        assertThat(get(ACC_PUBLIC | ACC_FINAL | ACC_STATIC | ACC_SYNCHRONIZED | ACC_SYNTHETIC
-                        | ACC_BRIDGE | ACC_NATIVE | ACC_ABSTRACT | ACC_STRICT , "method")
-                    , is("public static final synchronized bridge native abstract strict synthetic "));
+        assertThat(get(PUBLIC.key | FINAL.key | STATIC.key | SYNCHRONIZED.key | SYNTHETIC.key |
+                        BRIDGE | NATIVE.key | ABSTRACT.key | STRICT.key , "method")
+                    , is("public static final synchronized native abstract strict synthetic "));
     }
 
     @Test(expected = RuntimeException.class)
     public void testException() throws Exception {
-        get(ACC_PUBLIC | ACC_STATIC | ACC_FINAL, "class");
-        get(ACC_PROTECTED | ACC_FINAL | ACC_INTERFACE, "field");
-        get(ACC_PRIVATE | ACC_FINAL | ACC_STATIC | ACC_ANNOTATION, "method");
+        get(PUBLIC.key | STATIC.key | FINAL.key, "class");
+        get(PROTECTED.key | FINAL.key | INTERFACE.key, "field");
+        get(PRIVATE.key | FINAL.key | STATIC.key | ANNOTATION.key, "method");
     }
 }
