@@ -42,8 +42,9 @@ public class RuntimeTypeAnnotations implements AttributeInfo {
         this.name = name;
         this.types = new TypeAnnotation[data.readShort()];
         annotations = new String[types.length];
+        TargetInfoFactory factory = new TargetInfoFactory();
         for(int i = 0; i < types.length; i++) {
-            types[i] = new TypeAnnotation(data);
+            types[i] = new TypeAnnotation(factory.create(data), new TypePath(data), data);
             annotations[i] = parseAnnotation(types[i], new SDSStringBuilder(), pool);
         }
     }

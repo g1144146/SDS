@@ -30,7 +30,7 @@ class CatchTarget extends TargetInfo {
 
     @Override
     public String toString() {
-        return super.toString() + ": " + "index: " + exceptionTableIndex;
+        return super.toString() + ": index: " + exceptionTableIndex;
     }
 }
 
@@ -54,7 +54,7 @@ class MethodFormalParameterTarget extends TargetInfo {
 
     @Override
     public String toString() {
-        return super.toString() + ": " + "index: " + formalParameterIndex;
+        return super.toString() + ": index: " + formalParameterIndex;
     }
 }
 
@@ -68,7 +68,7 @@ class OffsetTarget extends TargetInfo {
 
     @Override
     public String toString() {
-        return super.toString() + ": " + "offset: " + offset;
+        return super.toString() + ": offset: " + offset;
     }
 }
 
@@ -82,7 +82,7 @@ class SuperTypeTarget extends TargetInfo {
 
     @Override
     public String toString() {
-        return super.toString() + ": " + "index: " + superTypeIndex;
+        return super.toString() + ": index: " + superTypeIndex;
     }
 }
 
@@ -96,7 +96,7 @@ class ThrowsTarget extends TargetInfo {
 
     @Override
     public String toString() {
-        return super.toString() + ": " + "index: " + throwsTypeIndex;
+        return super.toString() + ": index: " + throwsTypeIndex;
     }
 }
 
@@ -112,7 +112,7 @@ class TypeArgumentTarget extends TargetInfo {
 
     @Override
     public String toString() {
-        return super.toString() + ": " + "index: " + typeArgumentIndex + ", offset: " + offset;
+        return super.toString() + ": index: " + typeArgumentIndex + ", offset: " + offset;
     }
 }
 
@@ -128,7 +128,7 @@ class TypeParameterBoundTarget extends TargetInfo {
 
     @Override
     public String toString() {
-        return super.toString() + ": " + "bound_index: " + boundIndex + ", type_parameter_index: " + typeParameterIndex;
+        return super.toString() + ": bound_index: " + boundIndex + ", type_parameter_index: " + typeParameterIndex;
     }
 }
 
@@ -142,6 +142,6 @@ class TypeParameterTarget extends TargetInfo {
 
     @Override
     public String toString() {
-        return super.toString() + ": " + "index: " + typeParameterIndex;
+        return super.toString() + ": index: " + typeParameterIndex;
     }
 }

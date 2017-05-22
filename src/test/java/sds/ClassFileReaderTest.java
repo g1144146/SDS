@@ -129,13 +129,13 @@ public class ClassFileReaderTest {
                 assertThat(desc3[0], is("java.util.function.Consumer<T>"));
                 assertThat(name3[0], is("c"));
 
-                // runtime visible type annotations , and items of that.
+                // runtime visible type annotations, and items of that.
                 RuntimeTypeAnnotations r = (RuntimeTypeAnnotations)codeItr[3];
                 TypeAnnotation ta = r.types[0];
                 assertThat(ta.targetInfo.type, is(TargetInfoType.LocalVarTarget));
                 TypePath tp = ta.targetPath;
                 assertThat(tp.typeArgIndex[0], is(0));
-                ElementValuePair evp = ta.getElementValuePairs()[0];
+                ElementValuePair evp = ta.elementValuePairs[0];
                 assertThat(extract(evp.elementNameIndex, pool), is("value"));
                 assertThat(extract(evp.value.getConstValueIndex(), pool), is("generics_type"));
             }

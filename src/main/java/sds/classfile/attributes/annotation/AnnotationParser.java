@@ -23,8 +23,8 @@ public class AnnotationParser {
      * @return parsed annotation
      */
     public static String parseAnnotation(Annotation annotation, SDSStringBuilder sb, ConstantInfo[] pool) {
-        sb.append("@", parse(extract(annotation.getTypeIndex(), pool)), "(");
-        ElementValuePair[] evp = annotation.getElementValuePairs();
+        sb.append("@", parse(extract(annotation.typeIndex, pool)), "(");
+        ElementValuePair[] evp = annotation.elementValuePairs;
         for(int i = 0; i < evp.length; i++) {
             sb.append(extract(evp[i].elementNameIndex, pool), " = ", 
                 parseElementValue(evp[i].value, new SDSStringBuilder(), pool), ",");
