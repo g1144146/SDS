@@ -10,31 +10,25 @@ import sds.classfile.ClassFileStream;
  * SourceDebugExtension Attribute</a>.
  * @author inagakikenichi
  */
-public class SourceDebugExtension extends AttributeInfo {
-    private int[] debugExtension;
+public class SourceDebugExtension implements AttributeInfo {
+    /**
+     * constant-pool entry index of debugging information.
+     */
+    public final int[] debugExtension;
 
     SourceDebugExtension(int length, ClassFileStream data) throws IOException {
-        super(AttributeType.SourceDebugExtension);
         this.debugExtension = new int[length];
         for(int i = 0; i < length; i++) {
             debugExtension[i] = data.readUnsignedByte();
         }
     }
 
-    /**
-     * returns constant-pool entry index of debugging information.
-     * @return constant-pool entry index of debugging information
-     */
-    public int[] getDebugExtension() {
-        return debugExtension;
-    }
-
     @Override
     public String toString() {
         StringJoiner sj = new StringJoiner(",", "[", "]");
         for(int ex : debugExtension) {
-            sj.add(ex + "");
+            sj.add(Integer.toString(ex));
         }
-        return super.toString() + ": " + sj.toString();
+        return "[SourceDebugExtension]: " + sj.toString();
     }
 }

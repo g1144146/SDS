@@ -10,35 +10,24 @@ import sds.classfile.constantpool.ConstantInfo;
  * EnclosingMethod Attribute</a>.
  * @author inagaki
  */
-public class EnclosingMethod extends AttributeInfo {
-    private String _class;
-    private String method;
+public class EnclosingMethod implements AttributeInfo {
+    /**
+     * class of enclosing method.
+     */
+    public final String _class;
+    /**
+     * enclosing method.
+     */
+    public final String method;
     
     EnclosingMethod(ClassFileStream data, ConstantInfo[] pool) throws IOException {
-        super(AttributeType.EnclosingMethod);
         this._class = extract(data.readShort(), pool);
         int methodIndex = data.readShort();
         this.method = methodIndex > 0 ? extract(methodIndex, pool) : "";
     }
 
-    /**
-     * returns class of enclosing method.
-     * @return class
-     */
-    public String getEncClass() {
-        return _class;
-    }
-
-    /**
-     * returns enclosing method.
-     * @return method
-     */
-    public String getEncMethod() {
-        return method;
-    }
-
     @Override
     public String toString() {
-        return super.toString() + ": " + _class + "." + method;
+        return "[EnclosingMethod]: " + _class + "." + method;
     }
 }

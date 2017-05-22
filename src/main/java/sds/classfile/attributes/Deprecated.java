@@ -6,8 +6,7 @@ package sds.classfile.attributes;
  * Deprecated Attribute</a>.
  * @author inagaki
  */
-public class Deprecated extends AttributeInfo {
-    Deprecated() {
-        super(AttributeType.Deprecated);
-    }
+public class Deprecated implements AttributeInfo {
+    @Override
+    public String toString() { return "[Deprecated]"; }
 }

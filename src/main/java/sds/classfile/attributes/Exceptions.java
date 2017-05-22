@@ -11,23 +11,17 @@ import sds.classfile.constantpool.ConstantInfo;
  * Exceptions Attribute</a>.
  * @author inagaki
  */
-public class Exceptions extends AttributeInfo {
-    private String[] exceptionTable;
+public class Exceptions implements AttributeInfo {
+    /**
+     * exception classes.
+     */
+    public final String[] exceptionTable;
 
     Exceptions(ClassFileStream data, ConstantInfo[] pool) throws IOException {
-        super(AttributeType.Exceptions);
         this.exceptionTable = new String[data.readShort()];
         for(int i = 0; i < exceptionTable.length; i++) {
             exceptionTable[i] = extract(data.readShort(), pool).replace("/", ".");
         }
-    }
-
-    /**
-     * returns exception classes.
-     * @return exception classes
-     */
-    public String[] getExceptionTable() {
-        return exceptionTable;
     }
 
     @Override
@@ -36,6 +30,6 @@ public class Exceptions extends AttributeInfo {
         for(String ex : exceptionTable) {
             sj.add(ex);
         }
-        return super.toString() + ": " + sj.toString();
+        return "[Exceptions]: " + sj.toString();
     }
 }

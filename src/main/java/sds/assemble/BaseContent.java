@@ -31,47 +31,35 @@ public abstract class BaseContent {
      * @param pool constant-pool
      */
     void analyzeAttribute(AttributeInfo info, ConstantInfo[] pool) {
-        switch(info.getType()) {
-            case Deprecated: break;
-            case RuntimeVisibleAnnotations:
-                RuntimeAnnotations rva = (RuntimeAnnotations)info;
-                this.annContent = new AnnotationContent(rva.getAnnotations(), true);
-//                System.out.println("<Runtime Visible Annotation>: ");
-//                for(String a : annContent.visible)
-//                    System.out.println("  " + a);
-                break;
-            case RuntimeInvisibleAnnotations:
-                RuntimeAnnotations ria = (RuntimeAnnotations)info;
+        switch(info.getClass().getSimpleName()) {
+            case "Deprecated": break;
+            case "RuntimeAnnotations":
+                RuntimeAnnotations ra = (RuntimeAnnotations)info;
+                if(ra.name.equals("RuntimeVisibleAnnotations")) {
+                    this.annContent = new AnnotationContent(ra.annotations, true);
+                    break;
+                }
                 if(annContent == null) {
-                    this.annContent = new AnnotationContent(ria.getAnnotations(), false);
+                    this.annContent = new AnnotationContent(ra.annotations, false);
                 } else {
-                    annContent.setInvisible(ria.getAnnotations());
+                    annContent.setInvisible(ra.annotations);
                 }
-//                System.out.println("<Runtime Invisible Annotation>: ");
-//                for(String a : annContent.invisible)
-//                    System.out.println("  " + a);
                 break;
-            case RuntimeVisibleTypeAnnotations:
-                RuntimeTypeAnnotations rvta = (RuntimeTypeAnnotations)info;
-                this.taContent = new TypeAnnotationContent(rvta.getAnnotations(), true);
-                System.out.println("<Runtime Visible Type Annotation>: ");
-                for(String a : taContent.visible)
-                    System.out.println("  " + a);
-                break;
-            case RuntimeInvisibleTypeAnnotations:
-                RuntimeTypeAnnotations rita = (RuntimeTypeAnnotations)info;
+            case "RuntimeTypeAnnotations":
+                RuntimeTypeAnnotations rta = (RuntimeTypeAnnotations)info;
+                if(rta.name.equals("RuntimeVisibleTypeAnnotations")) {
+                    this.taContent = new TypeAnnotationContent(rta.annotations, true);
+                    break;
+                }
                 if(taContent == null) {
-                    this.taContent = new TypeAnnotationContent(rita.getAnnotations(), false);
+                    this.taContent = new TypeAnnotationContent(rta.annotations, false);
                 } else {
-                    taContent.setInvisible(rita.getAnnotations());
+                    taContent.setInvisible(rta.annotations);
                 }
-                System.out.println("<Runtime Invisible Type Annotation>: ");
-                for(String a : taContent.invisible)
-                    System.out.println("  " + a);
                 break;
-            case Signature:
+            case "Signature":
                 Signature sig = (Signature)info;
-                String desc = sig.getSignature();
+                String desc = sig.signature;
                 String parsedDesc = parse(desc, true);
                 String genericsType
                     = parsedDesc.substring(parsedDesc.indexOf("<") + 1, parsedDesc.lastIndexOf(">"));
@@ -84,7 +72,7 @@ public abstract class BaseContent {
                     }
                 }
                 break;
-            case Synthetic: break;
+            case "Synthetic": break;
             default:        break;
         }
     }

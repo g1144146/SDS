@@ -3,7 +3,6 @@ package sds.classfile.attributes.annotation;
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
 import sds.classfile.attributes.AttributeInfo;
-import sds.classfile.attributes.AttributeType;
 import sds.classfile.constantpool.ConstantInfo;
 import sds.util.SDSStringBuilder;
 
@@ -18,18 +17,25 @@ import static sds.classfile.attributes.annotation.AnnotationParser.parseAnnotati
  * RuntimeParameterInvisibleAnnotations Attribute</a>.
  * @author inagaki
  */
-public class RuntimeParameterAnnotations extends AttributeInfo {
-    private String[][] parameterAnnotations;
+public class RuntimeParameterAnnotations implements AttributeInfo {
+    /**
+     * runtime parameter annotations.
+     */
+    public final String[][] parameterAnnotations;
+    /**
+     * attribute name.
+     */
+    public final String name;
 
     /**
      * constructor.
-     * @param type attribute type
+     * @param name attribute name
      * @param data classfile stream
      * @param pool constant-pool
      * @throws IOException 
      */
-    public RuntimeParameterAnnotations(AttributeType type, ClassFileStream data, ConstantInfo[] pool) throws IOException {
-        super(type);
+    public RuntimeParameterAnnotations(String name, ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        this.name = name;
         this.parameterAnnotations = new String[data.readByte()][];
         for(int i = 0; i < parameterAnnotations.length; i++) {
             String[] annotations = new String[data.readShort()];
@@ -38,13 +44,5 @@ public class RuntimeParameterAnnotations extends AttributeInfo {
             }
             parameterAnnotations[i] = annotations;
         }
-    }
-
-    /**
-     * returns runtime parameter annotations.
-     * @return runtime parameter annotations
-     */
-    public String[][] getParamAnnotations() {
-        return parameterAnnotations;
     }
 }

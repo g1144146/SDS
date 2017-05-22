@@ -64,7 +64,7 @@ public class ClassFileReaderTest {
         }
         assertThat(extract(cf.superClass, pool), is("Object"));
         assertThat(extract(cf.thisClass, pool), is("Hello"));
-        String source = ((SourceFile)cf.attr[0]).getSourceFile();
+        String source = ((SourceFile)cf.attr[0]).sourceFile;
         assertThat(source, is("Hello.java"));
     }
 
@@ -80,11 +80,11 @@ public class ClassFileReaderTest {
             
             AttributeInfo[] itr = m.getAttr();
             RuntimeAnnotations a1 = (RuntimeAnnotations)itr[0];
-            assertThat(a1.getAnnotations()[0], is("@sds.RuntimeAnnotation(value = \"field\")"));
+            assertThat(a1.annotations[0], is("@sds.RuntimeAnnotation(value = \"field\")"));
             
             RuntimeTypeAnnotations a2 = (RuntimeTypeAnnotations)itr[1];
-            assertThat(a2.getTypes()[0].getTargetInfo().getType().toString(), is("EmptyTarget"));
-            assertThat(a2.getAnnotations()[0], is("@sds.RuntimeAnnotation(value = \"field\")"));
+            assertThat(a2.types[0].getTargetInfo().getType().toString(), is("EmptyTarget"));
+            assertThat(a2.annotations[0], is("@sds.RuntimeAnnotation(value = \"field\")"));
         }
         
         // public void method(int)    
@@ -97,32 +97,32 @@ public class ClassFileReaderTest {
             AttributeInfo[] itr = method.getAttr();
             Code code = (Code)itr[0];
             { // attributes in code attribute and opcodes.
-                assertThat(code.getMaxStack(), is(1));
-                assertThat(code.maxLocals(), is(3));
-                OpcodeInfo[] op = code.getCode(); // opcodes
+                assertThat(code.maxStack, is(1));
+                assertThat(code.maxLocals, is(3));
+                OpcodeInfo[] op = code.opcodes; // opcodes
                 assertThat(op[0].getType(), is(MnemonicTable.aload_0));
                 assertThat(op[1].getType(), is(MnemonicTable.inovokedynamic));
                 assertThat(op[2].getType(), is(MnemonicTable.astore_2));
                 assertThat(op[3].getType(), is(MnemonicTable._return));
                 
-                AttributeInfo[] codeItr = code.getAttr();
+                AttributeInfo[] codeItr = code.attr;
                 
-                int[][] table = ((LineNumberTable)codeItr[0]).getLineNumberTable();
+                int[][] table = ((LineNumberTable)codeItr[0]).table;
                 assertThat(table[0][1], is(7));
                 assertThat(table[0][2], is(27));
                 
-                int[][] table2 = ((LocalVariable)codeItr[1]).getTable();
-                String[] name2 = ((LocalVariable)codeItr[1]).getName();
-                String[] desc2 = ((LocalVariable)codeItr[1]).getDesc();
+                int[][] table2 = ((LocalVariable)codeItr[1]).table;
+                String[] name2 = ((LocalVariable)codeItr[1]).name;
+                String[] desc2 = ((LocalVariable)codeItr[1]).desc;
                 assertThat(table2[0][0], is(0));
                 assertThat(table2[0][1], is(8));
                 assertThat(table2[0][2], is(0));
                 assertThat(desc2[0], is("sds.AnnotatedTest"));
                 assertThat(name2[0], is("this"));
                 
-                int[][] table3 = ((LocalVariable)codeItr[2]).getTable();
-                String[] name3 = ((LocalVariable)codeItr[2]).getName();
-                String[] desc3 = ((LocalVariable)codeItr[2]).getDesc();
+                int[][] table3 = ((LocalVariable)codeItr[2]).table;
+                String[] name3 = ((LocalVariable)codeItr[2]).name;
+                String[] desc3 = ((LocalVariable)codeItr[2]).desc;
                 assertThat(table3[0][0], is(7));
                 assertThat(table3[0][1], is(1));
                 assertThat(table3[0][2], is(2));
@@ -131,7 +131,7 @@ public class ClassFileReaderTest {
 
                 // runtime visible type annotations , and items of that.
                 RuntimeTypeAnnotations r = (RuntimeTypeAnnotations)codeItr[3];
-                TypeAnnotation ta = r.getTypes()[0];
+                TypeAnnotation ta = r.types[0];
                 assertThat(ta.getTargetInfo().getType(), is(TargetInfoType.LocalVarTarget));
                 TypePath tp = ta.getTargetPath();
                 assertThat(tp.getArgIndex()[0], is(0));
@@ -140,44 +140,44 @@ public class ClassFileReaderTest {
                 assertThat(extract(evp.getValue().getConstValueIndex(), pool), is("generics_type"));
             }
             Exceptions e = (Exceptions)itr[1];
-            assertThat(e.getExceptionTable()[0], is("Exception"));
+            assertThat(e.exceptionTable[0], is("Exception"));
             sds.classfile.attributes.Deprecated dep = (sds.classfile.attributes.Deprecated)itr[2];
-            assertThat(dep.getType(), is(AttributeType.Deprecated));
+            assertThat(dep.toString(), is("[Deprecated]"));
             
             Signature sig = (Signature)itr[3];
-            assertThat(sig.getSignature(), is("<T:Ljava/lang/Object;>(I)V"));
+            assertThat(sig.signature, is("<T:Ljava/lang/Object;>(I)V"));
             
             // runtime visible annotations , and items of that.
             RuntimeAnnotations rva = (RuntimeAnnotations)itr[4];
-            String depAnn = rva.getAnnotations()[0];
+            String depAnn = rva.annotations[0];
             assertThat(depAnn, is("@Deprecated"));
-            String rep = rva.getAnnotations()[1];
+            String rep = rva.annotations[1];
             assertThat(rep, is("@sds.RepeatableRuntimeAnnotation(value = {@sds.RuntimeAnnotation(value = \"method\")"
                                                             + ",@sds.RuntimeAnnotation(value = \"return_type\")})"));
             
             // runtime visible type annotations , and items of that.
             RuntimeTypeAnnotations rvta = (RuntimeTypeAnnotations)itr[5];
-            assertThat(rvta.getTypes()[0].getTargetInfo().getType(), is(TargetInfoType.TypeParameterTarget));
-            assertThat(rvta.getTypes()[1].getTargetInfo().getType(), is(TargetInfoType.TypeParameterBoundTarget));
-            assertThat(rvta.getTypes()[2].getTargetInfo().getType(), is(TargetInfoType.ThrowsTarget));
-            assertThat(rvta.getTypes()[3].getTargetInfo().getType(), is(TargetInfoType.MethodFormalParameterTarget));
-            assertThat(rvta.getAnnotations()[0], is("@sds.RuntimeAnnotation(value = \"generics_type_definition\")"));
-            assertThat(rvta.getAnnotations()[1], is("@sds.RuntimeAnnotation(value = \"type_param_extends\")"));
-            assertThat(rvta.getAnnotations()[2], is("@sds.RuntimeAnnotation(value = \"throws_exception\")"));
-            assertThat(rvta.getAnnotations()[3], is("@sds.RuntimeAnnotation(value = \"method_arg\")"));
+            assertThat(rvta.types[0].getTargetInfo().getType(), is(TargetInfoType.TypeParameterTarget));
+            assertThat(rvta.types[1].getTargetInfo().getType(), is(TargetInfoType.TypeParameterBoundTarget));
+            assertThat(rvta.types[2].getTargetInfo().getType(), is(TargetInfoType.ThrowsTarget));
+            assertThat(rvta.types[3].getTargetInfo().getType(), is(TargetInfoType.MethodFormalParameterTarget));
+            assertThat(rvta.annotations[0], is("@sds.RuntimeAnnotation(value = \"generics_type_definition\")"));
+            assertThat(rvta.annotations[1], is("@sds.RuntimeAnnotation(value = \"type_param_extends\")"));
+            assertThat(rvta.annotations[2], is("@sds.RuntimeAnnotation(value = \"throws_exception\")"));
+            assertThat(rvta.annotations[3], is("@sds.RuntimeAnnotation(value = \"method_arg\")"));
             
             // runtime visible parameter annotations , and items of that.
             RuntimeParameterAnnotations ra = (RuntimeParameterAnnotations)itr[6];
-            assertThat(ra.getParamAnnotations()[0][0], is("@sds.RuntimeAnnotation(value = \"method_arg\")"));
+            assertThat(ra.parameterAnnotations[0][0], is("@sds.RuntimeAnnotation(value = \"method_arg\")"));
         }
         
         // attributes which class has.
         AttributeInfo[] cfAnItr = cfAnnotation.attr;
         
         SourceFile sf = (SourceFile)cfAnItr[0];
-        assertThat(sf.getSourceFile(), is("AnnotatedTest.java"));
+        assertThat(sf.sourceFile, is("AnnotatedTest.java"));
         
-        String[][] classes = ((InnerClasses)cfAnItr[2]).getClasses();
+        String[][] classes = ((InnerClasses)cfAnItr[2]).classes;
         assertThat(classes[0][3], is("public class "));
         assertThat(classes[0][0], is("sds.AnnotatedTest$Inner"));
         assertThat(classes[1][3], is("public static final enum "));
@@ -185,8 +185,8 @@ public class ClassFileReaderTest {
         assertThat(classes[2][3], is("public static final class "));
         assertThat(classes[2][0], is("java.lang.invoke.MethodHandles$Lookup"));
 
-        String[][] bsm = ((BootstrapMethods)cfAnItr[3]).getBSMArgs();
-        String[] bsmRef = ((BootstrapMethods)cfAnItr[3]).getBSMRef();
+        String[][] bsm = ((BootstrapMethods)cfAnItr[3]).bootstrapArgs;
+        String[] bsmRef = ((BootstrapMethods)cfAnItr[3]).bsmRef;
         assertThat(bsmRef[0], is("java.lang.invoke.LambdaMetafactory.metafactory|("
                         + "java.lang.invoke.MethodHandles$Lookup,String,java.lang.invoke.MethodType,"
                         + "java.lang.invoke.MethodType,java.lang.invoke.MethodHandle,java.lang.invoke.MethodType)"

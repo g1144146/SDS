@@ -12,11 +12,18 @@ import static sds.util.AccessFlags.get;
  * InnerClasses Attribute</a>.
  * @author inagaki
  */
-public class InnerClasses extends AttributeInfo {
-    private String[][] classes;
+public class InnerClasses implements AttributeInfo {
+    /**
+     * inner classes.<br>
+     * when one of array index defines N, the array content is next:<br>
+     * - classes[N][0]: inner class<br>
+     * - classes[N][1]: outer class<br>
+     * - classes[N][2]: inner class name<br>
+     * - classes[N][3]: inner class access flag
+     */
+    public final String[][] classes;
 
     InnerClasses(ClassFileStream data, ConstantInfo[] pool) throws IOException {
-        super(AttributeType.InnerClasses);
         this.classes = new String[data.readShort()][4];
         for(int i = 0; i < classes.length; i++) {
             int innerClassInfoIndex = data.readShort();
@@ -38,18 +45,5 @@ public class InnerClasses extends AttributeInfo {
 
     private boolean checkRange(int index, int size) {
         return (0 <= index) && (index < size);
-    }
-
-    /**
-     * returns inner classes.<br>
-     * when one of array index defines N, the array content is next:<br>
-     * - classes[N][0]: inner class<br>
-     * - classes[N][1]: outer class<br>
-     * - classes[N][2]: inner class name<br>
-     * - classes[N][3]: inner class access flag
-     * @return classes
-     */
-    public String[][] getClasses() {
-        return classes;
     }
 }

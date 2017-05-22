@@ -10,24 +10,18 @@ import sds.classfile.constantpool.ConstantInfo;
  * SourceFile Attribute</a>.
  * @author inagaki
  */
-public class SourceFile extends AttributeInfo {
-    private String sourceFile;
+public class SourceFile implements AttributeInfo {
+    /**
+     * source file.
+     */
+    public final String sourceFile;
 
     SourceFile(ClassFileStream data, ConstantInfo[] pool) throws IOException {
-        super(AttributeType.SourceFile);
         this.sourceFile = extract(data.readShort(), pool);
-    }
-
-    /**
-     * returns source file.
-     * @return source file
-     */
-    public String getSourceFile() {
-        return sourceFile;
     }
 
     @Override
     public String toString() {
-        return super.toString() + ": " + sourceFile;
+        return "[SourceFile]: " + sourceFile;
     }
 }

@@ -3,7 +3,6 @@ package sds.classfile.attributes.annotation;
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
 import sds.classfile.attributes.AttributeInfo;
-import sds.classfile.attributes.AttributeType;
 import sds.classfile.constantpool.ConstantInfo;
 import sds.util.SDSStringBuilder;
 
@@ -18,18 +17,19 @@ import static sds.classfile.attributes.annotation.AnnotationParser.parseAnnotati
  * RuntimeInvisibleAnnotations Attribute</a>.
  * @author inagaki
  */
-public class RuntimeAnnotations extends AttributeInfo {
-    private String[] annotations;
+public class RuntimeAnnotations implements AttributeInfo {
+    public final String[] annotations;
+    public final String name;
 
     /**
      * constructor.
-     * @param type attribute type
+     * @param name attribute name
      * @param data classfile stream
      * @param pool constant-pool
      * @throws IOException 
      */
-    public RuntimeAnnotations(AttributeType type, ClassFileStream data, ConstantInfo[] pool) throws IOException {
-        super(type);
+    public RuntimeAnnotations(String name, ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        this.name = name;
         this.annotations = new String[data.readShort()];
         for(int i = 0; i < annotations.length; i++) {
             annotations[i] = parseAnnotation(new Annotation(data), new SDSStringBuilder(), pool);

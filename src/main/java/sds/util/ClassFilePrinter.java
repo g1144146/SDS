@@ -162,12 +162,12 @@ public class ClassFilePrinter extends Printer {
      * @throws Exception
      */
     public void printAttributeInfo(AttributeInfo info, String indent) throws Exception {
-        switch(info.getType()) {
-            case BootstrapMethods:
+        switch(info.getClass().getSimpleName()) {
+            case "BootstrapMethods":
                 println(indent + info);
                 BootstrapMethods bsm = (BootstrapMethods)info;
-                String[] bsmRef = bsm.getBSMRef();
-                String[][] bsmArg = bsm.getBSMArgs();
+                String[] bsmRef = bsm.bsmRef;
+                String[][] bsmArg = bsm.bootstrapArgs;
                 for(int i = 0; i < bsmRef.length; i++) {
                     println(indent + indent + "bsm ref: " + bsmRef[i]);
                     for(String arg : bsmArg[i]) {
@@ -175,74 +175,72 @@ public class ClassFilePrinter extends Printer {
                     }
                 }
                 break;
-            case Code:
+            case "Code":
                 println(indent + info);
                 Code code = (Code)info;
-                println(indent + indent + "max_stack: " + code.getMaxStack() + ", max_locals: " + code.maxLocals());
-                this.opcodes = code.getCode();
+                println(indent + indent + "max_stack: " + code.maxStack + ", max_locals: " + code.maxLocals);
+                this.opcodes = code.opcodes;
                 for(OpcodeInfo op : opcodes) {
                     println(indent + indent + op.getPc() + " - " + op);
                 }
-                if(code.getExceptionTable().length > 0) {
+                if(code.exceptionTable.length > 0) {
                     println("  ExceptionTable");
+                    int[][] ex = code.exceptionTable;
+                    String[] cTable = code.catchTable;
+                    for(int i = 0; i < cTable.length; i++) {
+                        print(indent + indent + (i + 1) + ". pc: " + ex[i][0] + "-" + ex[i][1]
+                              + ", handler: " + ex[i][2]);
+                        println(", catch_type: " + cTable[i]);
+                    }
                 }
-                int[][] ex = code.getExceptionTable();
-                String[] cTable = code.getCatchTable();
-                for(int i = 0; i < cTable.length; i++) {
-                    print(indent + indent + (i + 1) + ". pc: " + ex[i][0] + "-" + ex[i][1] + ", handler: " + ex[i][2]);
-                    println(", catch_type: " + cTable[i]);
-                }
-                for(AttributeInfo a : code.getAttr()) {
+                for(AttributeInfo a : code.attr) {
                     printAttributeInfo(a, indent + indent);
                 }
                 break;
-            case InnerClasses:
+            case "InnerClasses":
                 println(indent + info);
                 InnerClasses ic = (InnerClasses)info;
                 int classIndex = 1;
-                for(String[] c : ic.getClasses()) {
+                for(String[] c : ic.classes) {
                     println(indent + indent + classIndex + ". " + c[3] + c[0]);
                     classIndex++;
                 }
                 break;
-            case LineNumberTable:
+            case "LineNumberTable":
                 println(indent + info);
                 LineNumberTable lnt = (LineNumberTable)info;
                 int lineIndex = 1;
-                for(int[] t : lnt.getLineNumberTable()) {
+                for(int[] t : lnt.table) {
                     print(indent + indent + lineIndex + ". start_pc: " + t[0] + ", end_pc: " + t[1]);
                     println(", line_number: " + t[2]);
                     lineIndex++;
                 }
                 break;
-            case LocalVariableTable:
-            case LocalVariableTypeTable:
-                println(indent + info);
+            case "LocalVariable":
                 LocalVariable lv = (LocalVariable)info;
-                int[][] lvt = lv.getTable();
-                String[] name = lv.getDesc();
-                String[] desc = lv.getDesc();
+                println(indent + lv.typeName);
+                int[][] lvt = lv.table;
+                String[] name = lv.name;
+                String[] desc = lv.desc;
                 for(int i = 0; i < name.length; i++) {
                     print(indent + indent + (i+1) + ". pc: " + lvt[i][0] + "-" + (lvt[i][0] + lvt[i][1] - 1));
                     println(", name: " + name[i] + ", index: " + lvt[i][2] + ", desc: " + desc[i]);
                 }
                 break;
-            case RuntimeInvisibleAnnotations:
-            case RuntimeVisibleAnnotations:
-                println(indent + info);
+            case "RuntimeAnnotations":
                 RuntimeAnnotations rva = (RuntimeAnnotations)info;
+                println(indent + rva.name);
                 int rvaIndex = 1;
                 for(String a : rva.getAnnotations()) {
                     println(indent + indent + rvaIndex + "." + a);
                     rvaIndex++;
                 }
                 break;
-            case RuntimeInvisibleParameterAnnotations:
-            case RuntimeVisibleParameterAnnotations:
-                println(indent + info);
+            case "RuntimeParameterAnnotations":
                 RuntimeParameterAnnotations rvpa = (RuntimeParameterAnnotations)info;
+                println(indent + rvpa.name);
                 int rvpaIndex = 1;
-                for(String[] pa : rvpa.getParamAnnotations()) {
+                for(String[] pa : rvpa.parameterAnnotations) {
                     println(indent + indent + rvpaIndex + ".");
                     for(String a : pa) {
                         println(indent + indent + indent + a);
@@ -250,22 +248,21 @@ public class ClassFilePrinter extends Printer {
                     rvpaIndex++;
                 }
                 break;
-            case RuntimeInvisibleTypeAnnotations:
-            case RuntimeVisibleTypeAnnotations:
-                println(indent + info);
+            case "RuntimeTypeAnnotations":
                 RuntimeTypeAnnotations rvta = (RuntimeTypeAnnotations)info;
+                println(indent + rvta.name);
                 int rvtaIndex = 1;
-                for(TypeAnnotation pa : rvta.getTypes()) {
+                for(TypeAnnotation pa : rvta.types) {
                     println(indent + indent + rvtaIndex + "." + parseAnnotation(pa, new SDSStringBuilder(), pool));
                     printTargetInfo(pa.getTargetInfo(), indent + indent + indent);
                     printTypePath(pa.getTargetPath(), indent + indent + indent);
                     rvtaIndex++;
                 }
                 break;
-            case StackMapTable:
+            case "StackMapTable":
                 println(indent + info);
                 StackMapTable smt = (StackMapTable)info;
-                Map<Integer, Map<String, List<String>>> stackMap = smt.getEntries();
+                Map<Integer, Map<String, List<String>>> stackMap = smt.entries;
                 for(Integer i : stackMap.keySet()) {
                     Map<String, List<String>> map = stackMap.get(i.intValue());
                     println(indent + indent + i + ": " + map);

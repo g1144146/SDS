@@ -13,11 +13,16 @@ import static sds.util.AccessFlags.get;
   * MethodParameters Attribute</a>.
  * @author inagaki
  */
-public class MethodParameters extends AttributeInfo {
-    private String[][] params;
+public class MethodParameters implements AttributeInfo {
+    /**
+     * method parameters.<br>
+     * when one of array index defines N, the array content is next:<br>
+     * - param[N][0]: name<br>
+     * - param[N][1]: access flag
+     */
+    public final String[][] params;
 
     MethodParameters(ClassFileStream data, ConstantInfo[] pool) throws IOException {
-        super(AttributeType.MethodParameters);
         this.params = new String[data.readByte()][2];
         for(int i = 0; i < params.length; i++) {
             int nameIndex = data.readShort();
@@ -27,23 +32,12 @@ public class MethodParameters extends AttributeInfo {
         }
     }
 
-    /**
-     * returns method parameters.<br>
-     * when one of array index defines N, the array content is next:<br>
-     * - param[N][0]: name<br>
-     * - param[N][1]: access flag
-     * @return method parameters
-     */
-    public String[][] getParams() {
-        return params;
-    }
-
     @Override
     public String toString() {
         StringJoiner sj = new StringJoiner(", ", "[", "]");
         for(String[] param : params) {
             sj.add(param[1] + param[0]);
         }
-        return sj.toString();
+        return "[MethodParameters]: " + sj.toString();
     }
 }

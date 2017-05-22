@@ -9,26 +9,20 @@ import static sds.util.DescriptorParser.parse;
  * Signature Attribute</a>.
  * @author inagaki
  */
-public class Signature extends AttributeInfo {
-    private String signature;
+public class Signature implements AttributeInfo {
+    /**
+     * signature.
+     */
+    public final String signature;
 
     Signature(int sigIndex, ConstantInfo[] pool) {
-        super(AttributeType.Signature);
         this.signature = extract(sigIndex, pool);
-    }
-
-    /**
-     * returns signature.
-     * @return signature
-     */
-    public String getSignature() {
-        return signature;
     }
 
     @Override
     public String toString() {
         String genericsType = parse(signature.substring(0, signature.lastIndexOf(">") + 1), true);
         String returnType = parse(signature.substring(signature.lastIndexOf(">") + 1));
-        return super.toString() + ": " + genericsType + returnType;
+        return "[Signature]: " + genericsType + returnType;
     }
 }

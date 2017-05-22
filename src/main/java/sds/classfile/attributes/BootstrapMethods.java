@@ -10,12 +10,17 @@ import sds.classfile.constantpool.ConstantInfo;
  * BootstrapMethods Attribute</a>.
  * @author inagaki
  */
-public class BootstrapMethods extends AttributeInfo {
-    private String[] bsmRef;
-    private String[][] bootstrapArgs;
+public class BootstrapMethods implements AttributeInfo {
+    /**
+     * bootstrap method
+     */
+    public final String[] bsmRef;
+    /**
+     * bootstrap method arguments.
+     */
+    public final String[][] bootstrapArgs;
 
     BootstrapMethods(ClassFileStream data, ConstantInfo[] pool) throws IOException {
-        super(AttributeType.BootstrapMethods);
         int len = data.readShort();
         this.bsmRef = new String[len];
         this.bootstrapArgs = new String[len][];
@@ -27,21 +32,5 @@ public class BootstrapMethods extends AttributeInfo {
             }
             this.bootstrapArgs[i] = args;
         }
-    }
-
-    /**
-     * returns bootstrap method.
-     * @return bootstrap method
-     */
-    public String[] getBSMRef() {
-        return bsmRef;
-    }
-    
-    /**
-     * retunrs bootstrap method arguments.
-     * @return bootstrap method arguments
-     */
-    public String[][] getBSMArgs() {
-        return bootstrapArgs;
     }
 }

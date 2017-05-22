@@ -91,30 +91,30 @@ public class MethodContent extends MemberContent {
 
     @Override
     void analyzeAttribute(AttributeInfo info, ConstantInfo[] pool) {
-        switch(info.getType()) {
-            case AnnotationDefault:
+        switch(info.getClass().getSimpleName()) {
+            case "AnnotationDefault":
                 AnnotationDefault ad = (AnnotationDefault) info;
-                this.defaultAnn = ad.getDefaultValue();
+                this.defaultAnn = ad.defaultValue;
                 break;
-            case Code:
+            case "Code":
                 Code code = (Code) info;
-                this.maxStack = code.getMaxStack();
-                this.maxLocals = code.maxLocals();
-                this.opcodes = code.getCode();
+                this.maxStack = code.maxStack;
+                this.maxLocals = code.maxLocals;
+                this.opcodes = code.opcodes;
                 // throws exceptions
-                int[][] exTable = code.getExceptionTable();
-                String[] exClass = code.getCatchTable();
+                int[][] exTable = code.exceptionTable;
+                String[] exClass = code.catchTable;
                 this.exContent = new ExceptionContent(exTable, exClass);
                 // other attributes
-                for(AttributeInfo a : code.getAttr()) {
+                for(AttributeInfo a : code.attr) {
                     analyzeAttribute(a, pool);
                 }
                 break;
-            case Exceptions:
-                this.exceptions = ((Exceptions) info).getExceptionTable();
+            case "Exceptions":
+                this.exceptions = ((Exceptions)info).exceptionTable;
                 break;
-            case LineNumberTable:
-                int[][] table = ((LineNumberTable)info).getLineNumberTable();
+            case "LineNumberTable":
+                int[][] table = ((LineNumberTable)info).table;
                 this.inst = new LineInstructions[table.length];
                 for(int i = 0; i < inst.length; i++) {
                     inst[i] = new LineInstructions();
@@ -145,65 +145,48 @@ public class MethodContent extends MemberContent {
                     }
                 }
                 break;
-            case LocalVariableTable:
-                LocalVariable lvt = (LocalVariable)info;
-                this.valContent = new LocalVariableContent(lvt.getTable(), lvt.getName(), lvt.getDesc(), pool);
+            case "LocalVariable":
+                LocalVariable lv = (LocalVariable)info;
+                if(lv.typeName.equals("LocalVariableTable")) {
+                    this.valContent = new LocalVariableContent(lv.table, lv.name, lv.desc, pool);
+                } else {
+                    valContent.setType(lv.table, lv.desc);
+                }
                 break;
-            case LocalVariableTypeTable:
-                LocalVariable lvtt = (LocalVariable)info;
-                valContent.setType(lvtt.getTable(), lvtt.getDesc());
-                break;
-            case MethodParameters:
-                String[][] param = ((MethodParameters)info).getParams();
+            case "MethodParameters":
+                String[][] param = ((MethodParameters)info).params;
                 this.args = new String[param.length][2];
                 for(int i = 0; i < param.length; i++) {
                     args[i][0] = param[i][1];
                     args[i][1] = param[i][0];
                 }
                 break;
-            case RuntimeInvisibleParameterAnnotations:
-                RuntimeParameterAnnotations ripa = (RuntimeParameterAnnotations) info;
-                String[][] invisiblePA = ripa.getParamAnnotations();
+            case "RuntimeParameterAnnotations":
+                RuntimeParameterAnnotations rpa = (RuntimeParameterAnnotations) info;
+                String[][] invisiblePA = rpa.parameterAnnotations;
+                if(rpa.name.equals("RuntimeVisibleParameterAnnotations")) {
+                    this.paContent = new ParamAnnotationContent(rpa.parameterAnnotations, true);
+                    break;
+                }
                 if(paContent == null) {
                     this.paContent = new ParamAnnotationContent(invisiblePA, false);
                 } else {
                     paContent.setInvisible(invisiblePA);
                 }
-//                System.out.println("<<<Runtime Invisible Parameter Annotation>>>: ");
-//                for(String[] a : paContent.invParam)
-//                    System.out.println("  " + Arrays.toString(a));
                 break;
-            case RuntimeVisibleParameterAnnotations:
-                RuntimeParameterAnnotations rvpa = (RuntimeParameterAnnotations) info;
-                String[][] visiblePA = rvpa.getParamAnnotations();
-                this.paContent = new ParamAnnotationContent(visiblePA, true);
-//                System.out.println("<<<Runtime Visible Parameter Annotation>>>: ");
-//                for(String[] a : paContent.param)
-//                    System.out.println("  " + Arrays.toString(a));
-                break;
-            case RuntimeVisibleTypeAnnotations:
-                RuntimeTypeAnnotations rvta = (RuntimeTypeAnnotations) info;
-                this.taContent = new MethodTypeAnnotationContent(rvta.getAnnotations(), true);
-                System.out.println("<<<Runtime Visible Type Annotation>>>: ");
-                for(int i = 0; i < taContent.count; i++) {
-                    System.out.print(taContent.visible[i]);
-                    System.out.println(", " + taContent.targets[i]);
+            case "RuntimeVisibleTypeAnnotations":
+                RuntimeTypeAnnotations rta = (RuntimeTypeAnnotations)info;
+                if(rta.name.equals("RuntimeVisibleTypeAnnotations")) {
+                    this.taContent = new MethodTypeAnnotationContent(rta.annotations, true);
+                    break;
                 }
-                break;
-            case RuntimeInvisibleTypeAnnotations:
-                RuntimeTypeAnnotations rita = (RuntimeTypeAnnotations) info;
                 if(taContent == null) {
-                    this.taContent = new MethodTypeAnnotationContent(rita.getAnnotations(), false);
+                    this.taContent = new MethodTypeAnnotationContent(rta.annotations, false);
                 } else {
-                    taContent.setInvisible(rita.getAnnotations());
-                }
-                System.out.println("<<<Runtime Invisible Type Annotation>>>: ");
-                for(int i = 0; i < taContent.count; i++) {
-                    System.out.print(taContent.invisible[i]);
-                    System.out.println(", " + taContent.invTargets[i]);
+                    taContent.setInvisible(rta.annotations);
                 }
                 break;
-            case StackMapTable:
+            case "StackMapTable":
                 StackMapTable smt = (StackMapTable) info;
                 break;
             default:

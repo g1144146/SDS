@@ -15,13 +15,30 @@ import static sds.util.DescriptorParser.parse;
  * LocalVariableTypeTable Attribute</a>.
  * @author inagaki
  */
-public class LocalVariable extends AttributeInfo {
-    private int[][] table;
-    private String[] name;
-    private String[] desc;
+public class LocalVariable implements AttributeInfo {
+    /**
+     * local variable table.<br>
+     * when one of array index defines N, the array content is next:<br>
+     * - table[N][0]: start pc<br>
+     * - table[N][1]: length<br>
+     * - table[N][2]: index
+     */
+    public final int[][] table;
+    /**
+     * local variable names.
+     */
+    public final String[] name;
+    /**
+     * local variable descriptors.
+     */
+    public final String[] desc;
+    /**
+     * attribute type name.
+     */
+    public final String typeName;
 
-    LocalVariable(AttributeType type, ClassFileStream data, ConstantInfo[] pool) throws IOException {
-        super(type);
+    LocalVariable(String typeName, ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        this.typeName = typeName;
         int len = data.readShort();
         this.table = new int[len][3];
         this.name = new String[len];
@@ -36,33 +53,5 @@ public class LocalVariable extends AttributeInfo {
             name[i] = extract(nameIndex, pool);
             desc[i] = (descIndex-1 >= 0) ? parse(extract(descIndex, pool)) : "";
         }
-    }
-
-    /**
-     * return local variable table.<br>
-     * when one of array index defines N, the array content is next:<br>
-     * - table[N][0]: start pc<br>
-     * - table[N][1]: length<br>
-     * - table[N][2]: index
-     * @return local variable table
-     */
-    public int[][] getTable() {
-        return table;
-    }
-
-    /**
-     * returns local variable names.
-     * @return name
-     */
-    public String[] getName() {
-        return name;
-    }
-    
-    /**
-     * returns local variable descriptors.
-     * @return descriptor
-     */
-    public String[] getDesc() {
-        return desc;
     }
 }

@@ -10,24 +10,18 @@ import sds.classfile.constantpool.ConstantInfo;
  * ConstantValue Attribute</a>.
  * @author inagaki
  */
-public class ConstantValue extends AttributeInfo {
-    private String constantValue;
+public class ConstantValue implements AttributeInfo {
+    /**
+     * constant value
+     */
+    public final String constantValue;
 
     ConstantValue(ClassFileStream data, ConstantInfo[] pool) throws IOException {
-        super(AttributeType.ConstantValue);
         this.constantValue = extract(data.readShort(), pool);
-    }
-
-    /**
-     * returns constant value.
-     * @return constant value
-     */
-    public String getConstantValue() {
-        return constantValue;
     }
 
     @Override
     public String toString() {
-        return super.toString() + ": " + constantValue;
+        return "[ConstantValue]: " + constantValue;
     }
 }

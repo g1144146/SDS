@@ -70,12 +70,12 @@ public class ClassContent extends BaseContent {
 
     @Override
     void analyzeAttribute(AttributeInfo info, ConstantInfo[] pool) {
-        switch(info.getType()) {
-            case BootstrapMethods:
+        switch(info.getClass().getSimpleName()) {
+            case "BootstrapMethods":
                 BootstrapMethods bsm = (BootstrapMethods)info;
-                this.bootstrapMethods = new String[bsm.getBSMArgs().length];
+                this.bootstrapMethods = new String[bsm.bootstrapArgs.length];
                 int index = 0;
-                for(String[] b : bsm.getBSMArgs()) {
+                for(String[] b : bsm.bootstrapArgs) {
                     for(String arg : b) {
                         if(! arg.startsWith("(")) {
                             bootstrapMethods[index++] = arg;
@@ -83,47 +83,37 @@ public class ClassContent extends BaseContent {
                     }
                 }
                 break;
-            case EnclosingMethod:
+            case "EnclosingMethod":
                 EnclosingMethod em = (EnclosingMethod)info;
-                this.enclosingClass  = em.getEncClass();
-                this.enclosingMethod = em.getEncMethod();
+                this.enclosingClass  = em._class;
+                this.enclosingMethod = em.method;
                 break;
-            case InnerClasses:
+            case "InnerClasses":
                 InnerClasses ic = (InnerClasses)info;
-                this.nested = new NestedClass[ic.getClasses().length];
-                String[][] c = ic.getClasses();
+                this.nested = new NestedClass[ic.classes.length];
+                String[][] c = ic.classes;
                 for(int i = 0; i < c.length; i++) {
                     nested[i] = new NestedClass(c[i]);
                 }
                 break;
-            case RuntimeVisibleTypeAnnotations:
-                RuntimeTypeAnnotations rvta = (RuntimeTypeAnnotations)info;
-                this.taContent = new ClassTypeAnnotationContent(rvta.getAnnotations(), true);
-                System.out.println("<<<Runtime Visible Type Annotation>>>: ");
-                for(int i = 0; i < taContent.count; i++) {
-                    System.out.print(taContent.visible[i]);
-                    System.out.println(", " + taContent.targets[i]);
+            case "RuntimeTypeAnnotations":
+                RuntimeTypeAnnotations rta = (RuntimeTypeAnnotations)info;
+                if(rta.name.equals("RuntimeVisibleTypeAnnotations")) {
+                    this.taContent = new ClassTypeAnnotationContent(rta.annotations, true);
+                    break;
                 }
-                break;
-            case RuntimeInvisibleTypeAnnotations:
-                RuntimeTypeAnnotations rita = (RuntimeTypeAnnotations)info;
                 if(taContent == null) {
-                    this.taContent = new ClassTypeAnnotationContent(rita.getAnnotations(), false);
+                    this.taContent = new ClassTypeAnnotationContent(rta.annotations, false);
                 } else {
-                    taContent.setInvisible(rita.getAnnotations());
-                }
-                System.out.println("<<<Runtime Invisible Type Annotation>>>: ");
-                for(int i = 0; i < taContent.count; i++) {
-                    System.out.print(taContent.invisible[i]);
-                    System.out.println(", " + taContent.invTargets[i]);
+                    taContent.setInvisible(rta.annotations);
                 }
                 break;
-            case SourceDebugExtension:
+            case "SourceDebugExtension":
                 // todo
                 break;
-            case SourceFile:
+            case "SourceFile":
                 SourceFile sf = (SourceFile)info;
-                this.sourceFile = sf.getSourceFile();
+                this.sourceFile = sf.sourceFile;
                 break;
             default:
                 super.analyzeAttribute(info, pool);

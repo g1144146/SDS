@@ -24,14 +24,14 @@ public class FieldContent extends MemberContent {
 
     @Override
     void analyzeAttribute(AttributeInfo info, ConstantInfo[] pool) {
-        switch(info.getType()) {
-            case ConstantValue:
+        switch(info.getClass().getSimpleName()) {
+            case "ConstantValue":
                 ConstantValue cv = (ConstantValue)info;
-                this.constVal = cv.getConstantValue();
+                this.constVal = cv.constantValue;
                 break;
-            case Signature:
+            case "Signature":
                 Signature sig = (Signature)info;
-                this.desc = parse(sig.getSignature());
+                this.desc = parse(sig.signature);
                 break;
             default:
                 super.analyzeAttribute(info, pool);
