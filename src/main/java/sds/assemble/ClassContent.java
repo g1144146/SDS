@@ -198,7 +198,7 @@ public class ClassContent extends BaseContent {
         @Override
         void initTarget(TargetInfo target, int annIndex, boolean isVisible) {
             String annotation = isVisible ? visible[annIndex] : invisible[annIndex];
-            switch(target.getType()) {
+            switch(target.type) {
                 case SuperTypeTarget:
 //                    SuperTypeTarget stt = (SuperTypeTarget)target;
 //                    if(stt.getIndex() == -1) {

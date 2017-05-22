@@ -56,7 +56,7 @@ public class StackMapFrameParser {
                     list.add(parseVerification(sle.getStack(), pool, opcodes));
                     map.put("stack", list);
                     map.put("local", local);
-                    key = sle.getOffset();
+                    key = sle.offset;
                     break;
                 case ChopFrame:
                     ChopFrame cf = (ChopFrame)frame;
@@ -67,13 +67,13 @@ public class StackMapFrameParser {
                     }
                     map.put("stack", list);
                     map.put("local", local);
-                    key = cf.getOffset();
+                    key = cf.offset;
                     break;
                 case SameFrameExtended:
                     SameFrameExtended sf = (SameFrameExtended)frame;
                     map.put("stack", list);
                     map.put("local", local);
-                    key = sf.getOffset();
+                    key = sf.offset;
                     break;
                 case AppendFrame:
                     AppendFrame af = (AppendFrame)frame;
@@ -83,11 +83,11 @@ public class StackMapFrameParser {
                     }
                     map.put("stack", list);
                     map.put("local", local);
-                    key = af.getOffset();
+                    key = af.offset;
                     break;
                 case FullFrame:
                     FullFrame ff = (FullFrame)frame;
-                    VerificationTypeInfo[] ffStackInfo = ff.getStacks();
+                    VerificationTypeInfo[] ffStackInfo = ff.stacks;
                     String[] ffStack = new String[ffStackInfo.length];
                     for(int i = 0; i < ffStack.length; i++) {
                         ffStack[i] = parseVerification(ffStackInfo[i], pool, opcodes);
@@ -101,7 +101,7 @@ public class StackMapFrameParser {
                     List<String> ffLocalsList = new ArrayList<>(Arrays.asList(ffLocals));
                     map.put("stack", ffStackList);
                     map.put("local", ffLocalsList);
-                    key = ff.getOffset();
+                    key = ff.offset;
                     break;
                 default:
                     break;
@@ -115,12 +115,12 @@ public class StackMapFrameParser {
     private static String parseVerification(VerificationTypeInfo info, ConstantInfo[] pool, OpcodeInfo[] opcodes) {
         if(info instanceof ObjectVariableInfo) {
             ObjectVariableInfo ov = (ObjectVariableInfo)info;
-            String value = extract(ov.getCPoolIndex(), pool);
+            String value = extract(ov.cpoolIndex, pool);
             return value.startsWith("[") ? parse(value) : value;
         }
         if(info instanceof UninitializedVariableInfo) {
             UninitializedVariableInfo uv = (UninitializedVariableInfo)info;
-            return extractOperand(opcodes[uv.getOffset()], pool);
+            return extractOperand(opcodes[uv.offset], pool);
         }
         return info.toString();
     }

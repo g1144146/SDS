@@ -11,8 +11,17 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public class TypePath {
-    private int[] typePathKind;
-    private int[] typeArgIndex;
+    /**
+     * kind index of location of the annotation.
+     * the kind index of location of the annotation in an array type,
+     * nested type, or parameterized type.<br>
+     * 0~3.
+     */
+    public final int[] typePathKind;
+    /**
+     * index of type argument of a parameterized type is annotated.
+     */
+    public final int[] typeArgIndex;
 
     TypePath(ClassFileStream data) throws IOException {
         this.typeArgIndex = new int[data.readUnsignedByte()];
@@ -21,24 +30,5 @@ public class TypePath {
             this.typePathKind[i] = data.readByte();
             this.typeArgIndex[i] = data.readByte();
         }
-    }
-
-    /**
-     * returns kind index of location of the annotation.
-     * the kind index of location of the annotation in an array type,
-     * nested type, or parameterized type.<br>
-     * 0~3.
-     * @return  kind index of location of the annotation
-     */
-    public int[] getPathKind() {
-        return typePathKind;
-    }
-
-    /**
-     * returns index of type argument of a parameterized type is annotated.
-     * @return index of type argument
-     */
-    public int[] getArgIndex() {
-        return typeArgIndex;
     }
 }

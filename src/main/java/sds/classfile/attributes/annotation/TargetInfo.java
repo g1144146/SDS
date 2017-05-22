@@ -8,18 +8,10 @@ package sds.classfile.attributes.annotation;
  * @author inagaki
  */
 public abstract class TargetInfo {
-    private TargetInfoType type;
+    public final TargetInfoType type;
 
     TargetInfo(TargetInfoType type) {
         this.type = type;
-    }
-
-    /**
-     * retunrs target info type
-     * @return target info type
-     */
-    public TargetInfoType getType() {
-        return type;
     }
 
     @Override
@@ -29,15 +21,11 @@ public abstract class TargetInfo {
 }
 
 class CatchTarget extends TargetInfo {
-    private int exceptionTableIndex;
+    public final int exceptionTableIndex;
 
     CatchTarget(int index) {
         super(TargetInfoType.CatchTarget);
         this.exceptionTableIndex = index;
-    }
-
-    public int getIndex() {
-        return exceptionTableIndex;
     }
 
     @Override
@@ -53,7 +41,7 @@ class EmptyTarget extends TargetInfo {
 }
 
 class MethodFormalParameterTarget extends TargetInfo {
-    private int formalParameterIndex;
+    public final int formalParameterIndex;
 
     MethodFormalParameterTarget(int formalParameterIndex) {
         super(TargetInfoType.MethodFormalParameterTarget);
@@ -71,15 +59,11 @@ class MethodFormalParameterTarget extends TargetInfo {
 }
 
 class OffsetTarget extends TargetInfo {
-    private int offset;
+    public final int offset;
 
     OffsetTarget(int offset) {
         super(TargetInfoType.OffsetTarget);
         this.offset = offset;
-    }
-
-    public int getOffset() {
-        return offset;
     }
 
     @Override
@@ -89,15 +73,11 @@ class OffsetTarget extends TargetInfo {
 }
 
 class SuperTypeTarget extends TargetInfo {
-    private int superTypeIndex;
+    public final int superTypeIndex;
 
     SuperTypeTarget(int superTypeIndex) {
         super(TargetInfoType.SuperTypeTarget);
         this.superTypeIndex = superTypeIndex;
-    }
-
-    public int getIndex() {
-        return superTypeIndex;
     }
 
     @Override
@@ -107,15 +87,11 @@ class SuperTypeTarget extends TargetInfo {
 }
 
 class ThrowsTarget extends TargetInfo {
-    private int throwsTypeIndex;
+    public final int throwsTypeIndex;
 
     ThrowsTarget(int throwsTypeIndex) {
         super(TargetInfoType.ThrowsTarget);
         this.throwsTypeIndex = throwsTypeIndex;
-    }
-
-    public int getIndex() {
-        return throwsTypeIndex;
     }
 
     @Override
@@ -125,21 +101,13 @@ class ThrowsTarget extends TargetInfo {
 }
 
 class TypeArgumentTarget extends TargetInfo {
-    private int offset;
-    private int typeArgumentIndex;
+    public final int offset;
+    public final int typeArgumentIndex;
 
     TypeArgumentTarget(int offset, int index) {
         super(TargetInfoType.TypeArgumentTarget);
         this.offset = offset;
         this.typeArgumentIndex = index;
-    }
-
-    public int getOffset() {
-        return offset;
-    }
-
-    public int getIndex() {
-        return typeArgumentIndex;
     }
 
     @Override
@@ -149,21 +117,13 @@ class TypeArgumentTarget extends TargetInfo {
 }
 
 class TypeParameterBoundTarget extends TargetInfo {
-    private int typeParameterIndex;
-    private int boundIndex;
+    public final int typeParameterIndex;
+    public final int boundIndex;
 
     TypeParameterBoundTarget(int typeParameterIndex, int boundIndex) {
         super(TargetInfoType.TypeParameterBoundTarget);
         this.typeParameterIndex = typeParameterIndex;
         this.boundIndex = boundIndex;
-    }
-
-    public int getTPI() {
-        return typeParameterIndex;
-    }
-
-    public int getBoundIndex() {
-        return boundIndex;
     }
 
     @Override
@@ -173,15 +133,11 @@ class TypeParameterBoundTarget extends TargetInfo {
 }
 
 class TypeParameterTarget extends TargetInfo {
-    private int typeParameterIndex;
+    public final int typeParameterIndex;
 
     TypeParameterTarget(int typeParameterIndex) {
         super(TargetInfoType.TypeParameterTarget);
         this.typeParameterIndex = typeParameterIndex;
-    }
-
-    public int getIndex() {
-        return typeParameterIndex;
     }
 
     @Override

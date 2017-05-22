@@ -10,7 +10,14 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public class LocalVarTarget extends TargetInfo {
-    private int[][] table;
+    /**
+     * local var table.<br>
+     * when one of array index defines N, the array content is next:<br>
+     * - table[N][0]: start pc<br>
+     * - table[N][1]: length<br>
+     * - table[N][2]: index
+     */
+    public final int[][] table;
 
     LocalVarTarget(ClassFileStream data) throws IOException {
         super(TargetInfoType.LocalVarTarget);
@@ -20,17 +27,5 @@ public class LocalVarTarget extends TargetInfo {
             table[i][1] = data.readShort();
             table[i][2] = data.readShort();
         }
-    }
-
-    /**
-     * returns local var table.<br>
-     * when one of array index defines N, the array content is next:<br>
-     * - table[N][0]: start pc<br>
-     * - table[N][1]: length<br>
-     * - table[N][2]: index
-     * @return local var table
-     */
-    public int[][] getTable() {
-        return table;
     }
 }

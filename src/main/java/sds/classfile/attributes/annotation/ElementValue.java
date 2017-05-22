@@ -8,7 +8,10 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public class ElementValue {
-    private char tag;
+    /**
+     * ASCII character to indicate the type of the value of the element-value.
+     */
+    public final char tag;
     private int constValueIndex;
     private EnumConstValue enumConstValue;
     private int classInfoIndex;
@@ -33,15 +36,6 @@ public class ElementValue {
             case '[': this.arrayValue      = new ArrayValue(data);     break;
             default:  throw new RuntimeException("unknown tag: " + tag + ".");
         }
-    }
-
-    /**
-     * returns ASCII character to indicate the type of the value
-     * of the element-value.
-     * @return ASCII character
-     */
-    public char getTag() {
-        return tag;
     }
 
     /**

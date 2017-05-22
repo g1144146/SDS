@@ -231,7 +231,7 @@ public class ClassFilePrinter extends Printer {
                 RuntimeAnnotations rva = (RuntimeAnnotations)info;
                 println(indent + rva.name);
                 int rvaIndex = 1;
-                for(String a : rva.getAnnotations()) {
+                for(String a : rva.annotations) {
                     println(indent + indent + rvaIndex + "." + a);
                     rvaIndex++;
                 }
@@ -254,8 +254,8 @@ public class ClassFilePrinter extends Printer {
                 int rvtaIndex = 1;
                 for(TypeAnnotation pa : rvta.types) {
                     println(indent + indent + rvtaIndex + "." + parseAnnotation(pa, new SDSStringBuilder(), pool));
-                    printTargetInfo(pa.getTargetInfo(), indent + indent + indent);
-                    printTypePath(pa.getTargetPath(), indent + indent + indent);
+                    printTargetInfo(pa.targetInfo, indent + indent + indent);
+                    printTypePath(pa.targetPath, indent + indent + indent);
                     rvtaIndex++;
                 }
                 break;
@@ -277,20 +277,20 @@ public class ClassFilePrinter extends Printer {
     private void printTargetInfo(TargetInfo info, String indent) {
         if(info instanceof LocalVarTarget) {
             LocalVarTarget lvt = (LocalVarTarget)info;
-            println(indent + info.getType());
-            for(int[] t : lvt.getTable()) {
+            println(indent + info.type);
+            for(int[] t : lvt.table) {
                 println(indent + "index: " + t[2] + ", pc: " + t[0] + "-" + (t[0] + t[1] - 1));
             }
             return;
         }
-        println(indent + info.getType());
+        println(indent + info.type);
     }
 
     private void printTypePath(TypePath path, String indent) {
-        for(int i = 0; i < path.getArgIndex().length; i++) {
+        for(int i = 0; i < path.typeArgIndex.length; i++) {
             print(indent + "type_path_type: ");
-            int pk = path.getPathKind()[i];
-            int ai = path.getArgIndex()[i];
+            int pk = path.typePathKind[i];
+            int ai = path.typeArgIndex[i];
             switch(pk) {
                 case 0:
                     println("Annotation is deeper in an array type.");

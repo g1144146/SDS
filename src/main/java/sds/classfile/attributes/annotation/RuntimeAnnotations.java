@@ -18,7 +18,13 @@ import static sds.classfile.attributes.annotation.AnnotationParser.parseAnnotati
  * @author inagaki
  */
 public class RuntimeAnnotations implements AttributeInfo {
+    /**
+     * runtime annotations.
+     */
     public final String[] annotations;
+    /**
+     * attribute name.
+     */
     public final String name;
 
     /**
@@ -34,13 +40,5 @@ public class RuntimeAnnotations implements AttributeInfo {
         for(int i = 0; i < annotations.length; i++) {
             annotations[i] = parseAnnotation(new Annotation(data), new SDSStringBuilder(), pool);
         }
-    }
-
-    /**
-     * returns runtime annotations.
-     * @return runtime annotations
-     */
-    public String[] getAnnotations() {
-        return annotations;
     }
 }

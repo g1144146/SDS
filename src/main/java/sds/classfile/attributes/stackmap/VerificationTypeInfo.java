@@ -9,7 +9,7 @@ package sds.classfile.attributes.stackmap;
  * @author inagaki
  */
 public class VerificationTypeInfo {
-    private String type;
+    public final String type;
 
     VerificationTypeInfo(String type) {
         this.type = type;
@@ -22,27 +22,19 @@ public class VerificationTypeInfo {
 }
 
 class ObjectVariableInfo extends VerificationTypeInfo {
-    private int cpoolIndex;
+    public final int cpoolIndex;
 
     ObjectVariableInfo(int cpoolIndex) {
         super("object");
         this.cpoolIndex = cpoolIndex;
     }
-
-    public int getCPoolIndex() {
-        return cpoolIndex;
-    }
 }
 
 class UninitializedVariableInfo extends VerificationTypeInfo {
-    private int offset;
+    public final int offset;
 
     UninitializedVariableInfo(int offset) {
         super("variable");
         this.offset = offset;
-    }
-
-    public int getOffset() {
-        return offset;
     }
 }

@@ -83,7 +83,7 @@ public class ClassFileReaderTest {
             assertThat(a1.annotations[0], is("@sds.RuntimeAnnotation(value = \"field\")"));
             
             RuntimeTypeAnnotations a2 = (RuntimeTypeAnnotations)itr[1];
-            assertThat(a2.types[0].getTargetInfo().getType().toString(), is("EmptyTarget"));
+            assertThat(a2.types[0].targetInfo.type.toString(), is("EmptyTarget"));
             assertThat(a2.annotations[0], is("@sds.RuntimeAnnotation(value = \"field\")"));
         }
         
@@ -132,12 +132,12 @@ public class ClassFileReaderTest {
                 // runtime visible type annotations , and items of that.
                 RuntimeTypeAnnotations r = (RuntimeTypeAnnotations)codeItr[3];
                 TypeAnnotation ta = r.types[0];
-                assertThat(ta.getTargetInfo().getType(), is(TargetInfoType.LocalVarTarget));
-                TypePath tp = ta.getTargetPath();
-                assertThat(tp.getArgIndex()[0], is(0));
+                assertThat(ta.targetInfo.type, is(TargetInfoType.LocalVarTarget));
+                TypePath tp = ta.targetPath;
+                assertThat(tp.typeArgIndex[0], is(0));
                 ElementValuePair evp = ta.getElementValuePairs()[0];
-                assertThat(extract(evp.getElementNameIndex(), pool), is("value"));
-                assertThat(extract(evp.getValue().getConstValueIndex(), pool), is("generics_type"));
+                assertThat(extract(evp.elementNameIndex, pool), is("value"));
+                assertThat(extract(evp.value.getConstValueIndex(), pool), is("generics_type"));
             }
             Exceptions e = (Exceptions)itr[1];
             assertThat(e.exceptionTable[0], is("Exception"));
@@ -157,10 +157,10 @@ public class ClassFileReaderTest {
             
             // runtime visible type annotations , and items of that.
             RuntimeTypeAnnotations rvta = (RuntimeTypeAnnotations)itr[5];
-            assertThat(rvta.types[0].getTargetInfo().getType(), is(TargetInfoType.TypeParameterTarget));
-            assertThat(rvta.types[1].getTargetInfo().getType(), is(TargetInfoType.TypeParameterBoundTarget));
-            assertThat(rvta.types[2].getTargetInfo().getType(), is(TargetInfoType.ThrowsTarget));
-            assertThat(rvta.types[3].getTargetInfo().getType(), is(TargetInfoType.MethodFormalParameterTarget));
+            assertThat(rvta.types[0].targetInfo.type, is(TargetInfoType.TypeParameterTarget));
+            assertThat(rvta.types[1].targetInfo.type, is(TargetInfoType.TypeParameterBoundTarget));
+            assertThat(rvta.types[2].targetInfo.type, is(TargetInfoType.ThrowsTarget));
+            assertThat(rvta.types[3].targetInfo.type, is(TargetInfoType.MethodFormalParameterTarget));
             assertThat(rvta.annotations[0], is("@sds.RuntimeAnnotation(value = \"generics_type_definition\")"));
             assertThat(rvta.annotations[1], is("@sds.RuntimeAnnotation(value = \"type_param_extends\")"));
             assertThat(rvta.annotations[2], is("@sds.RuntimeAnnotation(value = \"throws_exception\")"));

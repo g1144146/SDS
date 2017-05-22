@@ -26,8 +26,8 @@ public class AnnotationParser {
         sb.append("@", parse(extract(annotation.getTypeIndex(), pool)), "(");
         ElementValuePair[] evp = annotation.getElementValuePairs();
         for(int i = 0; i < evp.length; i++) {
-            sb.append(extract(evp[i].getElementNameIndex(), pool), " = ", 
-                parseElementValue(evp[i].getValue(), new SDSStringBuilder(), pool), ",");
+            sb.append(extract(evp[i].elementNameIndex, pool), " = ", 
+                parseElementValue(evp[i].value, new SDSStringBuilder(), pool), ",");
         }
         return evp.length > 0 
                 ? sb.toString().substring(0, sb.length()-1) + ")"
@@ -42,7 +42,7 @@ public class AnnotationParser {
      * @return parsed element value
      */
     public static String parseElementValue(ElementValue element, SDSStringBuilder sb, ConstantInfo[] pool) {
-        switch(element.getTag()) {
+        switch(element.tag) {
             case 'B':
                 sb.append(extract(element.getConstValueIndex(), pool));
                 break;
@@ -62,7 +62,7 @@ public class AnnotationParser {
                 break;
             case 'e':
                 EnumConstValue ecv = element.getEnumConstValue();
-                sb.append(parse(extract(ecv.getTypeNameIndex(), pool)), ".", extract(ecv.getConstNameIndex(), pool));
+                sb.append(parse(extract(ecv.typeNameIndex, pool)), ".", extract(ecv.constNameIndex, pool));
                 break;
             case 'c':
                 sb.append(parse(extract(element.getClassInfoIndex(), pool)), ".class");
@@ -73,13 +73,13 @@ public class AnnotationParser {
             case '[':
                 sb.append("{");
                 SDSStringBuilder values = new SDSStringBuilder();
-                for(ElementValue ev : element.getArrayValue().getValues()) {
+                for(ElementValue ev : element.getArrayValue().values) {
                     values.append(parseElementValue(ev, new SDSStringBuilder(), pool), ",");
                 }
                 sb.append(values.toString().substring(0, values.length() - 1), "}");
                 break;
             default:
-                throw new RuntimeException(Character.toString(element.getTag()));
+                throw new RuntimeException(Character.toString(element.tag));
         }
         return sb.toString();
     }

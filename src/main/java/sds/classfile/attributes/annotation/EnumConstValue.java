@@ -8,29 +8,17 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public class EnumConstValue {
-    private int typeNameIndex;
-    private int constNameIndex;
+    /**
+     * constant-pool entry index of internal form of the binary name of the type of the enum constant.
+     */
+    public final int typeNameIndex;
+    /**
+     * constant-pool entry index of name of the enum constant.
+     */
+    public final int constNameIndex;
 
     EnumConstValue(ClassFileStream data) throws IOException {
         this.typeNameIndex = data.readShort();
         this.constNameIndex = data.readShort();
-    }
-
-    /**
-     * returns constant-pool entry index of internal form of
-     * the binary name of the type of the enum constant.
-     * @return constant-pool entry index of internal form of
-     * the binary name of the type of the enum constant
-     */
-    public int getTypeNameIndex()  {
-        return typeNameIndex;
-    }
-
-    /**
-     * returns constant-pool entry index of name of the enum constant.
-     * @return constant-pool entry index of name of the enum constant
-     */
-    public int getConstNameIndex() {
-        return constNameIndex;
     }
 }

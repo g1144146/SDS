@@ -42,6 +42,7 @@ class SameFrame implements StackMapFrame {
         return stack;
     }
 
+    
     @Override
     public StackMapFrameType getFrameType() {
         return frameType;
@@ -51,7 +52,7 @@ class SameFrame implements StackMapFrame {
     public int getTag() {
         return tag;
     }
-
+    
     @Override
     public String toString() {
         return frameType + "[" + tag + "]"; 
@@ -72,17 +73,13 @@ class SameLocals1StackItemFrame extends SameFrame {
 }
 
 class SameLocals1StackItemFrameExtended extends SameFrame {
-    private int offset;
+    public final int offset;
 
     SameLocals1StackItemFrameExtended(int tag, ClassFileStream data) throws IOException {
         super(StackMapFrameType.SameLocals1StackItemFrameExtended, tag);
         this.offset = data.readShort();
         VerificationTypeInfoFactory factory = new VerificationTypeInfoFactory();
         this.stack = factory.create(data);
-    }
-
-    public int getOffset() {
-        return offset;
     }
 
     @Override
@@ -92,16 +89,12 @@ class SameLocals1StackItemFrameExtended extends SameFrame {
 }
 
 class ChopFrame extends SameFrame {
-    private int offset;
+    public final int offset;
     VerificationTypeInfo[] locals;
 
     ChopFrame(StackMapFrameType type, int tag, int offset) throws IOException {
         super(type, tag);
         this.offset = offset;
-    }
-
-    public int getOffset() {
-        return offset;
     }
 
     public VerificationTypeInfo[] getLocals() {
@@ -134,7 +127,7 @@ class AppendFrame extends ChopFrame {
 }
 
 class FullFrame extends ChopFrame {
-    private VerificationTypeInfo[] stacks;
+    public final VerificationTypeInfo[] stacks;
 
     FullFrame(int tag, ClassFileStream data) throws IOException {
         super(StackMapFrameType.FullFrame, tag, data.readShort());
@@ -147,10 +140,6 @@ class FullFrame extends ChopFrame {
         for(int i = 0; i < stacks.length; i++) {
             stacks[i] = factory.create(data);
         }
-    }
-
-    public VerificationTypeInfo[] getStacks() {
-        return stacks;
     }
 
     @Override

@@ -533,7 +533,7 @@ public class MethodContent extends MemberContent {
         @Override
         void initTarget(TargetInfo target, int annIndex, boolean isVisible) {
             String annotation = isVisible ? visible[annIndex] : invisible[annIndex];
-            switch(target.getType()) {
+            switch(target.type) {
                 case CatchTarget:
 //                    CatchTarget ct = (CatchTarget) target;
 //                    exContent.getException()[ct.getIndex()]
