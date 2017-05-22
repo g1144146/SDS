@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.Before;
 
 import sds.classfile.attributes.stackmap.StackMapTable;
-import static sds.classfile.attributes.AttributeType.*;
 
 public class AttributeInfoFactoryTest {
 	private AttributeInfoFactory b;
