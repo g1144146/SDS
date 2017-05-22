@@ -1,8 +1,7 @@
 package sds.classfile.attributes;
 
-import java.io.IOException;
-import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
+import static sds.util.DescriptorParser.parse;
 
 /**
  * This class is for
@@ -10,26 +9,20 @@ import sds.classfile.ConstantPool;
  * Signature Attribute</a>.
  * @author inagaki
  */
-public class Signature extends AttributeInfo {
-	private String signature;
+public class Signature implements AttributeInfo {
+    /**
+     * signature.
+     */
+    public final String signature;
 
-	/**
-	 * constructor.
-	 */
-	public Signature() {
-		super(AttributeType.Signature);
-	}
+    Signature(int sigIndex, ConstantInfo[] pool) {
+        this.signature = extract(sigIndex, pool);
+    }
 
-	/**
-	 * returns signature.
-	 * @return signature
-	 */
-	public String getSignature() {
-		return signature;
-	}
-
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.signature = extract(pool.get(data.readShort()-1), pool);
-	}
+    @Override
+    public String toString() {
+        String genericsType = parse(signature.substring(0, signature.lastIndexOf(">") + 1), true);
+        String returnType = parse(signature.substring(signature.lastIndexOf(">") + 1));
+        return "[Signature]: " + genericsType + returnType;
+    }
 }

@@ -1,9 +1,11 @@
 plugins {
+	id "java"
+	id "application"
     id "org.gradle.java"
     id "com.scuilion.syntastic" version "0.3.8"
+    id "jacoco"
+    id 'com.github.kt3k.coveralls' version '2.6.3'
 }
-apply(plugin: 'java')
-apply(plugin: 'application')
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -11,6 +13,13 @@ mainClassName = 'sds.Main'
 
 repositories {
     mavenCentral()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
 }
 
 dependencies {
@@ -22,6 +31,16 @@ dependencies {
 javadoc {
     options.encoding = "UTF-8"
     options.locale = "en_US"
+}
+
+sourceSets {
+    main {
+        java.srcDir 'src/main/java'
+    }
+    test {
+        java.srcDir 'src/test/java'
+        resources.srcDir 'src/test/resources'
+    }
 }
 
 jar {

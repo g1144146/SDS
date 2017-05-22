@@ -14,35 +14,35 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public abstract class SwitchOpcode extends OpcodeInfo {
-	int defaultByte;
+    /**
+     * returns default byte.<br>
+     * jump point of default key is "defaultByte + pc".
+     */
+    public final int defaultByte;
 
-	public SwitchOpcode(MnemonicTable opcodeType, int pc) {
-		super(opcodeType, pc);
-	}
+    SwitchOpcode(ClassFileStream data, MnemonicTable opcodeType, int pc) throws IOException {
+        super(opcodeType, pc);
+        for(int i = 1; ((i + pc) % 4) != 0; i++) {
+            data.readByte();
+        }
+        this.defaultByte = data.readInt();
+    }
 
-	@Override
-	public void read(ClassFileStream data) throws IOException {
-		for(int i = 1; ((i+this.getPc()) % 4) != 0; i++) {
-			data.readByte();
-		}
-		this.defaultByte = data.readInt();
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof SwitchOpcode)) {
+            return false;
+        }
+        SwitchOpcode opcode = (SwitchOpcode)obj;
+        return super.equals(obj) && (defaultByte == opcode.defaultByte);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if(!(obj instanceof SwitchOpcode)) {
-			return false;
-		}
-		SwitchOpcode opcode = (SwitchOpcode)obj;
-		return super.equals(obj) && (defaultByte == opcode.defaultByte);
-	}
-
-	/**
-	 * returns default byte.<br>
-	 * jump point of default key is "defaultByte + pc".
-	 * @return default byte
-	 */
-	public int getDefault() {
-		return defaultByte;
-	}
+    /**
+     * returns default byte.<br>
+     * jump point of default key is "defaultByte + pc".
+     * @return default byte
+     */
+    public int getDefault() {
+        return defaultByte;
+    }
 }

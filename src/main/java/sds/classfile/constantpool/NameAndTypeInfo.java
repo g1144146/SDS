@@ -1,52 +1,22 @@
 package sds.classfile.constantpool;
 
-import java.io.IOException;
-import sds.classfile.ClassFileStream;
-
 /**
  * This class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.6">
  * Constant_NameAndType_Info</a>.
  * @author inagaki
  */
-public class NameAndTypeInfo extends ConstantInfo {
-	private int nameIndex;
-	private int descriptorIndex;
+public class NameAndTypeInfo implements ConstantInfo {
+    final int nameIndex;
+    final int descIndex;
 
-	/**
-	 * constructor.
-	 */
-	public NameAndTypeInfo() {
-		super(ConstantType.C_NAME_AND_TYPE);
-	}
+    NameAndTypeInfo(int nameIndex, int descIndex) {
+        this.nameIndex = nameIndex;
+        this.descIndex = descIndex;
+    }
 
-	/**
-	 * returns constant-pool entry index of name
-	 * @return constant-pool entry index of name
-	 */
-	public int getNameIndex() {
-		return nameIndex;
-	}
-
-	/**
-	 * returns constant-pool entry index of descriptor.
-	 * @return constant-pool entry index of descriptor
-	 */
-	public int getDescriptorIndex() {
-		return descriptorIndex;
-	}
-
-	@Override
-	public void read(ClassFileStream data) throws IOException {
-		this.nameIndex = data.readShort();
-		this.descriptorIndex = data.readShort();
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(super.toString()).append("\t#")
-			.append(nameIndex).append(":#").append(descriptorIndex);
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        return "CONSTANT_NAME_AND_TYPE\t#" + nameIndex + ":#" + descIndex;
+    }
 }

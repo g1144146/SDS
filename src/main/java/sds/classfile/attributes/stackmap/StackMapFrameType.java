@@ -6,11 +6,11 @@ package sds.classfile.attributes.stackmap;
  * @author inagaki
  */
 public enum StackMapFrameType {
-	SameFrame,
-	SameLocals1StackItemFrame,
-	SameLocals1StackItemFrameExtended,
-	ChopFrame,
-	SameFrameExtended,
-	AppendFrame,
-	FullFrame;
+    SameFrame,
+    SameLocals1StackItemFrame,
+    SameLocals1StackItemFrameExtended,
+    ChopFrame,
+    SameFrameExtended,
+    AppendFrame,
+    FullFrame;
 }

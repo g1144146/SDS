@@ -1,7 +1,7 @@
 package sds.assemble;
 
-import sds.classfile.ConstantPool;
 import sds.classfile.MemberInfo;
+import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This adapter class is for
@@ -11,37 +11,27 @@ import sds.classfile.MemberInfo;
  * @author inagaki
  */
 public abstract class MemberContent extends BaseContent {
-	private String accessFlag;
-	private String name;
-	String desc;
+    /**
+     * this member's access flag.
+     */
+    public final String accessFlag;
+    /**
+     * this member's name.
+     */
+    public final String name;
+    String desc;
 
-	MemberContent(MemberInfo info, ConstantPool pool) {
-		this.accessFlag = info.getAccessFlags();
-		this.desc = info.getDescriptor();
-		this.name = info.getName();
-	}
+    MemberContent(MemberInfo info, ConstantInfo[] pool) {
+        this.accessFlag = info.getAccessFlags();
+        this.desc = info.getDescriptor();
+        this.name = info.getName();
+    }
 
-	/**
-	 * returns this member's access flag.
-	 * @return access flag.
-	 */
-	public String getAccessFlag() {
-		return accessFlag;
-	}
-
-	/**
-	 * returns this member's descriptor.
-	 * @return descriptor
-	 */
-	public String getDescriptor() {
-		return desc;
-	}
-
-	/**
-	 * returns this member's name.
-	 * @return name
-	 */
-	public String getName() {
-		return name;
-	}
+    /**
+     * returns this member's descriptor.
+     * @return descriptor
+     */
+    public String getDescriptor() {
+        return desc;
+    }
 }

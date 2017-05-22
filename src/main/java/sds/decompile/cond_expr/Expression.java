@@ -18,242 +18,242 @@ import static sds.util.Printer.println;
  * @author inagaki
  */
 public class Expression {
-	String[] exprs;
-	String logical;
-	int jumpPoint;
-	Expression trueExpr;
-	Expression falseExpr;
-	Child child;
-	private int[] range;
-	private int[] ownDest;
+    String[] exprs;
+    String logical;
+    int jumpPoint;
+    Expression trueExpr;
+    Expression falseExpr;
+    Child child;
+    private int[] range;
+    private int[] ownDest;
 
-	public enum Child {
-		TRUE, FALSE, OWN;
+    public enum Child {
+        TRUE, FALSE, OWN;
 
-		public boolean is(Child child) {
-			return ordinal() == child.ordinal();
-		}
+        public boolean is(Child child) {
+            return ordinal() == child.ordinal();
+        }
 
-		public boolean isNot(Child child) {
-			return (! is(child));
-		}
-	}
+        public boolean isNot(Child child) {
+            return (! is(child));
+        }
+    }
 
-	public Expression(int number, String expr, CFNode node) {
-		this.range = new int[]{ -1, 0 };
-		setRange(number, node);
-		this.exprs = new String[]{expr};
-		setChild(node);
-	}
+    Expression(int number, String expr, CFNode node) {
+        this.range = new int[]{ -1, 0 };
+        setRange(number, node);
+        this.exprs = new String[]{expr};
+        setChild(node);
+    }
 
-	private void setRange(int number, CFNode node) {
-		int ifCount = 0;
-		for(OpcodeInfo op : node.getOpcodes().getAll()) {
-			if((ifCount == number)) {
-				if(range[0] == -1) {
-					range[0] = op.getPc();
-				} else if(isIf(op)) {
-					BranchOpcode branch = (BranchOpcode)op;
-					range[1] = branch.getPc();
-					this.jumpPoint = branch.getBranch() + range[1];
-					break;
-				}
-			}
-			if(isIf(op)) {
-				ifCount++;
-				if(ifCount > number) {
-					break;
-				}
-			}
-		}
-	}
+    private void setRange(int number, CFNode node) {
+        int ifCount = 0;
+        for(OpcodeInfo op : node.getOpcodes()) {
+            if((ifCount == number)) {
+                if(range[0] == -1) {
+                    range[0] = op.pc;
+                } else if(isIf(op)) {
+                    BranchOpcode branch = (BranchOpcode)op;
+                    range[1] = branch.pc;
+                    this.jumpPoint = branch.branch + range[1];
+                    break;
+                }
+            }
+            if(isIf(op)) {
+                ifCount++;
+                if(ifCount > number) {
+                    break;
+                }
+            }
+        }
+    }
 
-	private boolean isIf(OpcodeInfo opcode) {
-		return (opcode instanceof BranchOpcode) && ((BranchOpcode)opcode).isIf();
-	}
+    private boolean isIf(OpcodeInfo opcode) {
+        return (opcode instanceof BranchOpcode) && ((BranchOpcode)opcode).isIf();
+    }
 
-	private void setChild(CFNode node) {
-		for(CFEdge edge : node.getChildren()) {
-			if(edge.getDest().isInPcRange(jumpPoint)) {
-				if(edge.getType() == TrueBranch) {
-					this.child = Child.TRUE;
-				} else if(edge.getType() == FalseBranch) {
-					reverse();
-					this.child = Child.FALSE;
-				}
-				break;
-			}
-		}
-		OpcodeInfo[] opcodes = node.getOpcodes().getAll();
-		int[] trueRange = new int[2];
-		for(int i = opcodes.length - 1; i >= 0; i--) {
-			if(isIf(opcodes[i])) {
-				BranchOpcode branch = (BranchOpcode)opcodes[i];
-				trueRange[0] = branch.getPc();
-				trueRange[1] = opcodes[opcodes.length - 1].getPc();
-				break;
-			}
-		}
-		if(node.isInPcRange(jumpPoint)) {
-			if((trueRange[0] < jumpPoint) && (jumpPoint <= trueRange[1])) {
-				this.child = Child.TRUE;
-			} else {
-				this.child = Child.OWN;
-				this.ownDest = new int[]{ jumpPoint };
-			}
-		}
-	}
+    private void setChild(CFNode node) {
+        for(CFEdge edge : node.getChildren()) {
+            if(edge.getDest().isInPcRange(jumpPoint)) {
+                if(edge.getType() == TrueBranch) {
+                    this.child = Child.TRUE;
+                } else if(edge.getType() == FalseBranch) {
+                    reverse();
+                    this.child = Child.FALSE;
+                }
+                break;
+            }
+        }
+        OpcodeInfo[] opcodes = node.getOpcodes();
+        int[] trueRange = new int[2];
+        for(int i = opcodes.length - 1; i >= 0; i--) {
+            if(isIf(opcodes[i])) {
+                BranchOpcode branch = (BranchOpcode)opcodes[i];
+                trueRange[0] = branch.pc;
+                trueRange[1] = opcodes[opcodes.length - 1].pc;
+                break;
+            }
+        }
+        if(node.isInPcRange(jumpPoint)) {
+            if((trueRange[0] < jumpPoint) && (jumpPoint <= trueRange[1])) {
+                this.child = Child.TRUE;
+            } else {
+                this.child = Child.OWN;
+                this.ownDest = new int[]{ jumpPoint };
+            }
+        }
+    }
 
-	/**
-	 * combines specified expression and this.<br>
-	 * @param newExpr conditional expression
-	 * @param logical logical operator
-	 */
-	public void combine(Expression newExpr, String logical) {
-//		println("\t" + toString());
+    /**
+     * combines specified expression and this.<br>
+     * @param newExpr conditional expression
+     * @param logical logical operator
+     */
+    public void combine(Expression newExpr, String logical) {
+//        println("\t" + toString());
 
-		this.exprs = new String[]{ getExpr(), newExpr.getExpr() };
-		this.logical = logical;	
-		this.trueExpr = newExpr.trueExpr;
-		this.falseExpr = newExpr.falseExpr;
-		this.child = newExpr.child;
-		if(equalsChild(Child.OWN)) {
-			int[] replaced = new int[ownDest.length + 1];
-			System.arraycopy(ownDest, 0, replaced, 0, ownDest.length);
-			replaced[replaced.length - 1] = newExpr.jumpPoint;
-			this.ownDest = replaced;
-		}
-		range[1] = newExpr.range[1];
-		this.jumpPoint = newExpr.jumpPoint;
+        this.exprs = new String[]{ getExpr(), newExpr.getExpr() };
+        this.logical = logical;    
+        this.trueExpr = newExpr.trueExpr;
+        this.falseExpr = newExpr.falseExpr;
+        this.child = newExpr.child;
+        if(equalsChild(Child.OWN)) {
+            int[] replaced = new int[ownDest.length + 1];
+            System.arraycopy(ownDest, 0, replaced, 0, ownDest.length);
+            replaced[replaced.length - 1] = newExpr.jumpPoint;
+            this.ownDest = replaced;
+        }
+        range[1] = newExpr.range[1];
+        this.jumpPoint = newExpr.jumpPoint;
 
-//		println("\t" + toString());
-	}
+//        println("\t" + toString());
+    }
 
-	/**
-	 * returns this conditional expression.
-	 * @return conditional expression
-	 */
-	public String getExpr() {
-		if(exprs.length < 2) {
-			return exprs[0];
-		}
-		String result = exprs[0] + logical + exprs[1];
-		return logical.contains("&&") ? result : "(" + result + ")";
-	}
+    /**
+     * returns this conditional expression.
+     * @return conditional expression
+     */
+    public String getExpr() {
+        if(exprs.length < 2) {
+            return exprs[0];
+        }
+        String result = exprs[0] + logical + exprs[1];
+        return logical.contains("&&") ? result : "(" + result + ")";
+    }
 
-	/**
-	 * returns other jump points to own.<br>
-	 * this method is able to call only this expression child is OWN.
-	 * @return jump points
-	 */
-	public int[] getOwnDest() {
-		if(child.isNot(Child.OWN)) {
-			throw new IllegalStateException(child + " type expression must not call this method.");
-		}
-		return ownDest;
-	}
+    /**
+     * returns other jump points to own.<br>
+     * this method is able to call only this expression child is OWN.
+     * @return jump points
+     */
+    public int[] getOwnDest() {
+        if(child.isNot(Child.OWN)) {
+            throw new IllegalStateException(child + " type expression must not call this method.");
+        }
+        return ownDest;
+    }
 
-	/**
-	 * returns whether destination is this expression.
-	 * @param pc index of code array.
-	 * @return
-	 * if destination is this expression, this method returns true.<br>
-	 * otherwise, it returns false.
-	 */
-	public boolean isDestination(int pc) {
-		return (range[0] <= pc) && (pc <= range[1]);
-	}
+    /**
+     * returns whether destination is this expression.
+     * @param pc index of code array.
+     * @return
+     * if destination is this expression, this method returns true.<br>
+     * otherwise, it returns false.
+     */
+    public boolean isDestination(int pc) {
+        return (range[0] <= pc) && (pc <= range[1]);
+    }
 
-	/**
-	 * returns whether destination of this expression is equal to specified expression's.
-	 * @param expr target expression
-	 * @return if the destination is equal to specified, this method returns true.<br>
-	 * otherwise, it returns false.
-	 */
-	public boolean equalsDest(Expression expr) {
-		return jumpPoint == expr.jumpPoint;
-	}
+    /**
+     * returns whether destination of this expression is equal to specified expression's.
+     * @param expr target expression
+     * @return if the destination is equal to specified, this method returns true.<br>
+     * otherwise, it returns false.
+     */
+    public boolean equalsDest(Expression expr) {
+        return jumpPoint == expr.jumpPoint;
+    }
 
-	/**
-	 * returns whether this expression child type is equal to specified expression's.
-	 * @param expr target expression
-	 * @return if the type is equal to specified, this method returns true.<br>
-	 * otherwise, it returns false.
-	 */
-	public boolean equalsChild(Expression expr) {
-		return equalsChild(expr.child);
-	}
+    /**
+     * returns whether this expression child type is equal to specified expression's.
+     * @param expr target expression
+     * @return if the type is equal to specified, this method returns true.<br>
+     * otherwise, it returns false.
+     */
+    public boolean equalsChild(Expression expr) {
+        return equalsChild(expr.child);
+    }
 
-	/**
-	 * returns whether this expression child type is equal to specified that.
-	 * @param expr target expression
-	 * @return if the type is equal to specified, this method returns true.<br>
-	 * otherwise, it returns false.
-	 */
-	public boolean equalsChild(Expression.Child child) {
-		return this.child.is(child);
-	}
+    /**
+     * returns whether this expression child type is equal to specified that.
+     * @param child expression's child type
+     * @return if the type is equal to specified, this method returns true.<br>
+     * otherwise, it returns false.
+     */
+    public boolean equalsChild(Expression.Child child) {
+        return this.child.is(child);
+    }
 
-	/**
-	 * reverses comparing operator of this expression.
-	 */
-	public void reverse() {
-		for(int i = 0; i < exprs.length; i++) {
-			String expr = exprs[i];
-			if(expr.contains("||")) {
-				exprs[i] = changeOperator(expr, " || ");
-			} else if(expr.contains("&&")) {
-				exprs[i] = changeOperator(expr, " && ");
-			} else {
-				exprs[i] = changeOperator(expr);
-			}
-		}
-	}
+    /**
+     * reverses comparing operator of this expression.
+     */
+    public void reverse() {
+        for(int i = 0; i < exprs.length; i++) {
+            String expr = exprs[i];
+            if(expr.contains("||")) {
+                exprs[i] = changeOperator(expr, " || ");
+            } else if(expr.contains("&&")) {
+                exprs[i] = changeOperator(expr, " && ");
+            } else {
+                exprs[i] = changeOperator(expr);
+            }
+        }
+    }
 
-	private String changeOperator(String target, String separator) {
-		StringJoiner sj = new StringJoiner(separator);
-		for(String boolExpr : target.split(separator.replace("|", "\\|"))) {
-			if(boolExpr.contains("||")) {
-				sj.add(changeOperator(boolExpr, " && "));
-			} else if(boolExpr.contains("&&")) {
-				sj.add(changeOperator(boolExpr, " || "));
-			} else {
-				sj.add(changeOperator(boolExpr));
-			}
-		}
-		return sj.toString();
-	}
+    private String changeOperator(String target, String separator) {
+        StringJoiner sj = new StringJoiner(separator);
+        for(String boolExpr : target.split(separator.replace("|", "\\|"))) {
+            if(boolExpr.contains("||")) {
+                sj.add(changeOperator(boolExpr, " && "));
+            } else if(boolExpr.contains("&&")) {
+                sj.add(changeOperator(boolExpr, " || "));
+            } else {
+                sj.add(changeOperator(boolExpr));
+            }
+        }
+        return sj.toString();
+    }
 
-	private String changeOperator(String target) {
-		if(target.contains("=="))   return target.replace("==", "!=");
-		if(target.contains("!="))   return target.replace("!=", "==");
-		if(target.contains(">="))   return target.replace(">=", "<");
-		if(target.contains("<="))   return target.replace("<=", ">");
-		if(target.contains(">"))    return target.replace(">" , "<=");
-		if(target.contains("<"))    return target.replace("<" , ">=");
-		if(target.startsWith("(!")) return target.replace("(!", "(");
-		return "(! " + target + ")";
-	}
+    private String changeOperator(String target) {
+        if(target.contains("=="))   return target.replace("==", "!=");
+        if(target.contains("!="))   return target.replace("!=", "==");
+        if(target.contains(">="))   return target.replace(">=", "<");
+        if(target.contains("<="))   return target.replace("<=", ">");
+        if(target.contains(">"))    return target.replace(">" , "<=");
+        if(target.contains("<"))    return target.replace("<" , ">=");
+        if(target.startsWith("(!")) return target.replace("(!", "(");
+        return "(! " + target + ")";
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if(isNull(obj) || (! (obj instanceof Expression))) {
-			return false;
-		}
-		Expression target = (Expression)obj;
-		boolean equal = true;
-		equal &= Arrays.equals(exprs, target.exprs);
-		equal &= Arrays.equals(range, target.range);
-		equal &= (jumpPoint == target.jumpPoint);
-		equal &= (child     == target.child);
-		return equal;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if(isNull(obj) || (! (obj instanceof Expression))) {
+            return false;
+        }
+        Expression target = (Expression)obj;
+        boolean equal = true;
+        equal &= Arrays.equals(exprs, target.exprs);
+        equal &= Arrays.equals(range, target.range);
+        equal &= (jumpPoint == target.jumpPoint);
+        equal &= (child     == target.child);
+        return equal;
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder(getExpr());
-		return sb.append("{").append(child).append(",").append(jumpPoint)
-				 .append(",[").append(range[0]).append("-").append(range[1]).append("]}")
-				.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(getExpr());
+        return sb.append("{").append(child).append(",").append(jumpPoint)
+                 .append(",[").append(range[0]).append("-").append(range[1]).append("]}")
+                .toString();
+    }
 }

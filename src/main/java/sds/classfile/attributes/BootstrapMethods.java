@@ -2,7 +2,7 @@ package sds.classfile.attributes;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This class is for
@@ -10,61 +10,27 @@ import sds.classfile.ConstantPool;
  * BootstrapMethods Attribute</a>.
  * @author inagaki
  */
-public class BootstrapMethods extends AttributeInfo {
-	private BSM[] bsm;
+public class BootstrapMethods implements AttributeInfo {
+    /**
+     * bootstrap method
+     */
+    public final String[] bsmRef;
+    /**
+     * bootstrap method arguments.
+     */
+    public final String[][] bootstrapArgs;
 
-	/**
-	 * constructor.
-	 */
-	public BootstrapMethods() {
-		super(AttributeType.BootstrapMethods);
-	}
-
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.bsm = new BSM[data.readShort()];
-		for(int i = 0; i < bsm.length; i++) {
-			bsm[i] = new BSM(data, pool);
-		}
-	}
-
-	/**
-	 * returns bootstrap methods table.
-	 * @return bootstrap methods table
-	 */
-	public BSM[] getBSM() {
-		return bsm;
-	}
-
-	/**
-	 * This class is for entry in the bootstrap methods table.
-	 */
-	public class BSM {
-		private String bsmRef;
-		private String[] bootstrapArgs;
-
-		BSM(ClassFileStream data, ConstantPool pool) throws IOException {
-			this.bsmRef = extract(pool.get(data.readShort()-1), pool);
-			this.bootstrapArgs = new String[data.readShort()];
-			for(int i = 0; i < bootstrapArgs.length; i++) {
-				bootstrapArgs[i] = extract(pool.get(data.readShort()-1), pool);
-			}
-		}
-
-		/**
-		 * returns bootstrap method.
-		 * @return bootstrap method
-		 */
-		public String getBSMRef() {
-			return bsmRef;
-		}
-
-		/**
-		 * retunrs bootstrap method arguments.
-		 * @return bootstrap method arguments
-		 */
-		public String[] getBSMArgs() {
-			return bootstrapArgs;
-		}
-	}
+    BootstrapMethods(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        int len = data.readShort();
+        this.bsmRef = new String[len];
+        this.bootstrapArgs = new String[len][];
+        for(int i = 0; i < len; i++) {
+            this.bsmRef[i] = extract(data.readShort(), pool);
+            String[] args = new String[data.readShort()];
+            for(int j = 0; j < args.length; j++) {
+                args[j] = extract(data.readShort(), pool);
+            }
+            this.bootstrapArgs[i] = args;
+        }
+    }
 }

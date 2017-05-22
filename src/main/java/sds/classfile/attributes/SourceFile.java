@@ -2,7 +2,7 @@ package sds.classfile.attributes;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This class is for
@@ -10,26 +10,18 @@ import sds.classfile.ConstantPool;
  * SourceFile Attribute</a>.
  * @author inagaki
  */
-public class SourceFile extends AttributeInfo {
-	private String sourceFile;
+public class SourceFile implements AttributeInfo {
+    /**
+     * source file.
+     */
+    public final String sourceFile;
 
-	/**
-	 * constructor.
-	 */
-	public SourceFile() {
-		super(AttributeType.SourceFile);
-	}
+    SourceFile(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        this.sourceFile = extract(data.readShort(), pool);
+    }
 
-	/**
-	 * returns source file.
-	 * @return source file
-	 */
-	public String getSourceFile() {
-		return sourceFile;
-	}
-
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.sourceFile = extract(pool.get(data.readShort()-1), pool);
-	}
+    @Override
+    public String toString() {
+        return "[SourceFile]: " + sourceFile;
+    }
 }

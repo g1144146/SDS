@@ -4,7 +4,7 @@ package sds.classfile.bytecode;
  * This class is for exception of {@link OpcodeInfo <code>OpcodeInfo</code>}.
  * @author inagaki
  */
-public class UndefinedOpcodeException extends Exception {
+public class UndefinedOpcodeException extends RuntimeException {
 	/**
 	 * constructor.
 	 * @param opcode hex of opcode

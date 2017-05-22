@@ -1,13 +1,7 @@
 package sds.classfile.constantpool;
 
-import java.io.IOException;
-import java.io.DataInput;
-import sds.classfile.ClassFileStream;
-
-import static sds.classfile.constantpool.ConstantType.*;
-
 /**
- * This adapter class is for
+ * This class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.4">
  * Constant_Integer_Info</a>,
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.4">
@@ -18,35 +12,23 @@ import static sds.classfile.constantpool.ConstantType.*;
  * Constant_Double_Info</a>.
  * @author inagakikenichi
  */
-abstract class NumberInfo extends ConstantInfo {
-	Number number;
+public class NumberInfo implements ConstantInfo {
+	final Number number;
+    public  final int tag;
 
-	NumberInfo(int tag) {
-		super(tag);
-	}
-
-	@Override
-	public void read(ClassFileStream data) throws IOException, NumberTypeException {
-		switch(this.getTag()) {
-			case C_INTEGER: this.number = data.readInt();    break;
-			case C_FLOAT:   this.number = data.readFloat();  break;
-			case C_LONG:    this.number = data.readLong();   break;
-			case C_DOUBLE:  this.number = data.readDouble(); break;
-			default: throw new NumberTypeException("unknown number type: " + this.getTag());
-		}
+	NumberInfo(int tag, Number number) {
+        this.number = number;
+        this.tag = tag;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(super.toString()).append("\t");
-		switch(this.getTag()) {
-			case C_INTEGER: sb.append(number.intValue());      break;
-			case C_FLOAT:   sb.append(number.floatValue());    break;
-			case C_LONG:    sb.append(number.longValue());     break;
-			case C_DOUBLE:  sb.append(number.doubleValue());   break;
-			default:        sb.append("unknown number type."); break;
+		switch(tag) {
+			case ConstantInfoFactory.C_INTEGER: return "CONSTANT_INTEGER" + number.toString();
+			case ConstantInfoFactory.C_FLOAT:   return "CONSTANT_FLOAT"   + number.toString();
+			case ConstantInfoFactory.C_LONG:    return "CONSTANT_LONG"    + number.toString();
+			case ConstantInfoFactory.C_DOUBLE:  return "CONSTANT_DOUBLE"  + number.toString();
+            default: throw new IllegalStateException();
 		}
-		return sb.toString();
 	}
 }

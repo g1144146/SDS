@@ -1,8 +1,9 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
+import java.util.StringJoiner;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 import static sds.util.AccessFlags.get;
 
@@ -12,60 +13,31 @@ import static sds.util.AccessFlags.get;
   * MethodParameters Attribute</a>.
  * @author inagaki
  */
-public class MethodParameters extends AttributeInfo {
-	private Parameters[] params;
+public class MethodParameters implements AttributeInfo {
+    /**
+     * method parameters.<br>
+     * when one of array index defines N, the array content is next:<br>
+     * - param[N][0]: name<br>
+     * - param[N][1]: access flag
+     */
+    public final String[][] params;
 
-	/**
-	 * constructor.
-	 */
-	public MethodParameters() {
-		super(AttributeType.MethodParameters);
-	}
+    MethodParameters(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        this.params = new String[data.readByte()][2];
+        for(int i = 0; i < params.length; i++) {
+            int nameIndex = data.readShort();
+            int accessFlag = data.readShort();
+            params[i][0] = get(accessFlag, "local");
+            params[i][1] = extract(nameIndex, pool);
+        }
+    }
 
-	/**
-	 * returns method parameters.
-	 * @return method parameters
-	 */
-	public Parameters[] getParams() {
-		return params;
-	}
-
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.params = new Parameters[data.readByte()];
-		for(int i = 0; i < params.length; i++) {
-			params[i] = new Parameters(data, pool);
-		}
-	}
-
-	/**
-	 * This class is for method parameter.
-	 */
-	public class Parameters {
-		private String name;
-		private String accessFlag;
-
-		Parameters(ClassFileStream data, ConstantPool pool) throws IOException {
-			int nameIndex = data.readShort();
-			int accessFlag = data.readShort();
-			this.accessFlag = get(accessFlag, "local");
-			this.name = extract(pool.get(nameIndex-1), pool);
-		}
-
-		/**
-		 * returns method parameter.
-		 * @return method parameter
-		 */
-		public String getName() {
-			return name;
-		}
-
-		/**
-		 * returns access flag of method parameter.
-		 * @return access flag
-		 */
-		public String getAccessFlag() {
-			return accessFlag;
-		}
-	}
+    @Override
+    public String toString() {
+        StringJoiner sj = new StringJoiner(", ", "[", "]");
+        for(String[] param : params) {
+            sj.add(param[1] + param[0]);
+        }
+        return "[MethodParameters]: " + sj.toString();
+    }
 }
