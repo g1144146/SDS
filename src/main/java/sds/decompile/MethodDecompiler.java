@@ -69,20 +69,20 @@ public class MethodDecompiler extends AbstractDecompiler {
         MethodContent method = (MethodContent)content;
         StringBuilder methodDeclaration = new StringBuilder();
         // access flag
-        methodDeclaration.append(method.getAccessFlag());
+        methodDeclaration.append(method.accessFlag);
 
         // in case of method is not static initializer
-        if(! method.getName().equals("<clinit>")) {
-            if(method.getName().contains("<init>")) {
+        if(! method.name.equals("<clinit>")) {
+            if(method.name.contains("<init>")) {
                 // in case of Constructor, it is unnecessary return type declaration.
-                methodDeclaration.append(method.getName().replace("<init>", caller)).append("(");
+                methodDeclaration.append(method.name.replace("<init>", caller)).append("(");
             } else {
                 String desc = method.getDescriptor();
                 String returnType = desc.substring(desc.indexOf(")") + 1, desc.length());
-                methodDeclaration.append(returnType).append(" ").append(method.getName()).append("(");
+                methodDeclaration.append(returnType).append(" ").append(method.name).append("(");
             }
             // args
-            if(! method.getAccessFlag().contains("static")) {
+            if(! method.accessFlag.contains("static")) {
                 // in case of method is not static, the method has own as argument.
                 local.push("this", caller);
             }
@@ -120,7 +120,7 @@ public class MethodDecompiler extends AbstractDecompiler {
             methodDeclaration.append(exceptions[exceptions.length - 1]).append(" ");
         }
         // abstract or other method
-        if(method.getAccessFlag().contains("abstract")) {
+        if(method.accessFlag.contains("abstract")) {
             methodDeclaration.append(";");
         } else {
             methodDeclaration.append("{");

@@ -11,8 +11,14 @@ import sds.classfile.constantpool.ConstantInfo;
  * @author inagaki
  */
 public abstract class MemberContent extends BaseContent {
-    private String accessFlag;
-    private String name;
+    /**
+     * this member's access flag.
+     */
+    public final String accessFlag;
+    /**
+     * this member's name.
+     */
+    public final String name;
     String desc;
 
     MemberContent(MemberInfo info, ConstantInfo[] pool) {
@@ -22,26 +28,10 @@ public abstract class MemberContent extends BaseContent {
     }
 
     /**
-     * returns this member's access flag.
-     * @return access flag.
-     */
-    public String getAccessFlag() {
-        return accessFlag;
-    }
-
-    /**
      * returns this member's descriptor.
      * @return descriptor
      */
     public String getDescriptor() {
         return desc;
-    }
-
-    /**
-     * returns this member's name.
-     * @return name
-     */
-    public String getName() {
-        return name;
     }
 }

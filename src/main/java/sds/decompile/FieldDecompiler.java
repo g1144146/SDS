@@ -25,7 +25,7 @@ public class FieldDecompiler extends AbstractDecompiler {
     void addDeclaration(BaseContent content) {
         FieldContent field = (FieldContent)content;
         SDSStringBuilder fieldDeclaration = new SDSStringBuilder();
-        fieldDeclaration.append(field.getAccessFlag(), field.getDescriptor(), " ", field.getName());
+        fieldDeclaration.append(field.accessFlag, field.getDescriptor(), " ", field.name);
         if(field.getConstVal() != null) {
             fieldDeclaration.append(" = ", field.getConstVal());
         }

@@ -44,7 +44,7 @@ public class MethodContent extends MemberContent {
 
     MethodContent(MemberInfo info, ConstantInfo[] pool) {
         super(info, pool);
-        println(this.getName() + desc.substring(0, desc.indexOf(")") + 1));
+        println(this.name + desc.substring(0, desc.indexOf(")") + 1));
         // set arguments
         String desc = this.desc;
         if(desc.indexOf("(") + 1 != desc.indexOf(")")) { // has argument
@@ -79,7 +79,7 @@ public class MethodContent extends MemberContent {
 //            }
 //        }
         // set CFG
-        if(! this.getAccessFlag().contains("abstract")) {
+        if(! this.accessFlag.contains("abstract")) {
             CFGBuilder builder = new CFGBuilder(inst, exContent);
             this.nodes = builder.build();
             for(CFNode n : nodes) {
