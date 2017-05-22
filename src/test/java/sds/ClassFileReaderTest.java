@@ -100,10 +100,10 @@ public class ClassFileReaderTest {
                 assertThat(code.maxStack, is(1));
                 assertThat(code.maxLocals, is(3));
                 OpcodeInfo[] op = code.opcodes; // opcodes
-                assertThat(op[0].getType(), is(MnemonicTable.aload_0));
-                assertThat(op[1].getType(), is(MnemonicTable.inovokedynamic));
-                assertThat(op[2].getType(), is(MnemonicTable.astore_2));
-                assertThat(op[3].getType(), is(MnemonicTable._return));
+                assertThat(op[0].opcodeType, is(MnemonicTable.aload_0));
+                assertThat(op[1].opcodeType, is(MnemonicTable.inovokedynamic));
+                assertThat(op[2].opcodeType, is(MnemonicTable.astore_2));
+                assertThat(op[3].opcodeType, is(MnemonicTable._return));
                 
                 AttributeInfo[] codeItr = code.attr;
                 

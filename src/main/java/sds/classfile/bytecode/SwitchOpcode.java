@@ -14,7 +14,11 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public abstract class SwitchOpcode extends OpcodeInfo {
-    private int defaultByte;
+    /**
+     * returns default byte.<br>
+     * jump point of default key is "defaultByte + pc".
+     */
+    public final int defaultByte;
 
     SwitchOpcode(ClassFileStream data, MnemonicTable opcodeType, int pc) throws IOException {
         super(opcodeType, pc);

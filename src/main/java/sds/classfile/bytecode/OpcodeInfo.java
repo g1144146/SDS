@@ -7,28 +7,18 @@ import sds.classfile.Info;
  * @author inagaki
  */
 public class OpcodeInfo implements Info {
-    int pc;
-    MnemonicTable opcodeType;
+    /**
+     * index into the code array.
+     */
+    public final int pc;
+    /**
+     * opcode type.
+     */
+    public final MnemonicTable opcodeType;
 
     OpcodeInfo(MnemonicTable opcodeType, int pc) {
         this.opcodeType = opcodeType;
         this.pc = pc;
-    }
-
-    /**
-     * returns opcode type.
-     * @return opcode type.
-     */
-    public MnemonicTable getType() {
-        return opcodeType;
-    }
-
-    /**
-     * returns index into the code array.
-     * @return index
-     */
-    public int getPc() {
-        return pc;
     }
 
     @Override

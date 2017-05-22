@@ -126,7 +126,7 @@ public class MethodContent extends MemberContent {
                 } else {
                     int index = 0;
                     for(OpcodeInfo op : opcodes) {
-                        if(op.getPc() < table[index][1]) { // op_pc < end_pc
+                        if(op.pc < table[index][1]) { // op_pc < end_pc
                             inst[index].add(op);
                         } else { // shift next line
                             index++;
@@ -136,7 +136,7 @@ public class MethodContent extends MemberContent {
                                 // when end line of method has some instructions,
                                 // it adds to end instruction in the line
                                 // because the line doesn't have the instruction.
-                                if(inst[index - 1].get(op.getPc()) == null) {
+                                if(inst[index - 1].get(op.pc) == null) {
                                     inst[index - 1].add(op);
                                 }
                                 break;

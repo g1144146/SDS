@@ -67,7 +67,7 @@ public enum CFNodeType {
             if(info instanceof SwitchOpcode) {
                 switchCount++;
             } else if(info instanceof BranchOpcode) {
-                MnemonicTable type = info.getType();
+                MnemonicTable type = info.opcodeType;
                 if((type == _goto) || (type == goto_w)) {
                     gotoCount++;
                 } else if((type == jsr) || (type == jsr_w)) {
@@ -75,9 +75,9 @@ public enum CFNodeType {
                 } else {
                     ifCount++;
                 }
-            } else if(info.getType() == monitorenter) {
+            } else if(info.opcodeType == monitorenter) {
                 synchCount++;
-            } else if(info.getType() == monitorexit) {
+            } else if(info.opcodeType == monitorexit) {
                 synchExitCount++;
             }
         }
@@ -116,14 +116,14 @@ public enum CFNodeType {
 
     private static CFNodeType searchBranchType(OpcodeInfo op) {
         BranchOpcode branch = (BranchOpcode)op;
-        switch(branch.getType()) {
+        switch(branch.opcodeType) {
             case jsr:
             case jsr_w:
                 // todo
                 throw new RuntimeException("it doesn't cope with jsr.");
             case _goto:
             case goto_w:
-                if(branch.getBranch() > 0) {
+                if(branch.branch > 0) {
                     return Exit;
                 }
                 return LoopExit;
@@ -132,7 +132,7 @@ public enum CFNodeType {
     }
     
     private static boolean isReturn(OpcodeInfo op) {
-        switch(op.getType()) {
+        switch(op.opcodeType) {
             case _return:
             case areturn:
             case ireturn:

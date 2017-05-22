@@ -105,7 +105,7 @@ public class CFGBuilder {
         }
         // for try-catch-finally
         for(int i = 0; i < nodes.length; i++) {
-            MnemonicTable type = nodes[i].getStart().getType();
+            MnemonicTable type = nodes[i].getStart().opcodeType;
             boolean isGoto = ((type == _goto) || (type == goto_w));
             if(setParentAndChildNodeForTryCatchFinally(isGoto, i)) {
                 break;
@@ -116,7 +116,7 @@ public class CFGBuilder {
     }
 
     private boolean setParentAndChildNodeForTryCatchFinally(boolean isGoto, int index) {
-        int[] tryIndex = ex.getIndexInRange(nodes[index].getStart().getPc(), isGoto);
+        int[] tryIndex = ex.getIndexInRange(nodes[index].getStart().pc, isGoto);
         if(tryIndex.length > 0) {
             nodes[index].inTry = true;
             Set<Integer> jumpSet = new HashSet<>();
@@ -142,8 +142,8 @@ public class CFGBuilder {
                             }
                         }
                         for(int j = i; j < nodes.length; j++) {
-                            int start = nodes[j].getStart().getPc();
-                            int end   = nodes[j].getEnd().getPc();
+                            int start = nodes[j].getStart().pc;
+                            int end   = nodes[j].getEnd().pc;
                             if((from <= start) && (end < to)) {
                                 jumpSet.add(j);
                             }
@@ -155,7 +155,7 @@ public class CFGBuilder {
                 for(int[] t : table) {
                     if(t[0] == finallyTarget) {
                         for(int i = index; i < nodes.length; i++) {
-                            int start = nodes[i].getStart().getPc();
+                            int start = nodes[i].getStart().pc;
                             if(start == finallyTarget) {
                                 nodes[i].inFinally = true;
                                 for(int jump : jumpSet) {
@@ -174,7 +174,7 @@ public class CFGBuilder {
                         if(exceptions[i].equals("any")) {
                             int target = table[i][2];
                             for(int j = index; j < nodes.length; j++) {
-                                int start = nodes[j].getStart().getPc();
+                                int start = nodes[j].getStart().pc;
                                 if(start == target) {
                                     nodes[j].inFinally = true;
                                     for(int jump : jumpSet) {
@@ -275,8 +275,8 @@ public class CFGBuilder {
     private void decideDominatorNode() {
         for(int i = nodes.length - 1; i > 0; i--) {
             CFNode _n = nodes[i];
-//            println(_n.getStart().getPc() + "-" + _n.getEnd().getPc() + "(parents ): " + _n.getParents());
-//            println(_n.getStart().getPc() + "-" + _n.getEnd().getPc() + "(children): " + _n.getChildren());
+//            println(_n.getStart().pc + "-" + _n.getEnd().pc + "(parents ): " + _n.getParents());
+//            println(_n.getStart().pc + "-" + _n.getEnd().pc + "(children): " + _n.getChildren());
             if(nodes[i].getParents().size() == 1) { // immediate dominator
                 CFNode n = nodes[i].getParents().iterator().next().getDest();
                 nodes[i].immediateDominator = n;

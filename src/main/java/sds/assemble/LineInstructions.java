@@ -30,7 +30,7 @@ public class LineInstructions {
      */
     public OpcodeInfo get(int pc) {
         for(OpcodeInfo op : opcodes) {
-            if(op.getPc() == pc) {
+            if(op.pc == pc) {
                 return op;
             }
         }
@@ -42,14 +42,14 @@ public class LineInstructions {
      * @return values
      */
     public int[] getKeys() {
-        return opcodes.stream().mapToInt(op -> op.getPc()).toArray();
+        return opcodes.stream().mapToInt(op -> op.pc).toArray();
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for(OpcodeInfo op : opcodes) {
-            sb.append(op.getPc()).append(":").append(op).append("\n");
+            sb.append(op.pc).append(":").append(op).append("\n");
         }
         return sb.toString();
     }

@@ -12,7 +12,11 @@ import sds.classfile.constantpool.ConstantInfo;
  * @author inagaki
  */
 public class Wide extends OpcodeInfo {
-    private int constByte = -1;
+    /**
+     * const.<br>
+     * if opcode item of this opcode is {@link Wide <code>Wide</code>}, const value equals -1.
+     */
+    public final int constByte;
     private CpRefOpcode ref;
 
     Wide(ClassFileStream data, ConstantInfo[] pool, int pc) throws IOException {
@@ -24,15 +28,6 @@ public class Wide extends OpcodeInfo {
             this.ref = new CpRefOpcode(data.readShort(), pool, MnemonicTable.values()[tag], pc);
         }
         this.constByte = (tag == MnemonicTable.iinc.getOpcode()) ? data.readShort() : -1;
-    }
-
-    /**
-     * returns const.<br>
-     * if opcode item of this opcode is {@link Wide <code>Wide</code>}, const value equals -1.
-     * @return const
-     */
-    public int getConst() {
-        return constByte;
     }
 
     /**

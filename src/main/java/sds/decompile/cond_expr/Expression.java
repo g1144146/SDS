@@ -51,11 +51,11 @@ public class Expression {
         for(OpcodeInfo op : node.getOpcodes()) {
             if((ifCount == number)) {
                 if(range[0] == -1) {
-                    range[0] = op.getPc();
+                    range[0] = op.pc;
                 } else if(isIf(op)) {
                     BranchOpcode branch = (BranchOpcode)op;
-                    range[1] = branch.getPc();
-                    this.jumpPoint = branch.getBranch() + range[1];
+                    range[1] = branch.pc;
+                    this.jumpPoint = branch.branch + range[1];
                     break;
                 }
             }
@@ -89,8 +89,8 @@ public class Expression {
         for(int i = opcodes.length - 1; i >= 0; i--) {
             if(isIf(opcodes[i])) {
                 BranchOpcode branch = (BranchOpcode)opcodes[i];
-                trueRange[0] = branch.getPc();
-                trueRange[1] = opcodes[opcodes.length - 1].getPc();
+                trueRange[0] = branch.pc;
+                trueRange[1] = opcodes[opcodes.length - 1].pc;
                 break;
             }
         }

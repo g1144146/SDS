@@ -61,9 +61,16 @@ import sds.classfile.constantpool.StringInfo;
  * @author inagaki
  */
 public class CpRefOpcode extends OpcodeInfo {
-    int index;
+    /**
+     * constant-pool entry index.
+     */
+    public final int index;
+    /**
+     * ldc type.<br>
+     * 0-length string in case of opcode type is not ldc, ldc_w or ldc2_w.
+     */
+    public final String type;
     String operand;
-    String type = "";
 
     CpRefOpcode(int index, ConstantInfo[] pool, MnemonicTable opcodeType, int pc) throws IOException {
         super(opcodeType, pc);
@@ -86,21 +93,15 @@ public class CpRefOpcode extends OpcodeInfo {
             } else if(info instanceof ClassInfo) {
                 this.type = extract(index, pool);
             }
-            else if(info instanceof MethodHandleInfo) /* do nothing. */;
+            else if(info instanceof MethodHandleInfo) this.type = "";
             else throw new IllegalStateException("LDC opcode refers unknown constant type info.");
+            return;
         }
+        this.type = "";
     }
 
     private String escape(String string) {
         return string.replaceAll("\n", "\\\\n");
-    }
-
-    /**
-     * returns constant-pool entry index.
-     * @return constant-pool entry index
-     */
-    public int getIndexByte() {
-        return index;
     }
 
     /**
@@ -109,15 +110,6 @@ public class CpRefOpcode extends OpcodeInfo {
      */
     public String getOperand() {
         return operand;
-    }
-
-    /**
-     * returns type.<br>
-     * returns 0-length string in case of opcode type is not ldc, ldc_w or ldc2_w.
-     * @return type
-     */
-    public String getLDCType() {
-        return type;
     }
 
     @Override

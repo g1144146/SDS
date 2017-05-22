@@ -14,20 +14,12 @@ import static sds.util.DescriptorParser.parse;
  * @author inagaki
  */
 public class MultiANewArray extends CpRefOpcode {
-    private int dimensions;
+    public final int dimensions;
 
     MultiANewArray(ClassFileStream data, ConstantInfo[] pool, int pc) throws IOException {
         super(data.readShort(), pool, MnemonicTable.multianewarray, pc);
         this.dimensions = data.readByte();
         operand = parse(operand, false);    
-    }
-
-    /**
-     * return value of dimensions of the array.
-     * @return value of dimensions of the array
-     */
-    public int getDimensions() {
-        return dimensions;
     }
 
     @Override

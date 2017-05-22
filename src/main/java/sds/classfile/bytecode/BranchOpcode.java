@@ -31,20 +31,14 @@ import static sds.classfile.bytecode.MnemonicTable.jsr_w;
  * @author inagaki
  */
 public class BranchOpcode extends OpcodeInfo {
-    private int branch;
+    /**
+     * branch bytes. (value of jump point).
+     */
+    public final int branch;
 
     BranchOpcode(int branch, MnemonicTable opcodeType, int pc) {
         super(opcodeType, pc);
         this.branch = branch;
-    }
-
-    /**
-     * returns branch bytes.<br>
-     * value of jump point.
-     * @return branch bytes
-     */
-    public int getBranch() {
-        return branch;
     }
 
     /**
@@ -68,6 +62,6 @@ public class BranchOpcode extends OpcodeInfo {
 
     @Override
     public String toString() {
-        return super.toString() + ": " + (branch + getPc());
+        return super.toString() + ": " + (branch + pc);
     }
 }

@@ -12,20 +12,15 @@ import sds.classfile.constantpool.ConstantInfo;
  * @author inagaki
  */
 public class InvokeInterface extends CpRefOpcode {
-    private int count;
+    /**
+     * count.
+     */
+    public final int count;
 
     InvokeInterface(ClassFileStream data, ConstantInfo[] pool, int pc) throws IOException {
         super(data.readShort(), pool, MnemonicTable.invokeinterface, pc);
         this.count = data.readUnsignedByte();
         data.skipBytes(1);
-    }
-
-    /**
-     * returns count.
-     * @return count
-     */
-    public int getCount() {
-        return count;
     }
 
     @Override

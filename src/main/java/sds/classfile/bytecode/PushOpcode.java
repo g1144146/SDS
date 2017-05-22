@@ -12,19 +12,14 @@ package sds.classfile.bytecode;
  * @author inagaki
  */
 public class PushOpcode extends OpcodeInfo {
-    private int value;
+    /**
+     * push value.
+     */
+    public final int value;
 
     PushOpcode(int value, MnemonicTable opcodeType, int pc) {
         super(opcodeType, pc);
         this.value = value;
-    }
-
-    /**
-     * returns push value.
-     * @return push value
-     */
-    public int getValue() {
-        return value;
     }
 
     @Override

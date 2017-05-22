@@ -11,7 +11,11 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public class TableSwitch extends SwitchOpcode {
-    private int[] jumpOffsets;
+    /**
+     * jump offsets.<br>
+     * jump point of each case keyword is "jump offset + pc".
+     */
+    public final int[] jumpOffsets;
 
     TableSwitch(ClassFileStream data, int pc) throws IOException {
         super(data, MnemonicTable.tableswitch, pc);
@@ -21,15 +25,6 @@ public class TableSwitch extends SwitchOpcode {
         for(int i = 0; i < jumpOffsets.length; i++) {
             jumpOffsets[i] = data.readInt();
         }
-    }
-
-    /**
-     * returns jump offsets.<br>
-     * jump point of each case keyword is "jump offset + pc".
-     * @return offset
-     */
-    public int[] getJumpOffsets() {
-        return jumpOffsets;
     }
 
     @Override
@@ -45,9 +40,9 @@ public class TableSwitch extends SwitchOpcode {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < jumpOffsets.length; i++) {
-            sb.append(jumpOffsets[i]+getPc()).append("\n");
+            sb.append(jumpOffsets[i] + pc).append("\n");
         }
-        sb.append(getDefault()+getPc());
+        sb.append(getDefault() + pc);
         return super.toString() + ": " + sb.toString();
     }
 }

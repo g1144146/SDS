@@ -12,8 +12,15 @@ import sds.classfile.ClassFileStream;
  * @author inagaki
  */
 public class LookupSwitch extends SwitchOpcode {
-    private int[] match;
-    private int[] offset;
+    /**
+     * values of case keyword.
+     */
+    public final int[] match;
+    /**
+     * offsets.<br>
+     * jump point of each case keyword is "offset + pc".
+     */
+    public final int[] offset;
 
     LookupSwitch(ClassFileStream data, int pc) throws IOException {
         super(data, MnemonicTable.lookupswitch, pc);
@@ -23,23 +30,6 @@ public class LookupSwitch extends SwitchOpcode {
             match[i] = data.readInt();
             offset[i] = data.readInt();
         }
-    }
-
-    /**
-     * returns values of case keyword.
-     * @return values
-     */
-    public int[] getMatch() {
-        return match;
-    }
-
-    /**
-     * returns offsets.<br>
-     * jump point of each case keyword is "offset + pc".
-     * @return offsets
-     */
-    public int[] getOffset() {
-        return offset;
     }
 
     @Override
@@ -59,9 +49,9 @@ public class LookupSwitch extends SwitchOpcode {
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < match.length; i++) {
             sb.append(match[i]).append(", ")
-                .append(offset[i]+getPc()).append("\n");
+                .append(offset[i] + pc).append("\n");
         }
-        sb.append(getDefault()+getPc());
+        sb.append(getDefault() + pc);
         return super.toString() + ": " + sb.toString();
     }
 }

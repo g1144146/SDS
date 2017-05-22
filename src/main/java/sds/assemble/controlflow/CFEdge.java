@@ -1,7 +1,5 @@
 package sds.assemble.controlflow;
 
-import static sds.assemble.controlflow.CFEdgeType.Normal;
-
 /**
  * This class is for edge of control flow graph.
  * @author inagaki
@@ -54,14 +52,14 @@ public class CFEdge {
         CFEdge edge = (CFEdge)obj;
         CFNode s = edge.getSource();
         CFNode d = edge.getDest();
-        return source.getStart().getPc() == s.getStart().getPc()
-            && source.getEnd().getPc()   == s.getEnd().getPc()
-            && dest.getStart().getPc()   == d.getStart().getPc()
-            && dest.getEnd().getPc()     == d.getEnd().getPc();
+        return source.getStart().pc == s.getStart().pc
+            && source.getEnd().pc   == s.getEnd().pc
+            && dest.getStart().pc   == d.getStart().pc
+            && dest.getEnd().pc     == d.getEnd().pc;
     }
 
     @Override
     public String toString() {
-        return dest.getStart().getPc() + "-" + dest.getEnd().getPc() + "(" + type + ")";
+        return dest.getStart().pc + "-" + dest.getEnd().pc + "(" + type + ")";
     }
 }

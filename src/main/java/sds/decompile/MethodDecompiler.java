@@ -169,10 +169,10 @@ public class MethodDecompiler extends AbstractDecompiler {
             boolean isFinally = (node.isTryCatchFinally() & FINALLY) == FINALLY;
             // opcode analysis
             for(OpcodeInfo opcode : opcodes) {
-//                println("[" + op.getPc() + "]" + opcode + " (catch: " + isCatch + ", finally: " + isFinally + ")");
+//                println("[" + op.pc + "]" + opcode + " (catch: " + isCatch + ", finally: " + isFinally + ")");
 //                println("local: " + local);
 //                println("stack: " + opStack);
-                switch(opcode.getType()) {
+                switch(opcode.opcodeType) {
                     case nop: break;
                     case aconst_null: opStack.push("null", "null"); break;
                     case iconst_m1:   opStack.push(-1);     break;
@@ -191,19 +191,19 @@ public class MethodDecompiler extends AbstractDecompiler {
                     case dconst_1:    opStack.push(1.0d);   break;
                     case bipush:
                     case sipush:
-                        opStack.push(((PushOpcode)opcode).getValue());
+                        opStack.push(((PushOpcode)opcode).value);
                         break;
                     case ldc:
                     case ldc_w:
                     case ldc2_w:
                         CpRefOpcode lcdOpcode = (CpRefOpcode)opcode;
-                        opStack.push(lcdOpcode.getOperand(), lcdOpcode.getLDCType());
+                        opStack.push(lcdOpcode.getOperand(), lcdOpcode.type);
                         break;
                     case iload:
                     case lload:
                     case fload:
                     case dload:
-                        load(((IndexOpcode)opcode).getIndex()); break;
+                        load(((IndexOpcode)opcode).index); break;
                     case iload_0:
                     case lload_0:
                     case fload_0:
@@ -248,7 +248,7 @@ public class MethodDecompiler extends AbstractDecompiler {
                     case lstore:
                     case dstore:
                         IndexOpcode inOp = (IndexOpcode)opcode;
-                        line.append(getStored(inOp.getIndex()));
+                        line.append(getStored(inOp.index));
                         break;
                     case istore_0:
                     case fstore_0:
@@ -418,8 +418,8 @@ public class MethodDecompiler extends AbstractDecompiler {
                     case lxor:  calculate(" ^ ", "long");   break;
                     case iinc:
                         Iinc inc = (Iinc)opcode;
-                        line.append(local.load(inc.getIndex()));
-                        int _const = inc.getConst();
+                        line.append(local.load(inc.index));
+                        int _const = inc._const;
                         if(_const == 1)       line.append("++");
                         else if(_const == -1) line.append("--");
                         else if(_const > 1)   line.append(" += ").append(_const);
@@ -609,7 +609,7 @@ public class MethodDecompiler extends AbstractDecompiler {
                             // in case of opcodes size is equal to 1,
                             // that's not the Exit node which corresponds to Entry node.
                             OpcodeInfo end = node.getEnd();
-                            if((end.getPc() == opcode.getPc())) {
+                            if((end.pc == opcode.pc)) {
                                 line.append(opStack.pop(typePop));
                             }
                         }
@@ -733,7 +733,7 @@ public class MethodDecompiler extends AbstractDecompiler {
                         opStack.push(classType, classType);
                         break;
                     case newarray:
-                        String type = ((NewArray)opcode).getAType();
+                        String type = ((NewArray)opcode).atype;
                         String primLen = opStack.pop(typePop);
                         opStack.push("new " + type + "[" + primLen + "]", type + "[]");
                         break;
@@ -765,7 +765,7 @@ public class MethodDecompiler extends AbstractDecompiler {
                     case multianewarray:
                         MultiANewArray mana = (MultiANewArray)opcode;
                         String multiArrayType = mana.getOperand().replace("/", ".");
-                        String[] dimArray = new String[mana.getDimensions()];
+                        String[] dimArray = new String[mana.dimensions];
                         for(int j = 0; j < dimArray.length; j++) {
                             dimArray[j] = opStack.pop(typePop);
                         }
@@ -862,11 +862,11 @@ public class MethodDecompiler extends AbstractDecompiler {
                     int tryCatchFinally = node.isTryCatchFinally();
                     int[][] table = except.getTable();
                     for(int[] column : table) {
-                        int currentStart = node.getStart().getPc();
+                        int currentStart = node.getStart().pc;
                         if(currentStart == column[0]) {
                             int target = column[2];
                             for(int targetIndex = i; targetIndex < nodes.length; targetIndex++) {
-                                int start = nodes[targetIndex].getStart().getPc();
+                                int start = nodes[targetIndex].getStart().pc;
                                 if((start == target)) {
                                     int flag  = nodes[targetIndex].isTryCatchFinally();
                                     if(((flag & (CATCH | FINALLY)) > 0)) {
@@ -890,7 +890,7 @@ public class MethodDecompiler extends AbstractDecompiler {
                     if(isCatch) {
                         // for catch-statement
                         StringJoiner exClass = new StringJoiner(" | ");
-                        int start = node.getStart().getPc();
+                        int start = node.getStart().pc;
                         for(int j = 0; j < table.length; j++) {
                             if(table[j][2] == start) {
                                 exClass.add(except.getException()[j]);
@@ -915,7 +915,7 @@ public class MethodDecompiler extends AbstractDecompiler {
     }
 
     private int getTailIndex(OpcodeInfo opcode) {
-        switch(opcode.getType()) {
+        switch(opcode.opcodeType) {
             case aload_0 :
             case astore_0: return 0;
             case aload_1 :
@@ -925,7 +925,7 @@ public class MethodDecompiler extends AbstractDecompiler {
             case aload_3 :
             case astore_3: return 3;
             case aload :
-            case astore:   return ((IndexOpcode)opcode).getIndex();
+            case astore:   return ((IndexOpcode)opcode).index;
             default:       return -1;
         }
     }
@@ -1123,7 +1123,7 @@ public class MethodDecompiler extends AbstractDecompiler {
      */
     private boolean pushOntoStack(OpcodeInfo[] opcodes, OpcodeInfo opcode, String element) {
         for(int j = opcodes.length - 1; j >= 0; j--) {
-            if(opcodes[j].getPc() == opcode.getPc()) {
+            if(opcodes[j].pc == opcode.pc) {
                 if(j == opcodes.length - 1) {
                     // end opcode
                     return false;

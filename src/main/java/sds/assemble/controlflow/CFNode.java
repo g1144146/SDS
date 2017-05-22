@@ -61,7 +61,7 @@ public class CFNode {
         }
         StringBuilder sb = new StringBuilder();
         for(OpcodeInfo info : opcodes) {
-            sb.append(info.getType()).append(" ");
+            sb.append(info.opcodeType).append(" ");
         }
         this.instStr = sb.toString();
 
@@ -71,8 +71,8 @@ public class CFNode {
             int ifCount = 0;
             for(OpcodeInfo op : opcodes) {
                 if(op instanceof BranchOpcode) {
-                    int branch = ((BranchOpcode)op).getBranch() + op.getPc();
-                    if(op.getType() == _goto || op.getType() == goto_w) {
+                    int branch = ((BranchOpcode)op).branch + op.pc;
+                    if(op.opcodeType == _goto || op.opcodeType == goto_w) {
                         this.gotoPoint = branch;
                         continue;
                     }
@@ -82,61 +82,61 @@ public class CFNode {
             }
             jumpPoints = Arrays.copyOf(points, ifCount);
         } else if(check(this, Exit, LoopExit)) { // goto
-            this.gotoPoint = ((BranchOpcode)end).getBranch() + end.getPc();
+            this.gotoPoint = ((BranchOpcode)end).branch + end.pc;
         } else if(check(this, Switch)) { // switch
             for(OpcodeInfo op : opcodes) {
                 if(op instanceof LookupSwitch) {
                     LookupSwitch look = (LookupSwitch)op;
-                    this.switchJump = new int[look.getMatch().length + 1];
-                    int[] offsets = look.getOffset();
+                    this.switchJump = new int[look.match.length + 1];
+                    int[] offsets = look.offset;
                     for(int i = 0; i < switchJump.length-1; i++) {
-                        switchJump[i] = offsets[i] + look.getPc();
+                        switchJump[i] = offsets[i] + look.pc;
                     }
-                    switchJump[switchJump.length - 1] = look.getDefault() + look.getPc();
+                    switchJump[switchJump.length - 1] = look.getDefault() + look.pc;
                     break;
                 } else if(op instanceof TableSwitch) {
                     TableSwitch table = (TableSwitch)op;
-                    this.switchJump = new int[table.getJumpOffsets().length + 1];
-                    int[] offsets = table.getJumpOffsets();
+                    this.switchJump = new int[table.jumpOffsets.length + 1];
+                    int[] offsets = table.jumpOffsets;
                     for(int i = 0; i < switchJump.length-1; i++) {
-                        switchJump[i] = offsets[i] + table.getPc();
+                        switchJump[i] = offsets[i] + table.pc;
                     }
-                    switchJump[switchJump.length - 1] = table.getDefault() + table.getPc();
+                    switchJump[switchJump.length - 1] = table.getDefault() + table.pc;
                     break;
                 }
             }
          } else if(check(this, StringSwitch)) { // switch statement with string
             if(end instanceof LookupSwitch) {
                 LookupSwitch look = (LookupSwitch)end;
-                this.switchJump = new int[look.getMatch().length + 1];
-                int[] offsets = look.getOffset();
+                this.switchJump = new int[look.match.length + 1];
+                int[] offsets = look.offset;
                 for(int i = 0; i < switchJump.length-1; i++) {
-                    switchJump[i] = offsets[i] + look.getPc();
+                    switchJump[i] = offsets[i] + look.pc;
                 }
-                switchJump[switchJump.length - 1] = look.getDefault() + look.getPc();
+                switchJump[switchJump.length - 1] = look.getDefault() + look.pc;
             } else if(end instanceof TableSwitch) {
                 TableSwitch table = (TableSwitch)end;
-                this.switchJump = new int[table.getJumpOffsets().length + 1];
-                int[] offsets = table.getJumpOffsets();
+                this.switchJump = new int[table.jumpOffsets.length + 1];
+                int[] offsets = table.jumpOffsets;
                 for(int i = 0; i < switchJump.length-1; i++) {
-                    switchJump[i] = offsets[i] + table.getPc();
+                    switchJump[i] = offsets[i] + table.pc;
                 }
-                switchJump[switchJump.length - 1] = table.getDefault() + table.getPc();
+                switchJump[switchJump.length - 1] = table.getDefault() + table.pc;
             }
         } else if(check(this, SynchronizedExit)) { // end of synchronized
             for(OpcodeInfo info : opcodes) {
                 if(info instanceof BranchOpcode) {
-                    this.gotoPoint = ((BranchOpcode)info).getBranch() + info.getPc();
+                    this.gotoPoint = ((BranchOpcode)info).branch + info.pc;
                     break;
                 }
             }
         }
 
         // calc hash
-        char[] val1 = String.valueOf(start.getPc()).toCharArray();
-        char[] val2 = String.valueOf(end.getPc()).toCharArray();
-        char[] val3 = start.getType().toString().toCharArray();
-        char[] val4 = end.getType().toString().toCharArray();
+        char[] val1 = String.valueOf(start.pc).toCharArray();
+        char[] val2 = String.valueOf(end.pc).toCharArray();
+        char[] val3 = start.opcodeType.toString().toCharArray();
+        char[] val4 = end.opcodeType.toString().toCharArray();
         for(int i = 0; i < val1.length; i++) {
             hash = 31 * hash + val1[i];
         }
@@ -246,7 +246,7 @@ public class CFNode {
      * Otherwise, this method returns false.
      */
     public boolean isInPcRange(int pc) {
-        return start.getPc() <= pc && pc <= end.getPc();
+        return start.pc <= pc && pc <= end.pc;
     }
 
     /**
@@ -302,7 +302,7 @@ public class CFNode {
     }
 
     boolean isRoot() {
-        return start.getPc() == 0;
+        return start.pc == 0;
     }
 
     @Override
@@ -316,14 +316,14 @@ public class CFNode {
             return false;
         }
         CFNode node = (CFNode)obj;
-        return start.getPc() == node.getStart().getPc()
-            && end.getPc() == node.getEnd().getPc();
+        return start.pc == node.getStart().pc
+            && end.pc == node.getEnd().pc;
     }
 
     @Override
     public String toString() {
         SDSStringBuilder sb = new SDSStringBuilder();
-        sb.append("#", start.getPc(), "-", end.getPc(), " [", nodeType, "]", "\n");
+        sb.append("#", start.pc, "-", end.pc, " [", nodeType, "]", "\n");
         if(inTry)           sb.append("  in try\n");
         if(inCatch)         sb.append("  in catch\n");
         if(inFinally)       sb.append("  in finally\n");
@@ -332,7 +332,7 @@ public class CFNode {
         if(parents.size() == 1) {
             sb.append("  immediate dominator: ", parents.iterator().next());
         } else if((parents.size() > 1) && (dominator != null)) {
-            sb.append("  dominator: ", dominator.start.getPc(), "-", dominator.end.getPc(), "\n  parents: ");
+            sb.append("  dominator: ", dominator.start.pc, "-", dominator.end.pc, "\n  parents: ");
             for(CFEdge edge : parents) {
                 sb.append(edge.toString(), " ");
             }

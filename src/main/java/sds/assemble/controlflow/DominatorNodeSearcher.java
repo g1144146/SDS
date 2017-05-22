@@ -55,8 +55,8 @@ public class DominatorNodeSearcher {
         System.out.println(node1);
         System.out.println(node2);
         throw new RuntimeException("not found common dominator node between "
-                    + node1.getStart().getPc() + "-" + node1.getEnd().getPc()
+                    + node1.getStart().pc + "-" + node1.getEnd().pc
                     + " and "
-                    + node2.getStart().getPc() + "-" + node2.getEnd().getPc());
+                    + node2.getStart().pc + "-" + node2.getEnd().pc);
     }
 }

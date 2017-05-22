@@ -38,19 +38,14 @@ package sds.classfile.bytecode;
  * @author inagakikenichi
  */
 public class IndexOpcode extends OpcodeInfo {
-    private int index;
+    /**
+     * index.
+     */
+    public final int index;
 
     IndexOpcode(int index, MnemonicTable opcodeType, int pc) {
         super(opcodeType, pc);
         this.index = index;
-    }
-
-    /**
-     * returns index.
-     * @return index
-     */
-    public int getIndex() {
-        return index;
     }
 
     @Override

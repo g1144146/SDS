@@ -181,7 +181,7 @@ public class ClassFilePrinter extends Printer {
                 println(indent + indent + "max_stack: " + code.maxStack + ", max_locals: " + code.maxLocals);
                 this.opcodes = code.opcodes;
                 for(OpcodeInfo op : opcodes) {
-                    println(indent + indent + op.getPc() + " - " + op);
+                    println(indent + indent + op.pc + " - " + op);
                 }
                 if(code.exceptionTable.length > 0) {
                     println("  ExceptionTable");

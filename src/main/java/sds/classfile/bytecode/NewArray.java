@@ -8,7 +8,10 @@ package sds.classfile.bytecode;
  * @author inagaki
  */
 public class NewArray extends OpcodeInfo {
-    private String atype;
+    /**
+     * array type.
+     */
+    public final String atype;
 
     NewArray(int type, int pc) {
         super(MnemonicTable.newarray, pc);
@@ -23,14 +26,6 @@ public class NewArray extends OpcodeInfo {
             case 11: this.atype = "long";    break;
             default: throw new RuntimeException("[unknown type]: " + type);
         }
-    }
-
-    /**
-     * returns array type.
-     * @return array type
-     */
-    public String getAType() {
-        return atype;
     }
 
     @Override

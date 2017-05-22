@@ -8,29 +8,19 @@ package sds.classfile.bytecode;
  * @author inagaki
  */
 public class Iinc extends OpcodeInfo {
-    private int index;
-    private int _const;
+    /**
+     * index into the local variable array of the current frame.
+     */
+    public final int index;
+    /**
+     * const.
+     */
+    public final int _const;
 
     Iinc(int index, int _const, int pc) {
         super(MnemonicTable.iinc, pc);
         this.index = index;
         this._const = _const;
-    }
-
-    /**
-     * returns index into the local variable array of the current frame.
-     * @return index
-     */
-    public int getIndex() {
-        return index;
-    }
-
-    /**
-     * returns const.
-     * @return const
-     */
-    public int getConst() {
-        return _const;
     }
 
     @Override
