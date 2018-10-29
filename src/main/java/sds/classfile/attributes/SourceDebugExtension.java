@@ -1,8 +1,8 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
+import java.util.StringJoiner;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
 
 /**
  * This class is for
@@ -10,32 +10,25 @@ import sds.classfile.ConstantPool;
  * SourceDebugExtension Attribute</a>.
  * @author inagakikenichi
  */
-public class SourceDebugExtension extends AttributeInfo {
-	private int[] debugExtension;
-	private int attrLen;
+public class SourceDebugExtension implements AttributeInfo {
+    /**
+     * constant-pool entry index of debugging information.
+     */
+    public final int[] debugExtension;
 
-	/**
-	 * constructor.
-	 * @param length attribute length
-	 */
-	public SourceDebugExtension(int length) {
-		super(AttributeType.SourceDebugExtension);
-		this.attrLen = length;
-	}
+    SourceDebugExtension(int length, ClassFileStream data) throws IOException {
+        this.debugExtension = new int[length];
+        for(int i = 0; i < length; i++) {
+            debugExtension[i] = data.readUnsignedByte();
+        }
+    }
 
-	/**
-	 * returns constant-pool entry index of debugging information.
-	 * @return constant-pool entry index of debugging information
-	 */
-	public int[] getDebugExtension() {
-		return debugExtension;
-	}
-
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.debugExtension = new int[attrLen];
-		for(int i = 0; i < debugExtension.length; i++) {
-			debugExtension[i] = data.readUnsignedByte();
-		}
-	}
+    @Override
+    public String toString() {
+        StringJoiner sj = new StringJoiner(",", "[", "]");
+        for(int ex : debugExtension) {
+            sj.add(Integer.toString(ex));
+        }
+        return "[SourceDebugExtension]: " + sj.toString();
+    }
 }

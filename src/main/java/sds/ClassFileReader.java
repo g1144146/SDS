@@ -2,156 +2,110 @@ package sds;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
-import sds.classfile.Attributes;
-import sds.classfile.ConstantPool;
 import sds.classfile.ClassFileStream;
-import sds.classfile.Fields;
-import sds.classfile.FieldInfo;
-import sds.classfile.Methods;
-import sds.classfile.MethodInfo;
+import sds.classfile.ClassFileStreamFactory;
+import sds.classfile.MemberInfo;
 import sds.classfile.attributes.AttributeInfo;
 import sds.classfile.attributes.AttributeInfoFactory;
 import sds.classfile.constantpool.ConstantInfo;
 import sds.classfile.constantpool.ConstantInfoFactory;
-import sds.classfile.constantpool.ConstantType;
-import sds.classfile.constantpool.Utf8Info;
+import sds.classfile.constantpool.SkippedConstantInfo;
+import static sds.classfile.constantpool.Utf8ValueExtractor.extract;
 
 /**
  * This class is for reading classfile contents.
  * @author inagaki
  */
 public class ClassFileReader {
-	private ClassFileStream stream;
-	private ClassFile cf;
+    private ClassFileStream stream;
+    private final ClassFile cf = new ClassFile();
 
-	/**
-	 * constructor for classfile.
-	 * @param fileName classfile name
-	 */
-	public ClassFileReader(String fileName) {
-		try {
-			RandomAccessFile raf = new RandomAccessFile(fileName, "r");
-			this.stream = new ClassFileStream(raf);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		cf = new ClassFile();
-	}
+    ClassFileReader(String fileName) {
+        try {
+            ClassFileStreamFactory factory = new ClassFileStreamFactory();
+            this.stream = factory.create(fileName);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * constructor for jar file.
-	 * @param input
-	 */
-	public ClassFileReader(InputStream input) {
-		try {
-			this.stream = new ClassFileStream(input);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		cf = new ClassFile();
-	}
+    ClassFileReader(InputStream input) {
+        try {
+            ClassFileStreamFactory factory = new ClassFileStreamFactory();
+            this.stream = factory.create(input);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * reads classfile.
-	 */
-	public void read() {
-		try {
-			cf.magicNumber = stream.readInt(); // 4byte
-			cf.minorVersion = stream.readShort(); // 2byte
-			cf.majorVersion = stream.readShort(); // 2byte
-			readConstantPool();
-			cf.accessFlag = stream.readShort();
-			cf.thisClass = stream.readShort();
-			cf.superClass = stream.readShort();
-			readInterfaces();
-			readFields();
-			readMethods();
-			cf.attr = readAttributes();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
+    void read() {
+        try {
+            cf.magicNumber = stream.readInt(); // 4byte
+            cf.minorVersion = stream.readShort(); // 2byte
+            cf.majorVersion = stream.readShort(); // 2byte
+            readConstantPool();
+            cf.accessFlag = stream.readShort();
+            cf.thisClass = stream.readShort();
+            cf.superClass = stream.readShort();
+            readInterfaces();
+            readMembers("field");
+            readMembers("method");
+            readAttributes();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	private void readConstantPool() throws Exception {
-		int constantPoolCount = stream.readShort() - 1;
-		ConstantPool pool = new ConstantPool(constantPoolCount);
-		ConstantInfoFactory factory = new ConstantInfoFactory();
-		for(int i = 0; i < constantPoolCount; i++) {
-			int tag = stream.readByte(); // 1 byte
-			ConstantInfo info = factory.create(tag);
-			info.read(stream);
-			pool.add(i, info);
-			if(tag == ConstantType.C_DOUBLE || tag == ConstantType.C_LONG) {
-				i++;
-				pool.add(i, null);
-			}
-		}
-		cf.pool = pool;
-	}
+    private void readConstantPool() throws Exception {
+        ConstantInfo[] pool = new ConstantInfo[stream.readShort() - 1];
+        ConstantInfoFactory factory = new ConstantInfoFactory();
+        for(int i = 0; i < pool.length; i++) {
+            int tag = stream.readByte(); // 1 byte
+            pool[i] = factory.create(tag, stream);
+            if(tag == ConstantInfoFactory.C_DOUBLE || tag == ConstantInfoFactory.C_LONG) {
+                i++;
+                pool[i] = new SkippedConstantInfo();
+            }
+        }
+        cf.pool = pool;
+    }
 
-	private void readInterfaces() throws IOException {
-		int interfaceCount = stream.readShort();
-		int[] interfaces = new int[interfaceCount];
-		for(int i = 0; i < interfaceCount; i++) {
-			interfaces[i] = stream.readShort();
-		}
-		cf.interfaces = interfaces;
-	}
+    private void readInterfaces() throws IOException {
+        int[] interfaces = new int[stream.readShort()];
+        for(int i = 0; i < interfaces.length; i++) {
+            interfaces[i] = stream.readShort();
+        }
+        cf.interfaces = interfaces;
+    }
 
-	private void readFields() throws Exception {
-		int fieldCount = stream.readShort();
-		Fields fields = new Fields(fieldCount);
-		Attributes attr;
-		for(int i = 0; i < fieldCount; i++) {
-			FieldInfo info = new FieldInfo();
-			info.read(stream, cf.pool);
-			attr = readAttributes();
-			info.setAttr(attr);
-			fields.add(i, info);
-		}
-		cf.fields = fields;
-	}
+    private void readMembers(String type) throws IOException {
+        MemberInfo[] members = new MemberInfo[stream.readShort()];
+        for(int i = 0; i < members.length; i++) {
+            members[i] = new MemberInfo(stream, cf.pool);
+        }
+        if(type.equals("field")) {
+            cf.fields = members;
+            return;
+        }
+        cf.methods = members;
+    }
 
-	private void readMethods() throws Exception {
-		int methodCount = stream.readShort();
-		Methods methods = new Methods(methodCount);
-		Attributes attr;
-		for(int i = 0; i < methodCount; i++) {
-			MethodInfo info = new MethodInfo();
-			info.read(stream, cf.pool);
-			attr = readAttributes();
-			info.setAttr(attr);
-			methods.add(i, info);
-		}
-		cf.methods = methods;
-	}
+    private void readAttributes() throws Exception {
+        AttributeInfo[] attrs = new AttributeInfo[stream.readShort()];
+        AttributeInfoFactory factory = new AttributeInfoFactory();
+        for(int i = 0; i < attrs.length; i++) {
+            String value = extract(stream.readShort(), cf.pool);
+            attrs[i] = factory.create(value, stream, cf.pool);
+        }
+        cf.attr = attrs;
+    }
 
-	private Attributes readAttributes() throws Exception {
-		int attrCount = stream.readShort();
-		Attributes attrs = new Attributes(attrCount);
-		AttributeInfoFactory factory = new AttributeInfoFactory();
-		AttributeInfo info;
-		Utf8Info utf8Info;
-		String attrName;
-		ConstantPool pool = cf.pool;
-		for(int i = 0; i < attrCount; i++) {
-			int nameIndex = stream.readShort();
-			utf8Info = (Utf8Info)pool.get(nameIndex - 1);
-			attrName = utf8Info.getValue();
-			info = factory.create(attrName, stream.readInt());
-			info.read(stream, cf.pool);
-			attrs.add(i, info);
-		}
-		return attrs;
-	}
-
-	/**
-	 * returns classfile contents.
-	 * @return classfile
-	 */
-	public ClassFile getClassFile() {
-		return cf;
-	}
+    /**
+     * returns classfile contents.
+     * @return classfile
+     */
+    public ClassFile getClassFile() {
+        return cf;
+    }
 }

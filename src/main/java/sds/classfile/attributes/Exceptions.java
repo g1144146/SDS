@@ -1,8 +1,9 @@
 package sds.classfile.attributes;
 
 import java.io.IOException;
+import java.util.StringJoiner;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This class is for
@@ -10,29 +11,25 @@ import sds.classfile.ConstantPool;
  * Exceptions Attribute</a>.
  * @author inagaki
  */
-public class Exceptions extends AttributeInfo {
-	private String[] exceptionTable;
+public class Exceptions implements AttributeInfo {
+    /**
+     * exception classes.
+     */
+    public final String[] exceptionTable;
 
-	/**
-	 * constructor.
-	 */
-	public Exceptions() {
-		super(AttributeType.Exceptions);
-	}
+    Exceptions(ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        this.exceptionTable = new String[data.readShort()];
+        for(int i = 0; i < exceptionTable.length; i++) {
+            exceptionTable[i] = extract(data.readShort(), pool).replace("/", ".");
+        }
+    }
 
-	/**
-	 * returns exception classes.
-	 * @return exception classes
-	 */
-	public String[] getExceptionTable() {
-		return exceptionTable;
-	}
-
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.exceptionTable = new String[data.readShort()];
-		for(int i = 0; i < exceptionTable.length; i++) {
-			exceptionTable[i] = extract(pool.get(data.readShort()-1), pool).replace("/", ".");
-		}
-	}
+    @Override
+    public String toString() {
+        StringJoiner sj = new StringJoiner(", ", "[", "]");
+        for(String ex : exceptionTable) {
+            sj.add(ex);
+        }
+        return "[Exceptions]: " + sj.toString();
+    }
 }

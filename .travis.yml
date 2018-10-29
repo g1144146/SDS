@@ -1,9 +1,7 @@
 language: java
 jdk:
     - oraclejdk8
-
-# install:
-#     - gradle check
-# 
-# after_success:
-#     - gradle clean test
+env:
+    secure: "szGauU6FgMhHeVDbOVzrmj4w7c16lyOPVrKyJVX+oY5xfJaAgzjzVkmI2yur8PAYxBNk9tfVLH7IRcdCmgvZUeonHq3E9EZRj+6TU46hcDlppoUH3lak8tZkxPsexVn2SsgtpiUtPACOLRzgmXVsRfaYrubmqani0hcAo+KTskvc9ZN+JenoVtdmwTjgLYTRwHC1oZKzyJe/baeuTTQBNqgnyslQ4p1Sw4oGB8ERjBMVrImkKrOpnCW55GfPgQMHU8SKhxA5dN4SkuhvW3Ks8NMWIPFBrJlv8X8GX4rCKBNCOWclUOP8rP4R3EE4N9+f1Xr7t+Ocek71Rj6+lCGGvxd2+gCiEcqZRcrq2pnlbAHkASdwocfyrZOvB7HsHyabkSLviX8J1PCX6oPo/YHve8wdjVgCmRUarTkkSXeVOIyvxgJrJ0/s5ArZ1MLsl9FIgbcWYxntNB//lbzjROXIMjNSiMkCXJnYsOyS3lgR6AfoYpcE0GzX9UmidMzcWJQ3aPt008g+oX0JKkF4dp8IbQxhuwQdViBy1AL4owfOuJXa7xKkzsaaA3EBmsD0c5g0gKQzIDW64GtXuO9U9vcnEDGUeShTp7bUJ8u3/hFZuzSvqOHLdc6wJ51Hs0/Ma/wkLDfjLknUssZe8WpymvNCfUfMevoaktJ7i1LM0hvqutA="
+after_success:
+- ./gradlew jacocoTestReport coveralls

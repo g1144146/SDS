@@ -1,19 +1,40 @@
 package sds.classfile.attributes.stackmap;
 
 /**
- * This interface is for verification_type_info which item of union of
- * {@link StackMapFrame <code>StackMapFrame</code>} has union.
+ * This class is for
+ * Top_variable_info, Null_variable_info, UninitializedThis_variable_info
+ * Integer_variable_info, Float_variable_info,
+ * Long_variable_info and Double_variable_info
+ * which {@link VerificationTypeInfo <code>VerificationTypeInfo</code>}.
  * @author inagaki
  */
-public interface VerificationTypeInfo {
-	/**
-	 * returns discrimination tag of verification type info.
-	 * @return discrimination tag
-	 */
-	public int getTag();
-	/**
-	 * returns type of verification type info.
-	 * @return type of verification type info.
-	 */
-	public VerificationInfoType getType();
+public class VerificationTypeInfo {
+    public final String type;
+
+    VerificationTypeInfo(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return type + "TypeInfo";
+    }
+}
+
+class ObjectVariableInfo extends VerificationTypeInfo {
+    public final int cpoolIndex;
+
+    ObjectVariableInfo(int cpoolIndex) {
+        super("object");
+        this.cpoolIndex = cpoolIndex;
+    }
+}
+
+class UninitializedVariableInfo extends VerificationTypeInfo {
+    public final int offset;
+
+    UninitializedVariableInfo(int offset) {
+        super("variable");
+        this.offset = offset;
+    }
 }

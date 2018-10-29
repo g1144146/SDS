@@ -2,105 +2,56 @@ package sds.classfile.attributes;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 import static sds.util.DescriptorParser.parse;
 
 /**
- * This adapter class is for
- * {@link LocalVariableTable <code>LocalVariableTable</code>}
+ * This class is for
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.13">
+ * LocalVariableTable Attribute</a>.
  * and
- * {@link LocalVariableTypeTable <code>LocalVariableTypeTable</code>}.
+ * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.14">
+ * LocalVariableTypeTable Attribute</a>.
  * @author inagaki
  */
-public abstract class LocalVariable extends AttributeInfo {
-	private LVTable[] localVariableTable;
+public class LocalVariable implements AttributeInfo {
+    /**
+     * local variable table.<br>
+     * when one of array index defines N, the array content is next:<br>
+     * - table[N][0]: start pc<br>
+     * - table[N][1]: length<br>
+     * - table[N][2]: index
+     */
+    public final int[][] table;
+    /**
+     * local variable names.
+     */
+    public final String[] name;
+    /**
+     * local variable descriptors.
+     */
+    public final String[] desc;
+    /**
+     * attribute type name.
+     */
+    public final String typeName;
 
-	/**
-	 * constructor.
-	 * @param type attribute type
-	 */
-	LocalVariable(AttributeType type) {
-		super(type);
-	}
-
-	/**
-	 * return local variable table.
-	 * @return local variable table
-	 */
-	public LVTable[] getTable() {
-		return localVariableTable;
-	}
-
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		this.localVariableTable = new LVTable[data.readShort()];
-		for(int i = 0; i < localVariableTable.length; i++) {
-			localVariableTable[i] = new LVTable(data, pool);
-		}
-	}
-
-	/**
-	 * This class is for local variable table.
-	 */
-	public class LVTable {
-		private int startPc;
-		private int length;
-		private int index;
-		private String name;
-		private String desc;
-
-		LVTable(ClassFileStream data, ConstantPool pool) throws IOException {
-			this.startPc = data.readShort();
-			this.length = data.readShort();
-			int nameIndex = data.readShort();
-			int descIndex = data.readShort();
-			this.index = data.readShort();
-			
-			this.name = extract(pool.get(nameIndex-1), pool);
-			this.desc = (descIndex-1 >= 0) ? parse(extract(pool.get(descIndex-1), pool)) : "";
-		}
-
-		/**
-		 * returns value.<br><br>
-		 * if key is "start_pc", it returns
-		 * start value of ranges in the code array at which
-		 * local variable is active.<br>
-		 * if key is "length", it returns
-		 * range in the code array at which local variable
-		 * is active.<br>
-		 * if key is "index", it returns
-		 * index in the local variable array of
-		 * the current frame.<br>
-		 * by default, it returns -1.
-		 * @param key value name
-		 * @return value
-		 */
-		public int getNumber(String key) {
-			switch(key) {
-				case "start_pc":   return startPc;
-				case "length":     return length;
-				case "index":      return index;
-				default:
-					System.out.println("Invalid key: " + key);
-					return -1;
-			}
-		}
-
-		/**
-		 * returns local variable name.
-		 * @return name
-		 */
-		public String getName() {
-			return name;
-		}
-
-		/**
-		 * returns local variable descriptor.
-		 * @return descriptor
-		 */
-		public String getDesc() {
-			return desc;
-		}
-	}
+    LocalVariable(String typeName, ClassFileStream data, ConstantInfo[] pool) throws IOException {
+        this.typeName = typeName;
+        int len = data.readShort();
+        this.table = new int[len][3];
+        this.name = new String[len];
+        this.desc = new String[len];
+        for(int i = 0; i < len; i++) {
+            table[i][0] = data.readShort();
+            table[i][1] = data.readShort();
+            int nameIndex = data.readShort();
+            int descIndex = data.readShort();
+            table[i][2] = data.readShort();
+            
+            name[i] = extract(nameIndex, pool);
+            desc[i] = (descIndex-1 >= 0) ? parse(extract(descIndex, pool)) : "";
+        }
+    }
 }

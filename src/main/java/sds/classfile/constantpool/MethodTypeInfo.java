@@ -1,41 +1,20 @@
 package sds.classfile.constantpool;
 
-import java.io.IOException;
-import sds.classfile.ClassFileStream;
-
 /**
  * This class is for
  * <a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.9">
  * Constant_MethodType_Info</a>.
  * @author inagaki
  */
-public class MethodTypeInfo extends ConstantInfo {
-	private int descriptorIndex;
+public class MethodTypeInfo implements ConstantInfo {
+    final int descIndex;
 
-	/**
-	 * constructor.
-	 */
-	public MethodTypeInfo() {
-		super(ConstantType.C_METHOD_TYPE);
-	}
+    MethodTypeInfo(int descIndex) {
+        this.descIndex = descIndex;
+    }
 
-	/**
-	 * returns constant-pool entry index of descriptor of method type.
-	 * @return constant-pool entry index of descriptor of method type
-	 */
-	public int getDescriptorIndex() {
-		return descriptorIndex;
-	}
-
-	@Override
-	public void read(ClassFileStream data) throws IOException {
-		this.descriptorIndex = data.readShort();
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(super.toString()).append("\t#").append(descriptorIndex);
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        return "CONSTANT_METHOD_TYPE\t#" + descIndex;
+    }
 }

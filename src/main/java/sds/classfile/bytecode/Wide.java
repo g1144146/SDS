@@ -2,7 +2,7 @@ package sds.classfile.bytecode;
 
 import java.io.IOException;
 import sds.classfile.ClassFileStream;
-import sds.classfile.ConstantPool;
+import sds.classfile.constantpool.ConstantInfo;
 
 /**
  * This class is for
@@ -11,46 +11,61 @@ import sds.classfile.ConstantPool;
  * </a>.
  * @author inagaki
  */
-public class Wide extends CpRefOpcode {
-	private int constByte = -1;
+public class Wide extends OpcodeInfo {
+    /**
+     * const.<br>
+     * if opcode item of this opcode is {@link Wide <code>Wide</code>}, const value equals -1.
+     */
+    public final int constByte;
+    private CpRefOpcode ref;
 
-	/**
-	 * constructor.
-	 * @param pc index into the code array
-	 */
-	public Wide(int pc) {
-		super(MnemonicTable.wide, pc);
-	}
+    Wide(ClassFileStream data, ConstantInfo[] pool, int pc) throws IOException {
+        super(MnemonicTable.wide, pc);
+        int tag = data.readByte();
+        if(data.readByte() == MnemonicTable.ldc.getOpcode()) {
+            this.ref = new CpRefOpcode(data.readUnsignedByte(), pool, MnemonicTable.values()[tag], pc);
+        } else {
+            this.ref = new CpRefOpcode(data.readShort(), pool, MnemonicTable.values()[tag], pc);
+        }
+        this.constByte = (tag == MnemonicTable.iinc.getOpcode()) ? data.readShort() : -1;
+    }
 
-	@Override
-	public void read(ClassFileStream data, ConstantPool pool) throws IOException {
-		if(data.readByte() == MnemonicTable.iinc.getOpcode()) {
-			super.read(data, pool);
-			return;
-		}
-		this.constByte = data.readShort();
-	}
+    /**
+     * returns constant-pool entry index.
+     * @return constant-pool entry index.
+     */
+    public int getIndexByte() {
+        return ref.index;
+    }
 
-	/**
-	 * returns const.<br>
-	 * if opcode item of this opcode is {@link Wide <code>Wide</code>}, const value equals -1.
-	 * @return const
-	 */
-	public int getConst() {
-		return constByte;
-	}
+    /**
+     * returns operand which this opcode has.
+     * @return operand.
+     */
+    public String getOperand() {
+        return ref.operand;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if(!(obj instanceof Wide)) {
-			return false;
-		}
-		Wide opcode = (Wide)obj;
-		return super.equals(obj) && (constByte == opcode.constByte);
-	}
+    /**
+     * returns type.<br>
+     * returns 0-length string in case of opcode type is not ldc, ldc_w or ldc2_w.
+     * @return type
+     */
+    public String getLDCType() {
+        return ref.type;
+    }
 
-	@Override
-	public String toString() {
-		return super.toString() + ", " + constByte;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Wide)) {
+            return false;
+        }
+        Wide opcode = (Wide)obj;
+        return super.equals(obj) && (constByte == opcode.constByte);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", " + constByte + ", " + ref;
+    }
 }
