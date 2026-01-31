@@ -29,6 +29,13 @@ import static sds.util.Utf8ValueExtractor.extract;
  */
 public class StackMapFrameParser {
 
+	/**
+	 * Gets the previous stack map entry for the specified type.
+	 * @param stackMap stack map
+	 * @param before previous key
+	 * @param type type name (local or stack)
+	 * @return list of values
+	 */
 	private static List<String> getBefore(Map<Integer, Map<String, List<String>>> stackMap,
 	int before, String type) {
 		if(stackMap.get(before) != null) {
@@ -39,6 +46,13 @@ public class StackMapFrameParser {
 		return new ArrayList<>();
 	}
 
+	/**
+	 * Parses stack map frames into a map structure.
+	 * @param frames stack map frames
+	 * @param pool constant pool
+	 * @param opcodes bytecode instructions
+	 * @return parsed stack map
+	 */
 	public static Map<Integer, Map<String, List<String>>> parseFrame(StackMapFrame[] frames,
 	ConstantPool pool, Opcodes opcodes) {
 		Map<Integer, Map<String, List<String>>> stackMap = new LinkedHashMap<>();
@@ -123,6 +137,13 @@ public class StackMapFrameParser {
 		return stackMap;
 	}
 
+	/**
+	 * Parses a verification type info into a string.
+	 * @param info verification type info
+	 * @param pool constant pool
+	 * @param opcodes bytecode instructions
+	 * @return parsed verification type
+	 */
 	private static String parseVerification(VerificationTypeInfo info, ConstantPool pool, Opcodes opcodes) {
 		switch(info.getType()) {
 			case TopVariableInfo:     return "top";

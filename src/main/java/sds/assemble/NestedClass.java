@@ -5,6 +5,9 @@ package sds.assemble;
  * @author inagaki
  */
 public class NestedClass extends ClassContent {
+	/**
+	 * Default constructor.
+	 */
 	public NestedClass() {
 		super();
 	}

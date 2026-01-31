@@ -322,6 +322,11 @@ public class MethodContent extends MemberContent {
 		private int[][] table;
 		private String[] exception;
 
+		/**
+		 * Constructs an ExceptionContent from the exception table.
+		 * @param table exception table from Code attribute
+		 * @param exception exception class names
+		 */
 		ExceptionContent(ExceptionTable[] table, String[] exception) {
 			this.table = new int[table.length][3];
 			for(int i = 0; i < table.length; i++) {
@@ -406,6 +411,11 @@ public class MethodContent extends MemberContent {
 		private int[] index;
 		private boolean hasValType;
 
+		/**
+		 * Constructs a LocalVariableContent from the local variable table.
+		 * @param table local variable table
+		 * @param pool constant-pool
+		 */
 		LocalVariableContent(LocalVariableTable.LVTable[] table, ConstantPool pool) {
 			this.range = new int[table.length][2];
 			this.variable = new String[table.length][2];
@@ -422,6 +432,10 @@ public class MethodContent extends MemberContent {
 			}
 		}
 
+		/**
+		 * Sets the generic type information from LocalVariableTypeTable.
+		 * @param table local variable type table
+		 */
 		void setType(LocalVariableTypeTable.LVTable[] table) {
 			this.hasValType = true;
 			for(LocalVariableTypeTable.LVTable t : table) {
@@ -513,17 +527,31 @@ public class MethodContent extends MemberContent {
 		private List<String[]> invParam;
 		private int paramCount;
 
+		/**
+		 * Constructs a ParamAnnotationContent from parameter annotations.
+		 * @param pa parameter annotations
+		 * @param isVisible whether the annotations are runtime visible
+		 */
 		ParamAnnotationContent(ParameterAnnotations[] pa, boolean isVisible) {
 			super(isVisible);
 			this.paramCount = pa.length;
 			initAnnotation(pa, isVisible);
 		}
 
+		/**
+		 * Sets the invisible parameter annotations.
+		 * @param annotations invisible parameter annotations
+		 */
 		private void setInvisible(ParameterAnnotations[] annotations) {
 			type = type | INVISIBLE;
 			initAnnotation(annotations, false);
 		}
 
+		/**
+		 * Initializes the parameter annotation list based on visibility.
+		 * @param pa parameter annotations
+		 * @param isVisible whether the annotations are runtime visible
+		 */
 		private void initAnnotation(ParameterAnnotations[] pa, boolean isVisible) {
 			if(isVisible) {
 				param = new ArrayList<>();
@@ -572,6 +600,11 @@ public class MethodContent extends MemberContent {
 	 */
 	public class MethodTypeAnnotationContent extends TypeAnnotationContent {
 
+		/**
+		 * Constructs a MethodTypeAnnotationContent with the specified type annotations.
+		 * @param ta array of type annotation strings
+		 * @param isVisible whether the annotations are runtime visible
+		 */
 		MethodTypeAnnotationContent(String[] ta, boolean isVisible) {
 			super(ta, isVisible);
 		}

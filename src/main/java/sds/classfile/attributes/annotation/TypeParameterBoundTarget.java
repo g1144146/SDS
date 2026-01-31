@@ -10,6 +10,11 @@ public class TypeParameterBoundTarget extends AbstractTargetInfo {
 	private int typeParameterIndex;
 	private int boundIndex;
 
+	/**
+	 * Constructs a TypeParameterBoundTarget with the specified indices.
+	 * @param typeParameterIndex index of type parameter declaration
+	 * @param boundIndex index of bound of the type parameter declaration
+	 */
 	TypeParameterBoundTarget(int typeParameterIndex, int boundIndex) {
 		super(TargetInfoType.TypeParameterBoundTarget);
 		this.typeParameterIndex = typeParameterIndex;

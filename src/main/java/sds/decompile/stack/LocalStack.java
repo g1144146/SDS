@@ -5,6 +5,9 @@ package sds.decompile.stack;
  * @author inagaki
  */
 public class LocalStack extends SimpleStack {
+	/**
+	 * Constructs a LocalStack.
+	 */
 	public LocalStack() {
 		super();
 	}

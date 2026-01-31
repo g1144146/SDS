@@ -9,6 +9,11 @@ public class SameFrame implements StackMapFrame {
 	private StackMapFrameType frameType;
 	private int tag;
 
+	/**
+	 * Constructs a SameFrame with the specified frame type and tag.
+	 * @param frameType stack-map-frame type
+	 * @param tag discrimination tag
+	 */
 	SameFrame(StackMapFrameType frameType, int tag) {
 		this.frameType = frameType;
 		this.tag = tag;

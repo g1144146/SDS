@@ -45,6 +45,12 @@ public class MethodParameters extends AttributeInfo {
 		private String name;
 		private String accessFlag;
 
+		/**
+		 * Constructs a Parameters entry from the classfile stream.
+		 * @param data classfile stream
+		 * @param pool constant-pool
+		 * @throws IOException if an error occurs during reading
+		 */
 		Parameters(ClassFileStream data, ConstantPool pool) throws IOException {
 			int nameIndex = data.readShort();
 			int accessFlag = data.readShort();

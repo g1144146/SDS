@@ -72,6 +72,9 @@ public class CFGBuilder {
 		return nodes;
 	}
 
+	/**
+	 * Sets parent and child relationships between nodes and investigates try-catch-finally or synchronized statements.
+	 */
 	private void setParentAndChildNode() {
 		int index = 0;
 		for(CFNode n : nodes) {
@@ -105,6 +108,12 @@ public class CFGBuilder {
 		}
 	}
 
+	/**
+	 * Sets parent and child relationships for try-catch-finally statements.
+	 * @param isGoto whether the start instruction of the node is goto
+	 * @param index current node index
+	 * @return true if try-catch-finally processing was performed
+	 */
 	private boolean setParentAndChildNodeForTryCatchFinally(boolean isGoto, int index) {
 		int[] tryIndex = ex.getIndexInRange(nodes[index].getStart().getPc(), isGoto);
 		if(tryIndex.length > 0) {
@@ -183,6 +192,9 @@ public class CFGBuilder {
 		return false;
 	}
 
+	/**
+	 * Sets jump point nodes for conditional branches, loops, and switch statements.
+	 */
 	private void setJumpPointNode() {
 		int index = 0;
 		int synchCount = 0;
@@ -255,11 +267,20 @@ public class CFGBuilder {
 		}
 	}
 
+	/**
+	 * Adds parent and child relationship between two nodes.
+	 * @param x index of child node
+	 * @param y index of parent node
+	 * @param type edge type
+	 */
 	private void addParentAndChild(int x, int y, CFEdgeType type) {
 		nodes[x].addParent(nodes[y], type);
 		nodes[y].addChild( nodes[x], type);
 	}
 
+	/**
+	 * Decides dominator nodes for all nodes in the control flow graph.
+	 */
 	private void decideDominatorNode() {
 		for(int i = nodes.length - 1; i > 0; i--) {
 			if(nodes[i].getParents().size() == 1) { // immediate dominator

@@ -16,6 +16,10 @@ abstract class RuntimeTypeAnnotations extends AttributeInfo {
 	private TypeAnnotation[] types;
 	private String[] annotations;
 
+	/**
+	 * Constructs a RuntimeTypeAnnotations with the specified attribute type.
+	 * @param type attribute type
+	 */
 	RuntimeTypeAnnotations(AttributeType type) {
 		super(type);
 	}

@@ -6,6 +6,10 @@ package sds.classfile.attributes.stackmap;
  * @author inagaki
  */
 public class UninitializedThisVariableInfo extends AbstractVerificationTypeInfo {
+	/**
+	 * Constructs an UninitializedThisVariableInfo with the specified tag.
+	 * @param tag verification type tag
+	 */
 	UninitializedThisVariableInfo(int tag) {
 		super(tag, VerificationInfoType.UninitializedThisVariableInfo);
 	}

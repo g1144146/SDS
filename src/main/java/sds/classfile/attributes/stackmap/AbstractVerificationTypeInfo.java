@@ -9,6 +9,11 @@ public abstract class AbstractVerificationTypeInfo implements VerificationTypeIn
 	private int tag;
 	private VerificationInfoType type;
 
+	/**
+	 * Constructs an AbstractVerificationTypeInfo with the specified tag and type.
+	 * @param tag verification type tag
+	 * @param type verification info type
+	 */
 	AbstractVerificationTypeInfo(int tag, VerificationInfoType type) {
 		this.tag = tag;
 		this.type = type;

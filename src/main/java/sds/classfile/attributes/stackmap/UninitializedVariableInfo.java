@@ -8,6 +8,11 @@ package sds.classfile.attributes.stackmap;
 public class UninitializedVariableInfo extends AbstractVerificationTypeInfo {
 	private int offset;
 
+	/**
+	 * Constructs an UninitializedVariableInfo with the specified tag and offset.
+	 * @param tag verification type tag
+	 * @param offset offset of new instruction
+	 */
 	UninitializedVariableInfo(int tag, int offset) {
 		super(tag, VerificationInfoType.UninitializedVariableInfo);
 		this.offset = offset;

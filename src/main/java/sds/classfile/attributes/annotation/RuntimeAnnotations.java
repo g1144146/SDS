@@ -17,6 +17,10 @@ import static sds.util.AnnotationParser.parseAnnotation;
 abstract class RuntimeAnnotations extends AttributeInfo {
 	private String[] annotations;
 
+	/**
+	 * Constructs a RuntimeAnnotations with the specified attribute type.
+	 * @param type attribute type
+	 */
 	RuntimeAnnotations(AttributeType type) {
 		super(type);
 	}

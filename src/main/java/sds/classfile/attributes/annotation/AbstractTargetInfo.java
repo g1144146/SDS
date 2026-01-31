@@ -7,6 +7,10 @@ package sds.classfile.attributes.annotation;
 public class AbstractTargetInfo implements TargetInfo {
 	private TargetInfoType type;
 
+	/**
+	 * Constructs an AbstractTargetInfo with the specified target info type.
+	 * @param type target info type
+	 */
 	AbstractTargetInfo(TargetInfoType type) {
 		this.type = type;
 	}

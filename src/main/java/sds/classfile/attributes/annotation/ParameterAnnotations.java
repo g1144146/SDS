@@ -17,6 +17,13 @@ import static sds.util.AnnotationParser.parseAnnotation;
 public class ParameterAnnotations {
 	private String[] annotations;
 
+	/**
+	 * Constructs a ParameterAnnotations from the classfile stream.
+	 * @param data classfile stream
+	 * @param pool constant-pool
+	 * @throws IOException if an error occurs during reading
+	 * @throws ElementValueException if an invalid element value is encountered
+	 */
 	ParameterAnnotations(ClassFileStream data, ConstantPool pool)
 	throws IOException, ElementValueException {
 		this.annotations = new String[data.readShort()];

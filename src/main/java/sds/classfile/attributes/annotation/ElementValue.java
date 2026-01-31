@@ -15,6 +15,12 @@ public class ElementValue {
 	private Annotation annotationValue;
 	private ArrayValue arrayValue;
 
+	/**
+	 * Constructs an ElementValue from the classfile stream.
+	 * @param data classfile stream
+	 * @throws IOException if an error occurs during reading
+	 * @throws ElementValueException if an invalid element value tag is encountered
+	 */
 	ElementValue(ClassFileStream data) throws IOException, ElementValueException {
 		this.tag = (char)data.readByte();
 		switch(tag) {

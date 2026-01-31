@@ -71,6 +71,9 @@ public class ClassFilePrinter extends Printer {
 		this.pool = pool;
 	}
 
+	/**
+	 * Default constructor.
+	 */
 	public ClassFilePrinter() {
 	}
 
@@ -422,6 +425,10 @@ public class ClassFilePrinter extends Printer {
 		}
 	}
 
+	/**
+	 * Prints the target info of a type annotation.
+	 * @param info target info
+	 */
 	private void printTargetInfo(TargetInfo info) {
 		println("       " + info.getType());
 		switch(info.getType()) {
@@ -475,6 +482,10 @@ public class ClassFilePrinter extends Printer {
 		}
 	}
 
+	/**
+	 * Prints the type path of a type annotation.
+	 * @param path type path
+	 */
 	private void printTypePath(TypePath path) {
 		for(int i = 0; i < path.getArgIndex().length; i++) {
 			print("       type_path_type: ");
@@ -502,6 +513,11 @@ public class ClassFilePrinter extends Printer {
 		}
 	}
 
+	/**
+	 * Checks if the index is within the constant pool range.
+	 * @param index index to check
+	 * @return true if the index is within range
+	 */
 	private boolean checkRange(int index) {
 		return (0 <= index) && (index < pool.size());
 	}

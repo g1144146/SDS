@@ -160,6 +160,11 @@ public class AccessFlags {
 		return " >>> unknown access flag <<<";
 	}
 
+	/**
+	 * Gets the access flag string for a class.
+	 * @param accessFlag hex of access flag
+	 * @return access flag string
+	 */
 	private static String getClassAccessFlag(int accessFlag) {
 		StringBuilder sb = new StringBuilder();
 		if(checkFlag(accessFlag, ACC_PUBLIC))     sb.append("public ");
@@ -178,6 +183,11 @@ public class AccessFlags {
 		return sb.toString();
 	}
 
+	/**
+	 * Gets the access flag string for a field.
+	 * @param accessFlag hex of access flag
+	 * @return access flag string
+	 */
 	private static String getFieldAccessFlag(int accessFlag) {
 		StringBuilder sb = new StringBuilder();
 		if(checkFlag(accessFlag, ACC_PUBLIC))     sb.append("public ");
@@ -192,6 +202,11 @@ public class AccessFlags {
 		return sb.toString();
 	}
 
+	/**
+	 * Gets the access flag string for a method.
+	 * @param accessFlag hex of access flag
+	 * @return access flag string
+	 */
 	private static String getMethodAccessFlag(int accessFlag) {
 		StringBuilder sb = new StringBuilder();
 		if(checkFlag(accessFlag, ACC_PUBLIC))         sb.append("public ");
@@ -208,10 +223,21 @@ public class AccessFlags {
 		return sb.toString();
 	}
 
+	/**
+	 * Gets the access flag string for a local variable.
+	 * @param accessFlag hex of access flag
+	 * @return access flag string
+	 */
 	private static String getLocalValAccessFlag(int accessFlag) {
 		return checkFlag(accessFlag, ACC_FINAL) ? "final " : "";
 	}
 
+	/**
+	 * Checks if the access flag contains the target flag.
+	 * @param accessFlag hex of access flag
+	 * @param target target flag to check
+	 * @return true if the access flag contains the target flag
+	 */
 	private static boolean checkFlag(int accessFlag, int target) {
 		return (accessFlag & target) == target;
 	}

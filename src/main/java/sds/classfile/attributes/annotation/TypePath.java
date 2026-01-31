@@ -14,6 +14,11 @@ public class TypePath {
 	private int[] typePathKind;
 	private int[] typeArgIndex;
 
+	/**
+	 * Constructs a TypePath from the classfile stream.
+	 * @param data classfile stream
+	 * @throws IOException if an error occurs during reading
+	 */
 	TypePath(ClassFileStream data) throws IOException {
 		this.typeArgIndex = new int[data.readUnsignedByte()];
 		this.typePathKind = new int[typeArgIndex.length];

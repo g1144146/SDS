@@ -9,6 +9,10 @@ package sds.classfile.attributes.annotation;
 public class ThrowsTarget extends AbstractTargetInfo {
 	private int throwsTypeIndex;
 
+	/**
+	 * Constructs a ThrowsTarget with the specified throws type index.
+	 * @param throwsTypeIndex index into the exception_index_table array
+	 */
 	ThrowsTarget(int throwsTypeIndex) {
 		super(TargetInfoType.ThrowsTarget);
 		this.throwsTypeIndex = throwsTypeIndex;

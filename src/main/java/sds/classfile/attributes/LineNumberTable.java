@@ -37,6 +37,10 @@ public class LineNumberTable extends AttributeInfo {
 		}
 	}
 
+	/**
+	 * Sets the end program counter for the line number table entry.
+	 * @param index index of the entry
+	 */
 	private void setEndPc(int index) {
 		if(index == lineNumberTable.length-1) {
 			lineNumberTable[index].endPc = lineNumberTable[index].getStartPc();
@@ -48,6 +52,10 @@ public class LineNumberTable extends AttributeInfo {
 		}
 	}
 
+	/**
+	 * Sets the end program counter for the previous entry when at the last entry.
+	 * @param index index of the last entry
+	 */
 	private void setEndPc2(int index) {
 		if(lineNumberTable.length > 1) {
 			lineNumberTable[index-1].endPc = lineNumberTable[index].getStartPc();
@@ -62,6 +70,11 @@ public class LineNumberTable extends AttributeInfo {
 		private int endPc;
 		private int lineNumber;
 
+		/**
+		 * Constructs an LNTable entry from the classfile stream.
+		 * @param data classfile stream
+		 * @throws IOException if an error occurs during reading
+		 */
 		LNTable(ClassFileStream data) throws IOException {
 			this.startPc = data.readShort();
 			this.lineNumber = data.readShort();

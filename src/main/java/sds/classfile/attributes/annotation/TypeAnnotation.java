@@ -13,6 +13,13 @@ public class TypeAnnotation extends Annotation {
 	private TargetInfo targetInfo;
 	private TypePath targetPath;
 
+	/**
+	 * Constructs a TypeAnnotation from the classfile stream.
+	 * @param data classfile stream
+	 * @throws IOException if an error occurs during reading
+	 * @throws TargetTypeException if an invalid target type is encountered
+	 * @throws ElementValueException if an invalid element value is encountered
+	 */
 	TypeAnnotation(ClassFileStream data)
 	throws IOException, TargetTypeException, ElementValueException {
 		TargetInfoFactory factory = new TargetInfoFactory();

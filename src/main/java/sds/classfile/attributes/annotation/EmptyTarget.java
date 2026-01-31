@@ -7,6 +7,9 @@ package sds.classfile.attributes.annotation;
  * @author inagaki
  */
 public class EmptyTarget extends AbstractTargetInfo {
+	/**
+	 * Constructs an EmptyTarget.
+	 */
 	EmptyTarget() {
 		super(TargetInfoType.EmptyTarget);
 	}

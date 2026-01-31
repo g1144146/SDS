@@ -9,6 +9,10 @@ package sds.classfile.attributes.annotation;
 public class SuperTypeTarget extends AbstractTargetInfo {
 	private int superTypeIndex;
 
+	/**
+	 * Constructs a SuperTypeTarget with the specified super type index.
+	 * @param superTypeIndex index of annotation in extends or implements clause
+	 */
 	SuperTypeTarget(int superTypeIndex) {
 		super(TargetInfoType.SuperTypeTarget);
 		this.superTypeIndex = superTypeIndex;

@@ -919,6 +919,11 @@ public class MethodDecompiler extends AbstractDecompiler {
         }
     }
 
+    /**
+     * Gets the tail index from the opcode.
+     * @param opcode opcode to get tail index from
+     * @return tail index
+     */
     private int getTailIndex(OpcodeInfo opcode) {
         switch(opcode.getOpcodeType()) {
             case aload_0 :
@@ -957,6 +962,11 @@ public class MethodDecompiler extends AbstractDecompiler {
         return false;
     }
 
+    /**
+     * Checks if the node is an else-if block.
+     * @param node node to check
+     * @return true if the node is an else-if block
+     */
     private boolean isElifBlock(CFNode node) {
         if(node.getParents().size() == 1) {
             CFNode dominator = node.getImmediateDominator();
@@ -977,10 +987,20 @@ public class MethodDecompiler extends AbstractDecompiler {
         return false;
     }
 
+    /**
+     * Checks if the node is an if node.
+     * @param node node to check
+     * @return true if the node is an if node
+     */
     private boolean isIfNode(CFNode node) {
         return check(node, Entry, OneLineEntry, OneLineEntryBreak);
     }
 
+    /**
+     * Handles indentation based on node type.
+     * @param node current node
+     * @param except exception content
+     */
     private void indent(CFNode node, MethodContent.ExceptionContent except) {
         if(check(node, LoopEntry, Entry, SynchronizedEntry)) {
             result.changeIndent(INCREMENT);
@@ -992,6 +1012,13 @@ public class MethodDecompiler extends AbstractDecompiler {
         }
     }
 
+    /**
+     * Makes an integer comparison expression.
+     * @param operator comparison operator
+     * @param line current line
+     * @param node current node
+     * @return comparison expression
+     */
     private String makeExprInt(String operator, String line, CFNode node) {
         String value_2 = opStack.pop(true);
         String value_1 = opStack.pop(true);
@@ -1007,6 +1034,13 @@ public class MethodDecompiler extends AbstractDecompiler {
         return "(" + value_1 + operator + value_2 + ")";
     }
 
+    /**
+     * Makes a null comparison expression.
+     * @param operator comparison operator
+     * @param line current line
+     * @param node current node
+     * @return comparison expression
+     */
     private String makeExprNull(String operator, String line, CFNode node) {
         String value = opStack.pop(true);
         if(check(node, LoopEntry)) {
@@ -1016,6 +1050,11 @@ public class MethodDecompiler extends AbstractDecompiler {
         return "(" + value + operator + "null)";
     }
 
+    /**
+     * Calculates a binary operation and pushes the result onto the stack.
+     * @param operator binary operator
+     * @param type result type
+     */
     private void calculate(String operator, String type) {
         String value_1 = opStack.pop(true); // right
         String value_2 = opStack.pop(true); // left
@@ -1029,15 +1068,28 @@ public class MethodDecompiler extends AbstractDecompiler {
         opStack.push(expr, type);
     }
 
+    /**
+     * Loads a local variable onto the operand stack.
+     * @param index local variable index
+     */
     private void load(int index) {
         opStack.push(local.load(index), local.loadType(index));
     }
 
+    /**
+     * Casts the top of the stack to a primitive type.
+     * @param type target primitive type
+     */
     private void castPrimitive(String type) {
         String casted = "((" + type + ")" + opStack.pop(true) + ")";
         opStack.push(casted, type);
     }
 
+    /**
+     * Gets the stored value expression for a local variable.
+     * @param index local variable index
+     * @return stored value expression
+     */
     private String getStored(int index) {
         String stored = opStack.pop();
         String type  = opStack.popType();
@@ -1052,6 +1104,11 @@ public class MethodDecompiler extends AbstractDecompiler {
         return type + " " + value + " = " + stored;
     }
 
+    /**
+     * Gets the method arguments from the operand stack.
+     * @param descriptor method descriptor
+     * @return method arguments string
+     */
     private String getMethodArgs(String descriptor) {
         StringBuilder sb = new StringBuilder("");
         if((descriptor.indexOf("(") + 1) < descriptor.indexOf(")")) {
@@ -1076,6 +1133,13 @@ public class MethodDecompiler extends AbstractDecompiler {
         return sb.toString();
     }
 
+    /**
+     * Gets the terminal node of an if statement.
+     * @param index current index
+     * @param target target node
+     * @param nodes all nodes
+     * @return terminal node
+     */
     private CFNode getIfTerminal(int index, CFNode target, CFNode[] nodes) {
         for(CFEdge edge : target.getChildren()) {
             if(edge.getType() == FalseBranch) {
@@ -1091,6 +1155,12 @@ public class MethodDecompiler extends AbstractDecompiler {
         return null;
     }
 
+    /**
+     * Gets the terminal node of an if-else statement.
+     * @param dominator dominator node
+     * @param before previous node
+     * @return terminal node
+     */
     private CFNode getIfElseTerminal(CFNode dominator, CFNode before) {
         CFNode ifElseTerminal = null;
         if(isIfNode(dominator)) {
@@ -1145,28 +1215,52 @@ public class MethodDecompiler extends AbstractDecompiler {
         throw new IllegalArgumentException("the specified opcode is not in the opcodes.");
     }
 
+    /**
+     * Helper class for building decompiled lines.
+     */
     private class LineBuilder {
         private StringBuilder sb;
         private List<String> list;
 
+        /**
+         * Constructs a LineBuilder.
+         */
         public LineBuilder() {
             this.sb = new StringBuilder();
             this.list = new ArrayList<>();
         }
 
+        /**
+         * Returns the size of dumped lines.
+         * @return size of dumped lines
+         */
         public int dumppedSize() {
             return list.size();
         }
 
+        /**
+         * Returns the dumped lines.
+         * @return dumped lines
+         */
         public String[] getDumpped() {
             return list.toArray(new String[0]);
         }
 
+        /**
+         * Appends a string to the line.
+         * @param s string to append
+         * @return this StringBuilder
+         */
         public StringBuilder append(String s) {
             list.add(s);
             return sb.append(s);
         }
 
+        /**
+         * Appends multiple strings to the line.
+         * @param strs strings to append
+         * @return this StringBuilder
+         */
         public StringBuilder append(String... strs) {
             StringBuilder sb = new StringBuilder();
             for(String s : strs) {
@@ -1176,11 +1270,18 @@ public class MethodDecompiler extends AbstractDecompiler {
             return this.sb.append(sb.toString());
         }
 
+        /**
+         * Deletes all content from the line.
+         */
         public void delete() {
             list.clear();
             sb.delete(0, sb.length());
         }
 
+        /**
+         * Returns the length of the line.
+         * @return length of the line
+         */
         public int length() {
             return sb.length();
         }

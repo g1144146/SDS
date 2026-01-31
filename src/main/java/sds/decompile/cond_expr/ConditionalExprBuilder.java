@@ -22,6 +22,9 @@ public class ConditionalExprBuilder {
 	private List<Expression> exprs;
 	private StringBuilder result;
 
+	/**
+	 * Constructs a ConditionalExprBuilder.
+	 */
 	public ConditionalExprBuilder() {
 		this.exprs = new ArrayList<>();
 		this.result = new StringBuilder();
@@ -103,10 +106,18 @@ public class ConditionalExprBuilder {
 		return result.toString();
 	}
 
+	/**
+	 * Outputs debug information for the specified phase.
+	 * @param len length before the phase
+	 * @param phase phase name
+	 */
 	private void output(int len, String phase) {
 //		if(len != exprs.size()) println("[after " + phase + "]: " + exprs);
 	}
 
+	/**
+	 * Sets the true and false expression branches for each expression.
+	 */
 	private void setExprBranch() {
 		for(int i = 0; i < exprs.size() - 1; i++) {
 			exprs.get(i).trueExpr = exprs.get(i + 1);
@@ -192,10 +203,20 @@ public class ConditionalExprBuilder {
 	 * when child type of expr_c is TRUE, the expressions combine with AND.
 	 * on the other hand, when the type is FALSE, the expressions combine with OR.
 	 */
+	/**
+	 * Combines expressions with OWN child type.
+	 */
 	private void combineExpr() {
 		updateExprs(combineExpr(0, exprs.size(), new HashSet<>()));
 	}
 
+	/**
+	 * Recursively combines expressions from the specified range.
+	 * @param from start index
+	 * @param until end index
+	 * @param removeSet set of expressions to remove
+	 * @return updated set of expressions to remove
+	 */
 	private Set<Expression> combineExpr(int from, int until, Set<Expression> removeSet) {
 		if((exprs.size() < 2) || (from == until)) {
 			return removeSet;
@@ -229,6 +250,11 @@ public class ConditionalExprBuilder {
 		return combineExpr(from + 1, until, removeSet);
 	}
 
+	/**
+	 * Searches for the destination child type of the expression.
+	 * @param expr expression to search
+	 * @return child type of the destination
+	 */
 	private Expression.Child searchDestinationChild(Expression expr) {
 		while(expr.equalsChild(OWN)) {
 			expr = expr.falseExpr;
@@ -298,6 +324,9 @@ public class ConditionalExprBuilder {
 		this.exprs = newList;
 	}
 
+	/**
+	 * Adds logical operators between expressions and builds the result.
+	 */
 	private void addLogicalOperator() {
 		if(exprs.size() < 2) {
 			result.append(exprs.get(0).getExpr());
