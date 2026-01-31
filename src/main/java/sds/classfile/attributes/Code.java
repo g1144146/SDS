@@ -82,6 +82,12 @@ public class Code extends AttributeInfo {
 		readAttributes(data, pool);
 	}
 
+	/**
+	 * Reads opcode sequence from the classfile stream.
+	 * @param data classfile stream
+	 * @param pool constant-pool
+	 * @throws Exception if an error occurs during reading
+	 */
 	private void readOpcode(ClassFileStream data, ConstantPool pool) throws Exception {
 		this.opcodes = new Opcodes();
 		int codeLen = data.readInt();
@@ -97,6 +103,12 @@ public class Code extends AttributeInfo {
 		}
 	}
 
+	/**
+	 * Reads attributes from the classfile stream.
+	 * @param data classfile stream
+	 * @param pool constant-pool
+	 * @throws Exception if an error occurs during reading
+	 */
 	private void readAttributes(ClassFileStream data, ConstantPool pool) throws Exception {
 		this.attr = new Attributes(data.readShort());
 		AttributeInfoFactory factory = new AttributeInfoFactory();
@@ -111,6 +123,14 @@ public class Code extends AttributeInfo {
 		}
 	}
 
+	/**
+	 * Reads attribute content from the classfile stream.
+	 * @param info attribute info to read
+	 * @param data classfile stream
+	 * @param pool constant-pool
+	 * @return attribute info with content
+	 * @throws Exception if an error occurs during reading
+	 */
 	private AttributeInfo readAttributeContent(AttributeInfo info, ClassFileStream data, ConstantPool pool)
 	throws Exception {
 		if(info.getType() == AttributeType.StackMapTable) {
@@ -130,6 +150,12 @@ public class Code extends AttributeInfo {
 		private int handlerPc;
 		private String catchType;
 
+		/**
+		 * Constructs an ExceptionTable from the classfile stream.
+		 * @param data classfile stream
+		 * @param pool constant-pool
+		 * @throws IOException if an error occurs during reading
+		 */
 		ExceptionTable(ClassFileStream data, ConstantPool pool) throws IOException {
 			this.startPc = data.readShort();
 			this.endPc = data.readShort();

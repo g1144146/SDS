@@ -15,6 +15,11 @@ public abstract class MemberContent extends BaseContent {
 	private String name;
 	String desc;
 
+	/**
+	 * Constructs a MemberContent from the specified member info.
+	 * @param info member info
+	 * @param pool constant-pool
+	 */
 	MemberContent(MemberInfo info, ConstantPool pool) {
 		this.accessFlag = info.getAccessFlags();
 		this.desc = info.getDescriptor();

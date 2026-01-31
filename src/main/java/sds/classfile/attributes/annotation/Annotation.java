@@ -13,7 +13,17 @@ public class Annotation {
 	int typeIndex;
 	ElementValuePair[] elementValuePairs;
 	
+	/**
+	 * Default constructor.
+	 */
 	Annotation() {}
+
+	/**
+	 * Constructs an Annotation from the classfile stream.
+	 * @param data classfile stream
+	 * @throws IOException if an error occurs during reading
+	 * @throws ElementValueException if an invalid element value is encountered
+	 */
 	Annotation(ClassFileStream data) throws IOException, ElementValueException {
 		this.typeIndex = data.readShort();
 		this.elementValuePairs = new ElementValuePair[data.readShort()];

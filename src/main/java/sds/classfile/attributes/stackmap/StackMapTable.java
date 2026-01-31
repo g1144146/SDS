@@ -38,6 +38,15 @@ public class StackMapTable extends AttributeInfo {
 	@Override
 	public void read(ClassFileStream data, ConstantPool pool) throws IOException {}
 
+	/**
+	 * Reads stack map table from the classfile stream with opcodes.
+	 * @param data classfile stream
+	 * @param pool constant-pool
+	 * @param opcodes opcode sequence
+	 * @throws IOException if an error occurs during reading
+	 * @throws VerificationTypeException if an invalid verification type is encountered
+	 * @throws StackMapFrameException if an invalid stack map frame is encountered
+	 */
 	public void read(ClassFileStream data, ConstantPool pool, Opcodes opcodes)
 	throws IOException, VerificationTypeException, StackMapFrameException {
 		StackMapFrame[] frames = new StackMapFrame[data.readShort()];

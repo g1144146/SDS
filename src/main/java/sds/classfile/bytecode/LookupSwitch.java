@@ -15,6 +15,10 @@ public class LookupSwitch extends SwitchOpcode {
 	private int[] match;
 	private int[] offset;
 
+	/**
+	 * Constructs a LookupSwitch with the specified program counter.
+	 * @param pc index into the code array
+	 */
 	LookupSwitch(int pc) {
 		super(MnemonicTable.lookupswitch, pc);
 	}

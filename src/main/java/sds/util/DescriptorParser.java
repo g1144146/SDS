@@ -135,6 +135,11 @@ public class DescriptorParser {
 		return classes.toArray(new String[0]);
 	}
 
+	/**
+	 * Parses a primitive type descriptor.
+	 * @param head type descriptor character
+	 * @return parsed type string
+	 */
 	private static String parseType(String head) {
 		switch(head) {
 			case "B": return "byte,";

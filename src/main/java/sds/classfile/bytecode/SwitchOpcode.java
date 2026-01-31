@@ -16,6 +16,11 @@ import sds.classfile.ClassFileStream;
 public abstract class SwitchOpcode extends OpcodeInfo {
 	int defaultByte;
 
+	/**
+	 * Constructs a SwitchOpcode with the specified opcode type and program counter.
+	 * @param opcodeType opcode type
+	 * @param pc index into the code array
+	 */
 	public SwitchOpcode(MnemonicTable opcodeType, int pc) {
 		super(opcodeType, pc);
 	}

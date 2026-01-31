@@ -50,6 +50,12 @@ public abstract class LocalVariable extends AttributeInfo {
 		private String name;
 		private String desc;
 
+		/**
+		 * Constructs an LVTable entry from the classfile stream.
+		 * @param data classfile stream
+		 * @param pool constant-pool
+		 * @throws IOException if an error occurs during reading
+		 */
 		LVTable(ClassFileStream data, ConstantPool pool) throws IOException {
 			this.startPc = data.readShort();
 			this.length = data.readShort();

@@ -9,6 +9,10 @@ package sds.classfile.attributes.annotation;
 public class OffsetTarget extends AbstractTargetInfo {
 	private int offset;
 
+	/**
+	 * Constructs an OffsetTarget with the specified offset.
+	 * @param offset code array offset
+	 */
 	OffsetTarget(int offset) {
 		super(TargetInfoType.OffsetTarget);
 		this.offset = offset;

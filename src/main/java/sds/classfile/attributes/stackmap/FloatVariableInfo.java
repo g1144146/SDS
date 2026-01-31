@@ -6,6 +6,10 @@ package sds.classfile.attributes.stackmap;
  * @author inagaki
  */
 public class FloatVariableInfo extends AbstractVerificationTypeInfo {
+	/**
+	 * Constructs a FloatVariableInfo with the specified tag.
+	 * @param tag verification type tag
+	 */
 	FloatVariableInfo(int tag) {
 		super(tag, VerificationInfoType.FloatVariableInfo);
 	}

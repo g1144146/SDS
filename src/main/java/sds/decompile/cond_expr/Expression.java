@@ -27,18 +27,37 @@ public class Expression {
 	private int[] range;
 	private int[] ownDest;
 
+	/**
+	 * Enum representing the child type of an expression.
+	 */
 	public enum Child {
 		TRUE, FALSE, OWN;
 
+		/**
+		 * Checks if this child type equals the specified child type.
+		 * @param child child type to compare
+		 * @return true if equal
+		 */
 		public boolean is(Child child) {
 			return ordinal() == child.ordinal();
 		}
 
+		/**
+		 * Checks if this child type does not equal the specified child type.
+		 * @param child child type to compare
+		 * @return true if not equal
+		 */
 		public boolean isNot(Child child) {
 			return (! is(child));
 		}
 	}
 
+	/**
+	 * Constructs an Expression with the specified number, expression string, and node.
+	 * @param number expression number
+	 * @param expr expression string
+	 * @param node control flow node
+	 */
 	public Expression(int number, String expr, CFNode node) {
 		this.range = new int[]{ -1, 0 };
 		setRange(number, node);
@@ -46,6 +65,11 @@ public class Expression {
 		setChild(node);
 	}
 
+	/**
+	 * Sets the range of this expression based on the node's opcodes.
+	 * @param number expression number
+	 * @param node control flow node
+	 */
 	private void setRange(int number, CFNode node) {
 		int ifCount = 0;
 		for(OpcodeInfo op : node.getOpcodes().getAll()) {
@@ -68,10 +92,19 @@ public class Expression {
 		}
 	}
 
+	/**
+	 * Checks if the opcode is an if instruction.
+	 * @param opcode opcode to check
+	 * @return true if the opcode is an if instruction
+	 */
 	private boolean isIf(OpcodeInfo opcode) {
 		return (opcode instanceof BranchOpcode) && ((BranchOpcode)opcode).isIf();
 	}
 
+	/**
+	 * Sets the child type of this expression based on the node's edges.
+	 * @param node control flow node
+	 */
 	private void setChild(CFNode node) {
 		for(CFEdge edge : node.getChildren()) {
 			if(edge.getDest().isInPcRange(jumpPoint)) {
@@ -210,6 +243,12 @@ public class Expression {
 		}
 	}
 
+	/**
+	 * Changes the logical operator in the target string.
+	 * @param target target string
+	 * @param separator logical operator separator
+	 * @return string with changed operator
+	 */
 	private String changeOperator(String target, String separator) {
 		StringJoiner sj = new StringJoiner(separator);
 		for(String boolExpr : target.split(separator.replace("|", "\\|"))) {
@@ -224,6 +263,11 @@ public class Expression {
 		return sj.toString();
 	}
 
+	/**
+	 * Changes the comparison operator in the target string.
+	 * @param target target string
+	 * @return string with changed operator
+	 */
 	private String changeOperator(String target) {
 		if(target.contains("=="))   return target.replace("==", "!=");
 		if(target.contains("!="))   return target.replace("!=", "==");

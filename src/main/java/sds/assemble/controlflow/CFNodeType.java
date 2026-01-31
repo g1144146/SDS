@@ -57,6 +57,12 @@ public enum CFNodeType {
 		return type;
 	}
 
+	/**
+	 * Searches for node type from the opcode sequence.
+	 * @param opcodes opcode sequence
+	 * @param end end of opcode
+	 * @return node type
+	 */
 	private static CFNodeType searchTypeFromOpcodes(Opcodes opcodes, OpcodeInfo end) {
 		int switchCount = 0;
 		int ifCount = 0;
@@ -108,12 +114,22 @@ public enum CFNodeType {
 		return Normal;
 	}
 	
+	/**
+	 * Searches for node type from a single opcode.
+	 * @param op opcode to check
+	 * @return node type
+	 */
 	private static CFNodeType searchType(OpcodeInfo op) {
 		if(op instanceof BranchOpcode) return searchBranchType(op);
 		if(isReturn(op))               return End;
 		return Normal;
 	}
 
+	/**
+	 * Searches for node type from a branch opcode.
+	 * @param op branch opcode to check
+	 * @return node type
+	 */
 	private static CFNodeType searchBranchType(OpcodeInfo op) {
 		BranchOpcode branch = (BranchOpcode)op;
 		switch(branch.getOpcodeType()) {
@@ -131,6 +147,11 @@ public enum CFNodeType {
 		return Entry;
 	}
 	
+	/**
+	 * Checks if the opcode is a return instruction.
+	 * @param op opcode to check
+	 * @return true if the opcode is a return instruction
+	 */
 	private static boolean isReturn(OpcodeInfo op) {
 		switch(op.getOpcodeType()) {
 			case _return:

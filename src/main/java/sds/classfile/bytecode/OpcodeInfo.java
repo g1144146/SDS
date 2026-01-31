@@ -13,6 +13,11 @@ public class OpcodeInfo implements Info {
 	private int pc;
 	MnemonicTable opcodeType;
 
+	/**
+	 * Constructs an OpcodeInfo with the specified opcode type and program counter.
+	 * @param opcodeType opcode type
+	 * @param pc index into the code array
+	 */
 	OpcodeInfo(MnemonicTable opcodeType, int pc) {
 		this.opcodeType = opcodeType;
 		this.pc = pc;

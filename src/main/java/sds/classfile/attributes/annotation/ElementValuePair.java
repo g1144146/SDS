@@ -12,6 +12,12 @@ public class ElementValuePair {
 	private int elementNameIndex;
 	private ElementValue value;
 
+	/**
+	 * Constructs an ElementValuePair from the classfile stream.
+	 * @param data classfile stream
+	 * @throws IOException if an error occurs during reading
+	 * @throws ElementValueException if an invalid element value is encountered
+	 */
 	ElementValuePair(ClassFileStream data) throws IOException, ElementValueException {
 		this.elementNameIndex = data.readShort();
 		this.value = new ElementValue(data);

@@ -77,6 +77,9 @@ public class ClassContent extends BaseContent {
 		}
 	}
 
+	/**
+	 * Default constructor.
+	 */
 	public ClassContent() {}
 
 	@Override
@@ -213,6 +216,11 @@ public class ClassContent extends BaseContent {
 	 * for class.
 	 */
 	public class ClassTypeAnnotationContent extends TypeAnnotationContent {
+		/**
+		 * Constructs a ClassTypeAnnotationContent with the specified type annotations.
+		 * @param ta array of type annotation strings
+		 * @param isVisible whether the annotations are runtime visible
+		 */
 		ClassTypeAnnotationContent(String[] ta, boolean isVisible) {
 			super(ta, isVisible);
 		}

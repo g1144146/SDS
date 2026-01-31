@@ -43,6 +43,12 @@ public class BootstrapMethods extends AttributeInfo {
 		private String bsmRef;
 		private String[] bootstrapArgs;
 
+		/**
+		 * Constructs a BSM entry from the classfile stream.
+		 * @param data classfile stream
+		 * @param pool constant-pool
+		 * @throws IOException if an error occurs during reading
+		 */
 		BSM(ClassFileStream data, ConstantPool pool) throws IOException {
 			this.bsmRef = extract(pool.get(data.readShort()-1), pool);
 			this.bootstrapArgs = new String[data.readShort()];

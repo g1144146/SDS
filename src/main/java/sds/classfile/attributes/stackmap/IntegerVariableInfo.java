@@ -6,7 +6,11 @@ package sds.classfile.attributes.stackmap;
  * @author inagaki
  */
 public class IntegerVariableInfo extends AbstractVerificationTypeInfo {
+	/**
+	 * Constructs an IntegerVariableInfo with the specified tag.
+	 * @param tag verification type tag
+	 */
 	IntegerVariableInfo(int tag) {
 		super(tag, VerificationInfoType.IntegerVariableInfo);
-	}	
+	}
 }

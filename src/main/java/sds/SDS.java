@@ -44,6 +44,10 @@ public class SDS {
 		}
 	}
 
+	/**
+	 * Parses a command line argument and adds it to the appropriate list.
+	 * @param arg command line argument to parse
+	 */
 	private void parseArg(String arg) {
 		if(arg.endsWith(".class")) {
 			classFiles.add(arg);
@@ -58,6 +62,9 @@ public class SDS {
 		}
 	}
 
+	/**
+	 * Analyzes class files and performs decompilation.
+	 */
 	private void analyzeClassFile() {
 		boolean output = true;
 		for(String arg : classFiles) {
@@ -71,6 +78,9 @@ public class SDS {
 		}
 	}
 
+	/**
+	 * Analyzes JAR file entries and processes each class file.
+	 */
 	private void analyzeJarFile() {
 		boolean output = true;
 		try {
@@ -89,6 +99,11 @@ public class SDS {
 		} catch(Exception e) {}
 	}
 
+	/**
+	 * Prints class file information for debugging purposes.
+	 * @param cf class file to print
+	 * @param output if true, skip printing
+	 */
 	private void printClassFile(ClassFile cf, boolean output) {
 		if(output) {
 			return;

@@ -12,6 +12,11 @@ import sds.classfile.ClassFileStream;
 public class LocalVarTarget extends AbstractTargetInfo {
 	private LVTTable[] table;
 
+	/**
+	 * Constructs a LocalVarTarget from the classfile stream.
+	 * @param data classfile stream
+	 * @throws IOException if an error occurs during reading
+	 */
 	LocalVarTarget(ClassFileStream data) throws IOException {
 		super(TargetInfoType.LocalVarTarget);
 		this.table = new LVTTable[data.readShort()];
@@ -36,6 +41,11 @@ public class LocalVarTarget extends AbstractTargetInfo {
 		private int length;
 		private int index;
 
+		/**
+		 * Constructs an LVTTable entry from the classfile stream.
+		 * @param data classfile stream
+		 * @throws IOException if an error occurs during reading
+		 */
 		LVTTable(ClassFileStream data) throws IOException {
 			this.startPc = data.readShort();
 			this.length  = data.readShort();

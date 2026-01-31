@@ -11,6 +11,11 @@ public class EnumConstValue {
 	private int typeNameIndex;
 	private int constNameIndex;
 
+	/**
+	 * Constructs an EnumConstValue from the classfile stream.
+	 * @param data classfile stream
+	 * @throws IOException if an error occurs during reading
+	 */
 	EnumConstValue(ClassFileStream data) throws IOException {
 		this.typeNameIndex = data.readShort();
 		this.constNameIndex = data.readShort();

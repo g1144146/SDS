@@ -133,21 +133,39 @@ public abstract class BaseContent {
 		String[] visible;
 		String[] invisible;
 
+		/**
+		 * Constructs an AnnotationContent with the specified annotations.
+		 * @param annotations array of annotation strings
+		 * @param isVisible whether the annotations are runtime visible
+		 */
 		AnnotationContent(String[] annotations, boolean isVisible) {
 			this(isVisible);
 			initAnnotation(annotations, isVisible);
 		}
 
+		/**
+		 * Constructs an AnnotationContent with visibility flag only.
+		 * @param isVisible whether the annotations are runtime visible
+		 */
 		AnnotationContent(boolean isVisible) {
 			hasAnnotation = true;
 			type = isVisible ? VISIBLE : INVISIBLE;
 		}
 
+		/**
+		 * Sets the invisible annotations.
+		 * @param annotations array of invisible annotation strings
+		 */
 		void setInvisible(String[] annotations) {
 			type = type | INVISIBLE;
 			initAnnotation(annotations, false);
 		}
 
+		/**
+		 * Initializes the annotation array based on visibility.
+		 * @param annotations array of annotation strings
+		 * @param isVisible whether the annotations are runtime visible
+		 */
 		void initAnnotation(String[] annotations, boolean isVisible) {
 			this.count = annotations.length;
 			if(isVisible) visible   = annotations;
@@ -198,6 +216,11 @@ public abstract class BaseContent {
 		String[] targets; 
 		String[] invTargets;
 
+		/**
+		 * Constructs a TypeAnnotationContent with the specified type annotations.
+		 * @param ta array of type annotation strings
+		 * @param isVisible whether the annotations are runtime visible
+		 */
 		TypeAnnotationContent(String[] ta, boolean isVisible) {
 			super(ta, isVisible);
 			if(isVisible) {
@@ -210,6 +233,12 @@ public abstract class BaseContent {
 			}
 		}
 
+		/**
+		 * Initializes the target info for the specified annotation index.
+		 * @param target target info of the type annotation
+		 * @param annIndex annotation array index
+		 * @param isVisible whether the annotation is runtime visible
+		 */
 		void initTarget(TargetInfo target, int annIndex, boolean isVisible) {}
 
 		@Override

@@ -10,12 +10,24 @@ import sds.assemble.BaseContent.AnnotationContent;
 public abstract class AbstractDecompiler implements Decompiler {
 	DecompiledResult result;
 
+	/**
+	 * Constructs an AbstractDecompiler with the specified result.
+	 * @param result decompiled result
+	 */
 	AbstractDecompiler(DecompiledResult result) {
 		this.result = result;
 	}
 
+	/**
+	 * Adds declaration of the content to the result.
+	 * @param content content to add declaration
+	 */
 	abstract void addDeclaration(BaseContent content);
 
+	/**
+	 * Adds annotations to the result.
+	 * @param annotation annotation content
+	 */
 	void addAnnotation(AnnotationContent annotation) {
 		if(annotation != null) {
 			// runtime visible annotation

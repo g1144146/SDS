@@ -102,6 +102,11 @@ public class CpRefOpcode extends OpcodeInfo {
 		}
 	}
 
+	/**
+	 * Escapes special characters in the string.
+	 * @param string string to escape
+	 * @return escaped string
+	 */
 	private String escape(String string) {
 		return string.replaceAll("\n", "\\\\n");
 	}

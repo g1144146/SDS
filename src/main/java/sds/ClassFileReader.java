@@ -74,6 +74,10 @@ public class ClassFileReader {
 		}
 	}
 
+	/**
+	 * Reads the constant pool from the class file stream.
+	 * @throws Exception if an error occurs while reading
+	 */
 	private void readConstantPool() throws Exception {
 		int constantPoolCount = stream.readShort() - 1;
 		ConstantPool pool = new ConstantPool(constantPoolCount);
@@ -91,6 +95,10 @@ public class ClassFileReader {
 		cf.pool = pool;
 	}
 
+	/**
+	 * Reads the interfaces from the class file stream.
+	 * @throws IOException if an error occurs while reading
+	 */
 	private void readInterfaces() throws IOException {
 		int interfaceCount = stream.readShort();
 		int[] interfaces = new int[interfaceCount];
@@ -100,6 +108,10 @@ public class ClassFileReader {
 		cf.interfaces = interfaces;
 	}
 
+	/**
+	 * Reads the fields from the class file stream.
+	 * @throws Exception if an error occurs while reading
+	 */
 	private void readFields() throws Exception {
 		int fieldCount = stream.readShort();
 		Fields fields = new Fields(fieldCount);
@@ -114,6 +126,10 @@ public class ClassFileReader {
 		cf.fields = fields;
 	}
 
+	/**
+	 * Reads the methods from the class file stream.
+	 * @throws Exception if an error occurs while reading
+	 */
 	private void readMethods() throws Exception {
 		int methodCount = stream.readShort();
 		Methods methods = new Methods(methodCount);
@@ -128,6 +144,11 @@ public class ClassFileReader {
 		cf.methods = methods;
 	}
 
+	/**
+	 * Reads the attributes from the class file stream.
+	 * @return attributes read from the stream
+	 * @throws Exception if an error occurs while reading
+	 */
 	private Attributes readAttributes() throws Exception {
 		int attrCount = stream.readShort();
 		Attributes attrs = new Attributes(attrCount);

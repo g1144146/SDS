@@ -9,6 +9,10 @@ package sds.classfile.attributes.annotation;
 public class MethodFormalParameterTarget extends AbstractTargetInfo {
 	private int formalParameterIndex;
 
+	/**
+	 * Constructs a MethodFormalParameterTarget with the specified index.
+	 * @param formalParameterIndex index of formal parameter declaration
+	 */
 	MethodFormalParameterTarget(int formalParameterIndex) {
 		super(TargetInfoType.MethodFormalParameterTarget);
 		this.formalParameterIndex = formalParameterIndex;

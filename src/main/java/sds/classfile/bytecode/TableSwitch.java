@@ -13,6 +13,10 @@ import sds.classfile.ClassFileStream;
 public class TableSwitch extends SwitchOpcode {
 	private int[] jumpOffsets;
 
+	/**
+	 * Constructs a TableSwitch with the specified program counter.
+	 * @param pc index into the code array
+	 */
 	TableSwitch(int pc) {
 		super(MnemonicTable.tableswitch, pc);
 	}

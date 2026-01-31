@@ -9,6 +9,10 @@ package sds.classfile.attributes.annotation;
 public class CatchTarget extends AbstractTargetInfo {
 	private int exceptionTableIndex;
 
+	/**
+	 * Constructs a CatchTarget with the specified exception table index.
+	 * @param index index into the exception_table array
+	 */
 	CatchTarget(int index) {
 		super(TargetInfoType.CatchTarget);
 		this.exceptionTableIndex = index;

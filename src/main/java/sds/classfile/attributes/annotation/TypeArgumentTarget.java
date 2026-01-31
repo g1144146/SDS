@@ -10,6 +10,11 @@ public class TypeArgumentTarget extends AbstractTargetInfo {
 	private int offset;
 	private int typeArgumentIndex;
 
+	/**
+	 * Constructs a TypeArgumentTarget with the specified offset and index.
+	 * @param offset code array offset
+	 * @param index type argument index
+	 */
 	TypeArgumentTarget(int offset, int index) {
 		super(TargetInfoType.TypeArgumentTarget);
 		this.offset = offset;

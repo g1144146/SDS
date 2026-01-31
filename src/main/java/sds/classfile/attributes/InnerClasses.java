@@ -47,6 +47,12 @@ public class InnerClasses extends AttributeInfo {
 		private String innerName;
 		private String innerClassAccessFlags;
 
+		/**
+		 * Constructs a Classes entry from the classfile stream.
+		 * @param data classfile stream
+		 * @param pool constant-pool
+		 * @throws IOException if an error occurs during reading
+		 */
 		Classes(ClassFileStream data, ConstantPool pool) throws IOException {
 			int innerClassInfoIndex = data.readShort();
 			int outerClassInfoIndex = data.readShort();
@@ -64,6 +70,12 @@ public class InnerClasses extends AttributeInfo {
 			this.innerClassAccessFlags = get(accessFlags, "nested");
 		}
 
+		/**
+		 * Checks if the index is within valid range.
+		 * @param index index to check
+		 * @param size size of the array
+		 * @return true if index is within valid range
+		 */
 		private boolean checkRange(int index, int size) {
 			return (0 <= index) && (index < size);
 		}

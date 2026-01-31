@@ -21,6 +21,10 @@ import static sds.classfile.constantpool.ConstantType.*;
 abstract class NumberInfo extends ConstantInfo {
 	Number number;
 
+	/**
+	 * Constructs a NumberInfo with the specified tag.
+	 * @param tag constant info tag
+	 */
 	NumberInfo(int tag) {
 		super(tag);
 	}
